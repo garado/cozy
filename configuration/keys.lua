@@ -32,6 +32,10 @@ awful.keyboard.append_global_keybindings({
 
   -----
 
+  awful.key({ mod }, "j", function()
+    awesome.emit_signal("dash::toggle", s)
+  end, { description = "open dash", group = "Apps" }),
+
   -- SYSTEM --  
 	awful.key({}, "XF86MonBrightnessUp", function()
 		awful.spawn("brightnessctl set 5%+ -q", false)
