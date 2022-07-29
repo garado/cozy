@@ -11,32 +11,36 @@ local dpi = xresources.apply_dpi
 
 return function(s)
   -- WIDGETS --
-  s.profile = require("ui.dash.main.profile")(s)
-  s.links = require("ui.dash.main.links")(s)
-  s.pepedoro = require("ui.dash.main.pepedoro")(s)
+  s.profile = require("ui.dash.main.profile")
+  --s.links = require("ui.dash.main.links")
+  s.pepedoro = require("ui.dash.main.pepedoro")
   s.stats = require("ui.dash.main.stats")(s)
+  s.events = require("ui.dash.main.events")
+  s.tasks = require("ui.dash.main.tasks")
   
   widget = {
     {
       {
-        s.links,
-        layout = wibox.layout.flex.vertical,
-      },
-      {
         s.profile,
         s.stats,
-        layout = wibox.layout.flex.vertical,
-      },
-      {
-        layout = wibox.layout.flex.vertical,
-      },
-      {
         s.pepedoro,
-        layout = wibox.layout.flex.vertical,
+        -- forced_width = dpi(300),
+        layout = wibox.layout.fixed.vertical,
       },
-      layout = wibox.layout.flex.horizontal,
+      {
+        s.events,
+        s.tasks,
+        forced_width = dpi(650),
+        layout = wibox.layout.fixed.vertical,
+      },
+      {
+        s.links,
+        forced_width = dpi(100),
+        layout = wibox.layout.fixed.vertical,
+      },
+      layout = wibox.layout.fixed.horizontal,
     },
-    bg = "bf616a",
+    bg = beautiful.background_dark,
     widget = wibox.container.background,
   } -- end widget
   return widget

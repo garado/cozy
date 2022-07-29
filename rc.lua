@@ -29,6 +29,7 @@ require("modules")
 require("ui")
 
 
+require("utils")
 
 -- Garbage collection
 collectgarbage("setpause", 110)

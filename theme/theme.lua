@@ -38,14 +38,17 @@ theme.dark_polar_night = "#20242c"
 theme.med_polar_night = "#373e4d"
 
 -- Other
-theme.transparent = "#000000"
+theme.transparent = "#FF000000"
 
 
 -- █▀▀ █▀█ █▄░█ ▀█▀ █▀
 -- █▀░ █▄█ █░▀█ ░█░ ▄█
 
 theme.font_name = "Roboto Mono "
-theme.font = theme.font_name .. "Medium 10"
+theme.font = theme.font_name .. "Regular "
+theme.header_font_name = "Roboto "
+theme.header_font = theme.header_font_name .. "Medium "
+
 --theme.icon_font = "Nerd Font"
 
 
@@ -88,5 +91,9 @@ theme.hotkeys_font = theme.font_name .. "Medium 12"
 theme.hotkeys_description_font = theme.font_name .. "Regular 10"
 theme.hotkeys_group_margin = dpi(25)
 theme.hotkeys_border_width = dpi(0)
+
+-- Notifications
+theme.notification_spacing = dpi(4)
+theme.notification_bg = theme.xbackground
 
 return theme

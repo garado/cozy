@@ -32,11 +32,20 @@ return function(s)
   local function new_tab(name)
     return wibox.widget({
       {
-        markup = name,
-        widget = wibox.widget.textbox,
+        {
+          markup = name,
+          widget = wibox.widget.textbox,
+        },
+        forced_height = dpi(100),
+        shape = function(cr, width, height)
+          gears.shape.partially_rounded_rect(cr, width, height, true, false, false, true)
+        end,
+        id = name, -- change bg of active/inactive tabs
+        bg = beautiful.background_med,
+        widget = wibox.container.background,
       },
-      bg = beautiful.background_med,
-      widget = wibox.container.background,
+      margins = { top = dpi(5), bottom = dpi(5) },
+      widget = wibox.container.margin,
     })
   end
 
@@ -78,9 +87,9 @@ return function(s)
     screen = s,
     minimum_height = dpi(800),
     maximum_height = dpi(800),
-    minimum_width = dpi(1200),
-    maximum_width = dpi(1200),
-    bg = beautiful.background_dark,
+    minimum_width = dpi(1400),
+    maximum_width = dpi(1400),
+    bg = beautiful.transparent,
     ontop = true,
     visible = false,
     placement = awful.placement.centered,
@@ -95,10 +104,17 @@ return function(s)
         widget = wibox.container.margin,
       }, -- end tabs
       {
-        tab,
-        layout = wibox.layout.fixed.vertical,
+        {
+          tab,
+          widget = wibox.container.margin,
+          margins = dpi(10),
+        },
+        bg = beautiful.background_dark,
+        shape = gears.shape.rounded_rect,
+        widget = wibox.container.background,
       }, -- end content
       layout = wibox.layout.align.horizontal,
+      -- UGH!!!
       -- callback = function()
       --   navigate()
       -- end
