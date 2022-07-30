@@ -8,6 +8,7 @@ local beautiful = require("beautiful")
 require("signal.battery")
 local gears = require("gears")
 local dpi = require("beautiful").xresources.apply_dpi
+local helpers = require("helpers")
 
 return function()
   local happy_color = beautiful.nord14
@@ -53,7 +54,7 @@ return function()
 
   local percentage = wibox.widget({
     id = "percent_text",
-    text = "50%",
+    markup = "50%",
     font = beautiful.font_name .. "Medium 10",
     align = "center",
     valign = "center",
@@ -84,7 +85,7 @@ return function()
   awesome.connect_signal("signal::battery", function(value, state)
     battery_bar.value = value
     last_value = value
-    percentage:set_text(math.floor(value))
+    percentage:set_markup(helpers.ui.colorize_text(math.floor(value), beautiful.xforeground))
     local batbar = battery_bar:get_children_by_id("batbar")[1] 
     batbar.color = happy_color
 

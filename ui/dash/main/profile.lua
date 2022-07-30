@@ -8,14 +8,14 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local gears = require("gears")
-local utils = require("utils")
+local helpers = require("helpers")
 
 local function widget(s)
   local image = wibox.widget({
     {
       {
         {
-          image = "/home/alexis/Pictures/Pepes/pepe_hacker.gif",
+          image = beautiful.pfp,
           resize = true,
           clip_shape = gears.shape.circle,
           halign = "center",
@@ -28,8 +28,8 @@ local function widget(s)
         widget = wibox.container.background,
       },
       strategy = "exact",
-      forced_width = dpi(200),
-      forced_height = dpi(200),
+      forced_width = dpi(100),
+      forced_height = dpi(100),
       widget = wibox.container.constraint,
     },
     { -- whyyyyy tf do we need this
@@ -50,55 +50,69 @@ local function widget(s)
 
   local name = wibox.widget({
     widget = wibox.widget.textbox,
-    markup = utils.ui.colorize_text("Alexis", beautiful.nord10),
-    font = beautiful.font .. "20",
-    --font = beautiful.font_name .. "Bold 18",
-    align = "center",
+    markup = helpers.ui.colorize_text("Alexis G.", beautiful.nord10),
+    font = beautiful.header_font .. "20",
+    align = "left",
     valign = "center",
   })
   
   local host = wibox.widget({
     widget = wibox.widget.textbox,
-    markup = utils.ui.colorize_text("@andromeda", beautiful.xforeground),
+    markup = helpers.ui.colorize_text("@andromeda", beautiful.nord1),
     font = beautiful.font .. "10",
-    --font = beautiful.font_name .. "Bold 10",
-    align = "center",
+    align = "left",
     valign = "center",
   })
   
   local title = wibox.widget({
     widget = wibox.widget.textbox,
-    markup = utils.ui.colorize_text("Resident Mechromancer", beautiful.xforeground),
-    font = beautiful.font .. "15",
-    --font = beautiful.font_name .. "Bold 11",
-    align = "center",
+    font = beautiful.font .. "11",
+    markup = "insert title here",
+    align = "left",
     valign = "center",
   })
+ 
+  -- new title every time you open dash
+  awesome.connect_signal("dash::toggle", function()
+    awful.spawn.easy_async_with_shell(
+      [[
+        $HOME/.config/awesome/utils/dash/main/get_random_title
+      ]],
+      function(stdout)
+        local stdout = helpers.ui.colorize_text(stdout, beautiful.dash_widget_fg)
+        title:set_markup(stdout)
+      end
+    )
+  end)
   
   profile = wibox.widget({
-    image,
     {
+      image,
       {
         {
           {
-            name,
-            host,
-            layout = wibox.layout.align.vertical,
+            {
+              name,
+              host,
+              spacing = dpi(-5),
+              layout = wibox.layout.fixed.vertical,
+            },
+            title,
+            spacing = dpi(5),
+            layout = wibox.layout.fixed.vertical,
           },
-          margins = { bottom = dpi(11) },
-          widget = wibox.container.margin,
+          widget = wibox.container.place,
         },
-        title,
-        layout = wibox.layout.align.vertical,
+        margins = { left = dpi(15) },
+        widget = wibox.container.margin,
       },
-      margins = { top = dpi(5) },
-      widget = wibox.container.margin,
+      layout = wibox.layout.fixed.horizontal,
     },
-    layout = wibox.layout.fixed.vertical,
+    widget = wibox.container.place,
   })
 
   return profile 
 end
 
-return utils.ui.create_boxed_widget(widget(), dpi(300), dpi(330), beautiful.background_med)
+return helpers.ui.create_boxed_widget(widget(), dpi(400), dpi(120), beautiful.dash_bg)
 

@@ -9,6 +9,7 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local keygrabber = require("awful.keygrabber")
+local helpers = require("helpers")
 
 return function(s) 
   -- import tab contents
@@ -33,15 +34,19 @@ return function(s)
     return wibox.widget({
       {
         {
-          markup = name,
-          widget = wibox.widget.textbox,
+          {
+            markup = helpers.ui.colorize_text(name, beautiful.xforeground),
+            widget = wibox.widget.textbox,
+          },
+          widget = wibox.container.place,
         },
         forced_height = dpi(100),
+        forced_width = dpi(30),
         shape = function(cr, width, height)
           gears.shape.partially_rounded_rect(cr, width, height, true, false, false, true)
         end,
         id = name, -- change bg of active/inactive tabs
-        bg = beautiful.background_med,
+        bg = beautiful.dash_tab_bg,
         widget = wibox.container.background,
       },
       margins = { top = dpi(5), bottom = dpi(5) },
@@ -95,12 +100,15 @@ return function(s)
     placement = awful.placement.centered,
     widget = {
       {
-        new_tab("main"), -- idk how to generate these from the tablist
-        new_tab("todo"),
-        new_tab("cal"),
-        new_tab("habit"),
-        new_tab("weather"),
-        layout = wibox.layout.fixed.vertical,
+        {
+          new_tab("M"), -- idk how to generate these from the tablist
+          new_tab("T"),
+          new_tab("C"),
+          new_tab("H"),
+          new_tab("W"),
+          layout = wibox.layout.fixed.vertical,
+        },
+        top = dpi(20),
         widget = wibox.container.margin,
       }, -- end tabs
       {
@@ -109,7 +117,7 @@ return function(s)
           widget = wibox.container.margin,
           margins = dpi(10),
         },
-        bg = beautiful.background_dark,
+        bg = beautiful.dash_bg,
         shape = gears.shape.rounded_rect,
         widget = wibox.container.background,
       }, -- end content

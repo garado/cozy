@@ -13,8 +13,7 @@ function _ui.create_boxed_widget(widget_to_be_boxed, width, height, bg_color)
   box_container.bg = bg_color
 	box_container.forced_height = height
 	box_container.forced_width = width
-  --box_container.shape = gears.shape.rounded_rect
-  box_container.shape = gears.shape.rect
+  box_container.shape = gears.shape.rounded_rect
 
 	local boxed_widget = wibox.widget({
 		--- Add margins
@@ -40,6 +39,19 @@ end
 
 function _ui.colorize_text(text, color)
 	return "<span foreground='" .. color .. "'>" .. text .. "</span>"
+end
+
+function _ui.vertical_pad(height)
+	return wibox.widget({
+		forced_height = height,
+		layout = wibox.layout.fixed.vertical,
+	})
+end
+
+function _ui.rrect(radius)
+	return function(cr, width, height)
+		gshape.rounded_rect(cr, width, height, radius)
+	end
 end
 
 return _ui

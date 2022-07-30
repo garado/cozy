@@ -90,17 +90,17 @@ awful.keyboard.append_global_keybindings({
   -- ROFI --
   -- App launcher
   awful.key({ alt }, "r", function()
-    awful.spawn.with_shell(apps.default.app_launcher)
+    awful.spawn.with_shell(apps.utils.app_launcher)
   end, { description = "app launcher", group = "Rofi" }), 
 
   -- Tmux presets
   awful.key({ alt }, "e", function()
-    awful.spawn.with_shell(apps.default.tmux_presets)
-  end, { description = "tmux presets", group = "Rofi" }), 
+    awful.spawn.with_shell(apps.utils.tmux_pane_presets)
+  end, { description = "tmux pane presets", group = "Rofi" }), 
 
   -- Bluetooth
   awful.key({ alt }, "b", function()
-    awful.spawn.with_shell(apps.default.bluetooth)
+    awful.spawn.with_shell(apps.utils.bluetooth)
   end, { description = "bluetooth", group = "Rofi" }), 
   
 })

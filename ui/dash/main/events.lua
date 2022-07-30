@@ -7,7 +7,7 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local utils = require("utils")
+local helpers = require("helpers")
 
 local function widget()
   local events = wibox.widget({
@@ -23,7 +23,7 @@ local function widget()
       cat $HOME/.cache/awesome/calendar/agenda
     ]],
     function(stdout)
-      local stdout = utils.ui.colorize_text(stdout, beautiful.xforeground)
+      local stdout = helpers.ui.colorize_text(stdout, beautiful.dash_widget_fg)
       events:get_children()[1]:set_markup(stdout)
     end
   )
@@ -31,7 +31,7 @@ local function widget()
   local contents = wibox.widget({
     { -- header
       {
-        markup = utils.ui.colorize_text("Events", beautiful.nord9),
+        markup = helpers.ui.colorize_text("Events", beautiful.dash_header_color),
         --font = beautiful.font .. "20",
         font = beautiful.header_font .. "20",
         widget = wibox.widget.textbox,
@@ -54,5 +54,5 @@ local function widget()
   return widget
 end
 
-return utils.ui.create_boxed_widget(widget(), dpi(320), dpi(210), beautiful.background_med)
+return helpers.ui.create_boxed_widget(widget(), dpi(220), dpi(210), beautiful.dash_widget_bg)
 

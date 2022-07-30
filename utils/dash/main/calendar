@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# Collect data
+cache_dir="$HOME/.cache/awesome/calendar"
+cache_cal_agenda=${cache_dir}/agenda
+
+# Make cache dir
+if [[ ! -d "$cache_dir" ]]; then
+  mkdir -p ${cache_dir}
+fi
+touch $cache_cal_agenda
+
+get_agenda() {
+  # Get next 2 weeks of events
+  agenda_start="$(date +%D)"
+  agenda_end="$(date +%D --date="2 weeks")"
+  agenda=`gcalcli --nocolor --calendar Master agenda $agenda_start $agenda_end --nostarted `
+  
+  # Put into an array, delimit on newlines
+  local -a events
+  echo $agenda
+  set -o noglob
+  IFS=$'\n' events=($agenda)
+  set +o noglob
+  
+  # Clear cached agenda
+  echo "" > $cache_cal_agenda
+
+  # Formatting
+  max_event=10;
+  count=0;
+  for event in ${events[@]}; do
+    # Formatting
+    event=`echo $event | sed '/^$/d'`
+    event=`echo $event | sed 's/m      /m/'`
+    
+    # Truncate if event description is too long
+    len=$(echo ${#event})
+    if (( $len > 44 )); then
+      event=${event:0:44}
+      event+='...' 
+    fi 
+   
+    # Print to file
+    printf "%s\n" "$event" >> $cache_cal_agenda
+
+    # Only show MAX_EVENT number of events
+    count=$(($count+1))
+    if [[ $count -ge $max_event ]]; then
+      break; 
+    fi
+  done
+
+  # Idk why but theres always a blank line at the
+  # beginning, this removes it
+  sed -i '1d' $cache_cal_agenda 
+}
+
+# Execute
+if [[ "$1" == "--getagenda" ]]; then
+  get_agenda
+elif [[ "$1" == "--printagenda" ]]; then
+  cat $cache_cal_agenda
+fi

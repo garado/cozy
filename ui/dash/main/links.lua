@@ -8,7 +8,7 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local gears = require("gears")
-local utils = require("utils")
+local helpers = require("helpers")
 
 local function widget(s)
 

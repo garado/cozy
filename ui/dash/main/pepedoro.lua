@@ -1,6 +1,6 @@
 
--- █▀█ █▀▀ █▀█ █▀▀ █▀▄ █▀█ █▀█ █▀█
--- █▀▀ ██▄ █▀▀ ██▄ █▄▀ █▄█ █▀▄ █▄█
+-- █▀█ █▀█ █▀▄▀█ █▀█ █▀▄ █▀█ █▀█ █▀█
+-- █▀▀ █▄█ █░▀░█ █▄█ █▄▀ █▄█ █▀▄ █▄█
 
 local awful = require("awful")
 local wibox = require("wibox")
@@ -8,22 +8,31 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local gears = require("gears")
-local utils = require("utils")
+local helpers = require("helpers")
 
-local _awmodoro = { 
+
+-- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄   █▀ ▀█▀ █░█ █▀▀ █▀▀
+-- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀   ▄█ ░█░ █▄█ █▀░ █▀░
+
+local pomodoro = { 
   current_state = "select_topic",
   states = {
     "select_topic", "select_time", "tick", "complete" 
-  }
+  },
+  topic = nil,
+  time = nil,
 }
 
-function _awmodoro.select_topic(topic_selected)
+function pomodoro.prompt()
 end
 
-function _awmodoro.select_time(time_selected)
+function pomodoro.select_topic(topic_selected)
 end
 
-function _awmodoro.timer_tick(time)
+function pomodoro.select_time(time_selected)
+end
+
+function pomodoro.timer_tick(time)
   -- Ticks every 1 second
   -- Updates progress bar ui
   local second_timer = gears.timer {
@@ -44,29 +53,28 @@ function _awmodoro.timer_tick(time)
       self.complete()
     end,
   }
-
 end
 
-function _awmodoro.start()
+function pomodoro.start()
 end
 
-function _awmodoro.stop()
+function pomodoro.stop()
 end
 
-function _awmodoro.complete()
+function pomodoro.complete()
 end
 
------
 
-local function widget()
-  -----------------
-  -- UI ELEMENTS --
-  -----------------
-  -- STATE 1: Topic selection 
+-- █▀▀ █▀█ █▀█ █▄░█ ▀█▀ █▀▀ █▄░█ █▀▄   █▀ ▀█▀ █░█ █▀▀ █▀▀
+-- █▀░ █▀▄ █▄█ █░▀█ ░█░ ██▄ █░▀█ █▄▀   ▄█ ░█░ █▄█ █▀░ █▀░
+
+-- STATE 1: Topic selection 
+local function state1()
   local header = wibox.widget({
     {
       widget = wibox.widget.textbox,
-      markup = "Get to work!",
+      markup = helpers.ui.colorize_text("Get to work!", beautiful.xforeground),
+      font = beautiful.header_font_name .. "Light 20",
       align = "center",
       valign = "center",
     },
@@ -74,84 +82,81 @@ local function widget()
     widget = wibox.container.margin, 
   })
 
-  -- STATE 2: Time selection
+  local prompt = wibox.widget({
+    widget = wibox.widget.textbox,
+  })
+  
+  local widget = wibox.widget({
+    header,
+    prompt,
+    layout = wibox.layout.flex.vertical,
+  })
 
+  return widget
+end
 
+local function state2()
+  local widget = wibox.widget({
+    --header,
+    layout = wibox.layout.fixed.vertical,
+  })
 
-  -- STATE 3: Timer
+  return state2
+end
+  
+-- STATE 3: Timer
+local function state3()
   local timer = wibox.widget({
     {
       {
-        {
-          widget = wibox.widget.textbox,
-          text = "23:59",
-          font = beautiful.font_name .. "Medium 25",
-          align = "center",
-          valign = "center",
-        },
-        { -- replace with button
-          text = 'pause',
-          widget = wibox.widget.textbox,
-          align = "center",
-          valign = "center",
-        }, 
-        spacing = dpi(-120),
-        layout = wibox.layout.flex.vertical,
+        widget = wibox.widget.textbox,
+        markup = helpers.ui.colorize_text("23:59", beautiful.xforeground),
+        font = beautiful.font .. "25",
+        align = "center",
+        valign = "center",
       },
       value = 0.5,
       max_value = 1,
       min_value = 0,
       color = beautiful.nord6, -- fg
       border_color = beautiful.nord10, -- bg
-      forced_height = dpi(300),
+      forced_height = dpi(200),
+      forced_width = dpi(200),
       widget = wibox.container.radialprogressbar,
     },
-    margins = dpi(30),
-    widget = wibox.container.margin,
-  })
- 
-  -- STATE 4: Finish
-
-
-
-
-
-  --------------
-  -- ASSEMBLE --
-  --------------
-  local state1 = wibox.widget({
-    header,
-    layout = wibox.layout.fixed.vertical,
-  })
-
-  local state2 = wibox.widget({
-    header,
-    layout = wibox.layout.fixed.vertical,
-  })
-
-  local state3 = wibox.widget({
-      timer,
-      layout = wibox.layout.fixed.vertical,
-  })
-
-  local state4 = wibox.widget({
-      timer,
-      layout = wibox.layout.fixed.vertical,
+    widget = wibox.container.place,
   })
   
-  local pepedoro = state1
-  --local pepedoro = state
-  --if current_state == "select_topic" then
-  --  pepedoro = state1
-  --elseif current_state == "select_time" then
-  --  pepedoro = state2
-  --elseif current_state == "tick" then
-  --  pepedoro = state3
-  --elseif current_state == "finished" then
-  --  pepedoro = state4
-  --end
+  local widget = wibox.widget({
+      timer,
+      layout = wibox.layout.fixed.vertical,
+  })
 
-  return pepedoro 
+  return widget
 end
 
-return utils.ui.create_boxed_widget(widget(), dpi(300), dpi(300), beautiful.background_med)
+local function state4()
+  local widget = wibox.widget({
+      --timer,
+      layout = wibox.layout.fixed.vertical,
+  })
+
+  return widget
+end
+
+local function widget()
+  local current_state = pomodoro.current_state
+  local pomo = nil
+  if current_state == "select_topic" then
+    pomo = state1()
+  elseif current_state == "select_time" then
+    pomo = state2()
+  elseif current_state == "tick" then
+    pomo = state3()
+  elseif current_state == "finished" then
+    pomo = state4()
+  end
+  return pomo 
+end
+
+return helpers.ui.create_boxed_widget(widget(), dpi(300), dpi(300), beautiful.dash_widget_bg)

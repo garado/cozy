@@ -81,9 +81,17 @@ return function(s)
 						self.indicator_animation:set(dpi(10))
           end
 
-          on_release = function()
-          end
+          -- Tag preview
+          self:connect_signal("mouse::enter", function()
+						if #c3:clients() > 0 then
+							awesome.emit_signal("bling::tag_preview::update", c3)
+							awesome.emit_signal("bling::tag_preview::visibility", s, true)
+						end
+					end)
 
+					self:connect_signal("mouse::leave", function()
+						awesome.emit_signal("bling::tag_preview::visibility", s, false)
+					end)
 				end,
 				update_callback = function(self, c3, _)
 					if c3.selected then

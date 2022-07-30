@@ -14,7 +14,7 @@ return function(s)
   s.profile = require("ui.dash.main.profile")
   --s.links = require("ui.dash.main.links")
   s.pepedoro = require("ui.dash.main.pepedoro")
-  s.stats = require("ui.dash.main.stats")(s)
+  s.stats = require("ui.dash.main.stats")
   s.events = require("ui.dash.main.events")
   s.tasks = require("ui.dash.main.tasks")
   
@@ -22,7 +22,6 @@ return function(s)
     {
       {
         s.profile,
-        s.stats,
         s.pepedoro,
         -- forced_width = dpi(300),
         layout = wibox.layout.fixed.vertical,
@@ -30,17 +29,18 @@ return function(s)
       {
         s.events,
         s.tasks,
-        forced_width = dpi(650),
+        forced_width = dpi(600),
         layout = wibox.layout.fixed.vertical,
       },
       {
-        s.links,
-        forced_width = dpi(100),
+        s.stats,
+        --s.links,
+        forced_width = dpi(300),
         layout = wibox.layout.fixed.vertical,
       },
       layout = wibox.layout.fixed.horizontal,
     },
-    bg = beautiful.background_dark,
+    bg = beautiful.dash_bg,
     widget = wibox.container.background,
   } -- end widget
   return widget

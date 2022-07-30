@@ -35,10 +35,19 @@ theme.nord15 = "#b48ead"
 
 -- Custom Nord colors
 theme.dark_polar_night = "#20242c"
+theme.med2_polar_night = "#272c36"
 theme.med_polar_night = "#373e4d"
 
 -- Other
 theme.transparent = "#FF000000"
+
+-- RPG Colors
+theme.color1 = "#bda997"
+theme.color2 = "#d4c2b6"
+theme.color3 = "#fbf2eb"
+theme.color4 = "#4d3f38"
+theme.color5 = "#aa8c7a"
+theme.color6 = "#c4ad9c"
 
 
 -- █▀▀ █▀█ █▄░█ ▀█▀ █▀
@@ -46,8 +55,6 @@ theme.transparent = "#FF000000"
 
 theme.font_name = "Roboto Mono "
 theme.font = theme.font_name .. "Regular "
-theme.header_font_name = "Roboto "
-theme.header_font = theme.header_font_name .. "Medium "
 
 --theme.icon_font = "Nerd Font"
 
@@ -69,18 +76,24 @@ theme.xforeground = theme.nord6
 
 -- Wibar
 theme.wibar_bg = theme.dark_polar_night
-theme.wibar_focused = theme.nord7
+theme.wibar_focused = theme.nord9
 theme.wibar_occupied = theme.nord6
 theme.wibar_empty = theme.med_polar_night
 
 -- █░█ █   █▀▀ █░░ █▀▀ █▀▄▀█ █▀▀ █▄░█ ▀█▀ █▀
 -- █▄█ █   ██▄ █▄▄ ██▄ █░▀░█ ██▄ █░▀█ ░█░ ▄█
 
+-- Pictures
+theme.pfp = gears.surface.load_uncached(gfs.get_configuration_dir() .. "theme/assets/pfp.png")
+
 -- Wallpapers
 theme.wallpaper = gears.surface.load_uncached(gfs.get_configuration_dir() .. "theme/assets/wall.png")
 
 -- Gaps
 theme.useless_gap = dpi(7)
+
+-- Corner radius
+theme.border_radius = 10
 
 -- Hotkeys
 theme.hotkeys_bg = theme.dark_polar_night
@@ -95,5 +108,27 @@ theme.hotkeys_border_width = dpi(0)
 -- Notifications
 theme.notification_spacing = dpi(4)
 theme.notification_bg = theme.xbackground
+theme.notification_height = dpi(10)
+
+-- Dash
+theme.header_font_name = "Roboto "
+theme.header_font = theme.header_font_name .. "Medium "
+theme.dash_bg = theme.dark_polar_night
+theme.dash_widget_bg = theme.med2_polar_night
+theme.dash_widget_fg = theme.nord6
+theme.dash_header_color = theme.nord10
+theme.dash_tab_bg = theme.med2_polar_night
+
+-- Tag preview
+theme.tag_preview_widget_margin = dpi(10)
+theme.tag_preview_widget_border_radius = theme.border_radius
+theme.tag_preview_client_border_radius = theme.border_radius / 2
+theme.tag_preview_client_opacity = 1
+theme.tag_preview_client_bg = theme.wibar_bg
+theme.tag_preview_client_border_color = theme.wibar_bg
+theme.tag_preview_client_border_width = 0
+theme.tag_preview_widget_bg = theme.wibar_bg
+theme.tag_preview_widget_border_color = theme.wibar_bg
+theme.tag_preview_widget_border_width = 0
 
 return theme
