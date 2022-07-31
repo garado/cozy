@@ -36,7 +36,7 @@ return function()
     {
       markup = helpers.ui.colorize_text("滛", beautiful.nord9),
       widget = wibox.widget.textbox,
-      font = beautiful.font .. "13",
+      font = beautiful.font .. "15",
       align = "center",
       valign = "center",
     },
@@ -104,9 +104,9 @@ return function()
   brightness_slider:connect_signal("property::value", function()
     local brightness = brightness_slider:get_value()
   	awful.spawn("brightnessctl set " .. brightness .. "%", false)
-    -- ???
-    -- Update volume osd
-  	-- awesome.emit_signal("module::volume_osd", volume_level)
+    
+    -- Update brightness osd
+  	awesome.connect_signal("module::brightness_osd", brightness)
   end)
   
   -- WIP: update slider value based on volume

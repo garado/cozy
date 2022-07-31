@@ -10,6 +10,8 @@ local wibox = require("wibox")
 local helpers = require("helpers")
 local naughty = require("naughty")
 local animation = require("modules.animation")
+local tonumber = tonumber
+local string = string
 
 return function()
   local slider = wibox.widget({
@@ -96,21 +98,64 @@ return function()
     bar_animation:set(0)
   end)
 
-  widget:connect_signal("mouse::release", function()
-
+  -- not working?
+  -- local vol_icon = icon.children[1]
+  widget:connect_signal("mouse::press", function()
+    awful.spawn("pamixer --toggle-mute", false)
+    naughty.notification { title = "ajsdfasdf" }
   end)
   
   -- Update volume based on slider value 
   volume_slider:connect_signal("property::value", function()
     local volume_level = volume_slider:get_value()
     awful.spawn("pamixer --set-volume " .. volume_level, false)
-   
-    -- ???
-    -- Update volume osd
-  	-- awesome.emit_signal("module::volume_osd", volume_level)
+  end)
+
+  vol_icon = icon.children[1]
+  awesome.connect_signal("widget::volume", function()
+    awful.spawn.easy_async_with_shell("pamixer --get-volume",
+      function(stdout)
+        local vol_level = string.gsub(stdout, '%W','')
+        vol_level = tonumber(vol_level)
+        if vol_level < 6 then
+          vol_icon:set_markup(helpers.ui.colorize_text("婢", beautiful.nord15))
+        elseif vol_level < 33 then
+          vol_icon:set_markup(helpers.ui.colorize_text("奄", beautiful.nord15))
+        elseif vol_level < 66 then
+          vol_icon:set_markup(helpers.ui.colorize_text("奔", beautiful.nord15))
+        else
+          vol_icon:set_markup(helpers.ui.colorize_text("墳", beautiful.nord15))
+        end
+      end
+    )
+  end)
+ 
+  -- barely works
+  awesome.connect_signal("widget::volume_mute", function()
+    local mute_status = awful.spawn.easy_async_with_shell("pamixer --get-mute",
+      function(stdout)
+        local mute_status = string.gsub(stdout, '%W','')
+        if mute_status == "true" then
+          vol_icon:set_markup(helpers.ui.colorize_text("婢", beautiful.nord15))
+        else
+          awful.spawn.easy_async_with_shell("pamixer --get-volume",
+            function(stdout)
+              local vol_level = string.gsub(stdout, '%W','')
+              vol_level = tonumber(vol_level)
+              if vol_level < 6 then
+                vol_icon:set_markup(helpers.ui.colorize_text("婢", beautiful.nord15))
+              elseif vol_level < 33 then
+                vol_icon:set_markup(helpers.ui.colorize_text("奄", beautiful.nord15))
+              elseif vol_level < 66 then
+                vol_icon:set_markup(helpers.ui.colorize_text("奔", beautiful.nord15))
+              else
+                vol_icon:set_markup(helpers.ui.colorize_text("墳", beautiful.nord15))
+              end
+            end
+          )
+        end
+      end)
   end)
   
-  -- WIP: update slider value based on volume
-
   return widget
 end

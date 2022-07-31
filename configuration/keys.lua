@@ -39,30 +39,32 @@ awful.keyboard.append_global_keybindings({
   -- SYSTEM --  
 	awful.key({}, "XF86MonBrightnessUp", function()
 		awful.spawn("brightnessctl set 5%+ -q", false)
-		--awesome.emit_signal("widget::brightness")
-		--awesome.emit_signal("module::brightness_osd:show", true)
+		awesome.emit_signal("widget::brightness")
+		awesome.emit_signal("module::brightness_osd:show", true)
 	end, { description = "increase brightness", group = "Hotkeys" }),
 	awful.key({}, "XF86MonBrightnessDown", function()
 		awful.spawn("brightnessctl set 5%- -q", false)
-		--awesome.emit_signal("widget::brightness")
-		--awesome.emit_signal("module::brightness_osd:show", true)
+		awesome.emit_signal("widget::brightness")
+		awesome.emit_signal("module::brightness_osd:show", true)
 	end, { description = "decrease brightness", group = "Hotkeys" }),
 
 	--- Audio control
 	awful.key({}, "XF86AudioRaiseVolume", function()
-		awful.spawn("pamixer -i 5", false)
-		--awesome.emit_signal("widget::volume")
-		--awesome.emit_signal("module::volume_osd:show", true)
+		awful.spawn("pamixer -u ; pamixer -i 5", false)
+		awesome.emit_signal("widget::volume")
+		awesome.emit_signal("module::volume_osd:show", true)
 	end, { description = "increase volume", group = "Hotkeys" }),
 
 	awful.key({}, "XF86AudioLowerVolume", function()
-		awful.spawn("pamixer -d 5", false)
-		--awesome.emit_signal("widget::volume")
-		--awesome.emit_signal("module::volume_osd:show", true)
+		awful.spawn("pamixer -u ; pamixer -d 5", false)
+		awesome.emit_signal("widget::volume")
+		awesome.emit_signal("module::volume_osd:show", true)
 	end, { description = "decrease volume", group = "Hotkeys" }),
   
 	awful.key({}, "XF86AudioMute", function()
 		awful.spawn("pamixer -t", false)
+    awesome.emit_signal("widget::volume_mute")
+    awesome.emit_signal("module::volume_osd:show")
 	end, { description = "mute volume", group = "Hotkeys" }),
   
   awful.key({mod}, "XF86AudioLowerVolume", function()
