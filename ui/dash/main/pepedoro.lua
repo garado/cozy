@@ -2,6 +2,8 @@
 -- █▀█ █▀█ █▀▄▀█ █▀█ █▀▄ █▀█ █▀█ █▀█
 -- █▀▀ █▄█ █░▀░█ █▄█ █▄▀ █▄█ █▀▄ █▄█
 
+-- I have no idea wtf I'm doing
+
 local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
@@ -9,30 +11,27 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local gears = require("gears")
 local helpers = require("helpers")
-
+local widgets = require("ui.widgets")
 
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄   █▀ ▀█▀ █░█ █▀▀ █▀▀
 -- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀   ▄█ ░█░ █▄█ █▀░ █▀░
 
 local pomodoro = { 
-  current_state = "select_topic",
-  states = {
-    "select_topic", "select_time", "tick", "complete" 
-  },
+  current_state = "start",
   topic = nil,
   time = nil,
+  states = {
+    "start", "select_topic", "select_time", "tick", "complete" 
+  },
+  topics = {
+    "School", "Coding", "Hobby", "Personal",
+  },
+  times = {
+    "5m", "15m", "25m", "60m",
+  },
 }
 
-function pomodoro.prompt()
-end
-
-function pomodoro.select_topic(topic_selected)
-end
-
-function pomodoro.select_time(time_selected)
-end
-
-function pomodoro.timer_tick(time)
+function pomodoro:timer_tick(time)
   -- Ticks every 1 second
   -- Updates progress bar ui
   local second_timer = gears.timer {
@@ -50,26 +49,34 @@ function pomodoro.timer_tick(time)
     autostart = false,
     callback = function()
       second_timer:stop()
-      self.complete()
+      self:complete()
     end,
   }
 end
 
-function pomodoro.start()
-end
-
-function pomodoro.stop()
-end
-
-function pomodoro.complete()
-end
-
-
 -- █▀▀ █▀█ █▀█ █▄░█ ▀█▀ █▀▀ █▄░█ █▀▄   █▀ ▀█▀ █░█ █▀▀ █▀▀
 -- █▀░ █▀▄ █▄█ █░▀█ ░█░ ██▄ █░▀█ █▄▀   ▄█ ░█░ █▄█ █▀░ █▀░
 
--- STATE 1: Topic selection 
-local function state1()
+function button(text)
+	return wibox.widget({
+    widgets.button.text.state({
+	  	forced_width = dpi(100),
+	  	forced_height = dpi(40),
+	  	normal_bg = beautiful.nord1,
+	  	normal_shape = gears.shape.rounded_rect,
+	  	on_normal_bg = beautiful.nord3,
+	  	text_normal_bg = beautiful.nord10,
+	  	text_on_normal_bg = beautiful.nord4,
+      font = beautiful.header_font_name .. "Light",
+	  	size = 10,
+	  	text = text,
+	  }),
+    widget = wibox.container.place,
+  })
+end
+
+-- STATE 0: Start
+function pomodoro:state0_start()
   local header = wibox.widget({
     {
       widget = wibox.widget.textbox,
@@ -81,31 +88,71 @@ local function state1()
     margins = dpi(3),
     widget = wibox.container.margin, 
   })
+  
+  local function button_cmd()
+    self.state = "select_topic"
+  end
 
-  local prompt = wibox.widget({
-    widget = wibox.widget.textbox,
-  })
+  local letsdoit = button("Let's do it!")
+  letsdoit:buttons(gears.table.join(awful.button({}, 1, nil, function()
+  	button_cmd()
+  end)))
   
   local widget = wibox.widget({
     header,
-    prompt,
+    letsdoit,
+    spacing = dpi(-160),
     layout = wibox.layout.flex.vertical,
   })
 
   return widget
 end
 
-local function state2()
+-- STATE 1: Topic selection 
+function pomodoro:state1_select_topic()
+  local header = wibox.widget({
+    {
+      widget = wibox.widget.textbox,
+      markup = helpers.ui.colorize_text("topic select!", beautiful.xforeground),
+      font = beautiful.header_font_name .. "Light 20",
+      align = "center",
+      valign = "center",
+    },
+    margins = dpi(3),
+    widget = wibox.container.margin, 
+  })
+
   local widget = wibox.widget({
-    --header,
+    header,
     layout = wibox.layout.fixed.vertical,
   })
 
-  return state2
+  return widget
+end
+
+function pomodoro:state2_select_time()
+  local header = wibox.widget({
+    {
+      widget = wibox.widget.textbox,
+      markup = helpers.ui.colorize_text("time select!", beautiful.xforeground),
+      font = beautiful.header_font_name .. "Light 20",
+      align = "center",
+      valign = "center",
+    },
+    margins = dpi(3),
+    widget = wibox.container.margin, 
+  })
+
+  local widget = wibox.widget({
+    header,
+    layout = wibox.layout.fixed.vertical,
+  })
+
+  return widget
 end
   
 -- STATE 3: Timer
-local function state3()
+function pomodoro:state3_tick()
   local timer = wibox.widget({
     {
       {
@@ -128,35 +175,52 @@ local function state3()
   })
   
   local widget = wibox.widget({
-      timer,
-      layout = wibox.layout.fixed.vertical,
+    timer,
+    layout = wibox.layout.fixed.vertical,
   })
 
   return widget
 end
 
-local function state4()
+-- STATE 4: Complete
+function pomodoro:state4_complete()
+  local header = wibox.widget({
+    {
+      widget = wibox.widget.textbox,
+      markup = helpers.ui.colorize_text("complete!", beautiful.xforeground),
+      font = beautiful.header_font_name .. "Light 20",
+      align = "center",
+      valign = "center",
+    },
+    margins = dpi(3),
+    widget = wibox.container.margin, 
+  })
+
   local widget = wibox.widget({
-      --timer,
-      layout = wibox.layout.fixed.vertical,
+    header,
+    layout = wibox.layout.fixed.vertical,
   })
 
   return widget
 end
 
-local function widget()
+function pomodoro:widget()
   local current_state = pomodoro.current_state
   local pomo = nil
-  if current_state == "select_topic" then
-    pomo = state1()
+  if current_state == "start" then
+    pomo = self:state0_start()
+  elseif current_state == "select_topic" then
+    pomo = self:state1_select_topic()
   elseif current_state == "select_time" then
-    pomo = state2()
+    pomo = self:state2_select_time()
   elseif current_state == "tick" then
-    pomo = state3()
-  elseif current_state == "finished" then
-    pomo = state4()
+    pomo = self:state3_tick()
+  elseif current_state == "complete" then
+    pomo = self:state4_complete()
   end
   return pomo 
 end
 
-return helpers.ui.create_boxed_widget(widget(), dpi(300), dpi(300), beautiful.dash_widget_bg)
+
+return helpers.ui.create_boxed_widget(pomodoro:widget(), dpi(300), dpi(300), beautiful.dash_widget_bg)
+

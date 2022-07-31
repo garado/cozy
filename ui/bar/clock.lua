@@ -17,13 +17,16 @@ return function(s)
     widget = wibox.widget.textclock,
   })
 
-  local clock_color = wibox.widget.background()
+  local clock_color = wibox.container.background()
   clock_color:set_widget(clock)
   clock_color:set_fg(beautiful.xforeground)
-
+  
   return wibox.widget ({
     clock_color,
-    margins = dpi(6),
+    margins = 
+    {
+      bottom = dpi(6),
+    },
     widget = wibox.container.margin,
   })
 end

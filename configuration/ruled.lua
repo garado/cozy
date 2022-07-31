@@ -45,7 +45,7 @@ ruled.client.connect_signal("request::rules", function()
     },
     properties = { 
       floating = true,
-      placement = awful.placement.centered,
+      placement = helpers.client.centered_client_placement,
     },
   })
 end)

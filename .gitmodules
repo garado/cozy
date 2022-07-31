@@ -1,3 +1,6 @@
 [submodule "modules/bling"]
 	path = modules/bling
 	url = https://github.com/BlingCorp/bling
+[submodule "modules/color"]
+	path = modules/color
+	url = https://github.com/andOrlando/color.git

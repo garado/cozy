@@ -72,13 +72,13 @@ return function()
   })
 
   local widget = wibox.widget({
-    layout = wibox.layout.fixed.vertical,
-    spacing = dpi(5),
-    {
-      battery,
-      widget = wibox.container.margin,
-    },
+    --spacing = dpi(5),
+    --{
+    --  battery,
+    --  widget = wibox.container.margin,
+    --},
     percentage,
+    layout = wibox.layout.fixed.vertical,
   })
 
   local last_value = 100

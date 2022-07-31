@@ -30,21 +30,21 @@ local function get_oldest_notification()
   return naughty.active[1]
 end
 
----- Handle notification icon
---naughty.connect_signal("request::icon", function(n, context, hints)
---  --- Handle other contexts here
---	if context ~= "app_icon" then
---		return
---	end
---
---	--- Use XDG icon
---	--local path = menubar.helpers.lookup_icon(hints.app_icon) or menubar.helpers.lookup_icon(hints.app_icon:lower())
---
---  local path = ""
---	if path then
---		n.icon = path
---	end
---end)
+-- Handle notification icon
+naughty.connect_signal("request::icon", function(n, context, hints)
+  --- Handle other contexts here
+	if context ~= "app_icon" then
+		return
+	end
+
+	--- Use XDG icon
+	--local path = menubar.helpers.lookup_icon(hints.app_icon) or menubar.helpers.lookup_icon(hints.app_icon:lower())
+
+  local path = ""
+	if path then
+		n.icon = path
+	end
+end)
 
 naughty.connect_signal("request::display", function(n)
   local message = wibox.widget({

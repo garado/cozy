@@ -1,5 +1,5 @@
 return {
-	--button = require(... .. ".button"),
+	button = require(... .. ".button"),
 	container = require(... .. ".container"),
 --	menu = require(... .. ".menu"),
 --	playerctl = require(... .. ".playerctl"),

@@ -53,7 +53,7 @@ theme.color6 = "#c4ad9c"
 -- █▀▀ █▀█ █▄░█ ▀█▀ █▀
 -- █▀░ █▄█ █░▀█ ░█░ ▄█
 
-theme.font_name = "Roboto Mono "
+theme.font_name = "RobotoMono Nerd Font "
 theme.font = theme.font_name .. "Regular "
 
 --theme.icon_font = "Nerd Font"
@@ -71,6 +71,20 @@ theme.background_dark = theme.dark_polar_night
 theme.xforeground = theme.nord6
 
 -- Accent colors
+function theme.random_accent_color()
+  local accents = {
+    theme.nord10,
+    theme.nord11,
+    theme.nord12,
+    theme.nord13,
+    theme.nord14,
+    theme.nord15,
+  }
+
+  local i = math.random(1, #accents)
+  return accents[i]
+end
+
 -- Widgets
 -- Titlebars
 
@@ -92,6 +106,9 @@ theme.wallpaper = gears.surface.load_uncached(gfs.get_configuration_dir() .. "th
 -- Gaps
 theme.useless_gap = dpi(7)
 
+-- Borders
+
+
 -- Corner radius
 theme.border_radius = 10
 
@@ -108,7 +125,7 @@ theme.hotkeys_border_width = dpi(0)
 -- Notifications
 theme.notification_spacing = dpi(4)
 theme.notification_bg = theme.xbackground
-theme.notification_height = dpi(10)
+-- theme.notification_height = dpi(10)
 
 -- Dash
 theme.header_font_name = "Roboto "
@@ -130,5 +147,21 @@ theme.tag_preview_client_border_width = 0
 theme.tag_preview_widget_bg = theme.wibar_bg
 theme.tag_preview_widget_border_color = theme.wibar_bg
 theme.tag_preview_widget_border_width = 0
+
+--- Tabs
+theme.mstab_bar_height = dpi(60)
+theme.mstab_bar_padding = dpi(0)
+theme.mstab_border_radius = dpi(6)
+theme.mstab_bar_disable = true
+theme.tabbar_disable = true
+theme.tabbar_style = "modern"
+theme.tabbar_bg_focus = theme.xbackground
+theme.tabbar_bg_normal = theme.xcolor0
+theme.tabbar_fg_focus = theme.xcolor0
+theme.tabbar_fg_normal = theme.xcolor15
+theme.tabbar_position = "top"
+theme.tabbar_AA_radius = 0
+theme.tabbar_size = 0
+theme.mstab_bar_ontop = true
 
 return theme

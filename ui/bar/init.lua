@@ -14,6 +14,8 @@ return function(s)
   -- IMPORTS --
   s.clock = require("ui.bar.clock")(s)
   s.battery = require("ui.bar.battery")(s)
+  s.volume = require("ui.bar.volume")()
+  s.brightness = require("ui.bar.brightness")()
 
   -- TAGLIST --
 	local modkey = "Mod4"
@@ -140,10 +142,13 @@ return function(s)
           },
           tag_list(s),
           {
+            s.brightness,
+            s.volume,
             s.battery, 
             -- system tray
             -- notif panel
             s.clock,
+            spacing = dpi(8),
             layout = wibox.layout.fixed.vertical,
           },
         },
