@@ -1,0 +1,9 @@
+#!/bin/zsh
+
+task context important > /dev/null 2>&1
+declare list
+list=$(task minimal)
+list=$(echo $list | sed '$d')     # remove empty lines
+list=$(echo $list | sed '1,3d')   # remove labels + dashed line
+list=$(echo $list | sed '7,$d')  # show 6 tasks max
+echo $list

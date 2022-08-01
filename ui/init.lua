@@ -1,4 +1,4 @@
---require(... .. ".notifications")
+require(... .. ".notifications")
 
 local bar = require(... .. ".bar")
 local dash = require(... .. ".dash")

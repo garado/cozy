@@ -1,7 +1,6 @@
 
 -- █▄▀ █▀▀ █▄█ █▀
 -- █░█ ██▄ ░█░ ▄█
--- this is where keybindings are declared
 
 local awful = require("awful")
 local hotkeys_popup = require("awful.hotkeys_popup")
@@ -16,6 +15,15 @@ shift = "Shift"
 
 -- Global key bindings
 awful.keyboard.append_global_keybindings({
+
+  -- temp --
+  awful.key({ mod }, "w", function()
+    local naughty = require("naughty")
+    naughty.notification {
+      title = "Title",
+      message = "This is example message text",
+    }
+  end, { description = "test notification", group = "_Temporary" }),
 
   -- WM --
   -- Restart awesome
@@ -35,6 +43,7 @@ awful.keyboard.append_global_keybindings({
   awful.key({ mod }, "j", function()
     awesome.emit_signal("dash::toggle", s)
   end, { description = "open dash", group = "Apps" }),
+
 
   -- SYSTEM --  
 	awful.key({}, "XF86MonBrightnessUp", function()
@@ -63,7 +72,7 @@ awful.keyboard.append_global_keybindings({
   
 	awful.key({}, "XF86AudioMute", function()
 		awful.spawn("pamixer -t", false)
-    awesome.emit_signal("widget::volume_mute")
+    awesome.emit_signal("widget::volume")
     awesome.emit_signal("module::volume_osd:show")
 	end, { description = "mute volume", group = "Hotkeys" }),
   

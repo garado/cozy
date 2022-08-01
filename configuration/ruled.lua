@@ -30,6 +30,7 @@ ruled.client.connect_signal("request::rules", function()
     rule_any = {
       instance = {
         "Thunar",
+        "nitrogen",
       },
       class = {
         "Lxappearance",

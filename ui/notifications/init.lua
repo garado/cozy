@@ -18,6 +18,7 @@ naughty.persistence_enabled = true
 naughty.config.defaults.ontop = true
 naughty.config.defaults.timeout = 6
 naughty.config.defaults.title = "Notification"
+naughty.config.defaults.position = "top_right"
 
 local function get_oldest_notification()
   for _, notification in ipairs(naughty.active) do
@@ -30,47 +31,39 @@ local function get_oldest_notification()
   return naughty.active[1]
 end
 
--- Handle notification icon
-naughty.connect_signal("request::icon", function(n, context, hints)
-  --- Handle other contexts here
-	if context ~= "app_icon" then
-		return
-	end
-
-	--- Use XDG icon
-	--local path = menubar.helpers.lookup_icon(hints.app_icon) or menubar.helpers.lookup_icon(hints.app_icon:lower())
-
-  local path = ""
-	if path then
-		n.icon = path
-	end
-end)
-
 naughty.connect_signal("request::display", function(n)
+  local title = wibox.widget({
+    widget = wibox.container.scroll.horizontal,
+    step_function = wibox.container.scroll.step_functions.waiting_nonlinear_back_and_forth,
+    fps = 60,
+    speed = 75,
+    widgets.text({
+      font = "Roboto Mono ",
+      --font = beautiful.font_name,
+      size = 10,
+      bold = true,
+      text = n.title,
+    }),
+  })
+
   local message = wibox.widget({
     widget = wibox.container.scroll.horizontal,
     step_function = wibox.container.scroll.step_functions.waiting_nonlinear_back_and_forth,
     fps = 60,
     speed = 75,
     widgets.text({
-      font = beautiful.font_name,
-      size = 11,
+      font = "Roboto Mono ",
+      size = 10,
       text = n.message,
     })
   })
-	
-  local title = wibox.widget({
-		widget = wibox.container.scroll.horizontal,
-		step_function = wibox.container.scroll.step_functions.waiting_nonlinear_back_and_forth,
-		fps = 60,
-		speed = 75,
-		widgets.text({
-			font = beautiful.font_name,
-			size = 11,
-			bold = true,
-			text = n.title,
-		}),
-	})
+
+  local app_name = widgets.text({
+    font = "Roboto Mono ",
+    size = 10,
+    bold = true,
+    text = "App name placeholder",
+  })
 
   local widget = naughty.layout.box({
     notification = n,
@@ -85,20 +78,30 @@ naughty.connect_signal("request::display", function(n)
     widget_template = {
       {
         layout = wibox.layout.fixed.vertical,
-        {
-          widget = wibox.container.background,
-        },
-        {
+        { -- App name
           {
-            layout = wibox.fixed.vertical,
             {
-              layout = wibox.fixed.horizontal,
-              spacing = dpi(10),
-              --icon,
+              app_name,
+              layout = wibox.layout.align.horizontal,
+            },
+            margins = { top = dpi(5), bottom = dpi(5), left = dpi(10), right = dpi(10) },
+            widget = wibox.container.margin,
+          },
+          bg = beautiful.notification_title_bg,
+          widget = wibox.container.background,
+        }, -- End app name
+        { -- Content
+          {
+            { -- app icon and title/msg
+              layout = wibox.layout.fixed.horizontal,
+              {
+                layout = wibox.layout.fixed.horizontal,
+                nil, -- icon goes here
+              },
               {
                 expand = "none",
                 layout = wibox.layout.align.vertical,
-                nil,
+                nil, --??
                 {
                   layout = wibox.layout.fixed.vertical,
                   title,
@@ -106,22 +109,25 @@ naughty.connect_signal("request::display", function(n)
                 },
                 nil,
               },
-            },
-            --{
-            --  helpers.ui.vertical_pad(dpi(10)),
-            --  {
-
-            --  }
-            --},
+            }, -- end app icon and title/msg
+            --{ -- Actions
+            --}, -- End actions
+            layout = wibox.layout.fixed.vertical,
           },
-          margins = dpi(15),
+          margins = dpi(10),
           widget = wibox.container.margin,
-        },
+        }, -- End content
       },
       shape = helpers.ui.rrect(beautiful.border_radius),
-      bg = beautiful.notification_bg,
+      bg = beautiful.notification_content_bg,
       widget = wibox.container.background,
     },
   })
+
+
 end)
 
+
+require(... .. ".error")
+require(... .. ".battery")
+require(... .. ".playerctl")

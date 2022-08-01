@@ -54,6 +54,9 @@ get_agenda() {
   # Idk why but theres always a blank line at the
   # beginning, this removes it
   sed -i '1d' $cache_cal_agenda 
+
+  # Update awesome
+  echo "awesome.emit_signal(\"widget::calendar_update\")" | awesome-client
 }
 
 # Execute

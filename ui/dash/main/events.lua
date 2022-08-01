@@ -18,16 +18,6 @@ local function widget()
     widget = wibox.container.place,
   })
 
-  awful.spawn.easy_async_with_shell(
-    [[
-      cat $HOME/.cache/awesome/calendar/agenda
-    ]],
-    function(stdout)
-      local stdout = helpers.ui.colorize_text(stdout, beautiful.dash_widget_fg)
-      events:get_children()[1]:set_markup(stdout)
-    end
-  )
-
   local contents = wibox.widget({
     { -- header
       {
@@ -50,6 +40,24 @@ local function widget()
     margins = dpi(5),
     widget = wibox.container.margin,
   })
+  
+  local function calendar()
+    awful.spawn.easy_async_with_shell(
+      [[
+        cat $HOME/.cache/awesome/calendar/agenda
+      ]],
+      function(stdout)
+        local stdout = helpers.ui.colorize_text(stdout, beautiful.dash_widget_fg)
+        events:get_children()[1]:set_markup(stdout)
+      end
+    )
+  end
+  
+  awesome.connect_signal("widget::calendar_update", function()
+    calendar()
+  end)
+  
+  calendar()
 
   return widget
 end

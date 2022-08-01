@@ -39,7 +39,7 @@ theme.med2_polar_night = "#272c36"
 theme.med_polar_night = "#373e4d"
 
 -- Other
-theme.transparent = "#FF000000"
+theme.transparent = "#ffffff00"
 
 -- RPG Colors
 theme.color1 = "#bda997"
@@ -85,7 +85,13 @@ function theme.random_accent_color()
   return accents[i]
 end
 
+-- Music player
+theme.music_now_playing_fg = theme.nord4
+theme.music_button_transparent = "#5e81ac00"
+
 -- Widgets
+
+
 -- Titlebars
 
 -- Wibar
@@ -123,8 +129,9 @@ theme.hotkeys_group_margin = dpi(25)
 theme.hotkeys_border_width = dpi(0)
 
 -- Notifications
-theme.notification_spacing = dpi(4)
-theme.notification_bg = theme.xbackground
+theme.notification_spacing = dpi(5)
+theme.notification_title_bg = theme.dark_polar_night
+theme.notification_content_bg = theme.med_polar_night
 -- theme.notification_height = dpi(10)
 
 -- Dash

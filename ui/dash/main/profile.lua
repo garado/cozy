@@ -57,11 +57,21 @@ local function widget(s)
   })
   
   local host = wibox.widget({
-    widget = wibox.widget.textbox,
-    markup = helpers.ui.colorize_text("@andromeda", beautiful.nord1),
-    font = beautiful.font .. "10",
-    align = "left",
-    valign = "center",
+    {
+      widget = wibox.widget.textbox,
+      markup = helpers.ui.colorize_text("@andromeda", beautiful.nord1),
+      font = beautiful.font .. "10",
+      align = "left",
+      valign = "center",
+    },
+    --margins = {
+    --  top = dpi(-5),
+    --  bottom = dpi(5),
+    --},
+    margins = {
+      --top = dpi(-5),
+    },
+    widget = wibox.container.margin,
   })
   
   local title = wibox.widget({
@@ -91,15 +101,10 @@ local function widget(s)
       {
         {
           {
-            {
               name,
               host,
-              spacing = dpi(-5),
+              --title, 
               layout = wibox.layout.fixed.vertical,
-            },
-            title,
-            spacing = dpi(5),
-            layout = wibox.layout.fixed.vertical,
           },
           widget = wibox.container.place,
         },
