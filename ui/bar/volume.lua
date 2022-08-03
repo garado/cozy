@@ -57,7 +57,7 @@ return function()
   -- Pressing the volume icon will toggle mute
   icon:connect_signal("button::press", function()
     awful.spawn("pamixer --toggle-mute", false)
-    awesome.emit_signal("widget::volume")
+    awesome.emit_signal("module::volume")
   end)
   
   -- Update volume based on slider value 
@@ -69,7 +69,7 @@ return function()
 
   -- Updates volume icon based on volume level :)
   vol_icon = icon.children[1]
-  awesome.connect_signal("widget::volume", function()
+  awesome.connect_signal("module::volume", function()
     awful.spawn.easy_async_with_shell("pamixer --get-volume-human",
       function(stdout)
         local out = string.gsub(stdout, '%W','')

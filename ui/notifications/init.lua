@@ -53,16 +53,18 @@ naughty.connect_signal("request::display", function(n)
     speed = 75,
     widgets.text({
       font = "Roboto Mono ",
+      --font = beautiful.font_name,
       size = 10,
+      bold = true,
       text = n.message,
-    })
+    }),
   })
 
   local app_name = widgets.text({
     font = "Roboto Mono ",
     size = 10,
     bold = true,
-    text = "App name placeholder",
+    text = n.app_name,
   })
 
   local widget = naughty.layout.box({
@@ -118,7 +120,7 @@ naughty.connect_signal("request::display", function(n)
           widget = wibox.container.margin,
         }, -- End content
       },
-      shape = helpers.ui.rrect(beautiful.border_radius),
+      shape = helpers.ui.rrect(dpi(5)),
       bg = beautiful.notification_content_bg,
       widget = wibox.container.background,
     },
@@ -131,3 +133,5 @@ end)
 require(... .. ".error")
 require(... .. ".battery")
 require(... .. ".playerctl")
+require(... .. ".brightness")
+require(... .. ".volume")

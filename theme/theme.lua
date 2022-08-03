@@ -130,9 +130,8 @@ theme.hotkeys_border_width = dpi(0)
 
 -- Notifications
 theme.notification_spacing = dpi(5)
-theme.notification_title_bg = theme.dark_polar_night
-theme.notification_content_bg = theme.med_polar_night
--- theme.notification_height = dpi(10)
+theme.notification_title_bg = theme.med_polar_night
+theme.notification_content_bg = theme.med2_polar_night
 
 -- Dash
 theme.header_font_name = "Roboto "

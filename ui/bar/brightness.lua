@@ -61,7 +61,7 @@ return function()
   	awful.spawn("brightnessctl set " .. brightness .. "%", false)
     
     -- Update brightness osd
-  	awesome.emit_signal("module::brightness_osd", brightness)
+  	awesome.emit_signal("module::brightness", brightness)
   end)
   
   -- WIP: update slider value based on volume
