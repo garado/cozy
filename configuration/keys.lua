@@ -16,15 +16,6 @@ shift = "Shift"
 -- Global key bindings
 awful.keyboard.append_global_keybindings({
 
-  -- temp --
-  awful.key({ mod }, "w", function()
-    local naughty = require("naughty")
-    naughty.notification {
-      title = "Title",
-      message = "This is example message text",
-    }
-  end, { description = "test notification", group = "_Temporary" }),
-
   -- WM --
   -- Restart awesome
   awful.key({ shift, alt }, "r", awesome.restart, 
