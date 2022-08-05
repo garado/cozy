@@ -12,30 +12,33 @@ local dpi = xresources.apply_dpi
 return function(s)
   -- WIDGETS --
   profile = require("ui.dash.main.profile")
-  --links = require("ui.dash.main.links")
-  pepedoro = require("ui.dash.main.pepedoro")
-  stats = require("ui.dash.main.stats")
+  links = require("ui.dash.main.links")
+  pomodoro = require("ui.dash.main.pomodoro")
   events = require("ui.dash.main.events")
   tasks = require("ui.dash.main.tasks")
   music = require("ui.dash.main.music_player")
+  fetch = require("ui.dash.main.fetch")
+  habit = require("ui.dash.main.habit")
  
   widget = {
     {
       {
         profile,
-        pepedoro,
+        pomodoro,
         music,
         forced_width = dpi(350),
+        expand = true,
         layout = wibox.layout.fixed.vertical,
       },
       {
         events,
         tasks,
-        forced_width = dpi(600),
+        forced_width = dpi(550),
         layout = wibox.layout.fixed.vertical,
       },
       {
-        stats,
+        fetch,
+        habit,
         --links,
         forced_width = dpi(400),
         layout = wibox.layout.fixed.vertical,

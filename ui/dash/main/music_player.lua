@@ -14,13 +14,15 @@ local playerctl_daemon = require("signal.playerctl")
 
 local music_text = wibox.widget({
 	font = beautiful.header_font_name .. "Medium 10",
-	valign = "center",
-	widget = wibox.widget.textbox,
+  valign = "center",
+  widget = wibox.widget.textbox,
 })
 
 local music_art = wibox.widget({
 	image = beautiful.music,
-	resize = true,
+	resize = false,
+  valign = "center",
+  halign = "center",
 	widget = wibox.widget.imagebox,
 })
 
@@ -34,15 +36,15 @@ local music_art_container = wibox.widget({
 local filter_color = {
 	type = "linear",
 	from = { 0, 0 },
-	to = { 0, 175 },
-	stops = { { 0, beautiful.nord3 .. "cc" }, { 1, beautiful.nord3 } },
+	to = { 0, 200 },
+	stops = { { 0, beautiful.nord3 }, { 1, beautiful.nord3 .. "cc" } },
 }
 
 local music_art_filter = wibox.widget({
 	{
 		bg = filter_color,
 		forced_height = dpi(120),
-		forced_width = dpi(175),
+		forced_width = dpi(200),
 		widget = wibox.container.background,
 	},
 	direction = "east",
