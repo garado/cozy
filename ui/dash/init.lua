@@ -18,11 +18,12 @@ return function(s)
   main = require("ui.dash.main")(s)
   todo = require("ui.dash.todo")(s)
   weather = require("ui.dash.weather")(s)
+  dreams = require("ui.dash.dreams")
   
   -- decide which tab to show
-  local active_tab = "main"
-  local tab = main
-  tablist = {"main", "todo", "cal", "weather", "habit"}
+  local active_tab = "main" 
+  local tab = main 
+  tablist = {"main", "todo", "cal", "weather", "habit", "dreams"}
   for t in ipairs(tablist) do
     if active_tab == t then
       tab = t
@@ -56,9 +57,61 @@ return function(s)
 
   -- toggle visibility
   awesome.connect_signal("dash::toggle", function(scr)
+    if s.dash.visible then
+      awesome.emit_signal("dash::close")
+    else
+      awesome.emit_signal("dash::open")
+    end
     s.dash.visible = not s.dash.visible
   end)
 
+  local tab_bar = wibox.widget({
+    {
+      layout = wibox.layout.flex.vertical,
+    },
+    forced_width = dpi(50),
+    forced_height = dpi(1400),
+    shape = function(cr, width, height)
+        gears.shape.partially_rounded_rect(cr, width, height, true, false, false, true)
+    end,
+    widget = wibox.widget.background,
+    bg = beautiful.dash_tab_bg,
+  })
+
+  -- build dashboard
+  s.dash = awful.popup({
+    type = "dock",
+    screen = s,
+    minimum_height = dpi(810),
+    maximum_height = dpi(810),
+    minimum_width = dpi(1400),
+    maximum_width = dpi(1400),
+    bg = beautiful.transparent,
+    ontop = true,
+    visible = false,
+    placement = awful.placement.centered,
+    widget = {
+      tab_bar,
+      {
+        {
+          tab,
+          widget = wibox.container.margin,
+          margins = dpi(10),
+        },
+        bg = beautiful.dash_bg,
+        shape = function(cr, width, height)
+            gears.shape.partially_rounded_rect(cr, width, height, false, true, true, false)
+        end,
+        widget = wibox.container.background,
+      }, -- end content
+      layout = wibox.layout.align.horizontal,
+      -- UGH!!!
+      -- callback = function()
+      --   navigate()
+      -- end
+    } -- end widget
+  })
+  
   -- DASH KEYBOARD NAVIGATION
   -- "cursor" is either in tabs or content
   local group_selected = "tab"
@@ -86,47 +139,5 @@ return function(s)
     --)
   end
 
-  -- build dashboard
-  s.dash = awful.popup({
-    type = "dock",
-    screen = s,
-    minimum_height = dpi(800),
-    maximum_height = dpi(800),
-    minimum_width = dpi(1400),
-    maximum_width = dpi(1400),
-    bg = beautiful.transparent,
-    ontop = true,
-    visible = false,
-    placement = awful.placement.centered,
-    widget = {
-      {
-        {
-          new_tab("M"), -- idk how to generate these from the tablist
-          new_tab("T"),
-          new_tab("C"),
-          new_tab("H"),
-          new_tab("W"),
-          layout = wibox.layout.fixed.vertical,
-        },
-        top = dpi(20),
-        widget = wibox.container.margin,
-      }, -- end tabs
-      {
-        {
-          tab,
-          widget = wibox.container.margin,
-          margins = dpi(10),
-        },
-        bg = beautiful.dash_bg,
-        shape = gears.shape.rounded_rect,
-        widget = wibox.container.background,
-      }, -- end content
-      layout = wibox.layout.align.horizontal,
-      -- UGH!!!
-      -- callback = function()
-      --   navigate()
-      -- end
-    } -- end widget
-  })
 
 end

@@ -8,8 +8,8 @@ local theme = dofile(themes_path .. "default/theme.lua")
 local theme_assets = require("beautiful.theme_assets")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
--- local helpers = require("helpers")
--- local icons = require("icons")
+local helpers = require("helpers")
+local math = math
 
 
 -- █▄░█ █▀█ █▀█ █▀▄
@@ -130,7 +130,7 @@ theme.hotkeys_border_width = dpi(0)
 
 -- Notifications
 theme.notification_spacing = dpi(5)
-theme.notification_title_bg = theme.med_polar_night
+theme.notification_title_bg = theme.dark_polar_night
 theme.notification_content_bg = theme.med2_polar_night
 
 -- Dash
@@ -141,6 +141,9 @@ theme.dash_widget_bg = theme.med2_polar_night
 theme.dash_widget_fg = theme.nord6
 theme.dash_header_color = theme.nord10
 theme.dash_tab_bg = theme.med2_polar_night
+
+theme.pomodoro_bar_fg = theme.nord10
+theme.pomodoro_bar_bg = theme.dark_polar_night
 
 -- Tag preview
 theme.tag_preview_widget_margin = dpi(10)

@@ -13,7 +13,7 @@ touch $cache_cal_agenda
 get_agenda() {
   # Get next 2 weeks of events
   agenda_start="$(date +%D)"
-  agenda_end="$(date +%D --date="2 weeks")"
+  agenda_end="$(date +%D --date="3 weeks")"
   agenda=`gcalcli --nocolor --calendar Master agenda $agenda_start $agenda_end --nostarted `
   
   # Put into an array, delimit on newlines

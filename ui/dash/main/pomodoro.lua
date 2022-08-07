@@ -331,7 +331,7 @@ local function ui_tick()
         ui_text:set_markup_silently(helpers.ui.colorize_text(text, beautiful.xforeground))
 
         -- Update progress bar
-        local progress = (pomodoro.time_remaining * 100) / start_time
+        local progress = (pomodoro.time_remaining * 100) / pomodoro.selected_time
         ui_bar.value = progress
 
         if pomodoro.time_remaining == 0 then

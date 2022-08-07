@@ -23,7 +23,7 @@ awesome.connect_signal("module::volume", function()
       if not notif then
         notif = naughty.notification { 
           title = "Volume",
-          app_name = "System",
+          app_name = "System notification",
           category = "device",
           message = "Volume at " .. val .. "%",
           auto_reset_timeout = true,
@@ -33,7 +33,7 @@ awesome.connect_signal("module::volume", function()
         notif:destroy()
         notif = naughty.notification { 
           title = "Volume",
-          app_name = "System",
+          app_name = "System notification",
           category = "device",
           message = "Volume at " .. val .. "%",
           auto_reset_timeout = true,

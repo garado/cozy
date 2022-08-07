@@ -32,14 +32,16 @@ local function get_oldest_notification()
 end
 
 naughty.connect_signal("request::display", function(n)
+  local accent_colors = beautiful.random_accent_color()
+
   local title = wibox.widget({
     widget = wibox.container.scroll.horizontal,
     step_function = wibox.container.scroll.step_functions.waiting_nonlinear_back_and_forth,
     fps = 60,
     speed = 75,
     widgets.text({
-      font = "Roboto Mono ",
-      --font = beautiful.font_name,
+      --font = "Roboto Mono ",
+      font = beautiful.font_name,
       size = 10,
       bold = true,
       text = n.title,
@@ -50,10 +52,10 @@ naughty.connect_signal("request::display", function(n)
     widget = wibox.container.scroll.horizontal,
     step_function = wibox.container.scroll.step_functions.waiting_nonlinear_back_and_forth,
     fps = 60,
-    speed = 75,
+    speed = 100,
     widgets.text({
-      font = "Roboto Mono ",
-      --font = beautiful.font_name,
+      --font = "Roboto Mono ",
+      font = beautiful.font_name,
       size = 10,
       bold = true,
       text = n.message,
@@ -65,6 +67,48 @@ naughty.connect_signal("request::display", function(n)
     size = 10,
     bold = true,
     text = n.app_name,
+  })
+
+	local dismiss = widgets.button.text.normal({
+		--font = beautiful.icon_font .. "Round ",
+    font = "RobotoMono Nerd Font",
+		paddings = dpi(2),
+		size = 10,
+		bold = true,
+		text = "",
+    normal_bg = beautiful.notification_title_bg,
+		text_normal_bg = accent_colors,
+		animate_size = false,
+		on_release = function()
+			n:destroy(naughty.notification_closed_reason.dismissed_by_user)
+		end,
+	})
+
+  local timeout_arc = wibox.widget({
+    widget = wibox.container.arcchart,
+		forced_width = dpi(26),
+		forced_height = dpi(26),
+		max_value = 100,
+		min_value = 0,
+		value = 0,
+		thickness = dpi(4),
+		rounded_edge = true,
+		bg = beautiful.notification_bg,
+		colors = {
+			{
+				type = "linear",
+				from = { 0, 0 },
+				to = { 400, 400 },
+				stops = {
+					{ 0, accent_colors },
+					{ 0.2, accent_colors },
+					{ 0.4, accent_colors },
+					{ 0.6, accent_colors },
+					{ 0.8, accent_colors },
+				},
+			},
+		},
+		dismiss,
   })
 
   local widget = naughty.layout.box({
@@ -84,6 +128,8 @@ naughty.connect_signal("request::display", function(n)
           {
             {
               app_name,
+              nil,
+              timeout_arc,
               layout = wibox.layout.align.horizontal,
             },
             margins = { top = dpi(5), bottom = dpi(5), left = dpi(10), right = dpi(10) },
@@ -122,10 +168,27 @@ naughty.connect_signal("request::display", function(n)
       },
       shape = helpers.ui.rrect(dpi(5)),
       bg = beautiful.notification_content_bg,
+      forced_width = dpi(250),
       widget = wibox.container.background,
     },
   })
 
+  -- Timeout arc animation
+	local anim = animation:new({
+		duration = n.timeout,
+		target = 100,
+		easing = animation.easing.linear,
+		reset_on_stop = false,
+		update = function(self, pos)
+			timeout_arc.value = pos
+		end,
+	})
+
+	anim:connect_signal("ended", function()
+		n:destroy()
+	end)
+
+  anim:start()
 
 end)
 

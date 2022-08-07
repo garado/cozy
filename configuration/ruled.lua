@@ -31,10 +31,13 @@ ruled.client.connect_signal("request::rules", function()
       instance = {
         "Thunar",
         "nitrogen",
+        "mpv",
       },
       class = {
         "Lxappearance",
         "Nm-connection-editor",
+        "qBittorrent",
+        "mpv",
       },
       role = {
         "GtkFileChooserDialog",
