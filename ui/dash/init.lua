@@ -10,27 +10,29 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local keygrabber = require("awful.keygrabber")
 local helpers = require("helpers")
+local widgets = require("ui.widgets")
+local naughty = require("naughty")
 
 return function(s) 
-  -- import tab contents
-  cal = require("ui.dash.cal")(s)
-  habit = require("ui.dash.habit")(s)
-  main = require("ui.dash.main")(s)
-  todo = require("ui.dash.todo")(s)
-  weather = require("ui.dash.weather")(s)
-  dreams = require("ui.dash.dreams")
-  
-  -- decide which tab to show
-  local active_tab = "main" 
-  local tab = main 
-  tablist = {"main", "todo", "cal", "weather", "habit", "dreams"}
-  for t in ipairs(tablist) do
-    if active_tab == t then
-      tab = t
-    end 
-  end
+  local dash
 
-  -- create tabs
+  -- import tab contents
+  local main = require("ui.dash.main")
+  local budget = require("ui.dash.budget")
+  local cal = require("ui.dash.cal")
+  local habit = require("ui.dash.habit")
+  local todo = require("ui.dash.todo")
+  local weather = require("ui.dash.weather")
+  local vision = require("ui.dash.dreams")
+ 
+  -- decide which tab to show
+  -- main, finances, habit, caltodo, weather, dreams,
+  local tablist_pos = 1
+  local tablist =   { main, budget, habit,  cal,    weather, vision}
+  local tab_icons = { "",  "",    "",    "",    "盛",   "滛", }
+  local tablist_elems = 7 -- ???
+
+  -- create tabs based on tablist
   local function new_tab(name)
     return wibox.widget({
       {
@@ -55,33 +57,149 @@ return function(s)
     })
   end
 
+  -------------------------
+  --                     -- 
+  -- ASSEMBLING THE DASH --
+  --                     -- 
+  -------------------------
+
+  local dash_content = wibox.widget({
+    {
+      {
+        id = "content",
+        layout = wibox.layout.fixed.vertical,
+      },
+      widget = wibox.container.margin,
+      margins = dpi(10),
+    },
+    bg = beautiful.dash_bg,
+    shape = function(cr, width, height)
+        gears.shape.partially_rounded_rect(cr, width, height, false, true, true, false)
+    end,
+    widget = wibox.container.background,
+  })
+
+  local function create_tab_bar()
+    local tab_bar = wibox.widget({
+      {
+        layout = wibox.layout.flex.vertical,
+      },
+      forced_width = dpi(50),
+      forced_height = dpi(1400),
+      shape = function(cr, width, height)
+          gears.shape.partially_rounded_rect(cr, width, height, true, false, false, true)
+      end,
+      widget = wibox.container.background,
+      bg = beautiful.dash_tab_bg,
+    })
+
+    for i,v in ipairs(tab_icons) do
+      local widget = widgets.button.text.normal({
+        text = v,
+        text_normal_bg = beautiful.xforeground,
+        normal_bg = beautiful.dash_tab_bg,
+        animate_size = false,
+        size = 15,
+        on_release = function()
+          local fuck = dash_content:get_children_by_id("content")[1]
+          fuck:set(1, tablist[i])
+          tablist_pos = i
+        end
+      })
+      tab_bar.children[1]:add(widget)
+    end
+
+    return tab_bar
+  end
+
+  dash_content:get_children_by_id("content")[1]:add(main)
+
+  local ugh = wibox.widget({
+   create_tab_bar(),
+   dash_content,
+   layout = wibox.layout.align.horizontal,
+   -- UGH!!!
+   -- end widget
+  })
+
+  -- DASH KEYBOARD NAVIGATION
+  -- "cursor" is either in tabs or content
+  local group_selected = "tab"
+  local obj_selected = "user"
+
+  local function dbn(message)
+    naughty.notification {
+      app_name = "custom keygrabber",
+      title = "navigate()",
+      message = message,
+      timeout = 1,
+    }
+  end
+
+  -- Vim-like keybindings to navigate dash!
+  local function navigate()
+    local content = dash_content:get_children_by_id("content")[1]
+
+    -- "j" and "k" navigate between tabs
+    local function next_tab()
+      local index = ((tablist_pos + 1) % tablist_elems)
+      content:set(1, tablist[index])
+      tablist_pos = index
+    end
+
+    local function prev_tab()
+      local index = ((tablist_pos - 1) % tablist_elems)
+      content:set(1, tablist[index])
+      tablist_pos = index
+    end
+
+    -- "h" and "l" navigate between elements of the tab
+    -- wip!
+    local function next_element()
+    end
+    
+    local function prev_element()
+    end
+
+    -- Call functions depending on which key was pressed
+    local function keypressed(self, mod, key, command)
+      if     key == "j" then
+        next_tab()
+      elseif key == "k" then
+        prev_tab()
+      elseif key == "h" then
+        prev_element()
+      elseif key == "l" then
+        next_element()
+      end
+    end
+
+    -- Putting all the puzzle pieces together
+    local dash_keygrabber = awful.keygrabber {
+      stop_key = "Mod4",
+      stop_event = "release",
+      autostart = true,
+      allowed_keys = { "h", "j", "k", "l" },
+      timeout = 3,
+      keypressed_callback = keypressed,
+    }
+  end
+  
   -- toggle visibility
-  awesome.connect_signal("dash::toggle", function(scr)
-    if s.dash.visible then
+  awesome.connect_signal("dash::toggle", function()
+    if dash.visible then
       awesome.emit_signal("dash::close")
     else
       awesome.emit_signal("dash::open")
+      navigate()
     end
-    s.dash.visible = not s.dash.visible
+    dash.visible = not dash.visible
   end)
 
-  local tab_bar = wibox.widget({
-    {
-      layout = wibox.layout.flex.vertical,
-    },
-    forced_width = dpi(50),
-    forced_height = dpi(1400),
-    shape = function(cr, width, height)
-        gears.shape.partially_rounded_rect(cr, width, height, true, false, false, true)
-    end,
-    widget = wibox.widget.background,
-    bg = beautiful.dash_tab_bg,
-  })
-
   -- build dashboard
-  s.dash = awful.popup({
+  dash = awful.popup({
     type = "dock",
-    screen = s,
+    --screen = s,
     minimum_height = dpi(810),
     maximum_height = dpi(810),
     minimum_width = dpi(1400),
@@ -90,54 +208,7 @@ return function(s)
     ontop = true,
     visible = false,
     placement = awful.placement.centered,
-    widget = {
-      tab_bar,
-      {
-        {
-          tab,
-          widget = wibox.container.margin,
-          margins = dpi(10),
-        },
-        bg = beautiful.dash_bg,
-        shape = function(cr, width, height)
-            gears.shape.partially_rounded_rect(cr, width, height, false, true, true, false)
-        end,
-        widget = wibox.container.background,
-      }, -- end content
-      layout = wibox.layout.align.horizontal,
-      -- UGH!!!
-      -- callback = function()
-      --   navigate()
-      -- end
-    } -- end widget
+    widget = ugh,
   })
-  
-  -- DASH KEYBOARD NAVIGATION
-  -- "cursor" is either in tabs or content
-  local group_selected = "tab"
-  local obj_selected = "user"
-
-  -- ugh
-  local function navigate()
-    --navigate_dash = awful.keygrabber(
-    --  function(_, key, event)
-    --    if key == 'release' then
-    --      awful.keygrabber.stop(navigate_dash)
-    --      return
-    --    end
-
-    --    if key == 'h' then
-    --      active_tab = "todo"
-    --    elseif key == 'l' then
-    --      active_tab = "weather"
-    --    elseif key == 'g' then
-    --      awful.keygrabber.stop(navigate_dash)
-    --    else
-    --      awful.keygrabber.stop(navigate_dash)
-    --    end
-    --  end
-    --)
-  end
-
 
 end

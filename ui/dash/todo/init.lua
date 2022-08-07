@@ -9,8 +9,7 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 
-return function(s)
-  widget = {
+  local widget = wibox.widget({
     {
       markup = 'todo',
       align = "center",
@@ -21,6 +20,5 @@ return function(s)
     forced_width = dpi(300),
     forced_height = dpi(300), 
     widget = wibox.container.background,
-  } -- end widget
+  })
   return widget
-end
