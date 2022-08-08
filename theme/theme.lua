@@ -135,7 +135,7 @@ theme.notification_content_bg = theme.med2_polar_night
 
 -- Dash
 theme.header_font_name = "Roboto "
-theme.header_font = theme.header_font_name .. "Medium "
+theme.header_font = theme.header_font_name .. "Light "
 theme.dash_bg = theme.dark_polar_night
 theme.dash_widget_bg = theme.med2_polar_night
 theme.dash_widget_fg = theme.nord6

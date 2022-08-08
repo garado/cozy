@@ -15,6 +15,7 @@ local helpers = require("helpers")
 --local widgets = require("ui.widgets")
 local naughty = require("naughty")
 local animation = require("modules.animation")
+local user_vars = require("user_variables")
 --local math = math
 
 local function breakdown()
@@ -152,12 +153,21 @@ local function balance()
   })
 
   local balance_ = wibox.widget({
-    markup = helpers.ui.colorize_text("$297.57", beautiful.xforeground),
+    markup = helpers.ui.colorize_text("$341", beautiful.xforeground),
     widget = wibox.widget.textbox,
     font = beautiful.header_font_name .. "20",
     align = "center",
     valign = "center",
   })
+
+  local ledger_file = user_vars.dash.ledger_file
+  local cmd = "ledger -f " .. ledger_file .. " balance checking"
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    balance = string.gsub(stdout, "Assets:Checking", "")
+    balance = string.gsub(balance, "%s+", "")
+    local markup = helpers.ui.colorize_text(balance, beautiful.xforeground)
+    balance_:set_markup_silently(markup)
+  end)
 
   local balance = wibox.widget({
     {
@@ -187,6 +197,16 @@ local function monthly_spending()
     align = "center",
     valign = "center",
   })
+  
+  local ledger_file = user_vars.dash.ledger_file
+  local cmd = "ledger -f " .. ledger_file .. " -M reg expenses | tail -1"
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    local total = string.match(stdout, "$(.*)")
+    total = string.match(total, "$(.*)")
+    total = string.gsub(total, "%s+", "")
+    local markup = helpers.ui.colorize_text("$" .. total, beautiful.xforeground)
+    amount:set_markup_silently(markup)
+  end)
 
   local widget = wibox.widget({
     header,

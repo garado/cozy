@@ -18,7 +18,7 @@ return function(s)
 
   -- import tab contents
   local main = require("ui.dash.main")
-  local budget = require("ui.dash.budget")
+  local finances = require("ui.dash.finances")
   local cal = require("ui.dash.cal")
   local habit = require("ui.dash.habit")
   local todo = require("ui.dash.todo")
@@ -28,7 +28,7 @@ return function(s)
   -- decide which tab to show
   -- main, finances, habit, caltodo, weather, dreams,
   local tablist_pos = 1
-  local tablist =   { main, budget, habit,  cal,    weather, vision}
+  local tablist =   { main, finances, habit,  cal,    weather, vision}
   local tab_icons = { "",  "",    "",    "",    "盛",   "滛", }
   local tablist_elems = 7 -- ???
 
@@ -153,13 +153,8 @@ return function(s)
       tablist_pos = index
     end
 
-    -- "h" and "l" navigate between elements of the tab
-    -- wip!
-    local function next_element()
-    end
-    
-    local function prev_element()
-    end
+    -- I thought about making h/l navigate between interactive
+    -- tab elements (e.g. pomodoro) but then decided against it
 
     -- Call functions depending on which key was pressed
     local function keypressed(self, mod, key, command)
@@ -167,10 +162,10 @@ return function(s)
         next_tab()
       elseif key == "k" then
         prev_tab()
-      elseif key == "h" then
-        prev_element()
-      elseif key == "l" then
-        next_element()
+      --elseif key == "h" then
+      --  prev_element()
+      --elseif key == "l" then
+      --  next_element()
       end
     end
 
