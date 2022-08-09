@@ -147,16 +147,15 @@ local function create_chart()
     local entries = { }
     local num_entries = 0
     for i,v in ipairs(lines) do
-      -- Count occurences
-      local _, count = string.gsub(v, "%:", "")
-      if count == 1 then
-      else
+      ---- Count occurences
+      --local _, count = string.gsub(v, "%:", "")
+      --if count == 1 then
+      --else
         -- Isolate category and category total by splitting 
         -- on last colon
         local s, e = v:find(":[^:]*$")
         local isolated = v:sub(s+1)
-      end
-
+      --end
 
       -- Parse category and total by delimiting on whitespace
       local fields = { }

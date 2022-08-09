@@ -43,7 +43,7 @@ local function reset_pomodoro()
   pomodoro.selected_time = nil
   pomodoro.time_remaining = nil
   pomodoro.preserved = false
-  awful.spawn("xrdb -remove")
+  awful.spawn.easy_async("xrdb -remove")
   timer_state = "stopped"
 end
 
@@ -61,7 +61,7 @@ local function ui_start()
     margins = dpi(3),
     widget = wibox.container.margin, 
   })
-  
+
   local letsdoit = widgets.button.text.normal({
     text = "Let's do it!",
     text_normal_bg = beautiful.xforeground,
@@ -210,6 +210,13 @@ local function create_time_buttons()
         pomodoro.selected_time = time * 60
         pomodoro.current_state = "tick"
         redraw_widget()
+        naughty.notification {
+          app_name = "Pomodoro",
+          title = "Pomodoro started",
+          message = "Work on " .. pomodoro.selected_topic 
+              .. " for " .. (pomodoro.selected_time/60) .. "m",
+          timeout = 5,
+        }
       end
     })
     buttons.children[1]:add(button)
@@ -336,6 +343,12 @@ local function ui_tick()
 
         if pomodoro.time_remaining == 0 then
           second_timer:stop()
+          naughty.notification {
+            app_name = "Pomodoro",
+            title = "Pomodoro completed!",
+            message = "Finished " .. (pomodoro.selected_time / 60) .. "m of work on " .. pomodoro.selected_topic,
+            timeout = 0,
+          }
         end
       end,
     }

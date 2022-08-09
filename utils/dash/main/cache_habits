@@ -1,0 +1,65 @@
+#!/bin/bash
+
+# █▀▀ ▄▀█ █▀▀ █░█ █▀▀   █░█ ▄▀█ █▄▄ █ ▀█▀ █▀
+# █▄▄ █▀█ █▄▄ █▀█ ██▄   █▀█ █▀█ █▄█ █ ░█░ ▄█
+
+# Caches data from Pixela so I don't spam the pixela API every
+# time I restart awesome (sorry @a-know!)
+
+# Usage:
+# ./cache_habits start_date num_days [graph_id...]
+# start_date
+#   The day to start fetching habits from (YYYYMMDD)
+#   Note: technically any `date`-acceptable format will work as 
+#   long as it has no spaces
+# num_days
+#   How many days in the past to get habit data from
+# graph_id
+#   A list of graph_ids to get data from
+# -f graph_id_file
+#   NOT YET IMPLEMENTED
+#   If this flag is set, cache_habits will retrieve graph ids from the file
+#   Each graph id in the file should be on its own line 
+
+# The intention is for you to run this script in a cron job once a day or so.
+
+# This script assumes that the necessary Pixela username/password env
+# variables are already set.
+
+# OUTPUT
+# Might be a kind of jank way to go about it, but whatever
+# In the cache folder, the script creates a folder for each habit 
+# and a file for each day for which the habit was completed
+# If a habit was not completed on a certain day, there is no file for it
+
+# Ensure cache directory exists
+cache_dir=$HOME/.cache/awesome/pixela
+mkdir -p $cache_dir
+
+# Get variables
+start_date=$1
+num_days=$2
+
+if [[ "$3" == "-f" ]]; then
+  echo "not implemented yet"
+else
+  graph_ids=(${@:3})
+fi
+
+# Get end date
+start_date=$(date -d "$start_date" +'%Y%m%d')
+end_date=$(date -d $start_date'-'$num_days' day' +'%Y%m%d')
+
+# Execute
+for graph in "${graph_ids[@]}"; do
+  mkdir -p $cache_dir/$graph
+  cmd="pi graphs pixels --from=$end_date --to=$start_date --graph-id=$graph"
+  json_out=$($cmd)
+  json_arr=$(echo $json_out | jq '.[][]')
+  dates_arr=($json_arr)
+  for date in "${dates_arr[@]}"; do
+    # The json entries have double quotes around day - remove them
+    date=$(echo $date | tr -d '"')
+    touch $cache_dir/$graph/$date
+  done
+done

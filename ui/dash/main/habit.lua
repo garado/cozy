@@ -10,6 +10,7 @@ local helpers = require("helpers")
 local wibox = require("wibox")
 local xresources = require("beautiful.xresources")
 local gears = require("gears")
+local gfs = require("gears.filesystem")
 local dpi = xresources.apply_dpi
 local naughty = require("naughty")
 local os = os
@@ -42,20 +43,13 @@ local function widget()
       widget = wibox.container.place,
     })
 
-    -- https://docs.pixe.la/entry/get-pixel
-    -- GET - /v1/users/<username>/graphs/<graphID>/<yyyyMMdd>
-    -- arguments
-    -- habit: pixela graph id
-    -- day: 
-    local function get_daily_status(graph_id, date, letter)
-      local date = "--date " .. date .. " "
-      local graph = "--graph-id " .. graph_id .. " "
-      local cmd = "pi pixel get " .. date .. graph
 
+    local function get_daily_status(graph_id, date, letter)
+      local cache_dir = "/home/alexis/.cache/awesome/pixela"
       local daily_box = wibox.widget({
         {
           {
-            id = "bitch",
+            id = "textbox",
             markup = helpers.ui.colorize_text(letter, beautiful.xforeground),
             widget = wibox.widget.textbox,
             align = "center",
@@ -63,30 +57,29 @@ local function widget()
           },
           forced_height = dpi(30),
           forced_width = dpi(30),
-          --bg = beautiful.nord10,
           shape = gears.shape.circle,
           widget = wibox.container.background,
         },
         widget = wibox.container.place,
       })
       
-      local script = "exec /home/alexis/.config/awesome/utils/dash/main/habit " .. cmd
+      -- If file exists, habit was completed and exit code is 0
+      -- Else habit wasn't completed; exit code 1
       local bg = daily_box.children[1]
-      local fg = daily_box:get_children_by_id("bitch")[1]
-      awful.spawn.easy_async_with_shell(script, function(stdout)
-        local stdout = string.gsub(stdout, "\n", "")
-        if stdout == "true" then
-          bg.bg = beautiful.nord10
-          fg:set_markup_silently(helpers.ui.colorize_text("", beautiful.xforeground))
-        elseif stdout == "false" then
-          bg.bg = beautiful.nord0
-          fg:set_markup_silently(helpers.ui.colorize_text("", beautiful.nord1))
-        end
-      end)
+      local fg = daily_box:get_children_by_id("textbox")[1]
+      
+      local file = cache_dir .. "/" .. graph_id .. "/" .. date
+      if gfs.file_readable(file) then
+        bg.bg = beautiful.nord10
+        fg:set_markup_silently(helpers.ui.colorize_text("", beautiful.xforeground))
+      else
+        bg.bg = beautiful.nord0
+        fg:set_markup_silently(helpers.ui.colorize_text("", beautiful.nord1))
+      end
 
       return daily_box
     end
-    
+
     local function get_overview(graph_id)
       -- get last 7 days of data
       -- starts from 7 days ago so it appends in the right order
@@ -97,6 +90,7 @@ local function widget()
         local day = os.date("%a", ago)
         
         local date = os.date("%Y%m%d", ago)
+        date = string.gsub(date, "\r\n", "")
         local letter = string.sub(day, 1, 1)
         local box = get_daily_status(graph_id, date, letter)
         overview.children[1]:add(box)
@@ -149,7 +143,7 @@ local function widget()
       create_habit_box("Commit", "pomocode"),
       create_habit_box("Journal", "journal"),
       create_habit_box("Exercise", "exercise"),
-      create_habit_box("Reading", "exercise"),
+      create_habit_box("Reading", "reading"),
       spacing = dpi(10),
       layout = wibox.layout.fixed.vertical,
     },

@@ -43,7 +43,7 @@ local widget = wibox.widget({
     {
       --links,
       pomodoro,
-      --habit,
+      habit,
       forced_width = dpi(400),
       layout = wibox.layout.fixed.vertical,
     },

@@ -157,20 +157,30 @@ theme.tag_preview_widget_bg = theme.wibar_bg
 theme.tag_preview_widget_border_color = theme.wibar_bg
 theme.tag_preview_widget_border_width = 0
 
---- Tabs
-theme.mstab_bar_height = dpi(60)
-theme.mstab_bar_padding = dpi(0)
-theme.mstab_border_radius = dpi(6)
-theme.mstab_bar_disable = true
-theme.tabbar_disable = true
-theme.tabbar_style = "modern"
-theme.tabbar_bg_focus = theme.xbackground
-theme.tabbar_bg_normal = theme.xcolor0
-theme.tabbar_fg_focus = theme.xcolor0
-theme.tabbar_fg_normal = theme.xcolor15
-theme.tabbar_position = "top"
-theme.tabbar_AA_radius = 0
-theme.tabbar_size = 0
-theme.mstab_bar_ontop = true
+--- Tabs (bling)
+-- For tabbed only
+theme.tabbed_spawn_in_tab = true -- whether a new client should spawn into the focused tabbing container
+
+-- For tabbar in general
+theme.tabbar_ontop  = false
+theme.tabbar_radius = 0                -- border radius of the tabbar
+theme.tabbar_style = "default"         -- style of the tabbar ("default", "boxes" or "modern")
+theme.tabbar_font = theme.font          -- font of the tabbar
+theme.tabbar_size = 30                 -- size of the tabbar
+theme.tabbar_position = "top"          -- position of the tabbar
+theme.tabbar_bg_normal = theme.nord3-- background color of the focused client on the tabbar
+theme.tabbar_fg_normal = "#ffffff"     -- foreground color of the focused client on the tabbar
+theme.tabbar_bg_focus  = theme.dark_polar_night     -- background color of unfocused clients on the tabbar
+theme.tabbar_fg_focus  = theme.nord9     -- foreground color of unfocused clients on the tabbar
+theme.tabbar_bg_focus_inactive = nil   -- background color of the focused client on the tabbar when inactive
+theme.tabbar_fg_focus_inactive = nil   -- foreground color of the focused client on the tabbar when inactive
+theme.tabbar_bg_normal_inactive = nil  -- background color of unfocused clients on the tabbar when inactive
+theme.tabbar_fg_normal_inactive = nil  -- foreground color of unfocused clients on the tabbar when inactive
+theme.tabbar_disable = false -- disable the tab bar entirely
+
+-- the following variables are currently only for the "modern" tabbar style
+theme.tabbar_color_close = "#f9929b" -- changes the color of the close button
+theme.tabbar_color_min   = "#fbdf90" -- changes the color of the minimize button
+theme.tabbar_color_float = "#ccaced" -- changes the color of the float button
 
 return theme

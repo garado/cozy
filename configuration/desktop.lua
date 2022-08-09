@@ -30,20 +30,20 @@ end)
 -- bling.module.flash_focus.enable()
 
 -- Tag preview 
-bling.widget.tag_preview.enable({
-	show_client_content = true,
-	scale = 0.20,
-  x = 50,
-  y = 425,
-	honor_workarea = true,
-	honor_padding = true,
-	background_widget = wibox.widget({
-		image = beautiful.wallpaper,
-		horizontal_fit_policy = "fit",
-		vertical_fit_policy = "fit",
-		widget = wibox.widget.imagebox,
-	}),
-})
+--bling.widget.tag_preview.enable({
+--	show_client_content = true,
+--	scale = 0.20,
+--  x = 50,
+--  y = 425,
+--	honor_workarea = true,
+--	honor_padding = true,
+--	background_widget = wibox.widget({
+--		image = beautiful.wallpaper,
+--		horizontal_fit_policy = "fit",
+--		vertical_fit_policy = "fit",
+--		widget = wibox.widget.imagebox,
+--	}),
+--})
 
 -- WALLPAPER --
 awful.screen.connect_for_each_screen(function(s)

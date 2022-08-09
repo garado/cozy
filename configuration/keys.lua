@@ -6,6 +6,7 @@ local awful = require("awful")
 local hotkeys_popup = require("awful.hotkeys_popup")
 local beautiful = require("beautiful")
 local apps = require("configuration.apps")
+local bling = require("modules.bling")
 
 -- Make key easier to call
 mod = "Mod4"
@@ -13,30 +14,54 @@ alt = "Mod1"
 ctrl = "Control"
 shift = "Shift"
 
+-- Helper functions for sane(er) keyboard resizing in layout.suit.tile.* modes
+local function resize_horizontal(factor)
+    local layout = awful.layout.get(awful.screen.focused())
+    if layout == awful.layout.suit.tile then
+        awful.tag.incmwfact(-factor)
+    elseif layout == awful.layout.suit.tile.left then
+        awful.tag.incmwfact(factor)
+    elseif layout == awful.layout.suit.tile.top then
+        awful.client.incwfact(-factor)
+    elseif layout == awful.layout.suit.tile.bottom then
+        awful.client.incwfact(-factor)
+    end
+end
+
+local function resize_vertical(factor)
+    local layout = awful.layout.get(awful.screen.focused())
+    if layout == awful.layout.suit.tile then
+        awful.client.incwfact(-factor)
+    elseif layout == awful.layout.suit.tile.left then
+        awful.client.incwfact(-factor)
+    elseif layout == awful.layout.suit.tile.top then
+        awful.tag.incmwfact(-factor)
+    elseif layout == awful.layout.suit.tile.bottom then
+        awful.tag.incmwfact(factor)
+    end
+end
+
 -- Global key bindings
 awful.keyboard.append_global_keybindings({
 
-  -- WM --
+  -- AWESOME --
   -- Restart awesome
   awful.key({ shift, alt }, "r", awesome.restart, 
-    { description = "reload awesome", group = "WM" }),
+    { description = "reload awesome", group = "Awesome" }),
 
   -- Quit awesome
   awful.key({ shift, alt }, "q", awesome.quit, 
-    { description = "quit awesome", group = "WM" }),
+    { description = "quit awesome", group = "Awesome" }),
 
   -- Show help
   awful.key({ mod }, "s", hotkeys_popup.show_help, 
-    { description = "show help", group = "WM"}),
-
-  -----
+    { description = "show help", group = "Awesome"}),
 
   awful.key({ mod }, "j", function()
     awesome.emit_signal("dash::toggle", s)
-  end, { description = "open dash", group = "Apps" }),
+  end, { description = "show dash", group = "Awesome" }),
 
-
-  -- SYSTEM --  
+  -- HOTKEYS --  
 	awful.key({}, "XF86MonBrightnessUp", function()
 		awful.spawn("brightnessctl set 5%+ -q", false)
 		awesome.emit_signal("module::brightness")
@@ -76,29 +101,27 @@ awful.keyboard.append_global_keybindings({
 
   -----
 
-  -- APPS -- 
+  -- LAUNCHERS -- 
   -- Terminal
   awful.key({ alt }, "Return", function()
     awful.spawn(apps.default.terminal)
-  end, { description = "open terminal", group = "Apps" }), 
+  end, { description = "open terminal", group = "Launchers" }), 
   
-  -----
-
-  -- ROFI --
+  -- Rofi --
   -- App launcher
   awful.key({ alt }, "r", function()
     awful.spawn.with_shell(apps.utils.app_launcher)
-  end, { description = "app launcher", group = "Rofi" }), 
+  end, { description = "app launcher", group = "Launchers" }), 
 
   -- Tmux presets
   awful.key({ alt }, "e", function()
     awful.spawn.with_shell(apps.utils.tmux_pane_presets)
-  end, { description = "tmux pane presets", group = "Rofi" }), 
+  end, { description = "tmux pane presets", group = "Launchers" }), 
 
   -- Bluetooth
   awful.key({ alt }, "b", function()
     awful.spawn.with_shell(apps.utils.bluetooth)
-  end, { description = "bluetooth", group = "Rofi" }), 
+  end, { description = "bluetooth", group = "Launchers" }), 
   
 })
 
@@ -109,16 +132,39 @@ client.connect_signal("request::default_keybindings", function()
     -- Toggle floating
 
     -- Toggle fullscreen
-    -- awful.key({ mod }, "f", function()
-    --   client.focus.fullscreen = not client.focus.fullscren
-    --   client.focus:raise()
-    -- end),
+    -- Doesn't work?
+    --awful.key({ ctrl, shift }, "f", function()
+    --  client.focus.fullscreen = not client.focus.fullscren
+    --  client.focus:raise()
+    --end),
     
     -- Close window
     awful.key({ ctrl, shift }, "w", function()
       client.focus:kill()
-    end, { description = "close window", group = "Client" })
+    end, { description = "close window", group = "Client" }),
+   
+    -- Bling tab containers
+    awful.key({ ctrl, shift }, "t", bling.module.tabbed.pick, { group = "Client", description = "pick client with cursor to add to tab group"}),
 
+    awful.key({ ctrl, shift }, "r", bling.module.tabbed.pop, { group = "Client", description = "remove focused client from tab group"}),
+
+    awful.key({ alt }, "Tab", function()
+      bling.module.tabbed.iter(1)
+    end, { group = "Client", description = "next tab in tab group"}),
+
+    awful.key({ alt, shift }, "Tab", function()
+      bling.module.tabbed.iter(-1)
+    end, { group = "Client", description = "prev tab in tab group"}),
+
+    -- Layout-aware resizing
+    awful.key({ mod, shift   }, "h", function () resize_horizontal(0.05) end,
+              { group = "Layout", description = "(tiled) increase size horizontally" }),
+    awful.key({ mod, shift   }, "l", function () resize_horizontal(-0.05) end,
+              { group = "Layout", description = "(tiled) decrease size horizontally" }),
+    awful.key({ mod, shift   }, "k", function () resize_vertical(-0.05) end,
+              { group = "Layout", description = "(tiled) increase size vertically" }),
+    awful.key({ mod, shift   }, "j", function () resize_vertical(0.05) end,
+             { group = "Layout", description = "(tiled) decrease size vertically" }),
   })
 end)
 

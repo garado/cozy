@@ -58,11 +58,8 @@ return function(s)
   end
 
   -------------------------
-  --                     -- 
   -- ASSEMBLING THE DASH --
-  --                     -- 
   -------------------------
-
   local dash_content = wibox.widget({
     {
       {
@@ -197,8 +194,8 @@ return function(s)
     --screen = s,
     minimum_height = dpi(810),
     maximum_height = dpi(810),
-    minimum_width = dpi(1400),
-    maximum_width = dpi(1400),
+    minimum_width = dpi(1350),
+    maximum_width = dpi(1350),
     bg = beautiful.transparent,
     ontop = true,
     visible = false,

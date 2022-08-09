@@ -54,8 +54,7 @@ naughty.connect_signal("request::display", function(n)
     fps = 60,
     speed = 100,
     widgets.text({
-      --font = "Roboto Mono ",
-      font = beautiful.font_name,
+      font = beautiful.font,
       size = 10,
       bold = true,
       text = n.message,

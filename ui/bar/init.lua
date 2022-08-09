@@ -163,7 +163,7 @@ return function(s)
 
   -- reserve screen space
   s.bar:struts({
-    left = s.bar.maximum_width + dpi(5),
+    left = s.bar.maximum_width,
   })
   
   -- SETTINGS --
