@@ -3,6 +3,7 @@
 # os 
 os=$(hostnamectl | grep 'Operating System: ')
 os=$(echo $os | sed -e s/^"Operating System: "//)
+os=$(echo $os | sed -e s/" Linux"//)
 echo "os:$os"
 
 # kernel
@@ -23,7 +24,12 @@ echo "pkg:$pkg"
 
 # uptime
 up=$(uptime -p)
-up=$(echo $up | sed -e s/^"up "//)
+up=$(echo $up | sed -e s/^"up "//g)
+up=$(echo $up | sed -e s/" day"/"d"/g)
+up=$(echo $up | sed -e s/" hour"/"h"/g)
+up=$(echo $up | sed -e s/" minute"/"m"/g)
+up=$(echo $up | sed -e s/","//g)
+up=$(echo $up | sed -e s/"s"//g)
 echo "up:$up"
 
 #cpu

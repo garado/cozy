@@ -47,45 +47,49 @@ awful.keyboard.append_global_keybindings({
   -- AWESOME --
   -- Restart awesome
   awful.key({ shift, alt }, "r", awesome.restart, 
-    { description = "reload awesome", group = "Awesome" }),
+    { description = "reload", group = "Awesome" }),
 
   -- Quit awesome
   awful.key({ shift, alt }, "q", awesome.quit, 
-    { description = "quit awesome", group = "Awesome" }),
+    { description = "quit", group = "Awesome" }),
 
   -- Show help
   awful.key({ mod }, "s", hotkeys_popup.show_help, 
-    { description = "show help", group = "Awesome"}),
+    { description = "help", group = "Awesome"}),
 
   awful.key({ mod }, "j", function()
     awesome.emit_signal("dash::toggle", s)
-  end, { description = "show dash", group = "Awesome" }),
+  end, { description = "dash", group = "Awesome" }),
+  
+  awful.key({ mod }, "k", function()
+    awesome.emit_signal("control_center::toggle", s)
+  end, { description = "control center", group = "Awesome" }),
 
   -- HOTKEYS --  
 	awful.key({}, "XF86MonBrightnessUp", function()
 		awful.spawn("brightnessctl set 5%+ -q", false)
 		awesome.emit_signal("module::brightness")
-	end, { description = "increase brightness", group = "Hotkeys" }),
+	end),
 	awful.key({}, "XF86MonBrightnessDown", function()
 		awful.spawn("brightnessctl set 5%- -q", false)
 		awesome.emit_signal("module::brightness")
-	end, { description = "decrease brightness", group = "Hotkeys" }),
+	end),
 
 	--- Audio control
 	awful.key({}, "XF86AudioRaiseVolume", function()
 		awful.spawn("pamixer -u ; pamixer -i 5", false)
 		awesome.emit_signal("module::volume")
-	end, { description = "increase volume", group = "Hotkeys" }),
+	end),
 
 	awful.key({}, "XF86AudioLowerVolume", function()
 		awful.spawn("pamixer -u ; pamixer -d 5", false)
 		awesome.emit_signal("module::volume")
-	end, { description = "decrease volume", group = "Hotkeys" }),
+	end),
   
 	awful.key({}, "XF86AudioMute", function()
 		awful.spawn("pamixer -t", false)
 		awesome.emit_signal("module::volume")
-	end, { description = "mute volume", group = "Hotkeys" }),
+	end),
   
   awful.key({mod}, "XF86AudioLowerVolume", function()
     awful.spawn("playerctl play-pause", false)
@@ -105,7 +109,7 @@ awful.keyboard.append_global_keybindings({
   -- Terminal
   awful.key({ alt }, "Return", function()
     awful.spawn(apps.default.terminal)
-  end, { description = "open terminal", group = "Launchers" }), 
+  end, { description = "terminal", group = "Launchers" }), 
   
   -- Rofi --
   -- App launcher
@@ -129,42 +133,78 @@ awful.keyboard.append_global_keybindings({
 -- ~~~~~~~~~~~~~~~~~~
 client.connect_signal("request::default_keybindings", function()
   awful.keyboard.append_client_keybindings({
+
     -- Toggle floating
+    awful.key({ ctrl, shift }, "g", function()
+      client.focus.floating = not client.focus.floating
+      client.focus:raise()
+    end, { description = "floating", group = "Client" }),
 
     -- Toggle fullscreen
-    -- Doesn't work?
-    --awful.key({ ctrl, shift }, "f", function()
-    --  client.focus.fullscreen = not client.focus.fullscren
-    --  client.focus:raise()
-    --end),
-    
+    awful.key({ ctrl, shift }, "f", function()
+      client.focus.fullscreen = not client.focus.fullscreen
+      client.focus:raise()
+    end, { description = "fullscreen", group = "Client" }),
+   
     -- Close window
     awful.key({ ctrl, shift }, "w", function()
       client.focus:kill()
-    end, { description = "close window", group = "Client" }),
+    end, { description = "close", group = "Client" }),
    
     -- Bling tab containers
-    awful.key({ ctrl, shift }, "t", bling.module.tabbed.pick, { group = "Client", description = "pick client with cursor to add to tab group"}),
+    awful.key({ ctrl, shift }, "t", bling.module.tabbed.pick, { group = "Client", description = "tab group: add with cursor"}),
 
-    awful.key({ ctrl, shift }, "r", bling.module.tabbed.pop, { group = "Client", description = "remove focused client from tab group"}),
+    awful.key({ ctrl, shift }, "r", bling.module.tabbed.pop, { group = "Client", description = "tab group: remove focused"}),
 
     awful.key({ alt }, "Tab", function()
       bling.module.tabbed.iter(1)
-    end, { group = "Client", description = "next tab in tab group"}),
+    end, { group = "Client", description = "tab group: focus next (+shift for prev)"}),
 
     awful.key({ alt, shift }, "Tab", function()
       bling.module.tabbed.iter(-1)
-    end, { group = "Client", description = "prev tab in tab group"}),
+    end),
 
     -- Layout-aware resizing
     awful.key({ mod, shift   }, "h", function () resize_horizontal(0.05) end,
-              { group = "Layout", description = "(tiled) increase size horizontally" }),
-    awful.key({ mod, shift   }, "l", function () resize_horizontal(-0.05) end,
-              { group = "Layout", description = "(tiled) decrease size horizontally" }),
-    awful.key({ mod, shift   }, "k", function () resize_vertical(-0.05) end,
-              { group = "Layout", description = "(tiled) increase size vertically" }),
-    awful.key({ mod, shift   }, "j", function () resize_vertical(0.05) end,
-             { group = "Layout", description = "(tiled) decrease size vertically" }),
+              { group = "Layout", description = "(tiled, vimlike) increase size horizontally" }),
+    awful.key({ mod, shift   }, "l", function () resize_horizontal(-0.05) end),
+    awful.key({ mod, shift   }, "k", function () resize_vertical(-0.05) end),
+    awful.key({ mod, shift   }, "j", function () resize_vertical(0.05) end),
+
+  -- Changing focus
+  awful.key({ alt, shift }, "h", function()
+    awful.client.focus.bydirection("left")
+  end, {description = "(vimlike) focus left", group = "Client"}),
+  
+  awful.key({ alt, shift }, "j", function()
+    awful.client.focus.bydirection("down")
+  end),
+
+  awful.key({ alt, shift }, "k", function()
+    awful.client.focus.bydirection("up")
+  end),
+
+  awful.key({ alt, shift }, "l", function()
+    awful.client.focus.bydirection("right")
+  end),
+
+  -- Swapping clients
+  awful.key({ alt, shift, ctrl }, "h", function()
+    awful.client.swap.bydirection("left")
+  end, { description = "(vimlike) swap left", group = "Client"}),
+
+  awful.key({ alt, shift, ctrl }, "j", function()
+    awful.client.swap.bydirection("down")
+  end),
+
+  awful.key({ alt, shift, ctrl }, "k", function()
+    awful.client.swap.bydirection("up")
+  end),
+
+  awful.key({ alt, shift, ctrl }, "l", function()
+    awful.client.swap.bydirection("right")
+  end),
+
   })
 end)
 

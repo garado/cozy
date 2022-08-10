@@ -38,6 +38,8 @@ theme.dark_polar_night = "#20242c"
 theme.med2_polar_night = "#272c36"
 theme.med_polar_night = "#373e4d"
 
+
+
 -- Other
 theme.transparent = "#ffffff00"
 
@@ -113,7 +115,9 @@ theme.wallpaper = gears.surface.load_uncached(gfs.get_configuration_dir() .. "th
 theme.useless_gap = dpi(7)
 
 -- Borders
-
+theme.border_width = dpi(2)
+theme.border_color_active = theme.nord9
+theme.border_color_normal = theme.med_polar_night
 
 -- Corner radius
 theme.border_radius = 10

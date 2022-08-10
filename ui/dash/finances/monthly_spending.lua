@@ -105,8 +105,7 @@ local function create_chart()
   --------------
   -- Get data --
   --------------
-  local function create_new_chart_section(entries, num_entries)
-    local total_spending = entries[num_entries][3]
+  local function create_new_chart_section(entries, num_entries, total_spending)
     local arc_values = { }
     local colors = { }
     local arc_text = chart:get_children_by_id("text")[1]
@@ -115,7 +114,7 @@ local function create_chart()
     -- Set values
     arc_chart.min_value = 0
     arc_chart.max_value = tonumber(total_spending)
-    arc_text:set_markup_silently(helpers.ui.colorize_text(total_spending, beautiful.xforeground))
+    arc_text:set_markup_silently(helpers.ui.colorize_text("$" .. total_spending, beautiful.xforeground))
 
     -- category: 1
     -- amount: 2
@@ -131,48 +130,72 @@ local function create_chart()
     arc_chart.values = arc_values
   end -- end create chart
 
-  local cmd = "ledger -f " .. ledger_file .. " -M -s --period-sort \"(amount)\" reg expenses"
+  local cmd = "ledger -f " .. ledger_file .. " -M csv register expenses"
+  --local cmd = "ledger -f " .. ledger_file .. " -M -s --period-sort \"(amount)\" reg expenses"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     -- Split on newlines
     local lines = { }
     for str in stdout:gmatch("[^\r\n]+") do
       table.insert(lines, str)
     end
-
+      
     -- Outputs look like this:
     --    Expenses:Personal:Food  $29.50
     --    Expenses:Fees           $0.10   
-    -- Category to show is after the 2nd to last colon,
-    -- or the last colon if there's only one
+
+    -- subcategories are separated by colons
+    -- if (num subcategories) > 1 then
+    --    Category to show = 2nd to last subcategory
+    -- else
+    --    Category to display = last subcategory
     local entries = { }
     local num_entries = 0
     for i,v in ipairs(lines) do
-      ---- Count occurences
-      --local _, count = string.gsub(v, "%:", "")
-      --if count == 1 then
-      --else
+      -- Detect num subcategories based on # of colons
+      local _, colon_count = string.gsub(v, "%:", "")
+      local isolated
+      local category, amount
+      if colon_count == 1 then
         -- Isolate category and category total by splitting 
         -- on last colon
         local s, e = v:find(":[^:]*$")
-        local isolated = v:sub(s+1)
-      --end
+        local substring = v:sub(s+1)
 
-      -- Parse category and total by delimiting on whitespace
-      local fields = { }
-      for field in string.gmatch(isolated, "([^%s]+)") do
-        table.insert(fields, field)
+        category = string.gsub(substring, "\"(.*)", "")
+        amount = string.gsub(substring, "[^0-9.]", "")
+      else
+        local t =  { }
+        local count = 0
+        for i in string.gmatch(v, "[^:]+") do
+          table.insert(t, i)
+          count = count + 1
+        end
+        category = t[count - 1]
+        local substring = t[count]
+        amount = string.gsub(substring, "[^0-9.]", "")
       end
-     
+
       -- Insert into table full of entries
-      local category = fields[1]
-      local amount = string.gsub(fields[2], "[^0-9.]", "")
-      local balance = fields[3]
-      table.insert(entries, { category, amount, balance })
-      num_entries = num_entries + 1
+      local categoryWasFound = false
+      for i, v in ipairs(entries) do
+        if v[1] == category then
+          v[2] = v[2] + tonumber(amount)
+          categoryWasFound = true
+        end
+      end
+
+      if not categoryWasFound then
+        table.insert(entries, { category, tonumber(amount) })
+        num_entries = num_entries + 1
+      end
     end
 
     -- Now that we have all the entries, we can create the arc chart
-    create_new_chart_section(entries, num_entries)
+    local total_spending = 0
+    for i, v in ipairs(entries) do
+      total_spending = total_spending + v[2]
+    end
+    create_new_chart_section(entries, num_entries, total_spending)
   end)
 
 

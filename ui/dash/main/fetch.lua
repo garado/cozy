@@ -27,17 +27,18 @@ local function create_entry(title, value)
     {
       markup = colorized_title,
       widget = wibox.widget.textbox,
-      forced_width = dpi(70),
+      forced_width = dpi(100),
       align = "right",
       valign = "top",
     },
     {
       markup = colorized_value,
       widget = wibox.widget.textbox,
+      forced_width = dpi(100),
       align = "left",
       valign = "top",
     },
-    layout = wibox.layout.fixed.horizontal,
+    layout = wibox.layout.flex.horizontal,
   })
 
   -- Insert into widget
@@ -57,7 +58,6 @@ local function fuck()
   local script="exec /home/alexis/.config/awesome/utils/dash/main/fetch"
   awful.spawn.easy_async_with_shell(script, function(stdout)
     extract_entry(stdout, "os")
-    extract_entry(stdout, "cpu")
     extract_entry(stdout, "wm")
     extract_entry(stdout, "pkg")
     extract_entry(stdout, "up")
@@ -67,4 +67,4 @@ end
 
 fuck()
 
-return helpers.ui.create_boxed_widget(widget, dpi(220), dpi(200), beautiful.dash_widget_bg) 
+return helpers.ui.create_boxed_widget(widget, dpi(220), dpi(160), beautiful.dash_widget_bg) 
