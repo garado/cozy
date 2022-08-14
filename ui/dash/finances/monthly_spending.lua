@@ -24,8 +24,6 @@ local ledger_file = user_vars.dash.ledger_file
 -- Each category of spending gets a color in the arc chart
 -- This table defines those colors
 local color_palette = {
-  beautiful.nord3,
-  beautiful.nord6,
   beautiful.nord7,
   beautiful.nord8,
   beautiful.nord9,
