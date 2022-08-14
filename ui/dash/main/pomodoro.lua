@@ -33,7 +33,7 @@ local pomodoro = {
     "School", "Coding", "Hobby", "Personal",
   },
   times = {
-    "5m", "15m", "25m", "60m",
+    "1m", "15m", "25m", "60m",
   },
 }
 
@@ -121,6 +121,19 @@ local function create_topic_buttons()
     widget = wibox.container.margin,
   })
 
+  local back_button = widgets.button.text.normal({
+    text = "",
+    text_normal_bg = beautiful.xforeground,
+    normal_bg = beautiful.nord0,
+    animate_size = false,
+    font = beautiful.font,
+    size = 12,
+    on_release = function()
+      pomodoro.current_state = "start"
+      redraw_widget()
+    end
+  })
+
   for i,v in ipairs(pomodoro.topics) do
     local button = widgets.button.text.normal({
       text = v,
@@ -137,6 +150,7 @@ local function create_topic_buttons()
     })
     buttons.children[1]:add(button)
   end
+  buttons.children[1]:add(back_button)
   return buttons
 end
 
@@ -197,6 +211,20 @@ local function create_time_buttons()
     widget = wibox.container.margin,
   })
 
+  local back_button = widgets.button.text.normal({
+    text = "",
+    text_normal_bg = beautiful.xforeground,
+    normal_bg = beautiful.nord0,
+    animate_size = false,
+    font = beautiful.font,
+    size = 12,
+    on_release = function()
+      pomodoro.current_state = "select_topic"
+      redraw_widget()
+    end
+  })
+
+
   for i,v in ipairs(pomodoro.times) do
     local button = widgets.button.text.normal({
       text = v,
@@ -207,20 +235,21 @@ local function create_time_buttons()
       size = 12,
       on_release = function()
         local time = string.gsub(v, "[^0-9.-]", "")
+        local formatted_time = string.format("%.0f", (pomodoro.selected_time / 60))
         pomodoro.selected_time = time * 60
         pomodoro.current_state = "tick"
         redraw_widget()
         naughty.notification {
           app_name = "Pomodoro",
           title = "Pomodoro started",
-          message = "Work on " .. pomodoro.selected_topic 
-              .. " for " .. (pomodoro.selected_time/60) .. "m",
+          message = "Work on " .. pomodoro.selected_topic .. " for " .. formatted_time .. "m",
           timeout = 5,
         }
       end
     })
     buttons.children[1]:add(button)
   end
+  buttons.children[1]:add(back_button)
   return buttons
 end
 
@@ -341,14 +370,18 @@ local function ui_tick()
         local progress = (pomodoro.time_remaining * 100) / pomodoro.selected_time
         ui_bar.value = progress
 
-        if pomodoro.time_remaining == 0 then
-          second_timer:stop()
+        if pomodoro.time_remaining <= 0 then
+          local formatted_time = string.format("%.0f", (pomodoro.selected_time / 60))
           naughty.notification {
             app_name = "Pomodoro",
             title = "Pomodoro completed!",
-            message = "Finished " .. (pomodoro.selected_time / 60) .. "m of work on " .. pomodoro.selected_topic,
+            message = "Finished " .. formatted_time .. "m of work on " .. pomodoro.selected_topic,
             timeout = 0,
           }
+          awful.spawn("mpg123 " .. "/home/alexis/.config/awesome/theme/assets/pomo_complete.mp3")
+          pomodoro.current_state = "complete"
+          redraw_widget()
+          second_timer:stop()
         end
       end,
     }
@@ -496,7 +529,42 @@ end
 --█▀▀ █▀█ █▀▄▀█ █▀█ █░░ █▀▀ ▀█▀ █▀▀
 --█▄▄ █▄█ █░▀░█ █▀▀ █▄▄ ██▄ ░█░ ██▄
 local function ui_complete()
-  local widget = wibox.widget({
+  local back_to_beginning = widgets.button.text.normal({
+    text = "take it back now yall",
+    text_normal_bg = beautiful.xforeground,
+    normal_bg = beautiful.nord3,
+    animate_size = false,
+    font = beautiful.header_font,
+    size = 12,
+    on_release = function()
+      pomodoro.current_state = "start"
+      redraw_widget()
+    end
+  })
+
+  local formatted_time = string.format("%.0f", (pomodoro.selected_time / 60))
+  local text = "finished " .. formatted_time .. "m of work on " .. pomodoro.selected_topic
+  local ugh = wibox.widget({
+    {
+      {
+        markup = helpers.ui.colorize_text("the horror is over", beautiful.xforeground),
+        font = beautiful.header_font_name .. "20",
+        widget = wibox.widget.textbox,
+        align = "center",
+        valign = "center",
+      },
+      {
+        markup = helpers.ui.colorize_text(text, beautiful.xforeground),
+        widget = wibox.widget.textbox,
+        font = beautiful.header_font_name .. "12",
+        align = "center",
+        valign = "center",
+      },
+      back_to_beginning,
+      spacing = dpi(10),
+      layout = wibox.layout.fixed.vertical,
+    },
+    widget = wibox.container.place,
   })
 
   local box_container = wibox.container.background()
@@ -507,7 +575,7 @@ local function ui_complete()
   local widget_cont = wibox.widget({
     {
       {
-        widget,
+        ugh,
         margins = dpi(15),
         widget = wibox.container.margin,
       },
@@ -535,6 +603,7 @@ function redraw_widget()
   elseif current_state == "tick" then
     new_content = ui_tick()
   elseif current_state == "complete" then
+    new_content = ui_complete()
   end
  
   widget:set_widget(new_content)
