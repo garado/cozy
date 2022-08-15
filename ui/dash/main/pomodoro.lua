@@ -235,8 +235,8 @@ local function create_time_buttons()
       size = 12,
       on_release = function()
         local time = string.gsub(v, "[^0-9.-]", "")
-        local formatted_time = string.format("%.0f", (pomodoro.selected_time / 60))
         pomodoro.selected_time = time * 60
+        local formatted_time = string.format("%.0f", (pomodoro.selected_time / 60))
         pomodoro.current_state = "tick"
         redraw_widget()
         naughty.notification {

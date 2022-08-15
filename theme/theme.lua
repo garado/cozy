@@ -55,7 +55,7 @@ theme.color6 = "#c4ad9c"
 -- █▀▀ █▀█ █▄░█ ▀█▀ █▀
 -- █▀░ █▄█ █░▀█ ░█░ ▄█
 
-theme.font_name = "RobotoMono Nerd Font "
+theme.font_name = "RobotoMono Nerd Font Mono "
 theme.font = theme.font_name .. "Regular "
 
 --theme.icon_font = "Nerd Font"

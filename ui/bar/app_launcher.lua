@@ -19,7 +19,7 @@ local function create_launcher_entry(icon, program)
     text_normal_bg = beautiful.xforeground,
     normal_bg = beautiful.wibar_bg,
     animate_size = false,
-    size = 12,
+    size = 20,
     on_release = function()
       awful.spawn(program)
       app_launcher.visible = not app_launcher.visible
@@ -32,14 +32,23 @@ end
 app_launcher = awful.popup({
   widget = {
     {
-      create_launcher_entry("d", "xournalpp"),
-      layout = wibox.layout.fixed.vertical,
+      {
+        create_launcher_entry("", "xournalpp"),
+        create_launcher_entry("", "foliate"),
+        create_launcher_entry("", "alacritty"),
+        create_launcher_entry("", "thunar"),
+        create_launcher_entry("", "firefox"),
+        spacing = dpi(5),
+        layout = wibox.layout.fixed.vertical,
+      },
+      margins = dpi(10),
+      widget = wibox.container.margin,
     },
     bg = beautiful.dark_polar_night,
     widget = wibox.container.background,
   },
   x = dpi(50),
-  y = dpi(100),
+  y = dpi(10),
   shape = gears.shape.rounded_rect,
   visible = false,
   ontop = true,
