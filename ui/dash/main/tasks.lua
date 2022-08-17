@@ -45,15 +45,11 @@ local function widget()
   })
 
   local function update_tasks()
-    awful.spawn.easy_async_with_shell(
-      [[
-        $HOME/.config/awesome/utils/dash/main/tasks/print_tasks 
-      ]],
-      function(stdout)
-        local stdout = helpers.ui.colorize_text(stdout, beautiful.dash_widget_fg)
-        tasks:get_children()[1]:set_markup(stdout)
-      end
-    )
+    local cmd = gfs.get_configuration_dir() .. "utils/dash/print_tasks"
+    awful.spawn.easy_async_with_shell(cmd, function(stdout)
+      local stdout = helpers.ui.colorize_text(stdout, beautiful.dash_widget_fg)
+      tasks:get_children()[1]:set_markup(stdout)
+    end)
   end
 
   -- This signal is emitted in a taskwarrior hook

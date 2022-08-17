@@ -3,5 +3,5 @@
 # Outputs a random title from a list of titles
 # (random line from a file)
 
-file=$HOME/.config/awesome/utils/dash/main/titles
+file=$HOME/.config/awesome/utils/dash/titles
 shuf -n 1 $file

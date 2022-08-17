@@ -8,6 +8,7 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local gears = require("gears")
+local gfs = require("gears.filesystem")
 local helpers = require("helpers")
 
 local function create_profile()
@@ -75,16 +76,11 @@ local function create_profile()
   -- new title every time you open dash
   -- need to make it change only when dash is closing
   awesome.connect_signal("dash::toggle", function()
-    local naughty = require("naughty")
-    awful.spawn.easy_async_with_shell(
-      [[
-        $HOME/.config/awesome/utils/dash/main/get_random_title
-      ]],
-      function(stdout)
-        local stdout = helpers.ui.colorize_text(stdout, beautiful.dash_widget_fg)
-        title:set_markup(stdout)
-      end
-    )
+    local cmd = gfs.get_configuration_dir() .. "utils/dash/get_random_title"
+    awful.spawn.easy_async_with_shell(cmd, function(stdout)
+      local stdout = helpers.ui.colorize_text(stdout, beautiful.dash_widget_fg)
+      title:set_markup(stdout)
+    end)
   end)
   
   local profile = wibox.widget({
