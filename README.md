@@ -4,7 +4,7 @@ Hi! This is my [AwesomeWM](https://awesomewm.org/) config. Thanks for checking i
 The primary goal of this setup is to create an environment that 1) can be used on both my laptop and my tablet, and 2) integrate all the cli tools I use to manage my life into a nice dashboard.
 
 # Dashboard
-![dashboard: main tab](.github/assets/dash_main.png | width=500)
+<img src=".github/assets/dash_main.png" width="1200">
 
 Features:
 - Fancy music player (credit: [rxhyn](https://github.com/rxyhn/yoru))
