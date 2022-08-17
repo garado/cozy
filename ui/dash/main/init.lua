@@ -18,17 +18,21 @@ local tasks = require("ui.dash.main.tasks")
 local music = require("ui.dash.main.music_player")
 local fetch = require("ui.dash.main.fetch")
 local habit = require("ui.dash.main.habit")
-local budget = require("ui.dash.main.budget")
+local monthly_spending = require("ui.dash.main.monthly_spending")
 local timedate = require("ui.dash.main.timedate")
+local goals = require("ui.dash.main.goals")
 local naughty = require("naughty")
 
+-- width of widgets is set here
+-- height of widgets is set within the widget.lua
 local widget = wibox.widget({
   {
     {
       profile,
-      fetch,
       timedate,
       music,
+      goals,
+      --fetch,
       forced_width = dpi(350),
       expand = true,
       layout = wibox.layout.fixed.vertical,
@@ -36,7 +40,7 @@ local widget = wibox.widget({
     {
       events,
       tasks,
-      budget,
+      monthly_spending,
       forced_width = dpi(550),
       layout = wibox.layout.fixed.vertical,
     },

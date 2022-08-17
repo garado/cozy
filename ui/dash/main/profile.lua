@@ -10,7 +10,7 @@ local dpi = xresources.apply_dpi
 local gears = require("gears")
 local helpers = require("helpers")
 
-local function widget(s)
+local function create_profile()
   local image = wibox.widget({
     {
       {
@@ -51,39 +51,31 @@ local function widget(s)
   local name = wibox.widget({
     widget = wibox.widget.textbox,
     markup = helpers.ui.colorize_text("Alexis G.", beautiful.nord10),
-    font = beautiful.header_font .. "20",
-    align = "left",
+    font = "Roboto Mono 18",
+    align = "center",
     valign = "center",
   })
   
   local host = wibox.widget({
-    {
-      widget = wibox.widget.textbox,
-      markup = helpers.ui.colorize_text("@andromeda", beautiful.nord1),
-      font = beautiful.font .. "10",
-      align = "left",
-      valign = "center",
-    },
-    --margins = {
-    --  top = dpi(-5),
-    --  bottom = dpi(5),
-    --},
-    margins = {
-      --top = dpi(-5),
-    },
-    widget = wibox.container.margin,
+    widget = wibox.widget.textbox,
+    markup = helpers.ui.colorize_text("@andromeda", beautiful.nord1),
+    font = "Roboto Mono 18",
+    align = "center",
+    valign = "center",
   })
   
   local title = wibox.widget({
     widget = wibox.widget.textbox,
     font = beautiful.font .. "11",
     markup = "insert title here",
-    align = "left",
+    align = "center",
     valign = "center",
   })
  
   -- new title every time you open dash
+  -- need to make it change only when dash is closing
   awesome.connect_signal("dash::toggle", function()
+    local naughty = require("naughty")
     awful.spawn.easy_async_with_shell(
       [[
         $HOME/.config/awesome/utils/dash/main/get_random_title
@@ -95,23 +87,19 @@ local function widget(s)
     )
   end)
   
-  profile = wibox.widget({
+  local profile = wibox.widget({
     {
       image,
-      {
-        {
-          {
-              name,
-              host,
-              --title, 
-              layout = wibox.layout.fixed.vertical,
-          },
-          widget = wibox.container.place,
-        },
-        margins = { left = dpi(15) },
-        widget = wibox.container.margin,
-      },
-      layout = wibox.layout.fixed.horizontal,
+      --{
+      --  --name
+      --  --host,
+      --  --spacing = dpi(2),
+      --  layout = wibox.layout.fixed.horizontal,
+      --},
+      name,
+      title, 
+      spacing = dpi(2),
+      layout = wibox.layout.fixed.vertical,
     },
     widget = wibox.container.place,
   })
@@ -119,5 +107,5 @@ local function widget(s)
   return profile 
 end
 
-return helpers.ui.create_boxed_widget(widget(), dpi(400), dpi(120), beautiful.dash_bg)
+return helpers.ui.create_boxed_widget(create_profile(), dpi(400), dpi(180), beautiful.dash_bg)
 

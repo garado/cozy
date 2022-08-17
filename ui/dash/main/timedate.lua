@@ -33,7 +33,7 @@ local date = wibox.widget({
 
 local date_color = wibox.container.background()
 date_color:set_widget(date)
-date_color:set_fg(beautiful.nord9)
+date_color:set_fg(beautiful.nord10)
 
 local widget = wibox.widget({
   {
