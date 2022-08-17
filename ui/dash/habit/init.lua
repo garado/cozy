@@ -1,25 +1,27 @@
 
--- █▀▄ ▄▀█ █▀ █░█ ▀   █░█ ▄▀█ █▄▄ █ ▀█▀
--- █▄▀ █▀█ ▄█ █▀█ ▄   █▀█ █▀█ █▄█ █ ░█░
+-- █░█ ▄▀█ █▄▄ █ ▀█▀   █▀▄ ▄▀█ █▀ █░█ █▄▄ █▀█ ▄▀█ █▀█ █▀▄
+-- █▀█ █▀█ █▄█ █ ░█░   █▄▀ █▀█ ▄█ █▀█ █▄█ █▄█ █▀█ █▀▄ █▄▀
 
 local awful = require("awful")
-local gears = require("gears")
-local wibox = require("wibox")
 local beautiful = require("beautiful")
+local helpers = require("helpers")
+local wibox = require("wibox")
 local xresources = require("beautiful.xresources")
+local gears = require("gears")
+local gfs = require("gears.filesystem")
 local dpi = xresources.apply_dpi
+local naughty = require("naughty")
+local widgets = require("ui.widgets")
+local os = os
 
-local widget = wibox.widget({
-  {
-    markup = 'habit',
-    align = "center",
-    valign = "center",
-    widget = wibox.widget.textbox,
-  },
-  bg = "bf616a",
-  forced_width = dpi(300),
-  forced_height = dpi(300), 
-  widget = wibox.container.background,
+-- Import
+local habit_overview = require("ui.dash.habit.weekly_overview")
+
+local habit_tab_header = wibox.widget({
 })
 
-return widget
+-- Assemble
+return wibox.widget({
+  habit_overview,
+  layout = wibox.layout.fixed.horizontal,
+})

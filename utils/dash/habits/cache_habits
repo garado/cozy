@@ -4,22 +4,22 @@
 # █▄▄ █▀█ █▄▄ █▀█ ██▄   █▀█ █▀█ █▄█ █ ░█░ ▄█
 
 # Caches data from Pixela so I don't spam the pixela API every
-# time I restart awesome (sorry @a-know!)
+# time I restart awesome and end up with 8000 requests (sorry @a-know!)
 
 # Usage:
 # ./cache_habits start_date num_days [graph_id...]
 # start_date
-#   The day to start fetching habits from (YYYYMMDD)
-#   Note: technically any `date`-acceptable format will work as 
-#   long as it has no spaces
+#     The day to start fetching habits from (YYYYMMDD)
+#     Note: technically any `date`-acceptable format will work as 
+#     long as it has no spaces
 # num_days
-#   How many days in the past to get habit data from
+#     How many days in the past to get habit data from
 # graph_id
-#   A list of graph_ids to get data from
+#     A list of graph_ids to get data from
 # -f graph_id_file
-#   NOT YET IMPLEMENTED
-#   If this flag is set, cache_habits will retrieve graph ids from the file
-#   Each graph id in the file should be on its own line 
+#     NOT YET IMPLEMENTED
+#     If this flag is set, cache_habits will retrieve graph ids from the file
+#     Each graph id in the file should be on its own line 
 
 # The intention is for you to run this script in a cron job once a day or so.
 
@@ -45,7 +45,15 @@ fi
 num_days=$2
 
 if [[ "$3" == "-f" ]]; then
-  echo "not implemented yet"
+  graph_id_file=$4
+  if test -f "$graph_id_file"; then
+    cmd="cat $graph_id_file"
+    cmd_out=$($cmd)
+    graph_ids=($cmd_out)
+  else
+    echo "cache_habits: error: graph id file does not exist"
+    exit
+  fi
 else
   graph_ids=(${@:3})
 fi
