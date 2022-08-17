@@ -38,6 +38,10 @@ mkdir -p $cache_dir
 
 # Get variables
 start_date=$1
+if [[ "$start_date" -eq "today" ]]; then
+  start_date=$(date -d today +'%Y%m%d')
+fi
+
 num_days=$2
 
 if [[ "$3" == "-f" ]]; then

@@ -40,7 +40,6 @@ naughty.connect_signal("request::display", function(n)
     fps = 60,
     speed = 75,
     widgets.text({
-      --font = "Roboto Mono ",
       font = beautiful.font_name,
       size = 10,
       bold = true,
@@ -56,9 +55,41 @@ naughty.connect_signal("request::display", function(n)
     widgets.text({
       font = beautiful.font,
       size = 10,
-      bold = true,
+      bold = false,
       text = n.message,
     }),
+  })
+  
+  local actions = wibox.widget({
+		notification = n,
+		base_layout = wibox.widget({
+			spacing = dpi(3),
+			layout = wibox.layout.flex.horizontal,
+		}),
+		widget_template = {
+			{
+				{
+					{
+						id = "text_role",
+						font = beautiful.font .. "10",
+						widget = wibox.widget.textbox,
+					},
+					left = dpi(6),
+					right = dpi(6),
+					widget = wibox.container.margin,
+				},
+				widget = wibox.container.place,
+			},
+			bg = beautiful.nord0,
+			forced_height = dpi(25),
+			forced_width = dpi(70),
+			widget = wibox.container.background,
+		},
+		style = {
+			underline_normal = false,
+			underline_selected = true,
+		},
+		widget = naughty.list.actions,
   })
 
   local app_name = widgets.text({
@@ -131,7 +162,12 @@ naughty.connect_signal("request::display", function(n)
               timeout_arc,
               layout = wibox.layout.align.horizontal,
             },
-            margins = { top = dpi(5), bottom = dpi(5), left = dpi(10), right = dpi(10) },
+            margins = { 
+              top = dpi(5), 
+              bottom = dpi(5), 
+              left = dpi(10), 
+              right = dpi(10) 
+            },
             widget = wibox.container.margin,
           },
           bg = beautiful.notification_title_bg,
@@ -143,7 +179,7 @@ naughty.connect_signal("request::display", function(n)
               layout = wibox.layout.fixed.horizontal,
               {
                 layout = wibox.layout.fixed.horizontal,
-                nil, -- icon goes here
+                nil, -- icon goes here when i get around to adding it
               },
               {
                 expand = "none",
@@ -157,8 +193,16 @@ naughty.connect_signal("request::display", function(n)
                 nil,
               },
             }, -- end app icon and title/msg
-            --{ -- Actions
-            --}, -- End actions
+            { -- Actions
+             	helpers.ui.vertical_pad(dpi(10)),
+              {
+                actions,
+                shape = helpers.ui.rrect(beautiful.border_radius / 2),
+                widget = wibox.container.background,
+              },
+              visible = n.actions and #n.actions > 0,
+              layout = wibox.layout.fixed.vertical,
+            }, -- End actions
             layout = wibox.layout.fixed.vertical,
           },
           margins = dpi(10),
@@ -167,7 +211,7 @@ naughty.connect_signal("request::display", function(n)
       },
       shape = helpers.ui.rrect(dpi(5)),
       bg = beautiful.notification_content_bg,
-      forced_width = dpi(250),
+      forced_width = dpi(275),
       widget = wibox.container.background,
     },
   })
@@ -197,3 +241,4 @@ require(... .. ".battery")
 require(... .. ".playerctl")
 require(... .. ".brightness")
 require(... .. ".volume")
+require(... .. ".prompts")
