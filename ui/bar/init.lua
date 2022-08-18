@@ -184,7 +184,7 @@ return function(s)
       c.screen.bar.visible = true 
     end
   end
-  
-  client.connect_signal("property::fullscreen", remove_bar)
-  client.connect_signal("request::unmanage", add_bar)
+ 
+  --client.connect_signal("property::fullscreen", remove_bar)
+  --client.connect_signal("request::unmanage", add_bar)
 end

@@ -55,6 +55,7 @@ local function create_chart()
       widget = wibox.container.arcchart,
     },
     forced_height = dpi(120),
+    forced_width = dpi(120),
     widget = wibox.container.place,
   })
   
@@ -204,29 +205,105 @@ end
 -- Returns current checking balance.
 local function balance()
   local header = wibox.widget({
-    markup = helpers.ui.colorize_text("balance", beautiful.nord3),
+    markup = helpers.ui.colorize_text("Checking", beautiful.nord3),
     widget = wibox.widget.textbox,
-    font = beautiful.font .. "12",
+    font = beautiful.font_name .. "11",
     align = "center",
     valign = "center",
   })
 
   local balance_ = wibox.widget({
-    markup = helpers.ui.colorize_text("$341", beautiful.xforeground),
+    markup = helpers.ui.colorize_text("$420.00", beautiful.xforeground),
     widget = wibox.widget.textbox,
-    font = beautiful.header_font_name .. "20",
+    font = beautiful.header_font_name .. "15",
     align = "center",
     valign = "center",
   })
 
-  local ledger_file = user_vars.dash.ledger_file
-  local cmd = "ledger -f " .. ledger_file .. " balance checking"
-  awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    balance = string.gsub(stdout, "Assets:Checking", "")
-    balance = string.gsub(balance, "%s+", "")
-    local markup = helpers.ui.colorize_text(balance, beautiful.xforeground)
-    balance_:set_markup_silently(markup)
-  end)
+  --local ledger_file = user_vars.dash.ledger_file
+  --local cmd = "ledger -f " .. ledger_file .. " balance checking"
+  --awful.spawn.easy_async_with_shell(cmd, function(stdout)
+  --  balance = string.gsub(stdout, "Assets:Checking", "")
+  --  balance = string.gsub(balance, "%s+", "")
+  --  local markup = helpers.ui.colorize_text(balance, beautiful.xforeground)
+  --  balance_:set_markup_silently(markup)
+  --end)
+
+  local balance = wibox.widget({
+    {
+      header,
+      balance_,
+      layout = wibox.layout.fixed.vertical,
+    },
+    widget = wibox.container.place,
+  })
+
+  return balance
+end
+
+local function savings()
+  local header = wibox.widget({
+    markup = helpers.ui.colorize_text("Savings", beautiful.nord3),
+    widget = wibox.widget.textbox,
+    font = beautiful.font_name .. "11",
+    align = "center",
+    valign = "center",
+  })
+
+  local balance_ = wibox.widget({
+    markup = helpers.ui.colorize_text("$420.00", beautiful.xforeground),
+    widget = wibox.widget.textbox,
+    font = beautiful.header_font_name .. "15",
+    align = "center",
+    valign = "center",
+  })
+
+  --local ledger_file = user_vars.dash.ledger_file
+  --local cmd = "ledger -f " .. ledger_file .. " balance checking"
+  --awful.spawn.easy_async_with_shell(cmd, function(stdout)
+  --  balance = string.gsub(stdout, "Assets:Checking", "")
+  --  balance = string.gsub(balance, "%s+", "")
+  --  local markup = helpers.ui.colorize_text(balance, beautiful.xforeground)
+  --  balance_:set_markup_silently(markup)
+  --end)
+
+  local balance = wibox.widget({
+    {
+      header,
+      balance_,
+      layout = wibox.layout.fixed.vertical,
+    },
+    widget = wibox.container.place,
+  })
+
+  return balance
+end
+
+local function total()
+  local header = wibox.widget({
+    markup = helpers.ui.colorize_text("Total", beautiful.nord3),
+    widget = wibox.widget.textbox,
+    font = beautiful.font_name .. "11",
+    align = "center",
+    valign = "center",
+  })
+
+  local balance_ = wibox.widget({
+    markup = helpers.ui.colorize_text("$840.00", beautiful.xforeground),
+    widget = wibox.widget.textbox,
+    font = beautiful.header_font_name .. "15",
+    align = "center",
+    valign = "center",
+  })
+
+  --local ledger_file = user_vars.dash.ledger_file
+  --local cmd = "ledger -f " .. ledger_file .. " balance checking"
+  --awful.spawn.easy_async_with_shell(cmd, function(stdout)
+  --  balance = string.gsub(stdout, "Assets:Checking", "")
+  --  balance = string.gsub(balance, "%s+", "")
+  --  local markup = helpers.ui.colorize_text(balance, beautiful.xforeground)
+  --  balance_:set_markup_silently(markup)
+  --end)
 
   local balance = wibox.widget({
     {
@@ -355,25 +432,24 @@ local widgets = create_chart()
 local breakdown_chart = widgets[1]
 local breakdown_legend = widgets[2]
 
-local left = wibox.widget({
+local top = wibox.widget({
   {
-    breakdown_chart,
     balance(),
-    --{
-    --  balance(),
-    --  layout = wibox.layout.fixed.vertical,
-    --  spacing = dpi(10),
-    --},
+    savings(),
+    total(),
     spacing = dpi(20),
-    layout = wibox.layout.fixed.vertical,
+    layout = wibox.layout.fixed.horizontal,
   },
-  forced_width = dpi(150),
   widget = wibox.container.place,
 })
 
-local right = wibox.widget({
-  breakdown_legend,
-  balance(),
+local bottom = wibox.widget({
+  {
+    breakdown_chart,
+    breakdown_legend,
+    spacing = dpi(30),
+    layout = wibox.layout.fixed.horizontal,
+  },
   widget = wibox.container.place,
 })
 
@@ -392,10 +468,13 @@ local header = wibox.widget({
 local widget = wibox.widget({
   header,
   {
-    left,
-    right,
-    spacing = dpi(10),
-    layout = wibox.layout.align.horizontal,
+    {
+      top,
+      bottom,
+      spacing = dpi(15),
+      layout = wibox.layout.fixed.vertical,
+    },
+    widget = wibox.container.place,
   },
   layout = wibox.layout.align.vertical,
 })

@@ -140,10 +140,10 @@ local function widget()
   local widget = wibox.widget({
     {
       --header,
-      create_habit_box("Commit", "pomocode"),
+      create_habit_box("Code", "pomocode"),
       create_habit_box("Journal", "journal"),
-      create_habit_box("Exercise", "exercise"),
       create_habit_box("Reading", "reading"),
+      create_habit_box("Ledger", "ledger"),
       spacing = dpi(10),
       layout = wibox.layout.fixed.vertical,
     },

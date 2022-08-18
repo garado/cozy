@@ -44,7 +44,8 @@ end
 -- Global key bindings
 awful.keyboard.append_global_keybindings({
 
-  -- AWESOME --
+  -- ▄▀█ █░█░█ █▀▀ █▀ █▀█ █▀▄▀█ █▀▀
+  -- █▀█ ▀▄▀▄▀ ██▄ ▄█ █▄█ █░▀░█ ██▄
   -- Restart awesome
   awful.key({ shift, alt }, "r", awesome.restart, 
     { description = "reload", group = "Awesome" }),
@@ -65,7 +66,9 @@ awful.keyboard.append_global_keybindings({
     awesome.emit_signal("control_center::toggle", s)
   end, { description = "control center", group = "Awesome" }),
 
-  -- HOTKEYS --  
+  -- █░█ █▀█ ▀█▀ █▄▀ █▀▀ █▄█ █▀
+  -- █▀█ █▄█ ░█░ █░█ ██▄ ░█░ ▄█
+  -- Brightness
 	awful.key({}, "XF86MonBrightnessUp", function()
 		awful.spawn("brightnessctl set 5%+ -q", false)
 		awesome.emit_signal("module::brightness")
@@ -91,21 +94,33 @@ awful.keyboard.append_global_keybindings({
 		awesome.emit_signal("module::volume")
 	end),
   
-  awful.key({mod}, "XF86AudioLowerVolume", function()
+  awful.key({ mod }, "XF86AudioLowerVolume", function()
     awful.spawn("playerctl play-pause", false)
   end, { description = "play/pause track", group = "Hotkeys" }),
   
-  awful.key({mod}, "XF86AudioMute", function()
+  awful.key({ mod }, "XF86AudioMute", function()
     awful.spawn("playerctl previous", false)
   end, { description = "previous track", group = "Hotkeys" }),
 
-  awful.key({mod}, "XF86AudioRaiseVolume", function()
+  awful.key({ mod }, "XF86AudioRaiseVolume", function()
     awful.spawn("playerctl next", false)
   end, { description = "next track", group = "Hotkeys" }),
 
+  -- Screenshots
+  awful.key({ mod, shift }, "s", function()
+    local cmd = "scrot ~/Pictures/Screenshots/%b%d::%H%M%S.png --silent -s -e 'xclip -selection clipboard -t image/png -i $f'"
+    awful.spawn.easy_async(cmd, function() end)
+  end, { description = "screenshot (select)", group = "Hotkeys" }),
+  
+  awful.key({ mod, alt }, "s", function()
+    local cmd = "scrot /home/alexis/Pictures/Screenshots/%b%d::%H%M%S.png --silent 'xclip -selection clipboard -t image/png -i $f'"
+    awful.spawn.easy_async(cmd, function() end)
+  end, { description = "screenshot (whole screen)", group = "Hotkeys" }),
+
   -----
 
-  -- LAUNCHERS -- 
+  --  █░░ ▄▀█ █░█ █▄░█ █▀▀ █░█ █▀▀ █▀█ █▀
+  --  █▄▄ █▀█ █▄█ █░▀█ █▄▄ █▀█ ██▄ █▀▄ ▄█
   -- Terminal
   awful.key({ alt }, "Return", function()
     awful.spawn(apps.default.terminal)
@@ -129,8 +144,8 @@ awful.keyboard.append_global_keybindings({
   
 })
 
--- Client keybindings
--- ~~~~~~~~~~~~~~~~~~
+-- █▀▀ █░░ █ █▀▀ █▄░█ ▀█▀
+-- █▄▄ █▄▄ █ ██▄ █░▀█ ░█░
 client.connect_signal("request::default_keybindings", function()
   awful.keyboard.append_client_keybindings({
 
@@ -208,8 +223,8 @@ client.connect_signal("request::default_keybindings", function()
   })
 end)
 
--- Workspaces 
--- ~~~~~~~~~~~~~~~~~~~~~~
+-- █░█░█ █▀█ █▀█ █▄▀ █▀ █▀█ ▄▀█ █▀▀ █▀▀ █▀
+-- ▀▄▀▄▀ █▄█ █▀▄ █░█ ▄█ █▀▀ █▀█ █▄▄ ██▄ ▄█
 awful.keyboard.append_global_keybindings({
   -- Switch to prev/next workspaces 
   awful.key({ mod }, "Tab", awful.tag.viewnext, 

@@ -16,7 +16,7 @@ local pomodoro = require("ui.dash.main.pomodoro")
 local events = require("ui.dash.main.events")
 local tasks = require("ui.dash.main.tasks")
 local music = require("ui.dash.main.music_player")
-local fetch = require("ui.dash.main.fetch")
+--local fetch = require("ui.dash.main.fetch")
 local habit = require("ui.dash.main.habit")
 local monthly_spending = require("ui.dash.main.monthly_spending")
 local timedate = require("ui.dash.main.timedate")
@@ -30,8 +30,8 @@ local widget = wibox.widget({
     {
       profile,
       timedate,
-      music,
       goals,
+      music,
       --fetch,
       forced_width = dpi(350),
       expand = true,
