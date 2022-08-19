@@ -8,6 +8,7 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local gears = require("gears")
+local gfs = require("gears.filesystem")
 local helpers = require("helpers")
 local widgets = require("ui.widgets")
 local naughty = require("naughty")
@@ -239,6 +240,7 @@ local function create_time_buttons()
         local formatted_time = string.format("%.0f", (pomodoro.selected_time / 60))
         pomodoro.current_state = "tick"
         redraw_widget()
+        awful.spawn("timew start " .. pomodoro.selected_topic)
         naughty.notification {
           app_name = "Pomodoro",
           title = "Pomodoro started",
@@ -307,7 +309,7 @@ local function ui_tick()
       {
         id = "textbox",
         widget = wibox.widget.textbox,
-        markup = helpers.ui.colorize_text("23:59", beautiful.xforeground),
+        markup = helpers.ui.colorize_text("00:00", beautiful.xforeground),
         font = beautiful.header_font_name .. "Light 30",
         align = "center",
         valign = "center",
@@ -343,7 +345,6 @@ local function ui_tick()
   -- Run the timer
   local second_timer
   function timer_tick(time)
-    -- Variables
     local ui_text = timer:get_children_by_id("textbox")[1]
     local ui_bar = timer:get_children_by_id("bar")[1]
     local start_time = tonumber(time)
@@ -378,7 +379,9 @@ local function ui_tick()
             message = "Finished " .. formatted_time .. "m of work on " .. pomodoro.selected_topic,
             timeout = 0,
           }
-          awful.spawn("mpg123 " .. "/home/alexis/.config/awesome/theme/assets/pomo_complete.mp3")
+          local sound = gfs.get_configuration_dir() .. "theme/assets/pomo_complete.mp3"
+          awful.spawn.easy_async("mpg123 " .. sound, function() end)
+          awful.spawn.easy_async("timew stop " .. pomodoro.selected_topic, function() end)
           pomodoro.current_state = "complete"
           redraw_widget()
           second_timer:stop()
@@ -410,6 +413,7 @@ local function ui_tick()
     on_release = function()
       timer_buttons.children[1]:remove(1)
       timer_buttons.children[1]:insert(1, timer_play_button)
+      awful.spawn("timew stop " .. pomodoro.selected_topic)
       pomodoro.timer_state = "paused"
       second_timer:stop()
     end
@@ -425,6 +429,7 @@ local function ui_tick()
     on_release = function()
       timer_buttons.children[1]:remove(1)
       timer_buttons.children[1]:insert(1, timer_pause_button)
+      awful.spawn("timew start " .. pomodoro.selected_topic)
       pomodoro.timer_state = "ticking"
       second_timer:start()
     end
@@ -439,6 +444,7 @@ local function ui_tick()
     size = 12,
     on_release = function()
       pomodoro.timer_state = "stopped"
+      awful.spawn("timew stop " .. pomodoro.selected_topic)
       second_timer:stop()
       reset_pomodoro()
       redraw_widget()
