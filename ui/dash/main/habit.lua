@@ -1,8 +1,6 @@
 
--- █▀▄ ▄▀█ █▀ █░█ ▀   █░█ ▄▀█ █▄▄ █ ▀█▀ █▀
--- █▄▀ █▀█ ▄█ █▀█ ▄   █▀█ █▀█ █▄█ █ ░█░ ▄█
-
--- Integrated with Pixela!
+-- █░█ ▄▀█ █▄▄ █ ▀█▀ █▀
+-- █▀█ █▀█ █▄█ █ ░█░ ▄█
 
 local awful = require("awful")
 local beautiful = require("beautiful")
@@ -13,28 +11,32 @@ local gears = require("gears")
 local gfs = require("gears.filesystem")
 local dpi = xresources.apply_dpi
 local naughty = require("naughty")
+local widgets = require("ui.widgets")
 local os = os
 
-local function widget()
-  local function create_habit_box(habit, graph_id)
+-- Create list of habits and their statuses for this week
+local function habit_overview()
+ 
+  -- Create weekly status for one habit
+  local function create_habit_entry(habit, graph_id, frequency)
     local habit_name = wibox.widget({
       markup = helpers.ui.colorize_text(habit, beautiful.xforeground),
       widget = wibox.widget.textbox,
-      font = beautiful.font .. "15",
-      align = "left",
+      font = beautiful.font_name .. "12",
+      align = "right",
       valign = "center",
     })
 
-    local frequency = wibox.widget({
-      markup = helpers.ui.colorize_text("daily", beautiful.nord9),
+    local freq = wibox.widget({
+      markup = helpers.ui.colorize_text(frequency, beautiful.nord9),
       widget = wibox.widget.textbox,
+      font = beautiful.font_name .. "10",
       align = "right",
       valign = "center",
     })
    
-    --------------
-    -- OVERVIEW --
-    --------------
+    -- Start constructing the overview
+    -- Things will get appended to this box.
     local overview = wibox.widget({
       {
         spacing = dpi(10),
@@ -43,53 +45,59 @@ local function widget()
       widget = wibox.container.place,
     })
 
-
     local function get_daily_status(graph_id, date, letter)
-      local cache_dir = "/home/alexis/.cache/awesome/pixela"
-      local daily_box = wibox.widget({
-        {
-          {
-            id = "textbox",
-            markup = helpers.ui.colorize_text(letter, beautiful.xforeground),
-            widget = wibox.widget.textbox,
-            align = "center",
-            valign = "center",
-          },
-          forced_height = dpi(30),
-          forced_width = dpi(30),
-          shape = gears.shape.circle,
-          widget = wibox.container.background,
-        },
-        widget = wibox.container.place,
-      })
-      
+      local cache_dir = gfs.get_cache_dir() .. "pixela"
+
       -- If file exists, habit was completed and exit code is 0
       -- Else habit wasn't completed; exit code 1
-      local bg = daily_box.children[1]
-      local fg = daily_box:get_children_by_id("textbox")[1]
-      
       local file = cache_dir .. "/" .. graph_id .. "/" .. date
-      if gfs.file_readable(file) then
-        bg.bg = beautiful.nord10
-        fg:set_markup_silently(helpers.ui.colorize_text("", beautiful.xforeground))
+      local habitCompleted = gfs.file_readable(file)
+      local btn_background, btn_text_color, btn_text
+      if habitCompleted then
+        btn_text_color = beautiful.xforeground
+        btn_background = beautiful.nord10
       else
-        bg.bg = beautiful.nord0
-        fg:set_markup_silently(helpers.ui.colorize_text("", beautiful.nord1))
+        btn_text_color = beautiful.xforeground
+        btn_background = beautiful.nord0
       end
+     
+      -- Create a single button
+      local daily_box_btn = widgets.button.text.normal({
+        text = letter,
+        text_normal_bg = btn_text_color,
+        normal_bg = btn_background,
+        animate_size = false,
+        font = beautiful.font,
+        size = 12,
+        on_release = function()
+          if not habitCompleted then
+            local cmd = "pi pixel post -g " .. graph_id .. " -d " .. date .. " -q 1"
+            awful.spawn(cmd)
+          end
+        end
+      })
+     
+      -- Create button container
+      local daily_box = wibox.widget({
+        daily_box_btn,
+        forced_height = dpi(35),
+        forced_width = dpi(35),
+        widget = wibox.container.place,
+      })
 
       return daily_box
     end
 
+    -- Create buttons for a whole week
     local function get_overview(graph_id)
-      -- get last 7 days of data
-      -- starts from 7 days ago so it appends in the right order
+      -- get last 4 days of data
+      -- starts from 4 days ago so it appends in the right order
       local current_time = os.time()
-      for i = 6, 0, -1 do
-        -- i days ago
-        local ago = current_time - (60 * 60 * 24 * i)
-        local day = os.date("%a", ago)
+      for i = 3, 0, -1 do
+        local i_days_ago = current_time - (60 * 60 * 24 * i)
+        local day = os.date("%a", i_days_ago)
         
-        local date = os.date("%Y%m%d", ago)
+        local date = os.date("%Y%m%d", i_days_ago)
         date = string.gsub(date, "\r\n", "")
         local letter = string.sub(day, 1, 1)
         local box = get_daily_status(graph_id, date, letter)
@@ -99,35 +107,24 @@ local function widget()
 
     get_overview(graph_id)
 
-    local widget = wibox.widget({
+    -- Assemble habit entry
+    local habit_entry = wibox.widget({
       {
         {
-          {
-            habit_name,
-            nil,
-            frequency,
-            layout = wibox.layout.align.horizontal,
-          },
-          overview,
-          spacing = dpi(10),
+          habit_name,
+          freq,
+          forced_width = dpi(125),
           layout = wibox.layout.fixed.vertical,
         },
-        margins = {
-          top = dpi(10),
-          bottom = dpi(10),
-          left = dpi(15),
-          right = dpi(15),
-        },
-        widget = wibox.container.margin,
+        widget = wibox.container.place,
       },
-      forced_width = dpi(330),
-      bg = beautiful.nord1,
-      shape = helpers.ui.rrect(dpi(beautiful.border_radius)),
-      widget = wibox.container.background,
+      overview,
+      spacing = dpi(20),
+      layout = wibox.layout.fixed.horizontal,
     })
 
-    return widget
-  end
+    return habit_entry
+  end -- end create_habit_entry
 
   local header = wibox.widget({
     markup = helpers.ui.colorize_text("Habits", beautiful.dash_header_color),
@@ -137,20 +134,24 @@ local function widget()
     valign = "center",
   })
 
+  -- Insert habits here
   local widget = wibox.widget({
     {
-      --header,
-      create_habit_box("Code", "pomocode"),
-      create_habit_box("Journal", "journal"),
-      create_habit_box("Reading", "reading"),
-      create_habit_box("Ledger", "ledger"),
+      create_habit_entry("Code", "pomocode", "daily"),
+      create_habit_entry("Journal", "journal", "daily"),
+      create_habit_entry("Exercise", "exercise", "3x week"),
+      create_habit_entry("Reading", "reading", "daily"),
+      create_habit_entry("Make bed", "make-bed", "daily"),
+      create_habit_entry("Ledger", "ledger", "daily"),
+      create_habit_entry("Meditate", "meditate", "daily"),
+      create_habit_entry("Touch grass", "go-outside", "daily"),
       spacing = dpi(10),
       layout = wibox.layout.fixed.vertical,
     },
     widget = wibox.container.place
   })
 
-  return widget
+  return helpers.ui.create_boxed_widget(widget, dpi(550), dpi(500), beautiful.dash_widget_bg)
 end
 
-return helpers.ui.create_boxed_widget(widget(), dpi(200), dpi(400), beautiful.dash_widget_bg)
+return habit_overview()

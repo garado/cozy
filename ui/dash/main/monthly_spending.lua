@@ -24,8 +24,7 @@ local tonumber = tonumber
 local table = table
 local ledger_file = user_vars.dash.ledger_file
 
--- Each category of spending gets a color in the arc chart
--- This table defines those colors
+-- arc chart colors
 local color_palette = {
   beautiful.nord7,
   beautiful.nord8,
@@ -50,7 +49,7 @@ local function create_chart()
       },
       id = "arc",
       color = beautiful.nord12,
-      thickness = 15,
+      thickness = 30,
       border_width = 0,
       widget = wibox.container.arcchart,
     },
@@ -59,9 +58,6 @@ local function create_chart()
     widget = wibox.container.place,
   })
   
-  ------------
-  -- Legend --
-  ------------
   local function create_legend_entry(text, amount, color)
     local circle = wibox.widget({
       markup = helpers.ui.colorize_text("", color),
@@ -104,9 +100,7 @@ local function create_chart()
     layout = wibox.layout.fixed.vertical,
   })
   
-  --------------
-  -- Get data --
-  --------------
+  -- Get data
   local function create_new_chart_section(entries, num_entries, total_spending)
     local arc_values = { }
     local colors = { }
@@ -116,82 +110,76 @@ local function create_chart()
     -- Set values
     arc_chart.min_value = 0
     arc_chart.max_value = tonumber(total_spending)
-    arc_text:set_markup_silently(helpers.ui.colorize_text("$" .. total_spending, beautiful.xforeground))
 
-    -- category: 1
-    -- amount: 2
-    -- balance: 3
+    local cat = 1 -- category
+    local amt = 2
+    local bal = 3
     for i, v in ipairs(entries) do
-      table.insert(arc_values, tonumber(v[2]))
+      table.insert(arc_values, tonumber(v[amt]))
       table.insert(colors, color_palette[i])
-      legend:add(create_legend_entry(v[1], v[2], color_palette[i]))
+      local amount = v[amt]
+      amount = string.format("%.2f", amount) 
+      legend:add(create_legend_entry(v[cat], amount, color_palette[i]))
     end
   
-    --arc_chart.values = arc_values
     arc_chart.colors = colors
     arc_chart.values = arc_values
   end -- end breakdown chart creation
 
   local cmd = "ledger -f " .. ledger_file .. " -M csv register expenses"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    -- Split on newlines
+    -- split on newlines
     local lines = { }
     for str in stdout:gmatch("[^\r\n]+") do
       table.insert(lines, str)
     end
       
-    -- Outputs look like this:
+    -- ledger outputs look like this:
     --    Expenses:Personal:Food  $29.50
     --    Expenses:Fees           $0.10   
 
     -- subcategories are separated by colons
     -- if (num subcategories) > 1 then
-    --    Category to show = 2nd to last subcategory
+    --    category to show = 2nd to last subcategory
     -- else
-    --    Category to display = last subcategory
+    --    category to show = last subcategory
     local entries = { }
     local num_entries = 0
     for i,v in ipairs(lines) do
-      -- Detect num subcategories based on # of colons
-      local _, colon_count = string.gsub(v, "%:", "")
-      local isolated
-      local category, amount
-      if colon_count == 1 then
-        -- Isolate category and category total by splitting 
-        -- on last colon
-        local s, e = v:find(":[^:]*$")
-        local substring = v:sub(s+1)
+      local t =  { }
+      local count = 0
+      -- split string on colons
+      for i in string.gmatch(v, "[^:]+") do
+        table.insert(t, i)
+        count = count + 1
+      end
 
-        category = string.gsub(substring, "\"(.*)", "")
-        amount = string.gsub(substring, "[^0-9.]", "")
-      else
-        local t =  { }
-        local count = 0
-        for i in string.gmatch(v, "[^:]+") do
-          table.insert(t, i)
-          count = count + 1
-        end
+      local category, amount
+      if count > 2 then -- more than 1 subcategory
         category = t[count - 1]
-        local substring = t[count]
-        amount = string.gsub(substring, "[^0-9.]", "")
+        amount = string.gsub(t[count], "[^0-9.]", "")
+      else
+        category = t[count]
+        category = string.gsub(category, "\"(.*)", "")
+        amount = string.gsub(t[count], "[^0-9.]", "")
       end
 
       -- Insert into table full of entries
-      local categoryWasFound = false
+      local category_already_exists = false
       for i, v in ipairs(entries) do
         if v[1] == category then
           v[2] = v[2] + tonumber(amount)
-          categoryWasFound = true
+          category_already_exists = true
         end
       end
 
-      if not categoryWasFound then
+      if not category_already_exists then
         table.insert(entries, { category, tonumber(amount) })
         num_entries = num_entries + 1
       end
     end
 
-    -- Now that we have all the entries, we can create the arc chart
+    -- now that we have all the entries, we can create the arc chart
     local total_spending = 0
     for i, v in ipairs(entries) do
       total_spending = total_spending + v[2]
@@ -202,10 +190,12 @@ local function create_chart()
   return { chart, legend }
 end
 
--- Returns current checking balance.
-local function balance()
+-- header_text    yuh
+-- ledger_cmd     yuh
+-- sub            string substitution to extract necessary data
+local function get_account_value(header_text, ledger_cmd, sub)
   local header = wibox.widget({
-    markup = helpers.ui.colorize_text("Checking", beautiful.nord3),
+    markup = helpers.ui.colorize_text(header_text, beautiful.nord3),
     widget = wibox.widget.textbox,
     font = beautiful.font_name .. "11",
     align = "center",
@@ -213,97 +203,19 @@ local function balance()
   })
 
   local balance_ = wibox.widget({
-    markup = helpers.ui.colorize_text("$420.00", beautiful.xforeground),
+    markup = helpers.ui.colorize_text("$--.--", beautiful.xforeground),
     widget = wibox.widget.textbox,
     font = beautiful.header_font_name .. "15",
     align = "center",
     valign = "center",
   })
 
-  --local ledger_file = user_vars.dash.ledger_file
-  --local cmd = "ledger -f " .. ledger_file .. " balance checking"
-  --awful.spawn.easy_async_with_shell(cmd, function(stdout)
-  --  balance = string.gsub(stdout, "Assets:Checking", "")
-  --  balance = string.gsub(balance, "%s+", "")
-  --  local markup = helpers.ui.colorize_text(balance, beautiful.xforeground)
-  --  balance_:set_markup_silently(markup)
-  --end)
-
-  local balance = wibox.widget({
-    {
-      header,
-      balance_,
-      layout = wibox.layout.fixed.vertical,
-    },
-    widget = wibox.container.place,
-  })
-
-  return balance
-end
-
-local function savings()
-  local header = wibox.widget({
-    markup = helpers.ui.colorize_text("Savings", beautiful.nord3),
-    widget = wibox.widget.textbox,
-    font = beautiful.font_name .. "11",
-    align = "center",
-    valign = "center",
-  })
-
-  local balance_ = wibox.widget({
-    markup = helpers.ui.colorize_text("$420.00", beautiful.xforeground),
-    widget = wibox.widget.textbox,
-    font = beautiful.header_font_name .. "15",
-    align = "center",
-    valign = "center",
-  })
-
-  --local ledger_file = user_vars.dash.ledger_file
-  --local cmd = "ledger -f " .. ledger_file .. " balance checking"
-  --awful.spawn.easy_async_with_shell(cmd, function(stdout)
-  --  balance = string.gsub(stdout, "Assets:Checking", "")
-  --  balance = string.gsub(balance, "%s+", "")
-  --  local markup = helpers.ui.colorize_text(balance, beautiful.xforeground)
-  --  balance_:set_markup_silently(markup)
-  --end)
-
-  local balance = wibox.widget({
-    {
-      header,
-      balance_,
-      layout = wibox.layout.fixed.vertical,
-    },
-    widget = wibox.container.place,
-  })
-
-  return balance
-end
-
-local function total()
-  local header = wibox.widget({
-    markup = helpers.ui.colorize_text("Total", beautiful.nord3),
-    widget = wibox.widget.textbox,
-    font = beautiful.font_name .. "11",
-    align = "center",
-    valign = "center",
-  })
-
-  local balance_ = wibox.widget({
-    markup = helpers.ui.colorize_text("$840.00", beautiful.xforeground),
-    widget = wibox.widget.textbox,
-    font = beautiful.header_font_name .. "15",
-    align = "center",
-    valign = "center",
-  })
-
-  --local ledger_file = user_vars.dash.ledger_file
-  --local cmd = "ledger -f " .. ledger_file .. " balance checking"
-  --awful.spawn.easy_async_with_shell(cmd, function(stdout)
-  --  balance = string.gsub(stdout, "Assets:Checking", "")
-  --  balance = string.gsub(balance, "%s+", "")
-  --  local markup = helpers.ui.colorize_text(balance, beautiful.xforeground)
-  --  balance_:set_markup_silently(markup)
-  --end)
+  awful.spawn.easy_async_with_shell(ledger_cmd, function(stdout)
+    balance = string.gsub(stdout, sub, "")
+    balance = string.gsub(balance, "%s+", "")
+    local markup = helpers.ui.colorize_text(balance, beautiful.xforeground)
+    balance_:set_markup_silently(markup)
+  end)
 
   local balance = wibox.widget({
     {
@@ -320,9 +232,9 @@ end
 -- Returns amount spent this month.
 local function monthly_spending()
   local header = wibox.widget({
-    markup = helpers.ui.colorize_text("spent this month", beautiful.nord3),
+    markup = helpers.ui.colorize_text("Spent", beautiful.nord3),
     widget = wibox.widget.textbox,
-    font = beautiful.font .. "10",
+    font = beautiful.font .. "11",
     align = "center",
     valign = "center",
   })
@@ -330,12 +242,11 @@ local function monthly_spending()
   local amount = wibox.widget({
     markup = helpers.ui.colorize_text("$168.90", beautiful.xforeground),
     widget = wibox.widget.textbox,
-    font = beautiful.header_font_name .. "18",
+    font = beautiful.header_font_name .. "15",
     align = "center",
     valign = "center",
   })
   
-  local ledger_file = user_vars.dash.ledger_file
   local cmd = "ledger -f " .. ledger_file .. " -M reg expenses | tail -1"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local total = string.match(stdout, "$(.*)")
@@ -432,12 +343,21 @@ local widgets = create_chart()
 local breakdown_chart = widgets[1]
 local breakdown_legend = widgets[2]
 
+local checking_cmd = "ledger -f " .. ledger_file .. " balance checking"
+local checking_sub = "Assets:Checking"
+local savings_cmd = "ledger -f " .. ledger_file .. " balance savings"
+local savings_sub = "Assets:Savings:Emergency Fund"
+
 local top = wibox.widget({
   {
-    balance(),
-    savings(),
-    total(),
-    spacing = dpi(20),
+    {
+      get_account_value("Checking", checking_cmd, checking_sub),
+      get_account_value("Savings", savings_cmd, savings_sub),
+      spacing = dpi(20),
+      layout = wibox.layout.fixed.horizontal,
+    },
+    spacing = dpi(40),
+    monthly_spending(),
     layout = wibox.layout.fixed.horizontal,
   },
   widget = wibox.container.place,
@@ -471,7 +391,7 @@ local widget = wibox.widget({
     {
       top,
       bottom,
-      spacing = dpi(15),
+      spacing = dpi(20),
       layout = wibox.layout.fixed.vertical,
     },
     widget = wibox.container.place,
