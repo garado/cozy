@@ -24,7 +24,7 @@ local journal_yes = naughty.action {
   name = helpers.ui.colorize_text("Yes", beautiful.xforeground) 
 }
 journal_yes:connect_signal("invoked", function()
-  awful.spawn.easy_async_with_shell("alacritty -e jrnl")
+  awful.spawn.easy_async_with_shell("alacritty -e jrnl", function() end)
 end)
 
 local journal_no = naughty.action {
@@ -54,7 +54,7 @@ awesome.connect_signal("habit::journal_check", function()
       }
     else
       local cmd = "pi pixel increment -g journal"
-      awful.spawn.easy_async(cmd)
+      awful.spawn.easy_async(cmd, function() end)
     end
   end)
 end)

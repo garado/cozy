@@ -60,8 +60,12 @@ get_agenda() {
 }
 
 # Execute
-if [[ "$1" == "--getagenda" ]]; then
+if [[ "$1" == "get" ]]; then
   get_agenda
-elif [[ "$1" == "--printagenda" ]]; then
+elif [[ "$1" == "print" ]]; then
   cat $cache_cal_agenda
+elif [[ "$1" == "" ]]; then
+  echo -e "update_calendar: no input received\n\
+get\tto retrieve calendar events\n\
+print\tto print currently cached events"
 fi

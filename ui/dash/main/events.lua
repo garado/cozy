@@ -62,5 +62,5 @@ local function widget()
   return widget
 end
 
-return helpers.ui.create_boxed_widget(widget(), dpi(220), dpi(210), beautiful.dash_widget_bg)
+return helpers.ui.create_boxed_widget(widget(), dpi(220), dpi(200), beautiful.dash_widget_bg)
 

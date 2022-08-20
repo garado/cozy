@@ -1,7 +1,14 @@
 #!/bin/bash
 
 # Outputs a random title from a list of titles
-# (random line from a file)
 
-file=$HOME/.config/awesome/utils/dash/titles
-shuf -n 1 $file
+titles=(
+  "Mechromancer"
+  "Linux enthusiast"
+  "Uses Arch, btw"
+  "Terminal dweller"
+)
+
+rand=$[$RANDOM % ${#titles[@]}]
+echo ${titles[$rand]}
+

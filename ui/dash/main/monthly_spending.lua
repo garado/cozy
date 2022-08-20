@@ -99,15 +99,13 @@ local function create_chart()
     spacing = dpi(3),
     layout = wibox.layout.fixed.vertical,
   })
-  
-  -- Get data
+ 
   local function create_new_chart_section(entries, num_entries, total_spending)
     local arc_values = { }
     local colors = { }
     local arc_text = chart:get_children_by_id("text")[1]
     local arc_chart = chart:get_children_by_id("arc")[1]
     
-    -- Set values
     arc_chart.min_value = 0
     arc_chart.max_value = tonumber(total_spending)
 
@@ -118,10 +116,11 @@ local function create_chart()
       table.insert(arc_values, tonumber(v[amt]))
       table.insert(colors, color_palette[i])
       local amount = v[amt]
-      amount = string.format("%.2f", amount) 
+      amount = string.format("%.2f", amount) -- force 2 decimal places
       legend:add(create_legend_entry(v[cat], amount, color_palette[i]))
     end
-  
+ 
+    -- :)
     arc_chart.colors = colors
     arc_chart.values = arc_values
   end -- end breakdown chart creation
@@ -177,7 +176,7 @@ local function create_chart()
         table.insert(entries, { category, tonumber(amount) })
         num_entries = num_entries + 1
       end
-    end
+    end -- end loop iterating through lines in stdout
 
     -- now that we have all the entries, we can create the arc chart
     local total_spending = 0
@@ -185,14 +184,14 @@ local function create_chart()
       total_spending = total_spending + v[2]
     end
     create_new_chart_section(entries, num_entries, total_spending)
-  end)
+  end) -- end awful.spawn
 
   return { chart, legend }
-end
+end -- end create_chart
 
--- header_text    yuh
--- ledger_cmd     yuh
--- sub            string substitution to extract necessary data
+-- header_text  account name to display   
+-- ledger_cmd   command that produces the necessary data
+-- sub          what to remove to be left with only the necessary data
 local function get_account_value(header_text, ledger_cmd, sub)
   local header = wibox.widget({
     markup = helpers.ui.colorize_text(header_text, beautiful.nord3),
@@ -229,7 +228,7 @@ local function get_account_value(header_text, ledger_cmd, sub)
   return balance
 end
 
--- Returns amount spent this month.
+-- returns amount spent this month.
 local function monthly_spending()
   local header = wibox.widget({
     markup = helpers.ui.colorize_text("Spent", beautiful.nord3),
@@ -399,4 +398,4 @@ local widget = wibox.widget({
   layout = wibox.layout.align.vertical,
 })
 
-return helpers.ui.create_boxed_widget(widget, dpi(300), dpi(310), beautiful.dash_widget_bg)
+return helpers.ui.create_boxed_widget(widget, dpi(300), dpi(300), beautiful.dash_widget_bg)

@@ -9,7 +9,7 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 
--- Import elements of the dash
+-- import dash widgets
 local profile = require("ui.dash.main.profile")
 local links = require("ui.dash.main.links")
 local pomodoro = require("ui.dash.main.pomodoro")
@@ -24,7 +24,7 @@ local goals = require("ui.dash.main.goals")
 local naughty = require("naughty")
 
 -- width of widgets is set here
--- height of widgets is set within the widget.lua
+-- height of widgets is set within widget itself
 local widget = wibox.widget({
   {
     {
