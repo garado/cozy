@@ -12,11 +12,11 @@ local animation = require("modules.animation")
 
 return function(s)
   -- IMPORTS --
-  s.clock = require("ui.bar.clock")(s)
-  s.battery = require("ui.bar.battery")(s)
-  s.volume = require("ui.bar.volume")()
-  s.brightness = require("ui.bar.brightness")()
-  app_launcher = require("ui.bar.app_launcher")
+  local clock = require("ui.bar.clock")
+  local battery = require("ui.bar.battery")(s)
+  local volume = require("ui.bar.volume")()
+  local brightness = require("ui.bar.brightness")()
+  local app_launcher = require("ui.bar.app_launcher")
 
   -- TAGLIST --
 	local modkey = "Mod4"
@@ -83,18 +83,6 @@ return function(s)
 						self.widget.children[1].bg = beautiful.wibar_occupied,
 						self.indicator_animation:set(dpi(10))
           end
-
-          -- Tag preview
-          self:connect_signal("mouse::enter", function()
-						if #c3:clients() > 0 then
-							awesome.emit_signal("bling::tag_preview::update", c3)
-							awesome.emit_signal("bling::tag_preview::visibility", s, true)
-						end
-					end)
-
-					self:connect_signal("mouse::leave", function()
-						awesome.emit_signal("bling::tag_preview::visibility", s, false)
-					end)
 				end,
 				update_callback = function(self, c3, _)
 					if c3.selected then
@@ -144,12 +132,13 @@ return function(s)
           },
           tag_list(s),
           {
-            s.brightness,
-            s.volume,
-            s.battery, 
+            brightness,
+            volume,
+            battery, 
             -- system tray
             -- notif panel
-            s.clock,
+            clock,
+            profile,
             spacing = dpi(8),
             layout = wibox.layout.fixed.vertical,
           },

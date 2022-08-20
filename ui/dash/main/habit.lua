@@ -9,6 +9,7 @@ local wibox = require("wibox")
 local xresources = require("beautiful.xresources")
 local gears = require("gears")
 local gfs = require("gears.filesystem")
+local user_vars = require("user_variables")
 local dpi = xresources.apply_dpi
 local naughty = require("naughty")
 local widgets = require("ui.widgets")
@@ -134,22 +135,23 @@ local function habit_overview()
     valign = "center",
   })
 
-  -- Insert habits here
+  -- Habits get appended here 
   local widget = wibox.widget({
     {
-      create_habit_entry("Code", "pomocode", "daily"),
-      create_habit_entry("Journal", "journal", "daily"),
-      create_habit_entry("Exercise", "exercise", "3x week"),
-      create_habit_entry("Reading", "reading", "daily"),
-      create_habit_entry("Make bed", "make-bed", "daily"),
-      create_habit_entry("Ledger", "ledger", "daily"),
-      create_habit_entry("Meditate", "meditate", "daily"),
-      create_habit_entry("Touch grass", "go-outside", "daily"),
       spacing = dpi(10),
       layout = wibox.layout.fixed.vertical,
     },
     widget = wibox.container.place
   })
+ 
+  -- get habit list from user_variables
+  local habit_list = user_vars.habit
+  local name = 1
+  local id = 2
+  local freq = 3
+  for _, v in ipairs(habit_list) do
+    widget.children[1]:add( create_habit_entry(v[name], v[id], v[freq]) )
+  end
 
   return helpers.ui.create_boxed_widget(widget, dpi(550), dpi(500), beautiful.dash_widget_bg)
 end

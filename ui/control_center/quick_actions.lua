@@ -68,7 +68,7 @@ local function create_quick_action(icon, name, func)
     normal_bg = beautiful.wibar_bg,
     animate_size = false,
     size = 20,
-    -- why doesn't on_release = func() work?
+    -- why doesn't on_release = func work?
     on_release = function()
       func()
     end,
@@ -83,11 +83,14 @@ end
 -- Arguments: icon name func 
 local widget = wibox.widget({
   create_quick_action("", "Rotate", rotate_screen_func),
-  create_quick_action("c", "Conservation mode", conservation_mode_func), 
+  create_quick_action("", "Conservation mode", conservation_mode_func), 
   --
-  create_quick_action("c", "Calculator", ""),
-  create_quick_action("a", "Airplane mode", ""),
-  create_quick_action("", "DND", ""),
+  create_quick_action("", "Nightshift", ""),
+  create_quick_action("", "Rotate bar", ""),
+  create_quick_action("", "Screenshot", ""),
+  create_quick_action("", "Keyboard", ""),
+  create_quick_action("", "Calculator", ""),
+  create_quick_action("", "Timer", ""),
   -- 
   --  
   --

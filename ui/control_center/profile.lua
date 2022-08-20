@@ -1,4 +1,7 @@
 
+-- █▀█ █▀█ █▀█ █▀▀ █ █░░ █▀▀
+-- █▀▀ █▀▄ █▄█ █▀░ █ █▄▄ ██▄
+
 local awful = require("awful")
 local gears = require("gears")
 local wibox = require("wibox")
@@ -8,4 +11,9 @@ local dpi = xresources.apply_dpi
 local helpers = require("helpers")
 local naughty = require("naughty")
 
-
+return wibox.widget({
+  markup = "profile",
+  align = "center",
+  valign = "center",
+  widget = wibox.widget.textbox,
+})

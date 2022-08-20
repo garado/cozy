@@ -22,7 +22,7 @@ local user_vars = require("user_variables")
 local string = string
 local tonumber = tonumber
 local table = table
-local ledger_file = user_vars.dash.ledger_file
+local ledger_file = user_vars.ledger.ledger_file
 
 -- arc chart colors
 local color_palette = {
@@ -191,8 +191,7 @@ end -- end create_chart
 
 -- header_text  account name to display   
 -- ledger_cmd   command that produces the necessary data
--- sub          what to remove to be left with only the necessary data
-local function get_account_value(header_text, ledger_cmd, sub)
+local function get_account_value(header_text, ledger_cmd)
   local header = wibox.widget({
     markup = helpers.ui.colorize_text(header_text, beautiful.nord3),
     widget = wibox.widget.textbox,
@@ -210,9 +209,9 @@ local function get_account_value(header_text, ledger_cmd, sub)
   })
 
   awful.spawn.easy_async_with_shell(ledger_cmd, function(stdout)
-    balance = string.gsub(stdout, sub, "")
+    balance = string.gsub(stdout, "[^0-9.]", "")
     balance = string.gsub(balance, "%s+", "")
-    local markup = helpers.ui.colorize_text(balance, beautiful.xforeground)
+    local markup = helpers.ui.colorize_text("$" .. balance, beautiful.xforeground)
     balance_:set_markup_silently(markup)
   end)
 
@@ -226,42 +225,6 @@ local function get_account_value(header_text, ledger_cmd, sub)
   })
 
   return balance
-end
-
--- returns amount spent this month.
-local function monthly_spending()
-  local header = wibox.widget({
-    markup = helpers.ui.colorize_text("Spent", beautiful.nord3),
-    widget = wibox.widget.textbox,
-    font = beautiful.font .. "11",
-    align = "center",
-    valign = "center",
-  })
-
-  local amount = wibox.widget({
-    markup = helpers.ui.colorize_text("$168.90", beautiful.xforeground),
-    widget = wibox.widget.textbox,
-    font = beautiful.header_font_name .. "15",
-    align = "center",
-    valign = "center",
-  })
-  
-  local cmd = "ledger -f " .. ledger_file .. " -M reg expenses | tail -1"
-  awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    local total = string.match(stdout, "$(.*)")
-    total = string.match(total, "$(.*)")
-    total = string.gsub(total, "%s+", "")
-    local markup = helpers.ui.colorize_text("$" .. total, beautiful.xforeground)
-    amount:set_markup_silently(markup)
-  end)
-
-  local widget = wibox.widget({
-    header,
-    amount,
-    layout = wibox.layout.fixed.vertical,
-  })
-
-  return widget
 end
 
 local function transactions()
@@ -343,20 +306,19 @@ local breakdown_chart = widgets[1]
 local breakdown_legend = widgets[2]
 
 local checking_cmd = "ledger -f " .. ledger_file .. " balance checking"
-local checking_sub = "Assets:Checking"
 local savings_cmd = "ledger -f " .. ledger_file .. " balance savings"
-local savings_sub = "Assets:Savings:Emergency Fund"
+local spent_cmd = "ledger -f " .. ledger_file .. " bal -M \\^Expenses | tail -n 1"
 
 local top = wibox.widget({
   {
     {
-      get_account_value("Checking", checking_cmd, checking_sub),
-      get_account_value("Savings", savings_cmd, savings_sub),
+      get_account_value("Checking", checking_cmd),
+      get_account_value("Savings", savings_cmd),
       spacing = dpi(20),
       layout = wibox.layout.fixed.horizontal,
     },
     spacing = dpi(40),
-    monthly_spending(),
+    get_account_value("Spent", spent_cmd),
     layout = wibox.layout.fixed.horizontal,
   },
   widget = wibox.container.place,

@@ -14,17 +14,16 @@ local naughty = require("naughty")
 local animation = require("modules.animation")
 
 return function(s)
-  -- Variables
   local screen_height = dpi(s.geometry.height)
   local screen_width = dpi(s.geometry.width)
 
-  -- Import widgets
   local profile = require("ui.control_center.profile")
   local quick_actions = require("ui.control_center.quick_actions")
   
-  local widget = wibox.widget({
+  local control_center_contents = wibox.widget({
     {
       {
+        profile,
         quick_actions,
         layout = wibox.layout.fixed.vertical,
       },
@@ -50,35 +49,12 @@ return function(s)
     end,
     ontop = true,
     visible = false,
-    widget = widget,
+    widget = control_center_contents,
   })
 
-  -- Sliding animation
-  -- Slide in from left side of screen
-  --control_center.x = screen_width + control_center_width
---  control_center.x = -dpi(control_center_width)
---  local isOpen = false
---  local control_center_anim = animation:new({
---    duration = 0.12,
---    easing = animation.easing.inOutQuad,
---    update = function(self, pos)
---      control_center.x = -control_center_width + dpi(pos) + dpi(50)
---      if dpi(pos) == 0 and isOpen then
---        control_center.visible = false
---      end
---    end
---  })
-  
   -- Keybind to toggle (default is Super_L + k)
   awesome.connect_signal("control_center::toggle", function()
     control_center.visible = not control_center.visible
---    if control_center.visible then
---      control_center_anim:set(0)
---    else
---      control_center.visible = true
---      control_center_anim:set(300)
---    end
---    isOpen = not isOpen
   end)
 
   return control_center

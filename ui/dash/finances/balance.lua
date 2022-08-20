@@ -16,7 +16,7 @@ local user_vars = require("user_variables")
 local naughty = require("naughty")
 local string = string
 
-local ledger_file = user_vars.dash.ledger_file
+local ledger_file = user_vars.ledger.ledger_file
 
 local header = wibox.widget({
   markup = helpers.ui.colorize_text("Total balance", beautiful.nord3),

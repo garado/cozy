@@ -15,7 +15,7 @@ local animation = require("modules.animation")
 local naughty = require("naughty")
 
 return function()
-  local ledger_file = user_vars.dash.ledger_file
+  local ledger_file = user_vars.ledger.ledger_file
  
   local transaction_header = wibox.widget({
     markup = helpers.ui.colorize_text("Transaction history", beautiful.nord3),

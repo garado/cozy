@@ -125,10 +125,10 @@ local function habit_overview()
 
     -- Create buttons for a whole week
     local function get_overview(graph_id)
-      -- get last 7 days of data
-      -- starts from 7 days ago so it appends in the right order
+      -- get last 4 days of data
+      -- starts from 4 days ago so it appends in the right order
       local current_time = os.time()
-      for i = 6, 0, -1 do
+      for i = 3, 0, -1 do
         -- i days ago
         local ago = current_time - (60 * 60 * 24 * i)
         local day = os.date("%a", ago)

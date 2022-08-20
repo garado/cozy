@@ -181,7 +181,7 @@ client.connect_signal("request::default_keybindings", function()
 
     -- Layout-aware resizing
     awful.key({ mod, shift   }, "h", function () resize_horizontal(0.05) end,
-              { group = "Layout", description = "(tiled, vimlike) increase size horizontally" }),
+              { group = "Layout", description = "(tiled, vimlike) inc size horizontally" }),
     awful.key({ mod, shift   }, "l", function () resize_horizontal(-0.05) end),
     awful.key({ mod, shift   }, "k", function () resize_vertical(-0.05) end),
     awful.key({ mod, shift   }, "j", function () resize_vertical(0.05) end),

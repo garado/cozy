@@ -19,7 +19,7 @@ local naughty = require("naughty")
 local string = string
 local tonumber = tonumber
 local table = table
-local ledger_file = user_vars.dash.ledger_file
+local ledger_file = user_vars.ledger.ledger_file
 
 -- Each category of spending gets a color in the arc chart
 -- This table defines those colors
