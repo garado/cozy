@@ -52,7 +52,7 @@ Update `configuration/apps.lua` with your default terminal/file manager/browser 
 | Vim theme     | [nord-vim](https://github.com/arcticicestudio/nord-vim)                |
 | Rofi          | custom version of [adi1090x theme](https://github.com/adi1090x/rofi) |
 
-# Dashboard
+## Dashboard
 <img src=".github/assets/dash_main.png" width="800">
 
 **Features**
@@ -65,7 +65,7 @@ Update `configuration/apps.lua` with your default terminal/file manager/browser 
   - Monthly spending tracker
   - Current account balances
 
-## Dashboard tabs
+### Dashboard tabs
 I couldn't fit enough information onto the main dashboard page, so I'm adding tabs!
 
 **Dashboard tab progress**
@@ -84,7 +84,15 @@ I couldn't fit enough information onto the main dashboard page, so I'm adding ta
     - [ ] Support subtasks + progress bar
   - [ ] Calendar
 
-# In progress/planned
+## Known bugs
+- [ ] Pomodoro gets a little wonky if you restart awesome too many times
+  - reason: stuff stored in xrdb to preserve pomodoro state across awesome restarts doesn't always get cleared properly
+- [ ] Monthly spending arc chart animation doesn't always work
+  - reason: i have no idea
+- [ ] Overdue tasks don't show the correct due date
+  - reason: my implementation was lazy lol i know how to fix it. i'll get around to it
+
+## In progress/planned
 - **Dash (other)**
   - [ ] Indicator for current dash tab
 - **Control center**
@@ -102,5 +110,5 @@ I couldn't fit enough information onto the main dashboard page, so I'm adding ta
 - **Notifications**
   - [ ] Add icons
 
-# Credits
+## Credits
 - [rxhyn](https://github.com/rxyhn/yoru) for code reference 
