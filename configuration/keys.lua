@@ -7,6 +7,8 @@ local hotkeys_popup = require("awful.hotkeys_popup")
 local beautiful = require("beautiful")
 local apps = require("configuration.apps")
 local bling = require("modules.bling")
+local gfs = require("gears.filesystem")
+local os = os
 
 -- Make key easier to call
 mod = "Mod4"
@@ -108,12 +110,14 @@ awful.keyboard.append_global_keybindings({
 
   -- Screenshots
   awful.key({ mod, shift }, "s", function()
-    local cmd = "scrot ~/Pictures/Screenshots/%b%d::%H%M%S.png --silent -s -e 'xclip -selection clipboard -t image/png -i $f'"
+    local home = os.getenv("HOME")
+    local cmd = "scrot " .. home  .. "/Pictures/Screenshots/%b%d::%H%M%S.png --silent -s -e 'xclip -selection clipboard -t image/png -i $f'"
     awful.spawn.easy_async(cmd, function() end)
   end, { description = "screenshot (select)", group = "Hotkeys" }),
   
   awful.key({ mod, alt }, "s", function()
-    local cmd = "scrot /home/alexis/Pictures/Screenshots/%b%d::%H%M%S.png --silent 'xclip -selection clipboard -t image/png -i $f'"
+    local home = os.getenv("HOME")
+    local cmd = "scrot " .. home  .. "/Pictures/Screenshots/%b%d::%H%M%S.png --silent 'xclip -selection clipboard -t image/png -i $f'"
     awful.spawn.easy_async(cmd, function() end)
   end, { description = "screenshot (whole screen)", group = "Hotkeys" }),
 

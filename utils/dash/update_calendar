@@ -1,10 +1,9 @@
 #!/bin/bash
 
-# Collect data
+# Ensure cache exists
 cache_dir="$HOME/.cache/awesome/calendar"
 cache_cal_agenda=${cache_dir}/agenda
 
-# Make cache dir
 if [[ ! -d "$cache_dir" ]]; then
   mkdir -p ${cache_dir}
 fi

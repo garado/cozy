@@ -8,36 +8,48 @@ The primary goal of this setup is to create an environment that:
   2. integrates all the cli tools I use to manage my life into a nice dashboard
   3. looks awesome!
 
-**NOTE: This setup is incomplete and under constant development.** Because of that, I don't recommend daily driving it quite yet unless you're ok with frequent potentially breaking changes.
+**NOTE: This setup is incomplete, somewhat buggy, and under constant development.** Because of that, I don't recommend daily driving it quite yet.
 
-# Installation (Arch)
-(Install instructions still need to be tested. And again, I don't recommend installing it right now, but if you want to, then go crazy)
-
+# Installation (Arch/Arch-based)
 ## Install dependencies
 - `cd ~/.config/ && git clone --recurse-submodules https://github.com/garado/awesome_dotfiles.git awesome`
-- `yay -S awesome-git gcalcli`
-- `pacman -S playerctl upower nerd-fonts-roboto-mono task timew ledger`
+
+- `yay -S awesome-git gcalcli nerd-fonts-roboto-mono ttf-roboto picom-pijulius-git`
+
+- `pacman -S playerctl rofi scrot pamixer brightnessctl upower task timew ledger alacritty jq`
 
 ## Configuration
 **Google Calendar events**
 - Follow instructions to [set up gcalcli](https://github.com/insanum/gcalcli#login-information)
+- The `utils/dash/update_calendar` script grabs gcalcli's output and caches it in `$HOME/.cache/awesome/calendar`.
+- Run it periodically with a cron job to keep your widget updated.
+
 
 **Pixela habit tracker**
 - [Read these instructions](https://pixe.la/) to create a Pixela account and create your habits
 - Install [pi](https://github.com/a-know/pi)
 - Set the `PIXELA_USER_NAME` and `PIXELA_USER_TOKEN` environment variables
 - Update `user_variables.lua` with the habits you want to display
-
+- The `utils/dash/habits/cache_habits` script caches data from Pixela. Run it periodically with a cron job to keep your widget updated.
 
 **Finances tracker**
 - Update `user_variables.lua` with the ledger file to read from 
 
+## Other stuff
+| Name          | Source                                                                 |
+| ----          | ----                                                                   |
+| Cursors       | [Nordzy cursors](https://github.com/alvatip/nordzy-cursors)            |
+| GTK theme     | [Nordic](https://github.com/EliverLara/Nordic)                         |
+| Firefox theme | [Nordic](https://github.com/eliverlara/firefox-nordic-theme)           |
+| Icon theme    | [Papirus-Nord](https://github.com/Adapta-Projects/Papirus-Nord)        |
+| Vim theme     | [nord-vim](https://github.com/arcticicestudio/nord-vim)                |
+| Rofi          | custom version of [adi1090x theme](https://github.com/adi1090x/rofi) |
 
 # Dashboard
 <img src=".github/assets/dash_main.png" width="800">
 
 **Features**
-- Fancy music player (thank you, [rxhyn](https://github.com/rxyhn/yoru))
+- Fancy music player (thank you [rxhyn](https://github.com/rxyhn/yoru))
 - Events widget (with Google Calendar) 
 - Tasks widget (with [Taskwarrior](https://taskwarrior.org/))
 - Pomodoro timer (with [Timewarrior](https://timewarrior.net/))
@@ -65,16 +77,23 @@ I couldn't fit enough information onto the main dashboard page, so I'm adding ta
     - [ ] Support subtasks + progress bar
   - [ ] Calendar
 
-# In progress
+# In progress/planned
+- **Dash (other)**
+  - [ ] Indicator for current dash tab
 - **Control center**
   - [ ] Quick actions
   - [ ] Power menu
   - [ ] Volume/brightness control
 - **Bar**
   - [X] Volume/brightness control
-  - [ ] Variable bar orientation 
+  - [ ] Variable bar orientation!
   - [ ] Systray
   - [ ] Better app launcher
+- **Other**
+  - [ ] Theme switcher
+  - [ ] Custom rofi launcher
+- **Notifications**
+  - [ ] Add icons
 
 # Credits
 - [rxhyn](https://github.com/rxyhn/yoru) for code reference 

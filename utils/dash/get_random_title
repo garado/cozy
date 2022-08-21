@@ -7,6 +7,8 @@ titles=(
   "Linux enthusiast"
   "Uses Arch, btw"
   "Terminal dweller"
+  "CLI sorcerer"
+  "Vim wizard"
 )
 
 rand=$[$RANDOM % ${#titles[@]}]

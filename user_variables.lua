@@ -1,17 +1,23 @@
 return {
+  display_name = "Display name",
   ledger = {
-    ledger_dir = "$HOME/Documents/Ledger/",
-    ledger_file = "$HOME/Documents/Ledger/2022-08.ledger",
+    ledger_dir = "$HOME/.config/awesome/misc/",
+    ledger_file = "$HOME/.config/awesome/misc/sample.ledger",
   },
   habit = {
  -- { "display name", "graph_id", "frequency" },
-    { "Code", "pomocode", "daily" },
-    { "Journal", "journal", "daily" },
-    { "Exercise", "exercise", "3x week" },
-    { "Reading", "reading", "daily" },
-    { "Make bed", "make-bed", "daily" },
-    { "Ledger", "ledger", "daily" },
-    { "Meditate", "meditate", "daily" },
-    { "Touch grass", "go-outside", "daily" },
-  }
+    { "Habit name", "graph_id", "frequency" },
+    { "Habit name", "graph_id", "frequency" },
+    { "Habit name", "graph_id", "frequency" },
+    { "Habit name", "graph_id", "frequency" },
+    { "Habit name", "graph_id", "frequency" },
+    { "Habit name", "graph_id", "frequency" },
+    { "Habit name", "graph_id", "frequency" },
+  },
+  goals = {
+    "Update user_vars",
+    "Finish Arch setup",
+    "Post to r/unixporn",
+    "Be kind to myself",
+  }, 
 }

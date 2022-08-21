@@ -12,6 +12,7 @@ local helpers = require("helpers")
 local function widget()
   local events = wibox.widget({
     {
+      markup = helpers.ui.colorize_text("No events found", beautiful.xforeground),
       font = beautiful.font .. "12",
       widget = wibox.widget.textbox,
     },
@@ -44,11 +45,15 @@ local function widget()
   local function calendar()
     awful.spawn.easy_async_with_shell(
       [[
-        cat $HOME/.cache/awesome/calendar/agenda
+        if test -f $HOME/.cache/awesome/calendar/agenda
+          cat $HOME/.cache/awesome/calendar/agenda
+        fi
       ]],
       function(stdout)
-        local stdout = helpers.ui.colorize_text(stdout, beautiful.dash_widget_fg)
-        events:get_children()[1]:set_markup(stdout)
+        if stdout ~= "" then
+          local stdout = helpers.ui.colorize_text(stdout, beautiful.dash_widget_fg)
+          events:get_children()[1]:set_markup(stdout)
+        end
       end
     )
   end

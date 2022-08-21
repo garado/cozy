@@ -97,7 +97,7 @@ local function create_chart()
 
   local legend = wibox.widget({
     spacing = dpi(3),
-    layout = wibox.layout.fixed.vertical,
+    layout = wibox.layout.flex.vertical,
   })
  
   local function create_new_chart_section(entries, num_entries, total_spending)

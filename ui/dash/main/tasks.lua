@@ -29,8 +29,16 @@ local function widget()
     margins = dpi(5),
     widget = wibox.container.margin,
   })
-  
+ 
+  local placeholder = wibox.widget({
+    markup = helpers.ui.colorize_text("No tasks found", beautiful.xforeground),
+    align = "center",
+    valign = "center",
+    widget = wibox.widget.textbox,
+  })
+
   local task_list = wibox.widget({
+    placeholder,
     spacing = dpi(5),
     layout = wibox.layout.fixed.vertical,
   })
@@ -101,14 +109,18 @@ local function widget()
   local function update_tasks()
     local cmd = "task limit:10 status:pending export" 
     awful.spawn.easy_async_with_shell(cmd, function(stdout)
-      local tasks = json.decode(stdout)
-      for i,v in ipairs(tasks) do
-        local desc = tasks[i]["description"]
-        local due  = tasks[i]["due"]
-        local urg  = tasks[i]["urgency"]
-        local tag  = tasks[i]["tag"]
-        local proj = tasks[i]["project"]
-        create_task(desc, due, urg, tag, proj)
+      local empty_json = "[\n]\n"
+      if stdout ~= empty_json and stdout ~= "" then
+        task_list:remove(1) -- remove placeholder
+        local tasks = json.decode(stdout)
+        for i,v in ipairs(tasks) do
+          local desc = tasks[i]["description"]
+          local due  = tasks[i]["due"]
+          local urg  = tasks[i]["urgency"]
+          local tag  = tasks[i]["tag"]
+          local proj = tasks[i]["project"]
+          create_task(desc, due, urg, tag, proj)
+        end
       end
     end)
   end

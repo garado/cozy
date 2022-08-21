@@ -20,4 +20,8 @@ local clock_color = wibox.container.background()
 clock_color:set_widget(clock)
 clock_color:set_fg(beautiful.xforeground)
 
-return clock_color
+return wibox.widget({
+  clock_color,
+  bottom = dpi(6),
+  widget = wibox.container.margin,
+})

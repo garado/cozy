@@ -7,7 +7,7 @@
 # time I restart awesome and end up with 8000 requests (sorry @a-know!)
 
 # Usage:
-# ./cache_habits start_date num_days [graph_id...]
+# ./cache_habits start_date num_days [-f file | graph_ids...]
 # start_date
 #     The day to start fetching habits from (YYYYMMDD)
 #     Note: technically any `date`-acceptable format will work as 
@@ -17,7 +17,6 @@
 # graph_id
 #     A list of graph_ids to get data from
 # -f graph_id_file
-#     NOT YET IMPLEMENTED
 #     If this flag is set, cache_habits will retrieve graph ids from the file
 #     Each graph id in the file should be on its own line 
 

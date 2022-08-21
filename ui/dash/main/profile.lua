@@ -10,6 +10,7 @@ local dpi = xresources.apply_dpi
 local gears = require("gears")
 local gfs = require("gears.filesystem")
 local helpers = require("helpers")
+local user_vars = require("user_variables")
 
 local function create_profile()
   local image = wibox.widget({
@@ -49,10 +50,11 @@ local function create_profile()
 		layout = wibox.layout.stack,
   })
 
+  local display_name = user_vars.display_name
   local name = wibox.widget({
     widget = wibox.widget.textbox,
-    markup = helpers.ui.colorize_text("Alexis G.", beautiful.nord10),
-    font = "Roboto Mono 18",
+    markup = helpers.ui.colorize_text(display_name, beautiful.nord10),
+    font = beautiful.font_name .. "18",
     align = "center",
     valign = "center",
   })
@@ -60,21 +62,21 @@ local function create_profile()
   local host = wibox.widget({
     widget = wibox.widget.textbox,
     markup = helpers.ui.colorize_text("@andromeda", beautiful.nord1),
-    font = "Roboto Mono 18",
+    font = beautiful.font_name .. "18",
     align = "center",
     valign = "center",
   })
   
   local title = wibox.widget({
     widget = wibox.widget.textbox,
-    font = beautiful.font .. "11",
+    font = beautiful.font_name .. "11",
     markup = "insert title here",
     align = "center",
     valign = "center",
   })
  
   -- new title every time you open dash
-  -- need to make it change only when dash is closing
+  -- need to make it change only when dash is closing but idk how
   awesome.connect_signal("dash::toggle", function()
     local cmd = gfs.get_configuration_dir() .. "utils/dash/get_random_title"
     awful.spawn.easy_async_with_shell(cmd, function(stdout)
@@ -86,12 +88,6 @@ local function create_profile()
   local profile = wibox.widget({
     {
       image,
-      --{
-      --  --name
-      --  --host,
-      --  --spacing = dpi(2),
-      --  layout = wibox.layout.fixed.horizontal,
-      --},
       name,
       title, 
       spacing = dpi(2),
