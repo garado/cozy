@@ -11,12 +11,16 @@ The primary goal of this setup is to create an environment that:
 **NOTE: This setup is incomplete, somewhat buggy, and under constant development.** Because of that, I don't recommend daily driving it quite yet.
 
 # Installation (Arch/Arch-based)
+## Clone
+`cd ~/.config/ && git clone --recurse-submodules https://github.com/garado/awesome_dotfiles.git awesome`
+
+Update `configuration/apps.lua` with your default terminal/file manager/browser applications.
+
+
 ## Install dependencies
-- `cd ~/.config/ && git clone --recurse-submodules https://github.com/garado/awesome_dotfiles.git awesome`
+`yay -S awesome-git gcalcli nerd-fonts-roboto-mono ttf-roboto picom-pijulius-git`
 
-- `yay -S awesome-git gcalcli nerd-fonts-roboto-mono ttf-roboto picom-pijulius-git`
-
-- `pacman -S playerctl rofi scrot pamixer brightnessctl upower task timew ledger alacritty jq`
+`pacman -S playerctl rofi scrot pamixer brightnessctl upower task timew ledger`
 
 ## Configuration
 **Google Calendar events**
