@@ -25,8 +25,8 @@ Update `configuration/apps.lua` with your default terminal/file manager/browser 
 ## Configuration
 **Google Calendar events**
 - Follow instructions to [set up gcalcli](https://github.com/insanum/gcalcli#login-information)
-- The `utils/dash/update_calendar` script grabs gcalcli's output and caches it in `$HOME/.cache/awesome/calendar`.
-- Run it periodically with a cron job to keep your widget updated.
+- The calendar widget checks `~/.cache/awesome/calendar/agenda` for data (in tsv format). It will automatically fetch data if it detects that there is no data in the file.
+- To keep your widget updated, periodically update the cache by putting `gcalcli agenda --tsv > ~/.cache/awesome/calendar/agenda` in a cron job.
 
 
 **Pixela habit tracker**
