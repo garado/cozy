@@ -101,6 +101,9 @@ local function create_chart()
   })
  
   local function create_new_chart_section(entries, num_entries, total_spending)
+    -- table of dummy values for animation
+    local tmp_arc_values = { }
+    
     local arc_values = { }
     local colors = { }
     local arc_text = chart:get_children_by_id("text")[1]
@@ -113,16 +116,43 @@ local function create_chart()
     local amt = 2
     local bal = 3
     for i, v in ipairs(entries) do
+      table.insert(tmp_arc_values, 0)
       table.insert(arc_values, tonumber(v[amt]))
       table.insert(colors, color_palette[i])
       local amount = v[amt]
       amount = string.format("%.2f", amount) -- force 2 decimal places
       legend:add(create_legend_entry(v[cat], amount, color_palette[i]))
     end
- 
-    -- :)
+
+    -- yay animations :)
+    -- still a little janky
+    -- can't get it to reset when you close the dash
+    arc_chart.values = tmp_arc_values
+    local section_index = 1
+    local relative_max = arc_values[1]
+    local sub = 0
+    local arc_chart_animation = animation:new({
+      duration = 1,
+      target = arc_chart.max_value,
+      easing = animation.easing.inOutExpo,
+      reset_on_stop = true,
+      update = function(self, pos)
+        if pos < relative_max then
+          arc_chart.values[section_index] = pos - sub
+          arc_chart:emit_signal("widget::redraw_needed")
+        else
+          section_index = section_index + 1
+          sub = relative_max
+          relative_max = relative_max + arc_values[section_index]
+        end
+      end,
+    })
+
+    awesome.connect_signal("dash::open", function()
+      arc_chart_animation:start()
+    end)
+
     arc_chart.colors = colors
-    arc_chart.values = arc_values
   end -- end breakdown chart creation
 
   local cmd = "ledger -f " .. ledger_file .. " -M csv register expenses"
