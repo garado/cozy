@@ -19,5 +19,13 @@ return {
     "Finish Arch setup",
     "Post to r/unixporn",
     "Be kind to myself",
-  }, 
+  },
+  titles = {
+    "Mechromancer",
+    "Linux enthusiast",
+    "Uses Arch, btw",
+    "Terminal dweller",
+    "CLI sorcerer",
+    "Vim wizard",
+  },
 }

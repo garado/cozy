@@ -12,6 +12,8 @@ local gfs = require("gears.filesystem")
 local helpers = require("helpers")
 local user_vars = require("user_variables")
 
+local math = math
+
 local function create_profile()
   local image = wibox.widget({
     {
@@ -70,19 +72,16 @@ local function create_profile()
   local title = wibox.widget({
     widget = wibox.widget.textbox,
     font = beautiful.font_name .. "11",
-    markup = "insert title here",
+    markup = helpers.ui.colorize_text("Uses Arch, btw", beautiful.xforeground),
     align = "center",
     valign = "center",
   })
  
   -- new title every time you open dash
-  -- need to make it change only when dash is closing but idk how
-  awesome.connect_signal("dash::toggle", function()
-    local cmd = gfs.get_configuration_dir() .. "utils/dash/get_random_title"
-    awful.spawn.easy_async_with_shell(cmd, function(stdout)
-      local stdout = helpers.ui.colorize_text(stdout, beautiful.dash_widget_fg)
-      title:set_markup(stdout)
-    end)
+  awesome.connect_signal("dash::close", function()
+    local titles_list = user_vars.titles
+    local random_title = titles_list[math.random(#titles_list)]
+    title:set_markup(helpers.ui.colorize_text(random_title, beautiful.dash_widget_fg))
   end)
   
   local profile = wibox.widget({
