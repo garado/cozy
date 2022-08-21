@@ -133,7 +133,6 @@ local function create_chart()
     local sub = 0
     local arc_chart_animation = animation:new({
       duration = 1,
-      target = arc_chart.max_value,
       easing = animation.easing.inOutExpo,
       reset_on_stop = true,
       update = function(self, pos)
@@ -145,11 +144,17 @@ local function create_chart()
           sub = relative_max
           relative_max = relative_max + arc_values[section_index]
         end
+
+        -- for some reason the animation doesn't end properly
+        -- so this is a hacky fix to make the animation end
+        if pos >= arc_chart.max_value - 1 then
+          self:stop()
+        end
       end,
     })
 
     awesome.connect_signal("dash::open", function()
-      arc_chart_animation:start()
+      arc_chart_animation:set(arc_chart.max_value)
     end)
 
     arc_chart.colors = colors
