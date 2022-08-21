@@ -4,10 +4,6 @@
   <img title="" src="assets/animation_demo.gif">
 </p>
 
-<p align="center">
-  <img title="" src="assets/showcase.png" alt="" width="1200">
-</p>
-
 Hi! This is **cozy**, my [AwesomeWM](https://awesomewm.org/) config. Thanks for checking it out!
 
 The primary goal of this setup is to create an environment that:
