@@ -11,7 +11,6 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local helpers = require("helpers")
 local gfs = require("gears.filesystem")
-local naughty = require("naughty")
 
 local json = require("modules.json")
 local math = math
@@ -44,40 +43,56 @@ local function widget()
   })
 
   local function create_task(desc, due, urg, tag, proj)
-    -- taskwarrior returns due date as string
-    -- convert that to a lua timestamp
-    local pattern = "(%d%d%d%d)(%d%d)(%d%d)T(%d%d)(%d%d)(%d%d)Z"
-    local xyear, xmon, xday, xhr, xmin, xsec = due:match(pattern)
-    local ts = os.time({ 
-      year = xyear, month = xmon, day = xday, 
-      hour = xhour, min = xmin, sec = xsec })
-    
-    -- turn timestamp into human-readable format
-    -- math.floor() rounds to whole number
-    local now = os.time()
-    local days_rem = (ts - now) / 86400
-    local hours_rem = (ts - now) / 3600
-    local min_rem = (ts - now) / 60
+    local function format_due_date(due)
+      -- taskwarrior returns due date as string
+      -- convert that to a lua timestamp
+      local pattern = "(%d%d%d%d)(%d%d)(%d%d)T(%d%d)(%d%d)(%d%d)Z"
+      local xyear, xmon, xday, xhr, xmin, xsec = due:match(pattern)
+      local ts = os.time({ 
+        year = xyear, month = xmon, day = xday, 
+        hour = xhour, min = xmin, sec = xsec })
+
+      -- turn timestamp into human-readable format
+      local now = os.time()
+      local time_difference = ts - now
+      local days_rem = math.abs(time_difference / 86400)
+      local hours_rem = math.abs(time_difference / 3600)
+  
+      local due_date_text
+      if days_rem >= 1 then -- in x days / x days ago
+        due_date_text = math.floor(days_rem) .. " day"
+        if days_rem > 1 then
+          due_date_text = due_date_text .. "s"
+        end
+      else -- in x hours / x hours ago
+        if hours_rem == 1 then
+          due_date_text = math.floor(hours_rem) .. " hour" 
+        elseif hours_rem < 1 then
+          due_date_text = "&lt;1 hour"
+        else
+          due_date_text = math.floor(hours_rem) .. " hours"
+        end
+      end
+     
+      if time_difference < 0 then -- overdue
+        due_date_text = due_date_text .. " ago"
+      else
+        due_date_text = "in " .. due_date_text
+      end
+
+      return due_date_text
+    end
 
     local due_date_text
-    if days_rem >= 1 then
-      due_date_text = "in " .. math.floor(days_rem) .. " day"
-      if days_rem > 1 then
-        due_date_text = due_date_text .. "s"
-      end
+    if due then
+      due_date_text = format_due_date(due)
     else
-      if hours_rem == 1 then
-        due_date_text = "in " .. math.floor(hours_rem) .. " hour" 
-      elseif hours_rem < 1 then
-        due_date_text = "in &lt;1 hour"
-      else
-        due_date_text = "in " .. math.floor(hours_rem) .. " hours"
-      end
+      due_date_text = "no due date"
     end
 
     -- more urgent tasks should be red
     local desc_color = beautiful.xforeground
-    if urg > 5 then
+    if urg > 7 then
       desc_color = beautiful.nord11
     end
 

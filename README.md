@@ -73,7 +73,9 @@ I couldn't fit enough information onto the main dashboard page, so I'm adding ta
   - [X] Recent transactions
   - [X] Monthly spending
   - [ ] Budget tracking 
-  - [ ] Arc chart animations :)
+  - [o] Arc chart animations :)
+    - [X] base implementation
+    - [ ] fix bugs
   - [ ] Yearly account balance trends 
   - [ ] Redesign UI
 - Habits/goals
@@ -89,8 +91,8 @@ I couldn't fit enough information onto the main dashboard page, so I'm adding ta
   - reason: stuff stored in xrdb to preserve pomodoro state across awesome restarts doesn't always get cleared properly
 - [ ] Monthly spending arc chart animation doesn't always work
   - reason: i have no idea
-- [ ] Overdue tasks don't show the correct due date
-  - reason: my implementation was lazy lol i know how to fix it. i'll get around to it
+- [ ] Task due dates don't always show correctly
+  - reason: something weird with lua/taskwarrior timezones, i think
 
 ## In progress/planned
 - **Dash (other)**
