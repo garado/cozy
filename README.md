@@ -31,7 +31,10 @@ Update `configuration/apps.lua` with your default terminal/file manager/browser 
 
 **Pixela habit tracker**
 - [Read these instructions](https://pixe.la/) to create a Pixela account and create your habits
-- Install [pi](https://github.com/a-know/pi)
+- Install [pi](https://github.com/a-know/pi) (command line Pixela tool)
+  - The install instructions on pi's Github page don't work, follow this:
+  - `go install github.com/a-know/pi/cmd/pi@latest`
+  - Put `pi` (located in `$HOME/go/bin`) in your path
 - Set the `PIXELA_USER_NAME` and `PIXELA_USER_TOKEN` environment variables
 - Update `user_variables.lua` with the habits you want to display
 - The `utils/dash/habits/cache_habits` script caches data from Pixela. Run it periodically with a cron job to keep your widget updated.
