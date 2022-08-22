@@ -22,44 +22,12 @@ return function(s)
   local cal = require("ui.dash.cal")
   local habit = require("ui.dash.habit")
   local todo = require("ui.dash.todo")
-  local weather = require("ui.dash.weather")
-  local vision = require("ui.dash.dreams")
  
-  -- decide which tab to show
-  -- main, finances, habit, caltodo, weather, dreams,
+  local tablist =   { main, finances, habit,  cal,}
+  local tab_icons = { "",  "",      "",    "",  }
   local tablist_pos = 1
-  local tablist =   { main, finances, habit,  cal,    weather, vision}
-  local tab_icons = { "",  "",    "",    "",    "盛",   "滛", }
-  local tablist_elems = 7 -- ???
+  local tablist_elems = 4
 
-  -- create tabs based on tablist
-  local function new_tab(name)
-    return wibox.widget({
-      {
-        {
-          {
-            markup = helpers.ui.colorize_text(name, beautiful.xforeground),
-            widget = wibox.widget.textbox,
-          },
-          widget = wibox.container.place,
-        },
-        forced_height = dpi(100),
-        forced_width = dpi(30),
-        shape = function(cr, width, height)
-          gears.shape.partially_rounded_rect(cr, width, height, true, false, false, true)
-        end,
-        id = name, -- change bg of active/inactive tabs
-        bg = beautiful.dash_tab_bg,
-        widget = wibox.container.background,
-      },
-      margins = { top = dpi(5), bottom = dpi(5) },
-      widget = wibox.container.margin,
-    })
-  end
-
-  -------------------------
-  -- ASSEMBLING THE DASH --
-  -------------------------
   local dash_content = wibox.widget({
     {
       {
@@ -70,9 +38,7 @@ return function(s)
       margins = dpi(10),
     },
     bg = beautiful.dash_bg,
-    shape = function(cr, width, height)
-        gears.shape.partially_rounded_rect(cr, width, height, false, true, true, false)
-    end,
+    shape = gears.shape.rect,
     widget = wibox.container.background,
   })
 
@@ -83,9 +49,7 @@ return function(s)
       },
       forced_width = dpi(50),
       forced_height = dpi(1400),
-      shape = function(cr, width, height)
-          gears.shape.partially_rounded_rect(cr, width, height, true, false, false, true)
-      end,
+      shape = gears.shape.rect,
       widget = wibox.container.background,
       bg = beautiful.dash_tab_bg,
     })
@@ -109,14 +73,14 @@ return function(s)
     return tab_bar
   end
 
+  local tab_bar = create_tab_bar()
+
   dash_content:get_children_by_id("content")[1]:add(main)
 
   local ugh = wibox.widget({
-   create_tab_bar(),
-   dash_content,
-   layout = wibox.layout.align.horizontal,
-   -- UGH!!!
-   -- end widget
+    tab_bar,
+    dash_content,
+    layout = wibox.layout.align.horizontal,
   })
 
   -- DASH KEYBOARD NAVIGATION
@@ -139,15 +103,27 @@ return function(s)
 
     -- "j" and "k" navigate between tabs
     local function next_tab()
+      local old_index = tablist_pos
       local index = ((tablist_pos + 1) % tablist_elems)
+      if index == 0 then index = 4 end
       content:set(1, tablist[index])
       tablist_pos = index
+      local tab = tab_bar.children[1].children[tablist_pos]
+      tab:set_color(beautiful.nord10)
+      local prev_tab = tab_bar.children[1].children[old_index]
+      prev_tab:set_color(beautiful.xforeground)
     end
 
     local function prev_tab()
+      local old_index = tablist_pos
       local index = ((tablist_pos - 1) % tablist_elems)
+      if index == 0 then index = 4 end
       content:set(1, tablist[index])
       tablist_pos = index
+      local tab = tab_bar.children[1].children[tablist_pos]
+      tab:set_color(beautiful.nord10)
+      local prev_tab = tab_bar.children[1].children[old_index]
+      prev_tab:set_color(beautiful.xforeground)
     end
 
     -- I thought about making h/l navigate between interactive
@@ -191,7 +167,6 @@ return function(s)
   -- build dashboard
   dash = awful.popup({
     type = "dock",
-    --screen = s,
     minimum_height = dpi(810),
     maximum_height = dpi(810),
     minimum_width = dpi(1350),
@@ -202,5 +177,8 @@ return function(s)
     placement = awful.placement.centered,
     widget = ugh,
   })
+      
+  local main_tab_icon = tab_bar.children[1].children[1]
+  main_tab_icon:set_color(beautiful.nord10)
 
 end

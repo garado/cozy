@@ -4,7 +4,7 @@
 
 -- Prompts that are triggered periodically.
 -- The main use case is notifs that ask if I've completed my habits.
--- These are triggered with a cron job:
+-- These are triggered with a cron job using:
 --    echo "awesome.emit_signal('habit::check_journal')" | awesome-client
 
 local awful = require("awful")
@@ -35,7 +35,7 @@ journal_no:connect_signal("invoked", function()
     app_name = "Health",
     title = ">:(",
     message = "Suit yourself.",
-    timeout = 5000,
+    timeout = 0,
   }
 end)
 
@@ -49,7 +49,7 @@ awesome.connect_signal("habit::journal_check", function()
         app_name = "Health",
         title = "You haven't journaled today.",
         message = "Open journal now?",
-        timeout = 5000,
+        timeout = 0,
         actions = { journal_yes, journal_no }, 
       }
     else
@@ -85,7 +85,7 @@ sleep_no:connect_signal("invoked", function()
     title = "You decide not to sleep.",
     message = "You will regret this in the\nmorning.",
     fg = beautiful.nord11,
-    timeout = 5000,
+    timeout = 0,
   }
 end)
 
@@ -94,7 +94,7 @@ awesome.connect_signal("habit::sleep_check", function()
     app_name = "Health",
     title = "You're still awake?",
     message = "Maybe consider a melatonin?\nThey're in your desk drawer.",
-    timeout = 5000,
+    timeout = 0,
     actions = { sleep_yes, sleep_no },
   }
 end)
@@ -130,7 +130,7 @@ awesome.connect_signal("habit::ledger_check", function()
     app_name = "Health",
     title = "Ledger check",
     message = "Open ledger now?",
-    timeout = 5000,
+    timeout = 0,
     actions = { ledger_yes, ledger_no }, 
   }
 end)

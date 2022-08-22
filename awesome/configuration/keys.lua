@@ -133,17 +133,17 @@ awful.keyboard.append_global_keybindings({
   -- Rofi --
   -- App launcher
   awful.key({ alt }, "r", function()
-    awful.spawn.with_shell(apps.utils.app_launcher)
+    awful.spawn(apps.utils.app_launcher)
   end, { description = "app launcher", group = "Launchers" }), 
 
   -- Tmux presets
   awful.key({ alt }, "e", function()
-    awful.spawn.with_shell(apps.utils.tmux_presets)
+    awful.spawn(apps.utils.tmux_presets)
   end, { description = "tmux presets", group = "Launchers" }), 
 
   -- Bluetooth
   awful.key({ alt }, "b", function()
-    awful.spawn.with_shell(apps.utils.bluetooth)
+    awful.spawn(apps.utils.bluetooth)
   end, { description = "bluetooth", group = "Launchers" }), 
   
 })
@@ -208,19 +208,19 @@ client.connect_signal("request::default_keybindings", function()
   end),
 
   -- Swapping clients
-  awful.key({ alt, shift, ctrl }, "h", function()
+  awful.key({ ctrl, shift }, "h", function()
     awful.client.swap.bydirection("left")
   end, { description = "(vimlike) swap left", group = "Client"}),
 
-  awful.key({ alt, shift, ctrl }, "j", function()
+  awful.key({ shift, ctrl }, "j", function()
     awful.client.swap.bydirection("down")
   end),
 
-  awful.key({ alt, shift, ctrl }, "k", function()
+  awful.key({ shift, ctrl }, "k", function()
     awful.client.swap.bydirection("up")
   end),
 
-  awful.key({ alt, shift, ctrl }, "l", function()
+  awful.key({ shift, ctrl }, "l", function()
     awful.client.swap.bydirection("right")
   end),
 

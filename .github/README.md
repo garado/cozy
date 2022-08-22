@@ -30,6 +30,7 @@ The primary goal of this setup is to create an environment that:
 - (WIP) Different tabs to show even more information!
 
 
+
 <h2>Install and configure</h2>
 <details><summary>(expand)</summary>
 
@@ -71,7 +72,7 @@ Other theme stuff
 | Icon theme    | [Papirus-Nord](https://github.com/Adapta-Projects/Papirus-Nord)      |
 | Vim theme     | [nord-vim](https://github.com/arcticicestudio/nord-vim)              |
 
-## Configuration
+### Configuration
 
 Most configuration happens in `awesome/configuration/*` and `awesome/user_variables.lua`.
 
@@ -155,3 +156,4 @@ Make sure you update `configuration/apps.lua` with your default terminal/file ma
 - [rxhyn](https://github.com/rxyhn/yoru) for code reference
 - [adi1090x]() for rofi theme
 - [siddhanthrathod](https://github.com/siddhanthrathod/bspwm) for picom configuration
+- [nick clyde](https://github.com/nickclyde/rofi-bluetooth) for rofi-bluetooth

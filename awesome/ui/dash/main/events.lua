@@ -9,7 +9,6 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local helpers = require("helpers")
 local gfs = require("gears.filesystem")
-local naughty = require("naughty")
 
 local string = string
 local table = table
@@ -110,8 +109,8 @@ local function widget()
   end
 
   local function update_calendar()
-    local cfg = gfs.get_configuration_dir()
-    local cmd = "cat " .. cfg .. "/calendar/agenda"
+    local file = gfs.get_cache_dir() .. "calendar/agenda"
+    local cmd = "cat " .. file
     awful.spawn.easy_async_with_shell(cmd, function(stdout)
       if stdout ~= nil and stdout ~= '' then
         parse_tsv(stdout)
@@ -119,6 +118,7 @@ local function widget()
         local gcalcli_cmd = "gcalcli agenda today '2 weeks' --tsv"
         awful.spawn.easy_async_with_shell(gcalcli_cmd, function(stdout)
           parse_tsv(stdout)
+          awful.spawn.with_shell("echo -e '" .. stdout .. "' > " .. file)
         end)
       end
     end)

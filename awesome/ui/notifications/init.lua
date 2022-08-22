@@ -22,7 +22,7 @@ naughty.config.defaults.position = "top_right"
 
 local function get_oldest_notification()
   for _, notification in ipairs(naughty.active) do
-    if notification and notification.timeout > 0 then
+    if notification then
       return notification
     end
   end
@@ -40,7 +40,7 @@ naughty.connect_signal("request::display", function(n)
     fps = 60,
     speed = 75,
     widgets.text({
-      font = beautiful.font_name,
+      font = beautiful.font,
       size = 10,
       bold = true,
       text = n.title,
@@ -94,14 +94,13 @@ naughty.connect_signal("request::display", function(n)
   })
 
   local app_name = widgets.text({
-    font = "Roboto Mono ",
+    font = beautiful.font,
     size = 10,
     bold = true,
     text = n.app_name,
   })
 
 	local dismiss = widgets.button.text.normal({
-		--font = beautiful.icon_font .. "Round ",
     font = beautiful.font,
 		paddings = dpi(2),
 		size = 9,
@@ -114,6 +113,7 @@ naughty.connect_signal("request::display", function(n)
 			n:destroy(naughty.notification_closed_reason.dismissed_by_user)
 		end,
 	})
+
 
   local timeout_arc = wibox.widget({
     widget = wibox.container.arcchart,
@@ -142,6 +142,12 @@ naughty.connect_signal("request::display", function(n)
 		dismiss,
   })
 
+  local function show_timeout_arc()
+    if n.timeout > 0 then
+      return timeout_arc
+    end
+  end
+
   local widget = naughty.layout.box({
     notification = n,
     type = "notification",
@@ -160,7 +166,7 @@ naughty.connect_signal("request::display", function(n)
             {
               app_name,
               nil,
-              timeout_arc,
+              show_timeout_arc(),
               layout = wibox.layout.align.horizontal,
             },
             margins = { 
@@ -171,6 +177,7 @@ naughty.connect_signal("request::display", function(n)
             },
             widget = wibox.container.margin,
           },
+          forced_height = dpi(35),
           bg = beautiful.notification_title_bg,
           widget = wibox.container.background,
         }, -- End app name
@@ -232,7 +239,9 @@ naughty.connect_signal("request::display", function(n)
 		n:destroy()
 	end)
 
-  anim:start()
+  if n.timeout > 0 then
+    anim:start()
+  end
 
 end)
 

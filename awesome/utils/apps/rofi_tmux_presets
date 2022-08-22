@@ -14,7 +14,6 @@ presets=(
   "awesome"
   "ledger"
   "triple"
-  "171"
   "home"
   "crossword"
   "eww"
@@ -33,13 +32,12 @@ declare -i SELECTED
 
 select_preset()
 {
-  local MORE_FLAGS=(-format i -no-custom -p "  ")
   while true
   do
     declare -i RTR
     declare -i RES
 
-    RES=$( create_preset_list | ${rofi_cmd} ${MORE_FLAGS[@]} -cycle -selected-row "${SELECTED}")
+    RES=$( create_preset_list | ${rofi_cmd} -cycle -selected-row "${SELECTED}")
     RTR=$?
     if [ "${RTR}" = 10 ]
     then
@@ -63,7 +61,6 @@ set_preset()
 {
   PRESET_NO=$1
   preset="${presets[$PRESET_NO]}"
-  echo $preset 
   case $preset in
   "single")
     tmux new-window
@@ -115,14 +112,6 @@ set_preset()
     splitw -h -c "$HOME/Documents/Crossword" \; \
     splitw -v -c "$HOME/Documents/Crossword" \; \
     rename-window crossword
-    ;;
-  "171")
-    tmux new-window -c "$HOME/Documents/UCSC/ece171-su22" \; \
-    splitw -v -c "#{pane_current_path}" \; \
-    select-layout even-vertical \; \
-    splitw -h -c "#{pane_current_path}" \; \
-    splitw -v -c "#{pane_current_path}" \; \
-    rename-window 171
     ;;
   "home")
     tmux new-window 'taskwarrior-tui' \; \

@@ -1,0 +1,25 @@
+
+# █▀▀ █▀█ █▀█ █▄░█ ▀█▀ ▄▀█ █▄▄
+# █▄▄ █▀▄ █▄█ █░▀█ ░█░ █▀█ █▄█
+# -----------------------------
+# Sample user crontab configuration
+
+# -- Dashboard --
+HABITS=$HOME/.config/awesome/utils/dash/habits
+# Every 3 hours at x:25
+25 */3 * * *  gcalcli agenda --tsv > $HOME/.cache/awesome/calendar/agenda
+
+# Every 4 hours at x:25
+25 */4 * * *  $HABITS/cache_habits today 2 -f $HABITS/habit_list
+
+# -- Prompts --
+# 4-11pm every day at x:00 and x:30
+0,30 16-23 * * *   echo "awesome.emit_signal('habit::journal_check')" | awesome-client
+
+# 11pm-5am every day at x:15 and x:45
+15,45 23    * * *   echo "awesome.emit_signal('habit::sleep_check') | awesome-client
+15,45 0-5   * * *   echo "awesome.emit_signal('habit::sleep_check') | awesome-client
+
+# Every 3 hours at x:25
+25    */3   * * *   echo "awesome.emit_signal('habit::ledger_check')" | awesome-client
+

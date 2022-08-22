@@ -11,6 +11,7 @@ local gears = require("gears")
 local gfs = require("gears.filesystem")
 local helpers = require("helpers")
 local widgets = require("ui.widgets")
+local user_vars = require("user_variables")
 local naughty = require("naughty")
 local math = math
 
@@ -30,12 +31,10 @@ local pomodoro = {
   timer_states = {
     "stopped", "ticking", "paused",
   },
-  topics = {
-    "School", "Coding", "Hobby", "Personal",
-  },
-  times = {
-    "1m", "15m", "25m", "60m",
-  },
+  topics = user_vars.pomo_topics,
+  times = user_vars.pomo_times,
+  short_break_duration = user_vars.pomo_short_break,
+  long_break_duration = user_vars.pomo_long_break,
 }
 
 local function reset_pomodoro()
@@ -107,7 +106,7 @@ local function ui_start()
     widget = wibox.container.margin,
   })
   return widget_cont
-end
+end -- end ui_start
 
 
 -- █▀ █▀▀ █░░ █▀▀ █▀▀ ▀█▀   ▀█▀ █▀█ █▀█ █ █▀▀
@@ -153,7 +152,7 @@ local function create_topic_buttons()
   end
   buttons.children[1]:add(back_button)
   return buttons
-end
+end -- end create_topic_buttons
 
 local function ui_select_topic()
   local header = wibox.widget({
@@ -197,7 +196,7 @@ local function ui_select_topic()
   })
 
   return widget_cont
-end
+end -- end ui_select_topic
 
 
 -- █▀ █▀▀ █░░ █▀▀ █▀▀ ▀█▀   ▀█▀ █ █▀▄▀█ █▀▀
@@ -253,7 +252,7 @@ local function create_time_buttons()
   end
   buttons.children[1]:add(back_button)
   return buttons
-end
+end -- end create_time_buttons
 
 local function ui_select_time()
   local header = wibox.widget({
@@ -297,7 +296,7 @@ local function ui_select_time()
   })
 
   return widget_cont
-end
+end -- end ui_select_time
 
 
 --▀█▀ █ █▀▀ █▄▀
@@ -529,7 +528,7 @@ local function ui_tick()
     widget = wibox.container.margin,
   })
   return widget_cont
-end
+end -- end ui_tick
 
 
 --█▀▀ █▀█ █▀▄▀█ █▀█ █░░ █▀▀ ▀█▀ █▀▀
@@ -615,7 +614,7 @@ function redraw_widget()
   widget:set_widget(new_content)
 end
       
--- If awesome was restarted, preserve stuff
+-- if awesome was restarted, preserve stuff
 awful.spawn.easy_async_with_shell("xrdb -query", 
   function(stdout)
     local preserved = stdout:match('pomodoro.preserved:%s+%w+')
