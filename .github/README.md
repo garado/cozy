@@ -29,12 +29,13 @@ The primary goal of this setup is to create an environment that:
   - Current account balances
 - (WIP) Different tabs to show even more information!
 
-<details>
-<summary><b>Install and configure</b></summary>
+
+<h2>Install and configure</h2>
+<details><summary>(expand)</summary>
 
 <b>NOTE: This setup is incomplete, somewhat buggy, and under constant development.</b> Because of that, I don't recommend daily driving it quite yet.
 
-## Installation (Arch/Arch-based)
+### Installation (Arch/Arch-based)
 
 Install dependencies
 
@@ -100,8 +101,8 @@ Make sure you update `configuration/apps.lua` with your default terminal/file ma
 </details>
 
 
-
-<details><summary><b>Known bugs</b></summary>
+<h2>Known bugs</h2>
+<details><summary>(expand)</summary>
 
 - [ ] Pomodoro gets a little wonky if you restart awesome too many times
   - reason: stuff stored in xrdb to preserve pomodoro state across awesome restarts doesn't always get cleared properly
@@ -111,7 +112,8 @@ Make sure you update `configuration/apps.lua` with your default terminal/file ma
   - reason: something weird with lua/taskwarrior timezones, i think
 </details>
 
-<details><summary><b>In progress/planned features</b></summary>
+<h2>In progress/planned features</h2>
+<details><summary>(expand)</summary>
 
 - <b>Dashboard tabs</b>
   - Finances
