@@ -1,0 +1,139 @@
+#!/bin/bash
+
+# ▀█▀ █▀▄▀█ █░█ ▀▄▀   █▀█ █▀█ █▀▀ █▀ █▀▀ ▀█▀ █▀
+# ░█░ █░▀░█ █▄█ █░█   █▀▀ █▀▄ ██▄ ▄█ ██▄ ░█░ ▄█
+# ----------------------------------------------
+# Easily open preset tmux windows and panes with Rofi
+
+# Make rofi look nice
+rofi_dir="~/.config/rofi"
+rofi_cmd="rofi -dmenu -theme $rofi_dir/style.rasi"
+
+declare -a presets
+presets=(
+  "awesome"
+  "ledger"
+  "triple"
+  "171"
+  "home"
+  "crossword"
+  "eww"
+)
+
+# List all presets
+create_preset_list()
+{
+  for preset in ${presets[@]}
+  do
+    echo "${preset}"
+  done
+}
+
+declare -i SELECTED
+
+select_preset()
+{
+  local MORE_FLAGS=(-format i -no-custom -p "  ")
+  while true
+  do
+    declare -i RTR
+    declare -i RES
+
+    RES=$( create_preset_list | ${rofi_cmd} ${MORE_FLAGS[@]} -cycle -selected-row "${SELECTED}")
+    RTR=$?
+    if [ "${RTR}" = 10 ]
+    then
+      return 0;
+    elif [ "${RTR}" = 1 ]
+    then
+      return 1;
+    elif [ "${RTR}" = 65 ]
+    then
+      return 1;
+    fi
+    
+    # Set new preset
+    SELECTED=${RES}
+    set_preset $SELECTED
+    exit
+  done
+}
+
+set_preset()
+{
+  PRESET_NO=$1
+  preset="${presets[$PRESET_NO]}"
+  echo $preset 
+  case $preset in
+  "single")
+    tmux new-window
+    ;;
+  "triple")
+    tmux new-window \; \
+    split-window -h \; \
+    split-window -v
+    ;;
+  "ledger")
+    tmux new-window -c $HOME/Documents/Ledger\; \
+    send-keys "vp *" Enter \; \
+    splitw -h -c "#{pane_current_path}"\; \
+    splitw -v -c "#{pane_current_path}"\; \
+    rename-window ledger
+    ;;
+  "awesome")
+    tmux new-window -c $HOME/.config/awesome \; \
+    splitw -h -c "#{pane_current_path}"\; \
+    splitw -v -c "#{pane_current_path}"\; \
+    rename-window dash
+    tmux new-window -c $HOME/.config/awesome \; \
+    splitw -h -c "#{pane_current_path}"\; \
+    splitw -v -c "#{pane_current_path}"\; \
+    rename-window bar
+    tmux new-window -c $HOME/.config/awesome\; \
+    rename-window xephyr
+    ;;
+  "eww")
+    tmux new-window -c $HOME/.config/eww/popup\; \
+    splitw -h -c "#{pane_current_path}"\; \
+    splitw -v -c "#{pane_current_path}"\; \
+    rename-window popup 
+    tmux new-window -c $HOME/.config/eww/dash\; \
+    splitw -h -c "#{pane_current_path}"\; \
+    splitw -v -c "#{pane_current_path}"\; \
+    rename-window dash
+    tmux new-window -c $HOME/.config/eww/bar\; \
+    splitw -h -c "#{pane_current_path}"\; \
+    splitw -v -c "#{pane_current_path}"\; \
+    rename-window bar 
+    tmux new-window -c $HOME/.config/eww/syspanel\; \
+    splitw -h -c "#{pane_current_path}"\; \
+    splitw -v -c "#{pane_current_path}"\; \
+    rename-window syspanel 
+    ;;
+  "crossword")
+    tmux new-window \; \
+    splitw -h -c "$HOME/Documents/Crossword" \; \
+    splitw -v -c "$HOME/Documents/Crossword" \; \
+    rename-window crossword
+    ;;
+  "171")
+    tmux new-window -c "$HOME/Documents/UCSC/ece171-su22" \; \
+    splitw -v -c "#{pane_current_path}" \; \
+    select-layout even-vertical \; \
+    splitw -h -c "#{pane_current_path}" \; \
+    splitw -v -c "#{pane_current_path}" \; \
+    rename-window 171
+    ;;
+  "home")
+    tmux new-window 'taskwarrior-tui' \; \
+    splitw -h 'ncspot' \; \
+    splitw -v \; \
+    rename-window home
+    ;;
+  *)
+    ;;
+  esac
+}
+
+select_preset
+

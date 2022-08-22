@@ -13,7 +13,7 @@ return {
 	--- List of binaries/shell scripts that will execute for a certain task
 	utils = {
     bluetooth = utils_dir .. "apps/rofi_bluetooth",
-    tmux_pane_presets = utils_dir .. "apps/rofi_tmux_pane_presets",
+    tmux_presets = utils_dir .. "apps/rofi_tmux_presets",
     app_launcher = utils_dir .. "apps/rofi_app_launcher",
 	},
 }

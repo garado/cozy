@@ -81,26 +81,26 @@ local function create_chart()
     })
 
     local legend_entry = wibox.widget({
-      {
         circle,
         label,
         amount_,
         spacing = dpi(10),
         layout = wibox.layout.fixed.horizontal,
         forced_width = dpi(300),
-      },
-      widget = wibox.container.place,
     })
     
     return legend_entry 
-  end
+  end -- end create_legend_entry()
 
   local legend = wibox.widget({
-    spacing = dpi(3),
-    layout = wibox.layout.flex.vertical,
+    {
+      spacing = dpi(3),
+      layout = wibox.layout.fixed.vertical,
+    },
+    widget = wibox.container.place,
   })
  
-  local function create_new_chart_section(entries, num_entries, total_spending)
+  local function create_chart_sections(entries, num_entries, total_spending)
     -- table of dummy values for animation
     local tmp_arc_values = { }
     
@@ -112,21 +112,19 @@ local function create_chart()
     arc_chart.min_value = 0
     arc_chart.max_value = tonumber(total_spending)
 
-    local cat = 1 -- category
-    local amt = 2
-    local bal = 3
     for i, v in ipairs(entries) do
+      local cat = v[1] -- category
+      local amt = v[2]
+      local bal = v[3]
       table.insert(tmp_arc_values, 0)
-      table.insert(arc_values, tonumber(v[amt]))
+      table.insert(arc_values, (tonumber(amt)))
       table.insert(colors, color_palette[i])
-      local amount = v[amt]
-      amount = string.format("%.2f", amount) -- force 2 decimal places
-      legend:add(create_legend_entry(v[cat], amount, color_palette[i]))
+      local amt_text = string.format("%.2f", amt) -- force 2 decimal places
+      legend.children[1]:add(create_legend_entry(cat, amt_text, color_palette[i]))
     end
 
     -- yay animations :)
     -- still a little janky
-    -- can't get it to reset when you close the dash
     arc_chart.values = tmp_arc_values
     local section_index = 1
     local relative_max = arc_values[1]
@@ -140,6 +138,7 @@ local function create_chart()
           arc_chart.values[section_index] = pos - sub
           arc_chart:emit_signal("widget::redraw_needed")
         else
+          arc_chart.values[section_index] = arc_values[section_index]
           section_index = section_index + 1
           sub = relative_max
           relative_max = relative_max + arc_values[section_index]
@@ -158,7 +157,7 @@ local function create_chart()
     end)
 
     arc_chart.colors = colors
-  end -- end breakdown chart creation
+  end -- end create_chart_sections
 
   local cmd = "ledger -f " .. ledger_file .. " -M csv register expenses"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
@@ -218,7 +217,7 @@ local function create_chart()
     for i, v in ipairs(entries) do
       total_spending = total_spending + v[2]
     end
-    create_new_chart_section(entries, num_entries, total_spending)
+    create_chart_sections(entries, num_entries, total_spending)
   end) -- end awful.spawn
 
   return { chart, legend }

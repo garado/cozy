@@ -17,12 +17,15 @@ local table = table
 local function widget()
   local placeholder = wibox.widget({
     markup = helpers.ui.colorize_text("No events found", beautiful.xforeground),
+    align = "center",
+    valign = "center",
     font = beautiful.font .. "12",
     widget = wibox.widget.textbox,
   })
 
   local events = wibox.widget({
     placeholder,
+    spacing = dpi(3),
     layout = wibox.layout.fixed.vertical,
   })
 

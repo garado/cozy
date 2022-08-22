@@ -55,22 +55,23 @@ local function widget()
       -- turn timestamp into human-readable format
       local now = os.time()
       local time_difference = ts - now
-      local days_rem = math.abs(time_difference / 86400)
-      local hours_rem = math.abs(time_difference / 3600)
+      local abs_time_difference = math.abs(time_difference)
+      local days_rem = math.floor(abs_time_difference / 86400)
+      local hours_rem = math.floor(abs_time_difference / 3600)
   
       local due_date_text
       if days_rem >= 1 then -- in x days / x days ago
-        due_date_text = math.floor(days_rem) .. " day"
+        due_date_text = days_rem .. " day"
         if days_rem > 1 then
           due_date_text = due_date_text .. "s"
         end
-      else -- in x hours / x hours ago
+      else -- in x hours / in <1 hour / etc
         if hours_rem == 1 then
-          due_date_text = math.floor(hours_rem) .. " hour" 
+          due_date_text = hours_rem .. " hour" 
         elseif hours_rem < 1 then
           due_date_text = "&lt;1 hour"
         else
-          due_date_text = math.floor(hours_rem) .. " hours"
+          due_date_text = hours_rem .. " hours"
         end
       end
      
@@ -122,7 +123,7 @@ local function widget()
   -- use `task export` to get task json, 
   -- then convert that to a lua table
   local function update_tasks()
-    local cmd = "task limit:10 status:pending export" 
+    local cmd = "task limit:8 status:pending export" 
     awful.spawn.easy_async_with_shell(cmd, function(stdout)
       local empty_json = "[\n]\n"
       if stdout ~= empty_json and stdout ~= "" then

@@ -154,3 +154,4 @@ Make sure you update `configuration/apps.lua` with your default terminal/file ma
 
 - [rxhyn](https://github.com/rxyhn/yoru) for code reference
 - [adi1090x]() for rofi theme
+- [siddhanthrathod](https://github.com/siddhanthrathod/bspwm) for picom configuration

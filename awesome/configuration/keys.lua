@@ -138,8 +138,8 @@ awful.keyboard.append_global_keybindings({
 
   -- Tmux presets
   awful.key({ alt }, "e", function()
-    awful.spawn.with_shell(apps.utils.tmux_pane_presets)
-  end, { description = "tmux pane presets", group = "Launchers" }), 
+    awful.spawn.with_shell(apps.utils.tmux_presets)
+  end, { description = "tmux presets", group = "Launchers" }), 
 
   -- Bluetooth
   awful.key({ alt }, "b", function()
