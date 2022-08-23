@@ -42,7 +42,7 @@ Install dependencies
 
 `yay -S awesome-git gcalcli nerd-fonts-roboto-mono ttf-roboto picom-pijulius-git`
 
-`pacman -S playerctl rofi scrot pamixer brightnessctl upower task timew ledger`
+`pacman -S playerctl rofi scrot pamixer brightnessctl upower task timew ledger mpg123`
 
 Clone repository
 

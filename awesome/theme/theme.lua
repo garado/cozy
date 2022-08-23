@@ -58,7 +58,8 @@ theme.color6 = "#c4ad9c"
 theme.font_name = "RobotoMono Nerd Font Mono "
 theme.font = theme.font_name .. "Regular "
 
---theme.icon_font = "Nerd Font"
+theme.alt_font_name = "Roboto "
+theme.alt_font = theme.alt_font_name .. "Regular "
 
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀

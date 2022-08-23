@@ -20,6 +20,7 @@ local user_vars = require("user_variables")
 -- █▄█ █▀▄ █░▀█ █▄▄
 -- Make sure I've written my daily jrnl entry
 -- Triggers 2x per hour between 4-11pm if I haven't written
+-- Note: this requires jrnl to be installed (pacman -S jrnl)
 local journal_yes = naughty.action { 
   name = helpers.ui.colorize_text("Yes", beautiful.xforeground) 
 }
@@ -109,7 +110,7 @@ local ledger_yes = naughty.action {
 }
 
 ledger_yes:connect_signal("invoked", function()
-  local ledger_dir = user_vars.dash.ledger_dir
+  local ledger_dir = user_vars.ledger.ledger_dir
   awful.spawn.with_shell(
     [[
       tmux new-window -c ]] .. ledger_dir .. [[\; \

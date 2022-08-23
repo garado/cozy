@@ -112,10 +112,10 @@ local function create_chart()
     arc_chart.min_value = 0
     arc_chart.max_value = tonumber(total_spending)
 
-    for i, v in ipairs(entries) do
-      local cat = v[1] -- category
-      local amt = v[2]
-      local bal = v[3]
+    for i = 1, #entries do
+      local cat = entries[i][1] -- category
+      local amt = entries[i][2]
+      local bal = entries[i][3]
       table.insert(tmp_arc_values, 0)
       table.insert(arc_values, (tonumber(amt)))
       table.insert(colors, color_palette[i])
@@ -146,8 +146,9 @@ local function create_chart()
 
         -- for some reason the animation doesn't end properly
         -- so this is a hacky fix to make the animation end
-        if pos >= arc_chart.max_value - 1 then
+        if pos >= math.floor(arc_chart.max_value)  then
           self:stop()
+          arc_chart.values[section_index] = arc_values[section_index]
         end
       end,
     })
@@ -178,11 +179,11 @@ local function create_chart()
     --    category to show = last subcategory
     local entries = { }
     local num_entries = 0
-    for i,v in ipairs(lines) do
+    for i = 1, #lines do
       local t =  { }
       local count = 0
       -- split string on colons
-      for i in string.gmatch(v, "[^:]+") do
+      for i in string.gmatch(lines[i], "[^:]+") do
         table.insert(t, i)
         count = count + 1
       end
@@ -199,9 +200,9 @@ local function create_chart()
 
       -- Insert into table full of entries
       local category_already_exists = false
-      for i, v in ipairs(entries) do
-        if v[1] == category then
-          v[2] = v[2] + tonumber(amount)
+      for i = 1, #entries do
+        if entries[i][1] == category then
+          entries[i][2] = entries[i][2] + tonumber(amount)
           category_already_exists = true
         end
       end
