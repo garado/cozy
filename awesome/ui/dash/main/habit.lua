@@ -6,112 +6,60 @@ local awful = require("awful")
 local beautiful = require("beautiful")
 local helpers = require("helpers")
 local wibox = require("wibox")
-local xresources = require("beautiful.xresources")
-local gears = require("gears")
+local xresources = require("beautiful.xresources") 
+local gears = require("gears") 
 local gfs = require("gears.filesystem")
 local user_vars = require("user_variables")
 local dpi = xresources.apply_dpi
 local naughty = require("naughty")
 local widgets = require("ui.widgets")
-local os = os
+local json = require("modules.json")
 
--- Create list of habits and their statuses for this week
-local function habit_overview()
- 
-  -- Create weekly status for one habit
-  local function create_habit_entry(habit, graph_id, frequency)
+local os = os
+local string = string
+
+-- habits get appended here later
+local habit_list = user_vars.habit
+local habit_widget = wibox.widget({
+  {
+    spacing = dpi(10),
+    layout = wibox.layout.fixed.vertical,
+  },
+  widget = wibox.container.place
+})
+
+-- update cache for just one graph 
+local function update_cache(graph_id)
+  local dir = gfs.get_configuration_dir() .. "utils/dash/habits/"
+  local cmd = dir .. "cache_habits today 5 " .. graph_id
+  awful.spawn(cmd)
+end
+
+-- populates habit_widget with habits
+local function create_habit_ui()
+  -- creates just one habit
+  local function create_habit_ui_entry(habit_name, graph_id, frequency)
     local habit_name = wibox.widget({
-      markup = helpers.ui.colorize_text(habit, beautiful.xforeground),
-      widget = wibox.widget.textbox,
+      markup = helpers.ui.colorize_text(habit_name, beautiful.xforeground),
       font = beautiful.font_name .. "12",
       align = "right",
       valign = "center",
+      widget = wibox.widget.textbox,
     })
 
     local freq = wibox.widget({
       markup = helpers.ui.colorize_text(frequency, beautiful.nord9),
-      widget = wibox.widget.textbox,
       font = beautiful.font_name .. "10",
       align = "right",
       valign = "center",
-    })
-   
-    -- Start constructing the overview
-    -- Things will get appended to this box.
-    local overview = wibox.widget({
-      {
-        spacing = dpi(10),
-        layout = wibox.layout.flex.horizontal,
-      },
-      widget = wibox.container.place,
+      widget = wibox.widget.textbox,
     })
 
-    local function get_daily_status(graph_id, date, letter)
-      local cache_dir = gfs.get_cache_dir() .. "pixela"
-
-      -- If file exists, habit was completed and exit code is 0
-      -- Else habit wasn't completed; exit code 1
-      local file = cache_dir .. "/" .. graph_id .. "/" .. date
-      local habitCompleted = gfs.file_readable(file)
-      local btn_background, btn_text_color, btn_text
-      if habitCompleted then
-        btn_text_color = beautiful.xforeground
-        btn_background = beautiful.nord10
-      else
-        btn_text_color = beautiful.xforeground
-        btn_background = beautiful.nord0
-      end
-     
-      -- Create a single button
-      local daily_box_btn = widgets.button.text.normal({
-        text = letter,
-        text_normal_bg = btn_text_color,
-        normal_bg = btn_background,
-        animate_size = false,
-        font = beautiful.font,
-        size = 12,
-        on_release = function()
-          if not habitCompleted then
-            local cmd = "pi pixel post -g " .. graph_id .. " -d " .. date .. " -q 1"
-            awful.spawn(cmd)
-          end
-        end
-      })
-     
-      -- Create button container
-      local daily_box = wibox.widget({
-        daily_box_btn,
-        forced_height = dpi(35),
-        forced_width = dpi(35),
-        widget = wibox.container.place,
-      })
-
-      return daily_box
-    end
-
-    -- Create buttons for a whole week
-    local function get_overview(graph_id)
-      -- get last 4 days of data
-      -- starts from 4 days ago so it appends in the right order
-      local current_time = os.time()
-      for i = 3, 0, -1 do
-        local i_days_ago = current_time - (60 * 60 * 24 * i)
-        local day = os.date("%a", i_days_ago)
-        
-        local date = os.date("%Y%m%d", i_days_ago)
-        date = string.gsub(date, "\r\n", "")
-        local letter = string.sub(day, 1, 1)
-        local box = get_daily_status(graph_id, date, letter)
-        overview.children[1]:add(box)
-      end
-    end
-
-    get_overview(graph_id)
-
-    -- Assemble habit entry
+    -- skeleton for habit_entry
     local habit_entry = wibox.widget({
+      id = graph_id,
       {
-        {
+        { 
           habit_name,
           freq,
           forced_width = dpi(125),
@@ -119,41 +67,91 @@ local function habit_overview()
         },
         widget = wibox.container.place,
       },
-      overview,
+      {
+        id = "days",
+        spacing = dpi(10),
+        layout = wibox.layout.flex.horizontal,
+      },
       spacing = dpi(20),
       layout = wibox.layout.fixed.horizontal,
     })
 
+    local days = habit_entry:get_children_by_id("days")[1]
+
+    -- grab graph data from cache
+    local file = gfs.get_cache_dir() .. "pixela/" .. graph_id
+    local cmd = "cat " .. file
+    awful.spawn.easy_async_with_shell(cmd, function(stdout)
+      -- check cache for last 4 days status
+      for i = 3, 0, -1 do
+        local current_time = os.time()
+        local i_days_ago = current_time - (60 * 60 * 24 * i)
+        local date = os.date("%Y%m%d", i_days_ago)
+
+        local btn_bg, qty
+        if string.find(stdout, date) ~= nil then
+          -- habit was completed 
+          btn_bg = beautiful.nord10
+          qty = 0 -- pressing button will set habit to this value
+        else
+          btn_bg = beautiful.nord0
+          qty = 1
+        end
+
+        -- assemble ui
+        -- the buttons aren't entirely functional
+        -- for now only going false->true works,
+        -- and the button colors only update on restart
+        local day_initial = os.date("%a", i_days_ago)
+        day_initial = string.sub(day_initial, 1, 1)
+        local day
+        day = widgets.button.text.normal({
+          text = day_initial,
+          text_normal_bg = beautiful.xforeground,
+          normal_bg = btn_bg,
+          animate_size = false,
+          font = beautiful.font,
+          size = 12,
+          on_release = function()
+            -- update in pixela
+            local pi_cmd = "pi pixel update -g " .. graph_id .. " -d " .. date .. " -q " .. qty
+            awful.spawn.easy_async_with_shell(pi_cmd, function(stdout)
+              if string.find(stdout, "Success.") ~= nil then
+                naughty.notification {
+                  app_name = "System notification",
+                  title = "Habit tracker",
+                  message = "Pixela update successfully",
+                }
+              else
+                naughty.notification {
+                  app_name = "System notification",
+                  title = "Habit tracker",
+                  message = "Pixela update failed",
+                  timeout = 0,
+                }
+              end
+              update_cache(graph_id)
+            end)
+          end,
+        })
+
+        days:add(day)
+      end -- end for
+    end) -- end async
+
     return habit_entry
-  end -- end create_habit_entry
+  end -- create_habit_entry()
 
-  local header = wibox.widget({
-    markup = helpers.ui.colorize_text("Habits", beautiful.dash_header_color),
-    font = beautiful.header_font .. "20",
-    widget = wibox.widget.textbox,
-    align = "center",
-    valign = "center",
-  })
-
-  -- Habits get appended here 
-  local widget = wibox.widget({
-    {
-      spacing = dpi(10),
-      layout = wibox.layout.fixed.vertical,
-    },
-    widget = wibox.container.place
-  })
- 
-  -- get habit list from user_variables
-  local habit_list = user_vars.habit
-  local name = 1
-  local id = 2
-  local freq = 3
-  for _, v in ipairs(habit_list) do
-    widget.children[1]:add( create_habit_entry(v[name], v[id], v[freq]) )
+  for i = 1, #habit_list do
+    local name = habit_list[i][1]
+    local id = habit_list[i][2]
+    local freq = habit_list[i][3]
+    local entry = create_habit_ui_entry(name, id, freq)
+    habit_widget.children[1]:add(entry)
   end
+end -- create_habit_ui()
 
-  return helpers.ui.create_boxed_widget(widget, dpi(550), dpi(500), beautiful.dash_widget_bg)
-end
+create_habit_ui()
 
-return habit_overview()
+return helpers.ui.create_boxed_widget(habit_widget, dpi(550), dpi(500), beautiful.dash_widget_bg)
+

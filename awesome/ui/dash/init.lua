@@ -21,7 +21,6 @@ return function(s)
   local finances = require("ui.dash.finances")
   local cal = require("ui.dash.cal")
   local habit = require("ui.dash.habit")
-  local todo = require("ui.dash.todo")
  
   local tablist =   { main, finances, habit,  cal,}
   local tab_icons = { "",  "",      "",    "",  }

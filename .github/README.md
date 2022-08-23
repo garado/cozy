@@ -108,39 +108,46 @@ Make sure you update `configuration/apps.lua` with your default terminal/file ma
 
 <h2>In progress/planned features</h2>
 <details><summary><b>Dashboard tabs</b></summary>
-  - Finances
-    - [x] Recent transactions
-    - [x] Monthly spending
-    - [ ] Budget tracking 
-    - [X] Arc chart animations :)
-      - [x] base implementation
-      - [X] fix bugs
-    - [ ] Yearly account balance trends 
-    - [ ] Redesign UI
-  - Habits/goals
-    - [ ] Goals tracker
-    - [x] Habit tracker
-  - Tasks/calendar
-    - [ ] Fancier task displays
-      - [ ] Support subtasks + progress bar
-    - [ ] Calendar
-  - [ ] Indicator for current dashboard tab
+
+- Finances
+  - [x] Recent transactions
+  - [x] Monthly spending
+  - [ ] Budget tracking 
+  - [X] Arc chart animations :)
+    - [x] base implementation
+    - [X] fix bugs
+  - [ ] Yearly account balance trends 
+  - [ ] Redesign UI
+- Habits/goals
+  - [ ] Goals tracker
+  - [x] Habit tracker
+- Tasks/calendar
+  - [ ] Fancier task displays
+    - [ ] Support subtasks + progress bar
+  - [ ] Calendar
+- [ ] Indicator for current dashboard tab
+
 </details>
 
 <details><summary><b>Control center</b></summary>
-  - [ ] Quick actions
-  - [ ] Power menu
-  - [ ] Volume/brightness control
+
+- [ ] Quick actions
+- [ ] Power menu
+- [ ] Volume/brightness control
+
 </details>
 
 <details><summary><b>Bar</b></summary>
-  - [x] Volume/brightness control
-  - [ ] Variable bar orientation!
-  - [ ] Systray
-  - [ ] Better app launcher
+
+- [ ] Volume/brightness control
+- [ ] Variable bar orientation!
+- [ ] Systray
+- [ ] Better app launcher
+
 </details>
 
 <details><summary><b>Other</b></summary>
+
 - **Other**
   - [ ] Theme switcher
   - [ ] Custom rofi launcher

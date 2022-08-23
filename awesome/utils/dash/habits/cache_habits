@@ -63,14 +63,6 @@ end_date=$(date -d $start_date'-'$num_days' day' +'%Y%m%d')
 
 # Execute
 for graph in "${graph_ids[@]}"; do
-  mkdir -p $cache_dir/$graph
-  cmd="pi graphs pixels --from=$end_date --to=$start_date --graph-id=$graph"
-  json_out=$($cmd)
-  json_arr=$(echo $json_out | jq '.[][]')
-  dates_arr=($json_arr)
-  for date in "${dates_arr[@]}"; do
-    # The json entries have double quotes around day - remove them
-    date=$(echo $date | tr -d '"')
-    touch $cache_dir/$graph/$date
-  done
+  cmd="pi graphs pixels --to=$start_date --from=$end_date --graph-id=$graph"
+  $cmd > $cache_dir/$graph
 done
