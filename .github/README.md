@@ -1,4 +1,4 @@
-# cozy
+<h1 align="center">cozy</h1>
 
 <p align="center">
   <img title="" src="assets/animation_demo.gif">
@@ -11,6 +11,8 @@ The primary goal of this setup is to create an environment that:
 1. can be used easily on both my laptop and my touchscreen tablet
 2. integrates all the cli tools I use to manage my life into a nice dashboard
 3. looks awesome!
+
+This is a port of my old Eww config. I've decided to keep maintaining the Eww config [here](https://github.com/garado/cozy/tree/eww). (Still heavily wip)
 
 
 <h2>Dashboard</h2>
@@ -32,11 +34,10 @@ The primary goal of this setup is to create an environment that:
 
 
 <h2>Install and configure</h2>
-<details><summary>(expand)</summary>
-
 <b>NOTE: This setup is incomplete, somewhat buggy, and under constant development.</b> Because of that, I don't recommend daily driving it quite yet.
 
-### Installation (Arch/Arch-based)
+
+<details><summary><b>Install (Arch/Arch-based)</b></summary>
 
 Install dependencies
 
@@ -72,7 +73,10 @@ Other theme stuff
 | Icon theme    | [Papirus-Nord](https://github.com/Adapta-Projects/Papirus-Nord)      |
 | Vim theme     | [nord-vim](https://github.com/arcticicestudio/nord-vim)              |
 
-### Configuration
+</details>
+
+
+<details><summary><b>Configure</b></summary>
 
 Most configuration happens in `awesome/configuration/*` and `awesome/user_variables.lua`.
 
@@ -102,21 +106,8 @@ Make sure you update `configuration/apps.lua` with your default terminal/file ma
 </details>
 
 
-<h2>Known bugs</h2>
-<details><summary>(expand)</summary>
-
-- [ ] Pomodoro gets a little wonky if you restart awesome too many times
-  - reason: stuff stored in xrdb to preserve pomodoro state across awesome restarts doesn't always get cleared properly
-- [ ] Monthly spending arc chart animation doesn't always work
-  - reason: i have no idea
-- [ ] Task due dates don't always show correctly
-  - reason: something weird with lua/taskwarrior timezones, i think
-</details>
-
 <h2>In progress/planned features</h2>
-<details><summary>(expand)</summary>
-
-- <b>Dashboard tabs</b>
+<details><summary><b>Dashboard tabs</b></summary>
   - Finances
     - [x] Recent transactions
     - [x] Monthly spending
@@ -134,15 +125,22 @@ Make sure you update `configuration/apps.lua` with your default terminal/file ma
       - [ ] Support subtasks + progress bar
     - [ ] Calendar
   - [ ] Indicator for current dashboard tab
-- **Control center**
+</details>
+
+<details><summary><b>Control center</b></summary>
   - [ ] Quick actions
   - [ ] Power menu
   - [ ] Volume/brightness control
-- **Bar**
+</details>
+
+<details><summary><b>Bar</b></summary>
   - [x] Volume/brightness control
   - [ ] Variable bar orientation!
   - [ ] Systray
   - [ ] Better app launcher
+</details>
+
+<details><summary><b>Other</b></summary>
 - **Other**
   - [ ] Theme switcher
   - [ ] Custom rofi launcher
@@ -157,3 +155,4 @@ Make sure you update `configuration/apps.lua` with your default terminal/file ma
 - [adi1090x]() for rofi theme
 - [siddhanthrathod](https://github.com/siddhanthrathod/bspwm) for picom configuration
 - [nick clyde](https://github.com/nickclyde/rofi-bluetooth) for rofi-bluetooth
+

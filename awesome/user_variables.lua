@@ -28,4 +28,20 @@ return {
     "CLI sorcerer",
     "Vim wizard",
   },
+  pomo = {
+    topics = {
+      "School",
+      "Coding",
+      "Hobby",
+      "Personal",
+    },
+    times = {
+      "15m",
+      "25m",
+      "55m",
+    },
+    short_break_duration = "5",
+    long_break_duration = "15",
+    target = "8",
+  }
 }
