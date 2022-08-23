@@ -42,6 +42,7 @@ local function widget()
     layout = wibox.layout.fixed.vertical,
   })
 
+  -- currently tag, proj are unused
   local function create_task(desc, due, urg, tag, proj)
     local function format_due_date(due)
       -- taskwarrior returns due date as string
@@ -58,7 +59,8 @@ local function widget()
       local abs_time_difference = math.abs(time_difference)
       local days_rem = math.floor(abs_time_difference / 86400)
       local hours_rem = math.floor(abs_time_difference / 3600)
-  
+ 
+      -- due date formatting
       local due_date_text
       if days_rem >= 1 then -- in x days / x days ago
         due_date_text = days_rem .. " day"
@@ -121,9 +123,9 @@ local function widget()
   end
 
   -- use `task export` to get task json, 
-  -- then convert that to a lua table
+  -- then convert that to a table
   local function update_tasks()
-    local cmd = "task limit:8 status:pending export" 
+    local cmd = "task limit:8 status:pending export next rc.json.array=on" 
     awful.spawn.easy_async_with_shell(cmd, function(stdout)
       local empty_json = "[\n]\n"
       if stdout ~= empty_json and stdout ~= "" then

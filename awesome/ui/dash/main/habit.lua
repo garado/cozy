@@ -28,11 +28,50 @@ local habit_widget = wibox.widget({
   widget = wibox.container.place
 })
 
--- update cache for just one graph 
-local function update_cache(graph_id)
-  local dir = gfs.get_configuration_dir() .. "utils/dash/habits/"
-  local cmd = dir .. "cache_habits today 5 " .. graph_id
-  awful.spawn(cmd)
+-- update cache for a graph
+local function update_cache(graph_id, date, set_as_complete)
+  local file = gfs.get_cache_dir() .. "pixela/" .. graph_id
+  awful.spawn.easy_async_with_shell("cat " .. file, function(stdout)
+    if set_as_complete then
+      -- if habit is already completed in cache, do nothing
+      if string.find(stdout, date) ~= nil then 
+        return
+      -- else, mark as completed by writing date to cache
+      else
+        stdout = stdout .. " " .. date
+        cmd = "echo '" .. stdout .. "' > " .. file
+        awful.spawn.with_shell(cmd)
+      end
+    -- if we want to set a habit as not completed
+    elseif not set_as_complete then
+      stdout = string.gsub(stdout, date, "")
+      stdout = string.gsub(stdout, "[(\n\r)+]", "")
+      cmd = "echo '" .. stdout .. "' > " .. file
+      awful.spawn.with_shell(cmd)
+    end
+  end)
+end
+
+local function update_pixela(graph_id, date, qty)
+  local pi_cmd = "pi pixel update -g " .. graph_id .. " -d " .. date .. " -q " .. qty
+  awful.spawn.easy_async_with_shell(pi_cmd, function(stdout)
+    -- pixela api returns api request status -- check that
+    if string.find(stdout, "Success.") ~= nil then
+      local state = qty == 1 and "complete" or qty == 0 and "not complete"
+      naughty.notification {
+        app_name = "System notification",
+        title = "Pixela API",
+        message = "Successfully set " .. graph_id .. " as " .. state,
+      }
+    else
+      naughty.notification {
+        app_name = "System notification",
+        title = "Pixela API",
+        message = "Setting " .. graph_id .. " as " .. state .. " failed",
+        timeout = 0,
+      }
+    end
+  end)
 end
 
 -- populates habit_widget with habits
@@ -88,54 +127,58 @@ local function create_habit_ui()
         local i_days_ago = current_time - (60 * 60 * 24 * i)
         local date = os.date("%Y%m%d", i_days_ago)
 
-        local btn_bg, qty
+        local checked, text_color, qty
         if string.find(stdout, date) ~= nil then
           -- habit was completed 
-          btn_bg = beautiful.nord10
+          checked = true
+          text_color = beautiful.xforeground
           qty = 0 -- pressing button will set habit to this value
         else
-          btn_bg = beautiful.nord0
+          checked = false
+          text_color = beautiful.nord3
           qty = 1
         end
 
-        -- assemble ui
-        -- the buttons aren't entirely functional
-        -- for now only going false->true works,
-        -- and the button colors only update on restart
-        local day_initial = os.date("%a", i_days_ago)
-        day_initial = string.sub(day_initial, 1, 1)
-        local day
-        day = widgets.button.text.normal({
-          text = day_initial,
-          text_normal_bg = beautiful.xforeground,
-          normal_bg = btn_bg,
-          animate_size = false,
-          font = beautiful.font,
-          size = 12,
-          on_release = function()
-            -- update in pixela
-            local pi_cmd = "pi pixel update -g " .. graph_id .. " -d " .. date .. " -q " .. qty
-            awful.spawn.easy_async_with_shell(pi_cmd, function(stdout)
-              if string.find(stdout, "Success.") ~= nil then
-                naughty.notification {
-                  app_name = "System notification",
-                  title = "Habit tracker",
-                  message = "Pixela update successfully",
-                }
-              else
-                naughty.notification {
-                  app_name = "System notification",
-                  title = "Habit tracker",
-                  message = "Pixela update failed",
-                  timeout = 0,
-                }
-              end
-              update_cache(graph_id)
-            end)
-          end,
+        -- assemble checkbox
+        local checkbox_text = os.date("%a", i_days_ago)
+        checkbox_text = string.sub(checkbox_text, 1, 1)
+        --local checkbox_text = os.date("%d", i_days_ago)
+        local checkbox = wibox.widget({
+          {
+            checked = checked,
+            forced_height = dpi(20),
+            border_width = dpi(0),
+            check_shape = gears.shape.circle,
+            check_color = beautiful.nord10,
+            bg = beautiful.nord0,
+            shape = gears.shape.circle,
+            widget = wibox.widget.checkbox,
+          },
+          {
+            {
+              markup = helpers.ui.colorize_text(checkbox_text, text_color),
+              align = "center",
+              valign = "center",
+              widget = wibox.widget.textbox,
+            },
+            widget = wibox.container.place,
+          },
+          layout = wibox.layout.stack,
         })
 
-        days:add(day)
+        checkbox:connect_signal("button::press", function()
+          -- update ui
+          local box = checkbox.children[1]
+          box.checked = not box.checked
+
+          -- update data
+          update_pixela(graph_id, date, qty)
+          update_cache(graph_id, date, box.checked)
+          if qty == 1 then qty = 0 end
+          if qty == 0 then qty = 1 end
+        end)
+
+        days:add(checkbox)
       end -- end for
     end) -- end async
 

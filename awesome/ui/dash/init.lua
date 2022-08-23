@@ -107,6 +107,7 @@ return function(s)
       if index == 0 then index = 4 end
       content:set(1, tablist[index])
       tablist_pos = index
+
       local tab = tab_bar.children[1].children[tablist_pos]
       tab:set_color(beautiful.nord10)
       local prev_tab = tab_bar.children[1].children[old_index]
@@ -119,6 +120,7 @@ return function(s)
       if index == 0 then index = 4 end
       content:set(1, tablist[index])
       tablist_pos = index
+
       local tab = tab_bar.children[1].children[tablist_pos]
       tab:set_color(beautiful.nord10)
       local prev_tab = tab_bar.children[1].children[old_index]
@@ -130,7 +132,7 @@ return function(s)
 
     -- Call functions depending on which key was pressed
     local function keypressed(self, mod, key, command)
-      if     key == "j" then
+      if key == "j" then
         next_tab()
       elseif key == "k" then
         prev_tab()
@@ -144,10 +146,9 @@ return function(s)
     -- Putting all the puzzle pieces together
     local dash_keygrabber = awful.keygrabber {
       stop_key = "Mod4",
-      stop_event = "release",
+      stop_event = "press",
       autostart = true,
-      allowed_keys = { "h", "j", "k", "l" },
-      timeout = 3,
+      timeout = 10,
       keypressed_callback = keypressed,
     }
   end

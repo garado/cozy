@@ -10,6 +10,7 @@ local dpi = xresources.apply_dpi
 local helpers = require("helpers")
 local gfs = require("gears.filesystem")
 
+local os = os
 local string = string
 local table = table
 
@@ -22,10 +23,11 @@ local function widget()
     widget = wibox.widget.textbox,
   })
 
+  -- actual events get appended here later
   local events = wibox.widget({
     placeholder,
     spacing = dpi(3),
-    layout = wibox.layout.fixed.vertical,
+    layout = wibox.layout.flex.vertical,
   })
 
   local header = wibox.widget({
@@ -43,14 +45,17 @@ local function widget()
   local widget = wibox.widget({
     {
       header,
-      events,
+      {
+        events,
+        widget = wibox.container.place,
+      },
       layout = wibox.layout.fixed.vertical,
     },
     widget = wibox.container.margin,
     margins = dpi(5),
   })
 
-  -- inserts entry into events 
+  -- inserts entry into events wibox
   local function create_calendar_entry(date, time, desc)
     local datetime_text = date .. " " .. time
     local datetime = wibox.widget({
@@ -78,7 +83,7 @@ local function widget()
 
   -- split tsv into lines (events) + their fields
   local function parse_tsv(tsv)
-    -- insert each event into table
+    -- insert each event into a table
     event_list = {}
     num_events = 0
     for event in string.gmatch(tsv, "[^\r\n]+") do
@@ -94,17 +99,24 @@ local function widget()
     end
 
     -- parse tsv
-    for _, event in ipairs(event_list) do
+    for i = 1, #event_list do
       -- split on tabs
       fields = { }
-      for field in string.gmatch(event, "[^\t]+") do
+      for field in string.gmatch(event_list[i], "[^\t]+") do
         table.insert(fields, field)
       end
-      
+
+      -- date comes in 2022-08-23 format
+      -- change to Tue Aug 23
       local date = fields[1]
+      local pattern = "(%d%d%d%d)-(%d%d)-(%d%d)"
+      local xyear, xmon, xday = date:match(pattern)
+      local ts = os.time({ year = xyear, month = xmon, day = xday })
+      local format_date = os.date("%a %b %d", ts)
+
       local time = fields[2]
       local desc = fields[5]
-      create_calendar_entry(date, time, desc)
+      create_calendar_entry(format_date, time, desc)
     end 
   end
 
@@ -125,6 +137,7 @@ local function widget()
   end
   
   awesome.connect_signal("widget::calendar_update", function()
+    events:reset()
     update_calendar()
   end)
   

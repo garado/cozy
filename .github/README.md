@@ -6,13 +6,13 @@
 
 Hi! This is **cozy**, my [AwesomeWM](https://awesomewm.org/) config. Thanks for checking it out!
 
-The primary goal of this setup is to create an environment that:
+The primary goals of this setup are to create an environment that:
 
 1. can be used easily on both my laptop and my touchscreen tablet
 2. integrates all the cli tools I use to manage my life into a nice dashboard
 3. looks awesome!
 
-This is a port of my old Eww config. I've decided to keep maintaining the Eww config [here](https://github.com/garado/cozy/tree/eww). (Still heavily wip)
+This is a port of my old Eww config. I've decided to keep maintaining the Eww config [here](https://github.com/garado/cozy/tree/eww) because I might leave AwesomeWM one day. (Eww version is heavily wip and will probably never be as feature-rich as the Awesome version, and also won't be updated as often)
 
 
 <h2>Dashboard</h2>
@@ -22,10 +22,10 @@ This is a port of my old Eww config. I've decided to keep maintaining the Eww co
 **Features**
 
 - Fancy music player (thank you [rxhyn](https://github.com/rxyhn/yoru))
-- Events widget (with Google Calendar) 
-- Tasks widget (with [Taskwarrior](https://taskwarrior.org/))
+- Calendar (with Google Calendar) 
+- To do list (with [Taskwarrior](https://taskwarrior.org/))
 - Pomodoro timer (with [Timewarrior](https://timewarrior.net/))
-- Habit tracker (with [Pixela](https://pixe.la/))
+- Interactive habit tracker (with [Pixela](https://pixe.la/))
 - Fancy finances (with [Ledger](https://github.com/ledger/))
   - Monthly spending tracker
   - Current account balances
@@ -41,9 +41,8 @@ This is a port of my old Eww config. I've decided to keep maintaining the Eww co
 
 Install dependencies
 
-`yay -S awesome-git gcalcli nerd-fonts-roboto-mono ttf-roboto picom-pijulius-git`
-
-`pacman -S playerctl rofi scrot pamixer brightnessctl upower task timew ledger mpg123`
+- `yay -S awesome-git gcalcli nerd-fonts-roboto-mono ttf-roboto picom-pijulius-git`
+- `pacman -S playerctl rofi scrot pamixer brightnessctl upower task timew ledger mpg123`
 
 Clone repository
 
@@ -99,6 +98,7 @@ Make sure you update `configuration/apps.lua` with your default terminal/file ma
 - Update `user_variables.lua` with the habits you want to display
 - The `utils/dash/habits/cache_habits` script caches data from Pixela. Run it periodically with a cron job to keep your widget updated.
 
+
 **Finances tracker**
 
 - Update `user_variables.lua` with the ledger file to read from 
@@ -109,23 +109,21 @@ Make sure you update `configuration/apps.lua` with your default terminal/file ma
 <h2>In progress/planned features</h2>
 <details><summary><b>Dashboard tabs</b></summary>
 
+- Main
+  - [ ] different time tracking widget
 - Finances
-  - [x] Recent transactions
-  - [x] Monthly spending
+  - [o] List recent transactions
+    - [X] base implementation
+    - [ ] update ui
   - [ ] Budget tracking 
-  - [X] Arc chart animations :)
-    - [x] base implementation
-    - [X] fix bugs
   - [ ] Yearly account balance trends 
-  - [ ] Redesign UI
 - Habits/goals
   - [ ] Goals tracker
-  - [x] Habit tracker
+  - [ ] Habit tracker
 - Tasks/calendar
   - [ ] Fancier task displays
     - [ ] Support subtasks + progress bar
   - [ ] Calendar
-- [ ] Indicator for current dashboard tab
 
 </details>
 
@@ -155,6 +153,11 @@ Make sure you update `configuration/apps.lua` with your default terminal/file ma
   - [ ] Add icons
 
 </details>
+
+## Other stuff
+<b>Why is it called 'cozy?'</b> 
+
+I've spent a lot of time tweaking this setup to be just the way I like it, so now this setup feels very personal, comfortable, and <b>cozy</b>. 
 
 ## Credits
 

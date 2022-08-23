@@ -3,14 +3,17 @@
 # ▀█▀ █▀▄▀█ █░█ ▀▄▀   █▀█ █▀█ █▀▀ █▀ █▀▀ ▀█▀ █▀
 # ░█░ █░▀░█ █▄█ █░█   █▀▀ █▀▄ ██▄ ▄█ ██▄ ░█░ ▄█
 # ----------------------------------------------
-# Easily open preset tmux windows and panes with Rofi
+# Easily open option tmux windows and panes with Rofi
+
+# if anyone can figure out why the text isn't vertically 
+# centered, i would greatly appreciate it. been driving me bonkers
 
 # Make rofi look nice
 rofi_dir="~/.config/rofi"
 rofi_cmd="rofi -dmenu -theme $rofi_dir/style.rasi"
 
-declare -a presets
-presets=(
+declare -a options
+options=(
   "awesome"
   "ledger"
   "triple"
@@ -19,25 +22,26 @@ presets=(
   "eww"
 )
 
-# List all presets
-create_preset_list()
+# List all options
+create_option_list()
 {
-  for preset in ${presets[@]}
+  for option in ${options[@]}
   do
-    echo "${preset}"
+    echo "${option}"
   done
 }
 
 declare -i SELECTED
 
-select_preset()
+select_option()
 {
+  local MORE_FLAGS=(-format i -no-custom)
   while true
   do
     declare -i RTR
     declare -i RES
 
-    RES=$( create_preset_list | ${rofi_cmd} -cycle -selected-row "${SELECTED}")
+    RES=$( create_option_list | ${rofi_cmd} ${MORE_FLAGS[@]} -cycle -selected-row "${SELECTED}")
     RTR=$?
     if [ "${RTR}" = 10 ]
     then
@@ -50,18 +54,19 @@ select_preset()
       return 1;
     fi
     
-    # Set new preset
+    # Set new option
     SELECTED=${RES}
-    set_preset $SELECTED
+    set_option $SELECTED
     exit
   done
 }
 
-set_preset()
+set_option()
 {
-  PRESET_NO=$1
-  preset="${presets[$PRESET_NO]}"
-  case $preset in
+  option_NO=$1
+  option="${options[$option_NO]}"
+  echo $option 
+  case $option in
   "single")
     tmux new-window
     ;;
@@ -90,32 +95,18 @@ set_preset()
     rename-window xephyr
     ;;
   "eww")
-    tmux new-window -c $HOME/.config/eww/popup\; \
-    splitw -h -c "#{pane_current_path}"\; \
-    splitw -v -c "#{pane_current_path}"\; \
-    rename-window popup 
     tmux new-window -c $HOME/.config/eww/dash\; \
     splitw -h -c "#{pane_current_path}"\; \
     splitw -v -c "#{pane_current_path}"\; \
-    rename-window dash
+    rename-window dash 
     tmux new-window -c $HOME/.config/eww/bar\; \
     splitw -h -c "#{pane_current_path}"\; \
     splitw -v -c "#{pane_current_path}"\; \
     rename-window bar 
-    tmux new-window -c $HOME/.config/eww/syspanel\; \
-    splitw -h -c "#{pane_current_path}"\; \
-    splitw -v -c "#{pane_current_path}"\; \
-    rename-window syspanel 
-    ;;
-  "crossword")
-    tmux new-window \; \
-    splitw -h -c "$HOME/Documents/Crossword" \; \
-    splitw -v -c "$HOME/Documents/Crossword" \; \
-    rename-window crossword
     ;;
   "home")
-    tmux new-window 'taskwarrior-tui' \; \
-    splitw -h 'ncspot' \; \
+    tmux new-window 'vim ~/Documents/Vault/index.wiki' \; \
+    splitw -h 'taskwarrior-tui' \; \
     splitw -v \; \
     rename-window home
     ;;
@@ -124,5 +115,5 @@ set_preset()
   esac
 }
 
-select_preset
+select_option
 
