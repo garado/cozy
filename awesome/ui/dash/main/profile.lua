@@ -17,39 +17,19 @@ local math = math
 local function create_profile()
   local image = wibox.widget({
     {
-      {
-        {
-          image = beautiful.pfp,
-          resize = true,
-          clip_shape = gears.shape.circle,
-          halign = "center",
-          valign = "center",
-          widget = wibox.widget.imagebox,
-        },
-        border_width = dpi(3),
-        border_color = beautiful.nord10,
-        shape = gears.shape.circle,
-        widget = wibox.container.background,
-      },
-      strategy = "exact",
-      forced_width = dpi(100),
-      forced_height = dpi(100),
-      widget = wibox.container.constraint,
+      image = beautiful.pfp,
+      resize = true,
+      clip_shape = gears.shape.circle,
+      halign = "center",
+      valign = "center",
+      widget = wibox.widget.imagebox,
     },
-    { -- whyyyyy tf do we need this
-			nil,
-			nil,
-			{
-				nil,
-				nil,
-				icon,
-				layout = wibox.layout.align.horizontal,
-				expand = "none",
-			},
-			layout = wibox.layout.align.vertical,
-			expand = "none",
-		},
-		layout = wibox.layout.stack,
+    border_width = dpi(3),
+    border_color = beautiful.nord10,
+    shape = gears.shape.circle,
+    widget = wibox.container.background,
+    forced_width = dpi(100),
+    forced_height = dpi(100),
   })
 
   local display_name = user_vars.display_name
@@ -87,9 +67,13 @@ local function create_profile()
   local profile = wibox.widget({
     {
       image,
-      name,
-      title, 
-      spacing = dpi(2),
+      {
+        name,
+        title, 
+        spacing = dpi(2),
+        layout = wibox.layout.fixed.vertical,
+      },
+      spacing = dpi(5),
       layout = wibox.layout.fixed.vertical,
     },
     widget = wibox.container.place,

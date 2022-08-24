@@ -47,6 +47,16 @@ function _ui.colorize_text(text, color)
 	return "<span foreground='" .. color .. "'>" .. text .. "</span>"
 end
 
+function _ui.create_dash_widget_header(text)
+  return wibox.widget({
+    markup = _ui.colorize_text(text, beautiful.dash_header_color),
+    font = beautiful.alt_font_name .. "Light 20",
+    align = "center",
+    valign = "center",
+    widget = wibox.widget.textbox,
+  })
+end
+
 function _ui.vertical_pad(height)
 	return wibox.widget({
 		forced_height = height,

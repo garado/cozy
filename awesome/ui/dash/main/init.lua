@@ -11,17 +11,19 @@ local dpi = xresources.apply_dpi
 
 -- import dash widgets
 local profile = require("ui.dash.main.profile")
-local links = require("ui.dash.main.links")
-local pomodoro = require("ui.dash.main.pomodoro")
+local timewarrior = require("ui.dash.main.timewarrior")
 local events = require("ui.dash.main.events")
 local tasks = require("ui.dash.main.tasks")
 local music = require("ui.dash.main.music_player")
---local fetch = require("ui.dash.main.fetch")
 local habit = require("ui.dash.main.habit")
 local monthly_spending = require("ui.dash.main.monthly_spending")
 local timedate = require("ui.dash.main.timedate")
 local goals = require("ui.dash.main.goals")
-local naughty = require("naughty")
+
+-- unused widgets
+-- local links = require("ui.dash.main.links")
+-- local fetch = require("ui.dash.main.fetch")
+-- local pomodoro = require("ui.dash.main.pomodoro")
 
 -- width of widgets is set here
 -- height of widgets is set within widget itself
@@ -32,7 +34,6 @@ local widget = wibox.widget({
       timedate,
       goals,
       music,
-      --fetch,
       forced_width = dpi(350),
       expand = true,
       layout = wibox.layout.fixed.vertical,
@@ -45,8 +46,8 @@ local widget = wibox.widget({
       layout = wibox.layout.fixed.vertical,
     },
     {
-      --links,
-      pomodoro,
+      timewarrior,
+      -- pomodoro,
       habit,
       forced_width = dpi(400),
       layout = wibox.layout.fixed.vertical,

@@ -24,7 +24,9 @@ This is a port of my old Eww config. I've decided to keep maintaining the Eww co
 - Fancy music player (thank you [rxhyn](https://github.com/rxyhn/yoru))
 - Calendar (with Google Calendar) 
 - To do list (with [Taskwarrior](https://taskwarrior.org/))
-- Pomodoro timer (with [Timewarrior](https://timewarrior.net/))
+- Time tracking (with [Timewarrior](https://timewarrior.net/))
+  - Use the pomodoro widget for working in intervals
+  - Or the focused time widget, for just starting/stopping time tracking - no intervals
 - Interactive habit tracker (with [Pixela](https://pixe.la/))
 - Fancy finances (with [Ledger](https://github.com/ledger/))
   - Monthly spending tracker
@@ -157,7 +159,7 @@ Make sure you update `configuration/apps.lua` with your default terminal/file ma
 ## Other stuff
 <b>Why is it called 'cozy?'</b> 
 
-I've spent a lot of time tweaking this setup to be just the way I like it, so now this setup feels very personal, comfortable, and <b>cozy</b>. 
+I've spent a lot of time tweaking this setup to be just the way I like it, so now this setup feels very personal, comfortable, and <b>cozy</b>.  :-)
 
 ## Credits
 

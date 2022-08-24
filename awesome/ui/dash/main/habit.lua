@@ -142,7 +142,6 @@ local function create_habit_ui()
         -- assemble checkbox
         local checkbox_text = os.date("%a", i_days_ago)
         checkbox_text = string.sub(checkbox_text, 1, 1)
-        --local checkbox_text = os.date("%d", i_days_ago)
         local checkbox = wibox.widget({
           {
             checked = checked,
@@ -151,17 +150,16 @@ local function create_habit_ui()
             check_shape = gears.shape.circle,
             check_color = beautiful.nord10,
             bg = beautiful.nord0,
+            paddings = dpi(0),
             shape = gears.shape.circle,
             widget = wibox.widget.checkbox,
           },
           {
-            {
-              markup = helpers.ui.colorize_text(checkbox_text, text_color),
-              align = "center",
-              valign = "center",
-              widget = wibox.widget.textbox,
-            },
-            widget = wibox.container.place,
+            markup = helpers.ui.colorize_text(checkbox_text, text_color),
+            font = beautiful.font .. "11",
+            align = "center",
+            valign = "center",
+            widget = wibox.widget.textbox,
           },
           layout = wibox.layout.stack,
         })
@@ -170,6 +168,11 @@ local function create_habit_ui()
           -- update ui
           local box = checkbox.children[1]
           box.checked = not box.checked
+          local text_color = box.checked and beautiful.xforeground 
+              or not box.checked and beautiful.nord3
+          local text = checkbox.children[2]
+          text.markup = helpers.ui.colorize_text(checkbox_text, text_color)
+
 
           -- update data
           update_pixela(graph_id, date, qty)
@@ -196,5 +199,5 @@ end -- create_habit_ui()
 
 create_habit_ui()
 
-return helpers.ui.create_boxed_widget(habit_widget, dpi(550), dpi(500), beautiful.dash_widget_bg)
+return helpers.ui.create_boxed_widget(habit_widget, dpi(550), dpi(400), beautiful.dash_widget_bg)
 

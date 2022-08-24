@@ -52,7 +52,7 @@ local function reset_pomodoro()
   pomodoro.preserved = false
   timer_state = "stopped"
   pomodoro.tick_type = nil
-  awful.spawn.easy_async("xrdb -remove")
+  awful.spawn.easy_async("xrdb -remove", function() end)
 end
 
 local function ui_target_pomos()
@@ -309,7 +309,6 @@ local function ui_tick()
   local second_timer
   local function timer_tick(time)
     local ui_text = timer:get_children_by_id("textbox")[1]
-    local ui_bar = timer:get_children_by_id("bar")[1]
     local start_time = tonumber(time)
     pomodoro.time_remaining = start_time
    
@@ -326,6 +325,7 @@ local function ui_tick()
       ui_text:set_markup_silently(text)
 
       -- update progress bar
+      local ui_bar = timer:get_children_by_id("bar")[1]
       ui_bar.value = pomodoro.time_remaining 
 
       -- timer expired
