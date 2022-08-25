@@ -32,17 +32,13 @@ end
 app_launcher = awful.popup({
   widget = {
     {
-      {
-        create_launcher_entry("", "xournalpp"),
-        create_launcher_entry("", "foliate"),
-        create_launcher_entry("", "alacritty"),
-        create_launcher_entry("", "thunar"),
-        create_launcher_entry("", "firefox"),
-        spacing = dpi(5),
-        layout = wibox.layout.fixed.vertical,
-      },
-      margins = dpi(10),
-      widget = wibox.container.margin,
+      create_launcher_entry("", "xournalpp"),
+      create_launcher_entry("", "foliate"),
+      create_launcher_entry("", "alacritty"),
+      create_launcher_entry("", "thunar"),
+      create_launcher_entry("", "firefox"),
+      spacing = dpi(5),
+      layout = wibox.layout.fixed.vertical,
     },
     bg = beautiful.dark_polar_night,
     widget = wibox.container.background,

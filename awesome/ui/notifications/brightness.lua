@@ -22,24 +22,24 @@ awesome.connect_signal("module::brightness", function()
       val = (val * 100) / 255
       val = math.floor(val, 0)
 
-      if not volnotif then
-        volnotif = naughty.notification { 
+      if not brightnotif then
+        brightnotif = naughty.notification { 
           title = "Brightness",
           app_name = "System notification",
           category = "device",
           message = "Brightness at " .. val .. "%",
           auto_reset_timeout = true,
-          timeout = 1,
+          timeout = 1.25,
         }
       else
-        volnotif:destroy()
-        volnotif = naughty.notification { 
+        brightnotif:destroy()
+        brightnotif = naughty.notification { 
           title = "Brightness",
           app_name = "System notification",
           category = "device",
           message = "Brightness at " .. val .. "%",
           auto_reset_timeout = true,
-          timeout = 1,
+          timeout = 1.25,
         }
       end
     end)

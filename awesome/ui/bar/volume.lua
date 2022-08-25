@@ -37,20 +37,13 @@ return function()
       align = "center",
       valign = "center",
     },
-    --margins = { top = dpi(5) },
     widget = wibox.container.margin,
   })
 
   local widget = wibox.widget({
-    --{
-      slider,
-      icon,
-      layout = wibox.layout.align.vertical,
-    --},
-    --margins = {
-    --  bottom = dpi(10),
-    --},
-    --widget = wibox.container.margin,
+    slider,
+    icon,
+    layout = wibox.layout.align.vertical,
   })
 
 
@@ -67,7 +60,7 @@ return function()
     awful.spawn("pamixer --set-volume " .. volume_level, false)
   end)
 
-  -- Updates volume icon based on volume level :)
+  -- updates volume icon based on volume level :)
   vol_icon = icon.children[1]
   awesome.connect_signal("module::volume", function()
     awful.spawn.easy_async_with_shell("pamixer --get-volume-human",

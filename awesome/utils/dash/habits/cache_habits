@@ -4,32 +4,46 @@
 # █▄▄ █▀█ █▄▄ █▀█ ██▄   █▀█ █▀█ █▄█ █ ░█░ ▄█
 
 # Caches data from Pixela so I don't spam the pixela API every
-# time I restart awesome and end up with 8000 requests (sorry @a-know!)
+# time I restart awesome and end up with 8000 requests every day 
+# (sorry @a-know!)
 
 # Usage:
-# ./cache_habits start_date num_days [-f file | graph_ids...]
-# start_date
-#     The day to start fetching habits from (YYYYMMDD)
-#     Note: technically any `date`-acceptable format will work as 
-#     long as it has no spaces
-# num_days
-#     How many days in the past to get habit data from
-# graph_id
-#     A list of graph_ids to get data from
-# -f graph_id_file
-#     If this flag is set, cache_habits will retrieve graph ids from the file
-#     Each graph id in the file should be on its own line 
+#   ./cache_habits start_date end_date [-f file | graph_ids...]
+# Example usage:
+#   ./cache_habits 'today' '5 days ago' -f file_containing_ids
+#   ./cache_habits 'today' '5 days ago' id_1 id_2 id_3
 
-# The intention is for you to run this script in a cron job once a day or so.
+# start_date
+#     The beginning of the date range to start fetching habits from.
+#     Any format recognized by `date` will work, so
+#       ./cache_habits today ...
+#       ./cache_habits '5 days ago' ...
+#       ./cache_habits 'fortnight' ...
+#     are all valid inputs.
+#     **Be sure to quote multi-word inputs.**
+# end_date
+#     The end of the date range to start fetching habits from.
+#     See start_date above for formatting.
+# graph_id
+#     Graph_id(s) to get data for 
+# -f graph_id_file
+#     If this flag is set, cache_habits will retrieve graph ids from the 
+#     specified file.
+#     Each graph id in the file should be on its own line.
+
+# The intention is for you to run this script in a cron job every 
+# so often to keep it updated.
 
 # This script assumes that the necessary Pixela username/password env
 # variables are already set.
 
-# OUTPUT
-# Might be a kind of jank way to go about it, but whatever
-# In the cache folder, the script creates a folder for each habit 
-# and a file for each day for which the habit was completed
-# If a habit was not completed on a certain day, there is no file for it
+# HOW IT WORKS
+# The pi command in this script will return a json array containing
+# dates for which the habit was completed.
+# When checking for habit completion, the source code simply scans the
+# file for a given date.
+# (It doesn't properly parse the json - it just performs a simple 
+# string.find() on the file contents.)
 
 # Ensure cache directory exists
 cache_dir=$HOME/.cache/awesome/pixela
@@ -37,11 +51,7 @@ mkdir -p $cache_dir
 
 # Get variables
 start_date=$1
-if [[ "$start_date" -eq "today" ]]; then
-  start_date=$(date -d today +'%Y%m%d')
-fi
-
-num_days=$2
+end_date=$2
 
 if [[ "$3" == "-f" ]]; then
   graph_id_file=$4
@@ -57,12 +67,13 @@ else
   graph_ids=(${@:3})
 fi
 
-# Get end date
+# Convert dates
 start_date=$(date -d "$start_date" +'%Y%m%d')
-end_date=$(date -d $start_date'-'$num_days' day' +'%Y%m%d')
+end_date=$(date -d "$end_date" +'%Y%m%d')
 
 # Execute
 for graph in "${graph_ids[@]}"; do
   cmd="pi graphs pixels --to=$start_date --from=$end_date --graph-id=$graph"
   $cmd > $cache_dir/$graph
 done
+

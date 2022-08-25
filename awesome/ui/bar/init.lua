@@ -17,6 +17,7 @@ return function(s)
   local volume = require("ui.bar.volume")()
   local brightness = require("ui.bar.brightness")()
   local app_launcher = require("ui.bar.app_launcher")
+  local systray = require("ui.bar.systray")
 
   -- TAGLIST --
 	local modkey = "Mod4"
@@ -107,8 +108,6 @@ return function(s)
 		})
 	end
 
-  -- SYSTRAY --
-
   -- BAR --
   -- assembling the bar
   s.bar = awful.popup({
@@ -127,20 +126,28 @@ return function(s)
           layout = wibox.layout.align.vertical,
           expand = "none",
           {
-            app_launcher,
-            layout = wibox.layout.fixed.vertical,
+            --{
+              app_launcher,
+              layout = wibox.layout.fixed.vertical,
+            --},
+            --top = dpi(6),
+            --widget = wibox.container.margin,
           },
           tag_list(s),
           {
-            brightness,
-            volume,
-            battery, 
-            -- system tray
-            -- notif panel
-            clock,
-            profile,
-            spacing = dpi(8),
-            layout = wibox.layout.fixed.vertical,
+            {
+              brightness,
+              volume,
+              battery, 
+              -- system tray
+              -- notif panel
+              clock,
+              --systray,
+              spacing = dpi(8),
+              layout = wibox.layout.fixed.vertical,
+            },
+            bottom = dpi(6),
+            widget = wibox.container.margin,
           },
         },
         left = dpi(3),

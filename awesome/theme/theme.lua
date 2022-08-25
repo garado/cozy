@@ -116,9 +116,9 @@ theme.wallpaper = gears.surface.load_uncached(gfs.get_configuration_dir() .. "th
 theme.useless_gap = dpi(7)
 
 -- Borders
-theme.border_width = dpi(2)
+theme.border_width = dpi(3)
 theme.border_color_active = theme.nord9
-theme.border_color_normal = theme.med_polar_night
+theme.border_color_normal = theme.nord0
 
 -- Corner radius
 theme.border_radius = 10
@@ -138,6 +138,10 @@ theme.notification_spacing = dpi(5)
 theme.notification_title_bg = theme.dark_polar_night
 theme.notification_content_bg = theme.med2_polar_night
 theme.notification_fg = theme.xforeground
+
+-- Systray
+theme.systray_icon_size = dpi(10)
+theme.bg_systray = theme.wibar_bg
 
 -- Dash
 theme.header_font_name = "Roboto "

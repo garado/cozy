@@ -31,8 +31,71 @@ local function get_oldest_notification()
   return naughty.active[1]
 end
 
+-- icon
+naughty.connect_signal("request::icon", function(n, context, hints)
+	--- Handle other contexts here
+	if context ~= "app_icon" then
+		return
+	end
+
+	--- use xdg icon
+	local path = menubar.utils.lookup_icon(hints.app_icon) or menubar.utils.lookup_icon(hints.app_icon:lower())
+
+	if path then
+		n.icon = path
+	end
+end)
+
+--- Use XDG icon
+naughty.connect_signal("request::action_icon", function(a, context, hints)
+	a.icon = menubar.utils.lookup_icon(hints.id)
+end)
+
+
 naughty.connect_signal("request::display", function(n)
   local accent_colors = beautiful.random_accent_color()
+
+	--- table of icons
+	local app_icons = {
+		["firefox"] = { icon = "" },
+		["discord"] = { icon = "" },
+		["music"] = { icon = "" },
+		["screenshot tool"] = { icon = "" },
+		["color picker"] = { icon = "" },
+	}
+
+	local app_icon = nil
+	local tolow = string.lower
+
+	if app_icons[tolow(n.app_name)] then
+		app_icon = app_icons[tolow(n.app_name)].icon
+	else
+		app_icon = "d"
+	end
+
+	local icon = wibox.widget({
+		{
+			{
+				{
+					image = n.icon,
+					resize = true,
+					clip_shape = gears.shape.circle,
+					halign = "center",
+					valign = "center",
+					widget = wibox.widget.imagebox,
+				},
+				border_width = dpi(2),
+				border_color = accent_colors,
+				shape = gears.shape.circle,
+				widget = wibox.container.background,
+			},
+			strategy = "exact",
+			height = dpi(50),
+			width = dpi(50),
+			widget = wibox.container.constraint,
+		},
+		layout = wibox.layout.stack,
+	})
 
   local title = wibox.widget({
     widget = wibox.container.scroll.horizontal,
@@ -41,12 +104,11 @@ naughty.connect_signal("request::display", function(n)
     speed = 75,
     widgets.text({
       font = beautiful.font,
-      size = 10,
       bold = true,
+      size = 10,
       text = n.title,
     }),
   })
-
 
   local message = wibox.widget({
     widget = wibox.container.scroll.horizontal,
@@ -56,16 +118,23 @@ naughty.connect_signal("request::display", function(n)
     widgets.text({
       font = beautiful.font,
       size = 10,
-      bold = false,
       text = n.message,
     }),
   })
-  
+ 
+  local function action_layout(num_actions)
+    if num_actions > 2 then
+      return wibox.layout.flex.vertical
+    else
+      return wibox.layout.flex.horizontal
+    end
+  end
+
   local actions = wibox.widget({
 		notification = n,
 		base_layout = wibox.widget({
 			spacing = dpi(3),
-			layout = wibox.layout.flex.horizontal,
+			layout = action_layout(#n.actions)
 		}),
 		widget_template = {
 			{
@@ -95,58 +164,37 @@ naughty.connect_signal("request::display", function(n)
 
   local app_name = widgets.text({
     font = beautiful.font,
-    size = 10,
+    color = accent_colors,
+    size = 8,
     bold = true,
-    text = n.app_name,
+    text = string.upper(n.app_name),
   })
 
 	local dismiss = widgets.button.text.normal({
     font = beautiful.font,
+    size = 10,
 		paddings = dpi(2),
-		size = 9,
-		bold = true,
+		bold = false,
 		text = "",
-    normal_bg = beautiful.notification_title_bg,
-		text_normal_bg = accent_colors,
+    normal_bg = beautiful.notification_content_bg,
+		text_normal_bg = beautiful.nord1,
 		animate_size = false,
 		on_release = function()
 			n:destroy(naughty.notification_closed_reason.dismissed_by_user)
 		end,
 	})
 
-
-  local timeout_arc = wibox.widget({
-    widget = wibox.container.arcchart,
-		forced_width = dpi(26),
-		forced_height = dpi(26),
+  local timeout_bar = wibox.widget ({
+    widget = wibox.widget.progressbar,
+		forced_height = dpi(3),
 		max_value = 100,
 		min_value = 0,
-		value = 0,
-		thickness = dpi(4),
-		rounded_edge = true,
-		bg = beautiful.notification_bg,
-		colors = {
-			{
-				type = "linear",
-				from = { 0, 0 },
-				to = { 400, 400 },
-				stops = {
-					{ 0, accent_colors },
-					{ 0.2, accent_colors },
-					{ 0.4, accent_colors },
-					{ 0.6, accent_colors },
-					{ 0.8, accent_colors },
-				},
-			},
-		},
-		dismiss,
+		value = 100,
+		thickness = dpi(3),
+    border_color = beautiful.nord0,
+		background_color = beautiful.nord0,
+    color = accent_colors,
   })
-
-  local function show_timeout_arc()
-    if n.timeout > 0 then
-      return timeout_arc
-    end
-  end
 
   local widget = naughty.layout.box({
     notification = n,
@@ -160,78 +208,72 @@ naughty.connect_signal("request::display", function(n)
 
     widget_template = {
       {
-        layout = wibox.layout.fixed.vertical,
-        { -- App name
+        {
           {
             {
-              app_name,
-              nil,
-              show_timeout_arc(),
-              layout = wibox.layout.align.horizontal,
-            },
-            margins = { 
-              top = dpi(5), 
-              bottom = dpi(5), 
-              left = dpi(10), 
-              right = dpi(10) 
-            },
-            widget = wibox.container.margin,
-          },
-          forced_height = dpi(35),
-          bg = beautiful.notification_title_bg,
-          widget = wibox.container.background,
-        }, -- End app name
-        { -- Content
-          {
-            { -- app icon and title/msg
-              layout = wibox.layout.fixed.horizontal,
               {
-                layout = wibox.layout.fixed.horizontal,
-                nil, -- icon goes here when i get around to adding it
-              },
-              {
-                expand = "none",
-                layout = wibox.layout.align.vertical,
-                nil, --??
-                {
-                  layout = wibox.layout.fixed.vertical,
-                  title,
-                  message,
-                },
+                app_name,
                 nil,
+                dismiss,
+                layout = wibox.layout.align.horizontal,
               },
-            }, -- end app icon and title/msg
-            { -- Actions
-             	helpers.ui.vertical_pad(dpi(10)),
+              {
+                {
+                  icon,
+                  helpers.ui.horizontal_pad(dpi(15)),
+                  visible = n.icon ~= nil,
+                  layout = wibox.layout.fixed.horizontal,
+                },
+                {
+                  {
+                    title,
+                    message,
+                    spacing = dpi(2),
+                    layout = wibox.layout.fixed.vertical,
+                  },
+                  widget = wibox.container.place,
+                },
+                layout = wibox.layout.fixed.horizontal,
+              },
+              spacing = dpi(5),
+              layout = wibox.layout.fixed.vertical,
+            },
+            { -- actions
+              helpers.ui.vertical_pad(dpi(10)),
               {
                 actions,
                 shape = helpers.ui.rrect(beautiful.border_radius / 2),
                 widget = wibox.container.background,
               },
               visible = n.actions and #n.actions > 0,
-              layout = wibox.layout.fixed.vertical,
-            }, -- End actions
+              layout = wibox.layout.fixed.vertical, 
+            }, -- end actions
             layout = wibox.layout.fixed.vertical,
           },
-          margins = dpi(10),
           widget = wibox.container.margin,
-        }, -- End content
+          margins = {
+            left = dpi(15),
+            right = dpi(15),
+            top = dpi(10),
+            bottom = dpi(10),
+          },
+        },
+        timeout_bar,
+        layout = wibox.layout.fixed.vertical,
       },
-      shape = helpers.ui.rrect(dpi(5)),
       bg = beautiful.notification_content_bg,
       forced_width = dpi(275),
       widget = wibox.container.background,
     },
   })
 
-  -- Timeout arc animation
 	local anim = animation:new({
 		duration = n.timeout,
-		target = 100,
+		target = 0,
 		easing = animation.easing.linear,
 		reset_on_stop = false,
 		update = function(self, pos)
-			timeout_arc.value = pos
+			timeout_bar.value = 100 - pos
 		end,
 	})
 
@@ -240,11 +282,10 @@ naughty.connect_signal("request::display", function(n)
 	end)
 
   if n.timeout > 0 then
-    anim:start()
+    anim:set(100)
   end
 
 end)
-
 
 require(... .. ".error")
 require(... .. ".battery")

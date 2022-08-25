@@ -64,6 +64,13 @@ function _ui.vertical_pad(height)
 	})
 end
 
+function _ui.horizontal_pad(width)
+	return wibox.widget({
+		forced_width = width,
+		layout = wibox.layout.fixed.horizontal,
+	})
+end
+
 function _ui.rrect(radius)
 	return function(cr, width, height)
 		gshape.rounded_rect(cr, width, height, radius)

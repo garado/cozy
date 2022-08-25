@@ -5,7 +5,7 @@ local utils_dir = config_dir .. "utils/"
 return {
 	--- Default Applications
 	default = {
-		terminal = "alacritty",
+		terminal = "kitty",
 		web_browser = "firefox",
 		file_manager = "thunar",
 	},

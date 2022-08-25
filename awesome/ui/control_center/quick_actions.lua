@@ -12,6 +12,7 @@ local helpers = require("helpers")
 local naughty = require("naughty")
 local widgets = require("ui.widgets")
 local gfs = require("gears.filesystem")
+local apps = require("configuration.apps")
 
 local scripts = gfs.get_configuration_dir() .. "utils/ctrl/"
 
@@ -25,22 +26,26 @@ end
 
 -- A bunch of functions that each quick action is going to call.
 
--- there is certainly a better way handle orientation state
--- BUT i am lazy right now!
-local screen_is_normal = true
-local function rotate_screen_func()
-  local orientation
-  if screen_is_normal then 
-    orientation = "left"
-  else
-    orientation = "normal"
-  end
-  screen_is_normal = not screen_is_normal
+local term = apps.default.terminal
 
-  local cmd = scripts .. "rotate_screen " .. orientation
-  awful.spawn.easy_async(cmd)
+-- rotate from portrait to landscape
+local function rotate_screen_func()
+  -- gets current screen orientation
+  -- works on my machine ¯\_(ツ)_/¯
+  local cmd =  "xrandr --query | head -n 2 | tail -n 1 | cut -d ' ' -f 5"
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    if stdout:find("normal") then
+      orientation = "left"
+    else
+      orientation = "normal"
+    end
+    local cmd = scripts .. "rotate_screen " .. orientation
+    awful.spawn(cmd)
+  end)
 end
 
+-- lenovo laptops have a conservation mode that
+-- stops charging when battery hits 55-60%
 local function conservation_mode_func()
   local cmd = "ideapad-cm status"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
@@ -54,8 +59,26 @@ local function conservation_mode_func()
       status = "enabled"
     end
     qa_notify("Conservation mode", "Conservation mode " .. status)
-    awful.spawn.easy_async(cmd)
+    awful.spawn(cmd)
   end)
+end
+
+local function onboard_func()
+  awful.spawn.once("onboard")
+end
+
+-- spawn floating term window
+-- i just use python as calculator lol
+local function calculator_func()
+  awful.spawn(term .. " -e python", {
+    floating  = true,
+    ontop     = true,
+    sticky    = true,
+    tag       = mouse.screen.selected_tag,
+    placement = awful.placement.bottom_right,
+    width = 600,
+    height = 400,
+  })
 end
 
 ---
@@ -68,11 +91,12 @@ local function create_quick_action(icon, name, func)
     normal_bg = beautiful.wibar_bg,
     animate_size = false,
     size = 20,
-    -- why doesn't on_release = func work?
     on_release = function()
       func()
-    end,
+      awesome.emit_signal("control_center::toggle")
+    end
   })
+
   return wibox.widget({
     quick_action,
     widget = wibox.container.place,
@@ -83,18 +107,24 @@ end
 -- Arguments: icon name func 
 local widget = wibox.widget({
   create_quick_action("", "Rotate", rotate_screen_func),
-  create_quick_action("", "Conservation mode", conservation_mode_func), 
-  --
+  create_quick_action("", "Conservation mode", conservation_mode_func), 
+  create_quick_action("", "Onboard", onboard_func), 
+  create_quick_action("", "Calculator", calculator_func),
+
+  -- unfinished --
   create_quick_action("", "Nightshift", ""),
   create_quick_action("", "Rotate bar", ""),
   create_quick_action("", "Screenshot", ""),
-  create_quick_action("", "Keyboard", ""),
-  create_quick_action("", "Calculator", ""),
   create_quick_action("", "Timer", ""),
+
   -- 
   --  
-  --
-  layout = wibox.layout.fixed.vertical,
+
+  spacing = dpi(5),
+  forced_num_rows = 2,
+  forced_num_cols = 4,
+  homogeneous = true,
+  layout = wibox.layout.grid,
 })
 
 return widget

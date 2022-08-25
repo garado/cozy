@@ -2,6 +2,8 @@
 -- ▀█▀ █ █▀▄▀█ █▀▀ █░█░█ ▄▀█ █▀█ █▀█ █ █▀█ █▀█
 -- ░█░ █ █░▀░█ ██▄ ▀▄▀▄▀ █▀█ █▀▄ █▀▄ █ █▄█ █▀▄
 
+-- Starts/stops Timewarrior time tracking.
+
 local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
@@ -64,22 +66,10 @@ function ui_timew_stopped()
   })
 end
 
---------
-
-function ui_timew_started()
-
-  -- duration of current session
-  local current_time_text = wibox.widget({
-    markup = helpers.ui.colorize_text("--", beautiful.xforeground),
-    font = beautiful.alt_font_name .. "Light 30",
-    valign = "center",
-    align = "center",
-    widget = wibox.widget.textbox,
-  })
-
-  local current_time = wibox.widget({
+local function create_ui_text(header, text, text_size)
+  local header = wibox.widget({
     {
-      markup = helpers.ui.colorize_text("CURRENT SESSION", beautiful.nord3),
+      markup = helpers.ui.colorize_text(header, beautiful.nord3),
       font = beautiful.font_name .. "Bold 10", 
       valign = "center",
       align = "center",
@@ -89,27 +79,32 @@ function ui_timew_started()
     layout = wibox.layout.fixed.vertical,
   })
 
-  -- duration of all sessions today combined
-  local total_time_text = wibox.widget({
-    markup = helpers.ui.colorize_text("--", beautiful.xforeground),
-    font = beautiful.alt_font_name .. "Light 30",
+  local text = wibox.widget({
+    markup = helpers.ui.colorize_text(text, beautiful.xforeground),
+    font = beautiful.alt_font_name .. text_size,
     valign = "center",
     align = "center",
     widget = wibox.widget.textbox,
   })
-  
-  local total_time = wibox.widget({
-    {
-      markup = helpers.ui.colorize_text("TOTAL TODAY", beautiful.nord3),
-      font = beautiful.font_name .. "Bold 10", 
-      valign = "center",
-      align = "center",
-      widget = wibox.widget.textbox,
-    },
-    total_time_text,
+
+  return wibox.widget({
+    header,
+    text,
     layout = wibox.layout.fixed.vertical,
   })
 
+end
+
+--------
+
+function ui_timew_started()
+  local current_time = create_ui_text("CURRENT SESSION", "--", 30)
+  local total_this_tag = create_ui_text("TOTAL TAG", "--", 15)
+  local total_all_tags = create_ui_text("TOTAL TODAY", "--", 15)
+  local current_tag = create_ui_text("WORKING ON", "--", 15)
+
+  local tag
+  
   -- turns 6:15:08 (H+:MM:SS) into 6h 15m
   local function format_time(str)
     str = string.gsub(str, "[^0-9:]", "")
@@ -122,27 +117,37 @@ function ui_timew_started()
     end
     return txt
   end
-  
+
   -- update current time and total time every 60 seconds
   local minute_timer = gears.timer {
     timeout = 60,
     call_now = true,
     autostart = false,
     callback = function()
+      -- total tracked time today across all tags
       local total_cmd = "timew sum | tail -n 2"
       awful.spawn.easy_async_with_shell(total_cmd, function(stdout)
         local markup = helpers.ui.colorize_text(format_time(stdout), beautiful.xforeground)
-        total_time_text:set_markup_silently(markup)
+        total_all_tags.children[2]:set_markup_silently(markup)
       end)
       
+      -- current session time
       local curr_cmd = "timew | tail -n 1"
       awful.spawn.easy_async_with_shell(curr_cmd, function(stdout)
         local markup = helpers.ui.colorize_text(format_time(stdout), beautiful.xforeground)
-        current_time_text:set_markup_silently(markup)
+        current_time.children[2]:set_markup_silently(markup)
       end)
     end
   }
   minute_timer:start()
+
+  -- update current tag
+  local cmd = "timew | head -n 1"
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    local tag = string.gsub(stdout, "Tracking ", "")
+    local markup = helpers.ui.colorize_text(tag, beautiful.xforeground)
+    current_tag.children[2]:set_markup_silently(markup)
+  end)
 
   local stop_button = widgets.button.text.normal({
     text = "Stop",
@@ -159,10 +164,19 @@ function ui_timew_started()
   })
 
   return wibox.widget({
-    current_time,
-    total_time,
+    {
+      current_time,
+      {
+        current_tag,
+        total_all_tags,
+        --total_this_tag,
+        spacing = dpi(20),
+        layout = wibox.layout.fixed.horizontal,
+      },
+      spacing = dpi(10),
+      layout = wibox.layout.fixed.vertical,
+    },
     stop_button,
-    spacing = dpi(10),
     layout = wibox.layout.fixed.vertical,
   })
 end

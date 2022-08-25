@@ -37,16 +37,14 @@ return function(s)
   local control_center_width = dpi(300)
   local control_center_height = dpi(300)
   local control_center = awful.popup ({
-    type = "dock",
+    type = "popup_menu",
     minimum_height = control_center_height,
     maximum_height = control_center_height,
     minimum_width = control_center_width,
     maximum_width = control_center_width,
-    placement = awful.placement.bottom_left,
+    placement = awful.placement.centered,
     bg = beautiful.transparent,
-    shape = function(cr, width, height)
-      gears.shape.rounded_rect(cr, width, height)
-    end,
+    shape = gears.shape.rect,
     ontop = true,
     visible = false,
     widget = control_center_contents,

@@ -12,10 +12,10 @@ The primary goals of this setup are to create an environment that:
 2. integrates all the cli tools I use to manage my life into a nice dashboard
 3. looks awesome!
 
-This is a port of my old Eww config. I've decided to keep maintaining the Eww config [here](https://github.com/garado/cozy/tree/eww) because I might leave AwesomeWM one day. (Eww version is heavily wip and will probably never be as feature-rich as the Awesome version, and also won't be updated as often)
+This is a port of my old Eww config. I've decided to keep maintaining the Eww config [here](https://github.com/garado/cozy/tree/eww) because I might leave Awesome one day. (Eww version is heavily wip and won't be updated as often)
 
 
-<h2>Dashboard</h2>
+<h2>🚀 Dashboard</h2>
 
 <img title="" src="assets/dash_main.png" alt="" width="800">
 
@@ -35,7 +35,7 @@ This is a port of my old Eww config. I've decided to keep maintaining the Eww co
 
 
 
-<h2>Install and configure</h2>
+<h2>🔧 Install and configure</h2>
 <b>NOTE: This setup is incomplete, somewhat buggy, and under constant development.</b> Because of that, I don't recommend daily driving it quite yet.
 
 
@@ -98,7 +98,7 @@ Make sure you update `configuration/apps.lua` with your default terminal/file ma
   - Put `pi` (located in `$HOME/go/bin`) in your path
 - Set the `PIXELA_USER_NAME` and `PIXELA_USER_TOKEN` environment variables
 - Update `user_variables.lua` with the habits you want to display
-- The `utils/dash/habits/cache_habits` script caches data from Pixela. Run it periodically with a cron job to keep your widget updated.
+- The `utils/dash/habits/cache_habits` script caches data from Pixela. Read the script documentation. Run it periodically with a cron job to keep your widget updated. 
 
 
 **Finances tracker**
@@ -108,7 +108,7 @@ Make sure you update `configuration/apps.lua` with your default terminal/file ma
 </details>
 
 
-<h2>In progress/planned features</h2>
+<h2>🗒️ In progress/planned features</h2>
 <details><summary><b>Dashboard tabs</b></summary>
 
 - Main
@@ -157,7 +157,7 @@ Make sure you update `configuration/apps.lua` with your default terminal/file ma
 </details>
 
 ## Other stuff
-<b>Why is it called 'cozy?'</b> 
+<b>Why is it called 'cozy'?</b> 
 
 I've spent a lot of time tweaking this setup to be just the way I like it, so now this setup feels very personal, comfortable, and <b>cozy</b>.  :-)
 

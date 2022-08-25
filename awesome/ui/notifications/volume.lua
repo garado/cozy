@@ -27,7 +27,7 @@ awesome.connect_signal("module::volume", function()
           category = "device",
           message = "Volume at " .. val .. "%",
           auto_reset_timeout = true,
-          timeout = 1,
+          timeout = 1.25,
         }
       else
         notif:destroy()
@@ -37,7 +37,7 @@ awesome.connect_signal("module::volume", function()
           category = "device",
           message = "Volume at " .. val .. "%",
           auto_reset_timeout = true,
-          timeout = 1,
+          timeout = 1.25,
         }
       end
     end

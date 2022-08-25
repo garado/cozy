@@ -30,10 +30,12 @@ ruled.client.connect_signal("request::rules", function()
     rule_any = {
       instance = {
         "Thunar",
-        "nitrogen",
+        "feh",
+        "simplescreenrecorder",
         "mpv",
       },
       class = {
+        "Pavucontrol",
         "Lxappearance",
         "Nm-connection-editor",
         "qBittorrent",
@@ -48,6 +50,31 @@ ruled.client.connect_signal("request::rules", function()
       },
     },
     properties = { 
+      floating = true,
+      placement = helpers.client.centered_client_placement,
+    },
+  })
+ 
+  ruled.client.append_rule({
+    rule_any = {
+      instance = {
+        "Thunar",
+      },
+      class = {
+        "Pavucontrol",
+      },
+    },
+    properties = {
+      height = 700,
+    },
+  })
+
+  -- On-screen keyboard
+  ruled.client.append_rule({
+    rule_any = {
+      instance = { "onboard" },
+    },
+    properties = {
       floating = true,
       placement = helpers.client.centered_client_placement,
     },
