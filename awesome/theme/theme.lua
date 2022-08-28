@@ -10,5 +10,6 @@ local theme = require("theme/colorschemes/" .. theme_name)
 
 -- theme-agnostic settings
 theme.pfp = gears.surface.load_uncached(gfs.get_configuration_dir() .. "theme/assets/pfp.png")
+theme.transparent = "#ffffff00"
 
 return theme

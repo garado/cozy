@@ -22,6 +22,7 @@ local string = string
 local habit_list = user_vars.habit
 local habit_widget = wibox.widget({
   {
+    helpers.ui.create_dash_widget_header("Habits"),
     spacing = dpi(10),
     layout = wibox.layout.fixed.vertical,
   },

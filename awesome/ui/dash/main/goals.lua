@@ -11,13 +11,6 @@ local helpers = require("helpers")
 local user_vars = require("user_variables")
 
 local function widget()
-  local header = wibox.widget({
-    markup = helpers.ui.colorize_text("Current Goals", beautiful.dash_header_fg),
-    font = beautiful.alt_font .. "20",
-    widget = wibox.widget.textbox,
-    align = "center",
-    valign = "center",
-  })
 
   local function create_goal(text)
     return wibox.widget({
@@ -31,7 +24,7 @@ local function widget()
 
   local widget = wibox.widget({
     {
-      header,
+      helpers.ui.create_dash_widget_header("Current Goals"),
       {
         id = "goals",
         spacing = dpi(5),

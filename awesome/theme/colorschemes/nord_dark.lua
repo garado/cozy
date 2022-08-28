@@ -99,11 +99,11 @@ theme.fg_urgent = theme.nord11
 theme.subtitle  = theme.nord3
 theme.subtext   = theme.nord3
 theme.surface0  = theme.nord18
-theme.surface1  = theme.nord0
+theme.surface1  = theme.nord3
 theme.xforeground = theme.fg
 
 -- Images
-theme.wallpaper = gears.surface.load_uncached(gfs.get_configuration_dir() .. "theme/assets/nord_dark.png")
+theme.wallpaper = gears.surface.load_uncached(gfs.get_configuration_dir() .. "theme/assets/walls/nord_dark.png")
 
 -- Dashboard
 theme.dash_bg         = theme.base
@@ -139,7 +139,7 @@ theme.wibar_empty     = theme.mantle
 theme.bat_charging    = theme.green
 theme.bat_normal      = theme.fg
 theme.bat_low         = theme.red
-theme.slider_bg       = theme.nord3
+theme.slider_bg       = theme.surface1
 theme.brightbar_fg    = theme.main_accent
 theme.volbar_fg       = theme.main_accent
 theme.wibar_clock     = theme.fg

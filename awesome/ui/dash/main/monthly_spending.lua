@@ -287,20 +287,8 @@ local bottom = wibox.widget({
   widget = wibox.container.place,
 })
 
-local header = wibox.widget({
-  {
-    markup = helpers.ui.colorize_text("Monthly Spending", beautiful.dash_header_fg),
-    font = beautiful.alt_font .. "20",
-    widget = wibox.widget.textbox,
-    align = "center",
-    valign = "center",
-  },
-  margins = dpi(5),
-  widget = wibox.container.margin,
-})
-
 local widget = wibox.widget({
-  header,
+  helpers.ui.create_dash_widget_header("Monthly Spending"),
   {
     {
       top,
@@ -311,6 +299,7 @@ local widget = wibox.widget({
     widget = wibox.container.place,
   },
   layout = wibox.layout.align.vertical,
+  widget = wibox.container.place,
 })
 
 return helpers.ui.create_boxed_widget(widget, dpi(300), dpi(300), beautiful.dash_widget_bg)

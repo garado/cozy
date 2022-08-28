@@ -90,7 +90,7 @@ local function widget()
     -- more urgent tasks should be red
     local desc_color = beautiful.fg
     if urg > 7 then
-      desc_color = beautiful.nord11
+      desc_color = beautiful.red
     end
 
     -- assemble widget
@@ -103,7 +103,7 @@ local function widget()
     })
 
     local due_ = wibox.widget({
-      markup = helpers.ui.colorize_text(due_date_text, beautiful.nord3),
+      markup = helpers.ui.colorize_text(due_date_text, beautiful.subtitle),
       align = "right",
       widget = wibox.widget.textbox,
     })

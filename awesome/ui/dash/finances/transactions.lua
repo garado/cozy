@@ -37,9 +37,9 @@ return function()
     local i, j = string.find(category, "Expenses:")
     local amount_color
     if i == nil then
-      amount_color = beautiful.expense_fg
+      amount_color = beautiful.green
     else
-      amount_color = beautiful.income_fg
+      amount_color = beautiful.red
     end
 
     local date_text = wibox.widget({
