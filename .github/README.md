@@ -58,9 +58,9 @@ Clone repository
 
 (Optional) Make a backup of your old configs
 
-<code>cp -r ~/.config/awesome/ ~/.config/awesome.${USER}/</code>
-<code>cp -r ~/.config/rofi/ ~/.config/rofi.${USER}/</code>
-<code>cp ~/.config/picom.conf ~/.config/picom.${USER}.conf</code>
+<code>cp -r ~/.config/awesome/ ~/.config/awesome.${USER}/
+cp -r ~/.config/rofi/ ~/.config/rofi.${USER}/
+cp ~/.config/picom.conf ~/.config/picom.${USER}.conf</code>
 
 Copy configs
 
