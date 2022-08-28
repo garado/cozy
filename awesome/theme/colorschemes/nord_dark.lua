@@ -71,7 +71,7 @@ theme.subtitle      = theme.nord3
 theme.subtext       = theme.nord2
 theme.main_accent   = theme.nord10  -- primary accent color
 
--- misc (used in task widget + finance widgets)
+-- misc (used in task, battery, and finance widgets)
 theme.red    = theme.nord11 -- 
 theme.green  = theme.nord14 --
 theme.yellow = theme.nord13
@@ -94,14 +94,6 @@ theme.alt_font = theme.alt_font_name .. "Regular "
 
 -- █░█ █   █▀▀ █░░ █▀▀ █▀▄▀█ █▀▀ █▄░█ ▀█▀ █▀
 -- █▄█ █   ██▄ █▄▄ ██▄ █░▀░█ ██▄ █░▀█ ░█░ ▄█
--- Text
-theme.fg_urgent = theme.nord11
-theme.subtitle  = theme.nord3
-theme.subtext   = theme.nord3
-theme.surface0  = theme.nord18
-theme.surface1  = theme.nord3
-theme.xforeground = theme.fg
-
 -- Images
 theme.wallpaper = gears.surface.load_uncached(gfs.get_configuration_dir() .. "theme/assets/walls/nord_dark.png")
 

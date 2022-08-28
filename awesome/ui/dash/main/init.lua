@@ -47,7 +47,7 @@ local widget = wibox.widget({
     },
     {
       timewarrior,
-      -- pomodoro,
+      --pomodoro,
       habit,
       forced_width = dpi(400),
       layout = wibox.layout.fixed.vertical,

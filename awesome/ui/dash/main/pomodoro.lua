@@ -432,7 +432,8 @@ local function ui_tick()
     return timer_buttons
   end
 
-  local desc_header_text, desc_text
+  local desc_header_text = ""
+  local desc_text = ""
    if pomodoro.tick_type == "work" then
      desc_header_text = "CURRENT TASK"
      desc_text = pomodoro.selected_topic
@@ -460,7 +461,7 @@ local function ui_tick()
   })
   
   -- Start timer!
-  if pomodoro.preserved == "true" then
+  if pomodoro.preserved then
     timer_tick(pomodoro.time_remaining)
   else
     timer_tick(pomodoro.timer_time)
@@ -475,7 +476,7 @@ local function ui_tick()
         '\npomodoro.timer_time: ' .. pomodoro.timer_time .. 
         '\npomodoro.time_remaining: ' .. pomodoro.time_remaining .. 
         '\npomodoro.timer_state: ' .. pomodoro.timer_state .. 
-        '\npomodoro.preserved: true' ..
+        '\npomodoro.preserved:  true' ..
         '" | xrdb -merge')
     end
   end)
@@ -586,7 +587,6 @@ end
 local pomodoro_ui = wibox.container.margin()
 function redraw_ui()
   local current_state = pomodoro.current_state
-
   local new_content 
   if current_state == "start" then
     new_content = ui_start()
@@ -606,25 +606,30 @@ end
 -- preserve state in xrdb if awesomewm restarts
 awful.spawn.easy_async_with_shell("xrdb -query", 
   function(stdout)
-    local preserved = stdout:match('pomodoro.preserved:%s+%w+')
+    local preserved = stdout:match('pomodoro.preserved:%s+true')
     if preserved then
-      pres = string.gsub(preserved, 'pomodoro.preserved:', '')
+      local pres = string.gsub(preserved, 'pomodoro.preserved:', '')
       pres = string.gsub(pres, '\t', '')
-      pomodoro.preserved = pres
+      pomodoro.preserved = true
 
-      pomo_state = stdout:match('pomodoro.current_state:%s+%a+')
+      local pomo_state = stdout:match('pomodoro.current_state:%s+%a+')
       pomo_state = string.gsub(pomo_state, 'pomodoro.current_state:', '')
       pomo_state = string.gsub(pomo_state, '\t', '')
       pomodoro.current_state = pomo_state
       
-      topic = stdout:match('pomodoro.selected_topic:%s+%a+')
+      local topic = stdout:match('pomodoro.selected_topic:%s+%a+')
       topic = string.gsub(topic, 'pomodoro.selected_topic:', '')
       topic = string.gsub(topic, '\t', '')
       pomodoro.selected_topic = topic
       
-      sel_time = stdout:match('pomodoro.timer_time:%s+%d+')
+      local sel_time = stdout:match('pomodoro.timer_time:%s+%d+')
       sel_time = tonumber(sel_time:match('%d+'))
       pomodoro.timer_time = sel_time
+      
+      local tick_type = stdout:match('pomodoro.tick_type:%s+%a+')
+      tick_type = string.gsub(tick_type, 'pomodoro.tick_type:', '')
+      tick_type = string.gsub(tick_type, '\t', '')
+      pomodoro.tick_type = tick_type 
 
       remaining = stdout:match('pomodoro.time_remaining:%s+%d+')
       remaining = tonumber(remaining:match('%d+'))
@@ -633,8 +638,8 @@ awful.spawn.easy_async_with_shell("xrdb -query",
       redraw_ui()
     else
       redraw_ui()
-    end
-  end)
+  end
+end)
 
 return pomodoro_ui 
 

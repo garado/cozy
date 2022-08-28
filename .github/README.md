@@ -81,9 +81,11 @@ Make sure you update <code>configuration/apps.lua</code> with your default termi
 
 <b>Themes</b>
 
-Change theme in `user_vars.lua`
-Built-in themes: nord_dark, dracula, tokyo_night
+Change theme in `user_vars.lua`.
 
+If you want to create your own theme, start use the default nord_dark theme as a template.
+
+Built-in themes: nord_dark, dracula, tokyo_night
 <ul>
   <li>
     <details><summary><b>nord_dark</b></summary>

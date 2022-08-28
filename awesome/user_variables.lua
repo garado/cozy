@@ -1,6 +1,6 @@
 return {
   -- available themes:
-  -- nord_dark, dracula, tokyo_night 
+  -- nord_dark, dracula, tokyo_night
   theme = "nord_dark",
   display_name = "Display Name",
   goals = {
@@ -19,6 +19,18 @@ return {
       "Hobby",
       "Rice",
     },
+    times = {
+      "5m",
+      "25m",
+      "55m",
+    },
+    short_break_duration = "5",
+    long_break_duration = "15",
+    -- the following currently aren't used for
+    -- the pomodoro widget
+    target = 8,
+    completed = 0,
+    min_focused = 0,
   },
   titles = {
     "Mechromancer",

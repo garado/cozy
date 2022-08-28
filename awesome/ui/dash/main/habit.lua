@@ -29,30 +29,6 @@ local habit_widget = wibox.widget({
   widget = wibox.container.place
 })
 
--- update cache for a graph
-local function update_cache(graph_id, date, set_as_complete)
-  local file = gfs.get_cache_dir() .. "pixela/" .. graph_id
-  awful.spawn.easy_async_with_shell("cat " .. file, function(stdout)
-    if set_as_complete then
-      -- if habit is already completed in cache, do nothing
-      if string.find(stdout, date) ~= nil then 
-        return
-      -- else, mark as completed by writing date to cache
-      else
-        stdout = stdout .. " " .. date
-        cmd = "echo '" .. stdout .. "' > " .. file
-        awful.spawn.with_shell(cmd)
-      end
-    -- if we want to set a habit as not completed
-    elseif not set_as_complete then
-      stdout = string.gsub(stdout, date, "")
-      stdout = string.gsub(stdout, "[(\n\r)+]", "")
-      cmd = "echo '" .. stdout .. "' > " .. file
-      awful.spawn.with_shell(cmd)
-    end
-  end)
-end
-
 local function update_pixela(graph_id, date, qty)
   local pi_cmd = "pi pixel update -g " .. graph_id .. " -d " .. date .. " -q " .. qty
   awful.spawn.easy_async_with_shell(pi_cmd, function(stdout)
@@ -71,6 +47,32 @@ local function update_pixela(graph_id, date, qty)
         message = "Setting " .. graph_id .. " as " .. state .. " failed",
         timeout = 0,
       }
+    end
+  end)
+end
+
+-- update cache for a graph
+local function update_cache(graph_id, date, set_as_complete)
+  local file = gfs.get_cache_dir() .. "pixela/" .. graph_id
+  awful.spawn.easy_async_with_shell("cat " .. file, function(stdout)
+    if set_as_complete then
+      -- if habit is already completed in cache, do nothing
+      if string.find(stdout, date) ~= nil then 
+        return
+      -- else, mark as completed by writing date to cache
+      else
+        stdout = stdout .. " " .. date
+        cmd = "echo '" .. stdout .. "' > " .. file
+        awful.spawn.with_shell(cmd)
+        update_pixela(graph_id, date, 1)
+      end
+    -- if we want to set a habit as not completed
+    elseif not set_as_complete then
+      stdout = string.gsub(stdout, date, "")
+      stdout = string.gsub(stdout, "[(\n\r)+]", "")
+      cmd = "echo '" .. stdout .. "' > " .. file
+      awful.spawn.with_shell(cmd)
+      update_pixela(graph_id, date, 0)
     end
   end)
 end
@@ -176,7 +178,6 @@ local function create_habit_ui()
 
 
           -- update data
-          update_pixela(graph_id, date, qty)
           update_cache(graph_id, date, box.checked)
           if qty == 1 then qty = 0 end
           if qty == 0 then qty = 1 end
