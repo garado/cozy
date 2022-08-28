@@ -1,0 +1,15 @@
+
+;  █▄▄ █░█ █▀▄ █▀▀ █▀▀ ▀█▀
+;  █▄█ █▄█ █▄▀ █▄█ ██▄ ░█░
+
+; https://www.ledger-cli.org/3.0/doc/ledger3.html#Budgeting
+
+~ Monthly
+  Expenses:Food             $100
+  Expenses:Household        $50
+  Expenses:Personal         $60
+  Expenses:Education        $3000
+  Expenses:Transportation   $50
+  Expenses:Bills            $900
+  Assets:Checking
+

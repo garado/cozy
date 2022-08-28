@@ -10,6 +10,7 @@ return {
   },
   ledger = {
     ledger_file = "~/.config/awesome/misc/sample.ledger",
+    budget_file = "~/.config/awesome/misc/budget.ledger",
   },
   pomo = {
     topics = {
