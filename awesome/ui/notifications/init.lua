@@ -53,7 +53,7 @@ end)
 
 
 naughty.connect_signal("request::display", function(n)
-  local accent_colors = beautiful.random_accent_color()
+  local accent_color = beautiful.random_accent_color()
 
 	--- table of icons
 	local app_icons = {
@@ -85,7 +85,7 @@ naughty.connect_signal("request::display", function(n)
 					widget = wibox.widget.imagebox,
 				},
 				border_width = dpi(2),
-				border_color = accent_colors,
+				border_color = accent_color,
 				shape = gears.shape.circle,
 				widget = wibox.container.background,
 			},
@@ -104,6 +104,7 @@ naughty.connect_signal("request::display", function(n)
     speed = 75,
     widgets.text({
       font = beautiful.font,
+      color = beautiful.fg,
       bold = true,
       size = 10,
       text = n.title,
@@ -117,6 +118,7 @@ naughty.connect_signal("request::display", function(n)
     speed = 100,
     widgets.text({
       font = beautiful.font,
+      color = beautiful.fg,
       size = 10,
       text = n.message,
     }),
@@ -150,7 +152,7 @@ naughty.connect_signal("request::display", function(n)
 				},
 				widget = wibox.container.place,
 			},
-			bg = beautiful.nord0,
+			bg = beautiful.notif_actions_bg,
 			forced_height = dpi(25),
 			forced_width = dpi(70),
 			widget = wibox.container.background,
@@ -164,7 +166,7 @@ naughty.connect_signal("request::display", function(n)
 
   local app_name = widgets.text({
     font = beautiful.font,
-    color = accent_colors,
+    color = accent_color,
     size = 8,
     bold = true,
     text = string.upper(n.app_name),
@@ -176,8 +178,8 @@ naughty.connect_signal("request::display", function(n)
 		paddings = dpi(2),
 		bold = false,
 		text = "",
-    normal_bg = beautiful.notification_content_bg,
-		text_normal_bg = beautiful.nord1,
+    normal_bg = beautiful.notif_dismiss_bg,
+		text_normal_bg = accent_color,
 		animate_size = false,
 		on_release = function()
 			n:destroy(naughty.notification_closed_reason.dismissed_by_user)
@@ -191,9 +193,9 @@ naughty.connect_signal("request::display", function(n)
 		min_value = 0,
 		value = 100,
 		thickness = dpi(3),
-    border_color = beautiful.nord0,
-		background_color = beautiful.nord0,
-    color = accent_colors,
+    border_color = beautiful.notif_timeout_bg,
+		background_color = beautiful.notif_timeout_bg,
+    color = accent_color,
   })
 
   local widget = naughty.layout.box({
@@ -261,7 +263,7 @@ naughty.connect_signal("request::display", function(n)
         timeout_bar,
         layout = wibox.layout.fixed.vertical,
       },
-      bg = beautiful.notification_content_bg,
+      bg = beautiful.notif_bg,
       forced_width = dpi(275),
       widget = wibox.container.background,
     },

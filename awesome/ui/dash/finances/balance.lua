@@ -19,29 +19,29 @@ local string = string
 local ledger_file = user_vars.ledger.ledger_file
 
 local header = wibox.widget({
-  markup = helpers.ui.colorize_text("Total balance", beautiful.nord3),
+  markup = helpers.ui.colorize_text("Total balance", beautiful.dash_header_fg),
   widget = wibox.widget.textbox,
-  font = beautiful.header_font_name .. "Light 20",
+  font = beautiful.font_name .. "Light 20",
   align = "left",
   valign = "center",
 })
 
 local function balance()
   local total = wibox.widget({
-    markup = helpers.ui.colorize_text("$--.--", beautiful.xforeground),
+    markup = helpers.ui.colorize_text("$--.--", beautiful.fg),
     widget = wibox.widget.textbox,
     font = beautiful.font_name .. "Light 30",
   })
 
   local checking = wibox.widget({
     widget = wibox.widget.textbox,
-    font = beautiful.header_font_name .. "Light 12",
+    font = beautiful.font_name .. "Light 12",
     font = beautiful.font_name .. "Light 10",
   })
   
   local savings = wibox.widget({
     widget = wibox.widget.textbox,
-    font = beautiful.header_font_name .. "Light 12",
+    font = beautiful.font_name .. "Light 12",
     font = beautiful.font_name .. "Light 10",
   })
 
@@ -60,15 +60,15 @@ local function balance()
       local str_stripped = string.gsub(str, "[^0-9$.]", "")
 
       if str_assets ~= nil then
-        local markup = helpers.ui.colorize_text(str_stripped, beautiful.xforeground)
+        local markup = helpers.ui.colorize_text(str_stripped, beautiful.fg)
         total:set_markup_silently(markup)
       elseif str_checking ~= nil then
         local text = "Checking - " .. str_stripped
-        local markup = helpers.ui.colorize_text(text, beautiful.nord4)
+        local markup = helpers.ui.colorize_text(text, beautiful.subtext)
         checking:set_markup_silently(markup)
       elseif str_savings ~= nil then
         local text = "Savings - " .. str_stripped
-        local markup = helpers.ui.colorize_text(text, beautiful.nord4)
+        local markup = helpers.ui.colorize_text(text, beautiful.subtext)
         savings:set_markup_silently(markup)
       end
     end

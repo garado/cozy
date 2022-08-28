@@ -12,8 +12,8 @@ local user_vars = require("user_variables")
 
 local function widget()
   local header = wibox.widget({
-    markup = helpers.ui.colorize_text("Current Goals", beautiful.dash_header_color),
-    font = beautiful.header_font .. "20",
+    markup = helpers.ui.colorize_text("Current Goals", beautiful.dash_header_fg),
+    font = beautiful.alt_font .. "20",
     widget = wibox.widget.textbox,
     align = "center",
     valign = "center",
@@ -21,7 +21,7 @@ local function widget()
 
   local function create_goal(text)
     return wibox.widget({
-      markup = helpers.ui.colorize_text(text, beautiful.xforeground),
+      markup = helpers.ui.colorize_text(text, beautiful.fg),
       font = beautiful.font_name .. "12",
       widget = wibox.widget.textbox,
       align = "center",

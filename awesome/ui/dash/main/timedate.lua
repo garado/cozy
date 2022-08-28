@@ -13,7 +13,7 @@ local naughty = require("naughty")
 
 local time = wibox.widget({
   format = "%l:%M %p", 
-  font = beautiful.header_font .. "25",
+  font = beautiful.alt_font .. "25",
   align = "center",
   valign = "center",
   widget = wibox.widget.textclock
@@ -21,7 +21,7 @@ local time = wibox.widget({
 
 local time_color = wibox.container.background()
 time_color:set_widget(time)
-time_color:set_fg(beautiful.xforeground)
+time_color:set_fg(beautiful.fg)
 
 local date = wibox.widget({
   format = "%A %B %d", 
@@ -33,7 +33,7 @@ local date = wibox.widget({
 
 local date_color = wibox.container.background()
 date_color:set_widget(date)
-date_color:set_fg(beautiful.nord10)
+date_color:set_fg(beautiful.timedate)
 
 local widget = wibox.widget({
   {

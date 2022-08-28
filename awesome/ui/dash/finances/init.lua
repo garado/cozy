@@ -21,8 +21,8 @@ local transactions = require("ui.dash.finances.transactions")()
 local balance = require("ui.dash.finances.balance")
 
 local finances_header = wibox.widget({
-  markup = helpers.ui.colorize_text("Finances", beautiful.xforeground),
-  font = beautiful.header_font_name .. "Medium 30",
+  markup = helpers.ui.colorize_text("Finances", beautiful.fg),
+  font = beautiful.alt_font_name .. "Medium 30",
   widget = wibox.widget.textbox,
 })
 

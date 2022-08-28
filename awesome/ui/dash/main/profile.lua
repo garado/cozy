@@ -24,8 +24,7 @@ local function create_profile()
       valign = "center",
       widget = wibox.widget.imagebox,
     },
-    border_width = dpi(3),
-    border_color = beautiful.nord10,
+    border_width = dpi(0),
     shape = gears.shape.circle,
     widget = wibox.container.background,
     forced_width = dpi(100),
@@ -35,7 +34,7 @@ local function create_profile()
   local display_name = user_vars.display_name
   local name = wibox.widget({
     widget = wibox.widget.textbox,
-    markup = helpers.ui.colorize_text(display_name, beautiful.nord10),
+    markup = helpers.ui.colorize_text(display_name, beautiful.display_name_fg),
     font = beautiful.font_name .. "18",
     align = "center",
     valign = "center",
@@ -43,7 +42,7 @@ local function create_profile()
   
   local host = wibox.widget({
     widget = wibox.widget.textbox,
-    markup = helpers.ui.colorize_text("@andromeda", beautiful.nord1),
+    markup = helpers.ui.colorize_text("@andromeda", beautiful.title_fg),
     font = beautiful.font_name .. "18",
     align = "center",
     valign = "center",
@@ -52,7 +51,7 @@ local function create_profile()
   local title = wibox.widget({
     widget = wibox.widget.textbox,
     font = beautiful.font_name .. "11",
-    markup = helpers.ui.colorize_text("Uses Arch, btw", beautiful.xforeground),
+    markup = helpers.ui.colorize_text("Uses Arch, btw", beautiful.fg),
     align = "center",
     valign = "center",
   })
@@ -61,7 +60,7 @@ local function create_profile()
   awesome.connect_signal("dash::close", function()
     local titles_list = user_vars.titles
     local random_title = titles_list[math.random(#titles_list)]
-    title:set_markup(helpers.ui.colorize_text(random_title, beautiful.dash_widget_fg))
+    title:set_markup(helpers.ui.colorize_text(random_title, beautiful.fg))
   end)
   
   local profile = wibox.widget({

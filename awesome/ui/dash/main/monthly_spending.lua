@@ -25,30 +25,19 @@ local table = table
 local ledger_file = user_vars.ledger.ledger_file
 
 -- arc chart colors
-local color_palette = {
-  beautiful.nord7,
-  beautiful.nord8,
-  beautiful.nord9,
-  beautiful.nord10,
-  beautiful.nord11,
-  beautiful.nord12,
-  beautiful.nord13,
-  beautiful.nord14,
-  beautiful.nord15,
-}
+local color_palette = beautiful.arcchart_colors
 
 local function create_chart()
   local chart = wibox.widget({
     {
       {
         id = "text",
-        font = beautiful.header_font_name .. "12",
+        font = beautiful.alt_font_name .. "12",
         align = "center",
         valign = "center",
         widget = wibox.widget.textbox,
       },
       id = "arc",
-      color = beautiful.nord12,
       thickness = 30,
       border_width = 0,
       widget = wibox.container.arcchart,
@@ -67,14 +56,14 @@ local function create_chart()
     })
 
     local label = wibox.widget({
-      markup = helpers.ui.colorize_text(text, beautiful.xforeground),
+      markup = helpers.ui.colorize_text(text, beautiful.fg),
       widget = wibox.widget.textbox,
       valign = "center",
       align = "start",
     })
 
     local amount_ = wibox.widget({
-      markup = helpers.ui.colorize_text("— $" .. amount, beautiful.nord3),
+      markup = helpers.ui.colorize_text("— $" .. amount, beautiful.legend_amount),
       widget = wibox.widget.textbox,
       valign = "center",
       align = "start",
@@ -231,7 +220,7 @@ end -- end create_chart
 -- ledger_cmd   command that produces the necessary data
 local function get_account_value(header_text, ledger_cmd)
   local header = wibox.widget({
-    markup = helpers.ui.colorize_text(header_text, beautiful.nord3),
+    markup = helpers.ui.colorize_text(header_text, beautiful.account_title),
     widget = wibox.widget.textbox,
     font = beautiful.font_name .. "11",
     align = "center",
@@ -239,9 +228,9 @@ local function get_account_value(header_text, ledger_cmd)
   })
 
   local balance_ = wibox.widget({
-    markup = helpers.ui.colorize_text("$--.--", beautiful.xforeground),
+    markup = helpers.ui.colorize_text("$--.--", beautiful.fg),
     widget = wibox.widget.textbox,
-    font = beautiful.header_font_name .. "15",
+    font = beautiful.alt_font_name .. "15",
     align = "center",
     valign = "center",
   })
@@ -249,7 +238,7 @@ local function get_account_value(header_text, ledger_cmd)
   awful.spawn.easy_async_with_shell(ledger_cmd, function(stdout)
     balance = string.gsub(stdout, "[^0-9.]", "")
     balance = string.gsub(balance, "%s+", "")
-    local markup = helpers.ui.colorize_text("$" .. balance, beautiful.xforeground)
+    local markup = helpers.ui.colorize_text("$" .. balance, beautiful.fg)
     balance_:set_markup_silently(markup)
   end)
 
@@ -263,80 +252,6 @@ local function get_account_value(header_text, ledger_cmd)
   })
 
   return balance
-end
-
-local function transactions()
-  local header = wibox.widget({
-    markup = helpers.ui.colorize_text("transactions", beautiful.nord3),
-    widget = wibox.widget.textbox,
-    align = "center",
-    valign = "center",
-  })
-
-  local function create_transaction_entry(date, amount, title, isExpense)
-    local textColor, prefix
-    if isExpense then
-      prefix = "-"
-      textColor = beautiful.nord11
-    else
-      prefix = "+"
-      textColor = beautiful.nord14
-    end
-
-    local date_ = wibox.widget({
-      markup = helpers.ui.colorize_text(date, beautiful.nord3),
-      widget = wibox.widget.textbox,
-      align = "center",
-      valign = "center",
-    })
-    
-    local amount_ = wibox.widget({
-      markup = helpers.ui.colorize_text(prefix .. "$" .. amount, textColor),
-      widget = wibox.widget.textbox,
-      align = "left",
-      valign = "center",
-      forced_width = dpi(100),
-    })
-    
-    local title_ = wibox.widget({
-      markup = helpers.ui.colorize_text(title, beautiful.xforeground),
-      widget = wibox.widget.textbox,
-      align = "left",
-      valign = "center",
-      forced_width = dpi(200),
-    })
-    
-    local entry = wibox.widget({
-      {
-        amount_,
-        title_,
-        spacing = dpi(10),
-        layout = wibox.layout.fixed.horizontal,
-      },
-      widget = wibox.container.place,
-    })
-
-    return entry 
-  end
-
-  local transactions_ = wibox.widget({
-    create_transaction_entry("08/04", "23.75", "Betty Burgers", true),
-    create_transaction_entry("08/04", "1167.66", "Deposit", false),
-    create_transaction_entry("08/04", "15.00", "The Laundry Room", true),
-    layout = wibox.layout.flex.vertical,
-  })
-
-  local widget = wibox.widget({
-    {
-      header,
-      transactions_,
-      spacing = dpi(5),
-      layout = wibox.layout.fixed.vertical,
-    },
-    widget = wibox.container.place,
-  })
-
-  return widget
 end
 
 local widgets = create_chart()
@@ -374,8 +289,8 @@ local bottom = wibox.widget({
 
 local header = wibox.widget({
   {
-    markup = helpers.ui.colorize_text("Monthly Spending", beautiful.dash_header_color),
-    font = beautiful.header_font .. "20",
+    markup = helpers.ui.colorize_text("Monthly Spending", beautiful.dash_header_fg),
+    font = beautiful.alt_font .. "20",
     widget = wibox.widget.textbox,
     align = "center",
     valign = "center",

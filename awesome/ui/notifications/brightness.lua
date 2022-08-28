@@ -8,11 +8,6 @@
 
 local awful = require("awful")
 local naughty = require("naughty")
-local helpers = require("helpers")
-local beautiful = require("beautiful")
-local wibox = require("wibox")
-local string = string
-local math = math 
 
 awesome.connect_signal("module::brightness", function()
   awful.spawn.easy_async_with_shell("brightnessctl get",

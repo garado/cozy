@@ -13,7 +13,7 @@ local widgets = require("ui.widgets")
 local playerctl_daemon = require("signal.playerctl")
 
 local music_text = wibox.widget({
-	font = beautiful.header_font_name .. "Medium 10",
+	font = beautiful.font_name .. "Medium 10",
   valign = "center",
   widget = wibox.widget.textbox,
 })
@@ -37,7 +37,7 @@ local filter_color = {
 	type = "linear",
 	from = { 0, 0 },
 	to = { 0, 200 },
-	stops = { { 0, beautiful.nord3 }, { 1, beautiful.nord3 .. "cc" } },
+	stops = { { 0, beautiful.album_filter_1}, { 1, beautiful.album_filter_2 .. "cc" } },
 }
 
 local music_art_filter = wibox.widget({
@@ -52,13 +52,13 @@ local music_art_filter = wibox.widget({
 })
 
 local music_title = wibox.widget({
-	font = beautiful.header_font_name .. "Regular 13",
+	font = beautiful.font_name .. "Regular 13",
 	valign = "center",
 	widget = wibox.widget.textbox,
 })
 
 local music_artist = wibox.widget({
-	font = beautiful.header_font_name .. "Bold 16",
+	font = beautiful.font_name .. "Bold 16",
 	valign = "center",
 	widget = wibox.widget.textbox,
 })
@@ -100,9 +100,9 @@ local music = wibox.widget({
 					nil,
 					{
 						{
-							widgets.playerctl.previous(20, beautiful.xforeground, beautiful.music_button_transparent),
-							widgets.playerctl.play(beautiful.xforeground, beautiful.music_button_transparent),
-							widgets.playerctl.next(20, beautiful.xforeground, beautiful.music_button_transparent),
+							widgets.playerctl.previous(20, beautiful.fg, beautiful.playerctl_bg),
+							widgets.playerctl.play(beautiful.fg, beautiful.playerctl_bg),
+							widgets.playerctl.next(20, beautiful.fg, beautiful.playerctl_bg),
 							layout = wibox.layout.flex.horizontal,
 						},
 						forced_height = dpi(70),
@@ -145,15 +145,15 @@ playerctl_daemon:connect_signal("metadata", function(_, title, artist, album_pat
 	end
 
 	music_art:set_image(gears.surface.load_uncached(album_path))
-	music_title:set_markup_silently(helpers.ui.colorize_text(title, beautiful.xforeground))
-	music_artist:set_markup_silently(helpers.ui.colorize_text(artist, beautiful.xforeground))
+	music_title:set_markup_silently(helpers.ui.colorize_text(title, beautiful.fg))
+	music_artist:set_markup_silently(helpers.ui.colorize_text(artist, beautiful.fg))
 end)
 
 playerctl_daemon:connect_signal("playback_status", function(_, playing, __)
 	if playing then
-		music_text:set_markup_silently(helpers.ui.colorize_text("Now Playing", beautiful.music_now_playing_fg))
+		music_text:set_markup_silently(helpers.ui.colorize_text("Now Playing", beautiful.now_playing_fg))
 	else
-		music_text:set_markup_silently(helpers.ui.colorize_text("Music", beautiful.music_now_playing_fg))
+		music_text:set_markup_silently(helpers.ui.colorize_text("Music", beautiful.now_playing_fg))
 	end
 end)
 

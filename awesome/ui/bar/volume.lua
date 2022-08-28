@@ -18,8 +18,8 @@ return function()
     {
       bar_shape = gears.shape.rounded_bar,
       bar_height = dpi(10),
-      bar_color = beautiful.nord3,
-      bar_active_color = beautiful.nord9,
+      bar_color = beautiful.slider_bg,
+      bar_active_color = beautiful.volbar_fg,
       handle_width = dpi(0),
       value = 25,
       widget = wibox.widget.slider,
@@ -31,7 +31,7 @@ return function()
 
   local icon = wibox.widget({
     {
-      markup = helpers.ui.colorize_text("", beautiful.nord9),
+      markup = helpers.ui.colorize_text("", beautiful.volbar_fg),
       widget = wibox.widget.textbox,
       font = beautiful.font .. "13",
       align = "center",
@@ -68,13 +68,13 @@ return function()
         local out = string.gsub(stdout, '%W','')
         local outnum = tonumber(out)
         if out == "muted" or outnum < 6 then
-          vol_icon:set_markup(helpers.ui.colorize_text("婢", beautiful.nord9))
+          vol_icon:set_markup(helpers.ui.colorize_text("婢", beautiful.volbar_fg))
         elseif outnum < 33 then
-          vol_icon:set_markup(helpers.ui.colorize_text("奄", beautiful.nord9))
+          vol_icon:set_markup(helpers.ui.colorize_text("奄", beautiful.volbar_fg))
         elseif outnum < 66 then
-          vol_icon:set_markup(helpers.ui.colorize_text("奔", beautiful.nord9))
+          vol_icon:set_markup(helpers.ui.colorize_text("奔", beautiful.volbar_fg))
         else
-          vol_icon:set_markup(helpers.ui.colorize_text("墳", beautiful.nord9))
+          vol_icon:set_markup(helpers.ui.colorize_text("墳", beautiful.volbar_fg))
         end
       end
     )

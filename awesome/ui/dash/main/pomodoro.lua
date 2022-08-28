@@ -60,7 +60,7 @@ local function ui_target_pomos()
   return wibox.widget({
     align = "center",
     valign = "center",
-    markup = helpers.ui.colorize_text(text, beautiful.nord3),
+    markup = helpers.ui.colorize_text(text, beautiful.subtext),
     widget = wibox.widget.textbox,
   })
 end
@@ -90,8 +90,8 @@ local function create_header(text)
   return wibox.widget({
     {
       widget = wibox.widget.textbox,
-      markup = helpers.ui.colorize_text(text, beautiful.dash_header_color),
-      font = beautiful.header_font_name .. "Light 20",
+      markup = helpers.ui.colorize_text(text, beautiful.dash_header_fg),
+      font = beautiful.font_name .. "Light 20",
       align = "center",
       valign = "center",
     },
@@ -105,8 +105,8 @@ end
 local function ui_start()
   local letsdoit = widgets.button.text.normal({
     text = "Let's do it!",
-    text_normal_bg = beautiful.xforeground,
-    normal_bg = beautiful.nord3,
+    text_normal_bg = beautiful.fg,
+    normal_bg = beautiful.subtext,
     animate_size = false,
     font = beautiful.font,
     size = 12,
@@ -146,8 +146,8 @@ local function create_topic_buttons()
 
   local back_button = widgets.button.text.normal({
     text = "",
-    text_normal_bg = beautiful.xforeground,
-    normal_bg = beautiful.nord0,
+    text_normal_bg = beautiful.fg,
+    normal_bg = beautiful.surface0,
     animate_size = false,
     font = beautiful.font,
     size = 12,
@@ -160,8 +160,8 @@ local function create_topic_buttons()
   for i,v in ipairs(pomodoro.topics) do
     local button = widgets.button.text.normal({
       text = v,
-      text_normal_bg = beautiful.xforeground,
-      normal_bg = beautiful.nord3,
+      text_normal_bg = beautiful.fg,
+      normal_bg = beautiful.surface0,
       animate_size = false,
       font = beautiful.font,
       size = 12,
@@ -205,8 +205,8 @@ local function create_time_buttons()
 
   local back_button = widgets.button.text.normal({
     text = "",
-    text_normal_bg = beautiful.xforeground,
-    normal_bg = beautiful.nord0,
+    text_normal_bg = beautiful.fg,
+    normal_bg = beautiful.surface0,
     animate_size = false,
     font = beautiful.font,
     size = 12,
@@ -219,8 +219,8 @@ local function create_time_buttons()
   for i,v in ipairs(pomodoro.times) do
     local button = widgets.button.text.normal({
       text = v,
-      text_normal_bg = beautiful.xforeground,
-      normal_bg = beautiful.nord3,
+      text_normal_bg = beautiful.fg,
+      normal_bg = beautiful.surface0,
       animate_size = false,
       font = beautiful.font,
       size = 12,
@@ -271,7 +271,7 @@ local function ui_tick()
           {
             id = "textbox",
             widget = wibox.widget.textbox,
-            markup = helpers.ui.colorize_text("00:00", beautiful.xforeground),
+            markup = helpers.ui.colorize_text("00:00", beautiful.fg),
             font = beautiful.alt_font_name .. "Light 30",
             align = "center",
             valign = "center",
@@ -283,8 +283,8 @@ local function ui_tick()
         value = pomodoro.timer_time,
         max_value = pomodoro.timer_time,
         min_value = 0,
-        color = beautiful.pomodoro_bar_fg,
-        border_color = beautiful.pomodoro_bar_bg,
+        color = beautiful.main_accent,
+        border_color = beautiful.surface0,
         border_width = dpi(3),
         forced_height = dpi(150),
         forced_width = dpi(150),
@@ -314,14 +314,14 @@ local function ui_tick()
    
     -- run this once first to set starting time
     local text = format_ui_time(pomodoro.time_remaining)
-    ui_text:set_markup_silently(helpers.ui.colorize_text(text, beautiful.xforeground))
+    ui_text:set_markup_silently(helpers.ui.colorize_text(text, beautiful.fg))
 
     local function second_timer_callback()
       pomodoro.time_remaining = pomodoro.time_remaining - 1
     
       -- update text time
       text = format_ui_time(pomodoro.time_remaining)
-      text = helpers.ui.colorize_text(text, beautiful.xforeground)
+      text = helpers.ui.colorize_text(text, beautiful.fg)
       ui_text:set_markup_silently(text)
 
       -- update progress bar
@@ -382,8 +382,8 @@ local function ui_tick()
   local timer_play_button, timer_pause_button, timer_stop_button
   timer_pause_button = widgets.button.text.normal({
     text = "",
-    text_normal_bg = beautiful.xforeground,
-    normal_bg = beautiful.nord3,
+    text_normal_bg = beautiful.fg,
+    normal_bg = beautiful.surface0,
     animate_size = false,
     font = beautiful.font,
     size = 12,
@@ -397,8 +397,8 @@ local function ui_tick()
   
   timer_play_button = widgets.button.text.normal({
     text = "",
-    text_normal_bg = beautiful.xforeground,
-    normal_bg = beautiful.nord3,
+    text_normal_bg = beautiful.fg,
+    normal_bg = beautiful.surface0,
     animate_size = false,
     font = beautiful.font,
     size = 12,
@@ -412,10 +412,10 @@ local function ui_tick()
   
   local timer_stop_button = widgets.button.text.normal({
     text = "",
-    text_normal_bg = beautiful.xforeground,
-    normal_bg = beautiful.nord3,
+    text_normal_bg = beautiful.fg,
+    normal_bg = beautiful.surface0,
     animate_size = false,
-    font = beautiful.font,
+    font = beautiful.surface0,
     size = 12,
     on_release = function()
       pomodoro.timer_state = "stopped"
@@ -443,15 +443,15 @@ local function ui_tick()
 
   local description = wibox.widget({
     {
-      markup = helpers.ui.colorize_text(desc_header_text, beautiful.nord3),
+      markup = helpers.ui.colorize_text(desc_header_text, beautiful.subtext),
       font = beautiful.font_name .. "Bold 10", 
       align = "center",
       valign = "center",
       widget = wibox.widget.textbox,
     },
     {
-      markup = helpers.ui.colorize_text(desc_text, beautiful.xforeground),
-      font = beautiful.header_font_name .. "15",
+      markup = helpers.ui.colorize_text(desc_text, beautiful.fg),
+      font = beautiful.font_name .. "15",
       align = "center",
       valign = "center",
       widget = wibox.widget.textbox,
@@ -504,10 +504,10 @@ end -- end ui_tick
 local function ui_complete()
   local back_to_beginning = widgets.button.text.normal({
     text = "Start a new pomodoro",
-    text_normal_bg = beautiful.xforeground,
-    normal_bg = beautiful.nord3,
+    text_normal_bg = beautiful.fg,
+    normal_bg = beautiful.surface0,
     animate_size = false,
-    font = beautiful.header_font,
+    font = beautiful.font,
     size = 12,
     on_release = function()
       reset_pomodoro()
@@ -517,10 +517,10 @@ local function ui_complete()
 
   local take_break = widgets.button.text.normal({
     text = "Take a break",
-    text_normal_bg = beautiful.xforeground,
-    normal_bg = beautiful.nord3,
+    text_normal_bg = beautiful.fg,
+    normal_bg = beautiful.surface0,
     animate_size = false,
-    font = beautiful.header_font,
+    font = beautiful.font,
     size = 12,
     on_release = function()
       reset_pomodoro()
@@ -565,9 +565,9 @@ local function ui_complete()
     {
       create_header(header_text),
       {
-        markup = helpers.ui.colorize_text(text, beautiful.xforeground),
+        markup = helpers.ui.colorize_text(text, beautiful.fg),
         widget = wibox.widget.textbox,
-        font = beautiful.header_font_name .. "12",
+        font = beautiful.font_name .. "12",
         align = "center",
         valign = "center",
       },

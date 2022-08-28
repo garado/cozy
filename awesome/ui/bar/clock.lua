@@ -18,6 +18,6 @@ local clock = wibox.widget({
 
 local clock_color = wibox.container.background()
 clock_color:set_widget(clock)
-clock_color:set_fg(beautiful.xforeground)
+clock_color:set_fg(beautiful.wibar_clock)
 
 return clock_color

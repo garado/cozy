@@ -11,9 +11,9 @@ local dpi = require("beautiful").xresources.apply_dpi
 local helpers = require("helpers")
 
 return function()
-  local charging_color = beautiful.nord14
-  local low_color = beautiful.nord11
-  local normal_color = beautiful.xforeground
+  local charging_color = beautiful.bat_charging
+  local low_color = beautiful.bat_low
+  local normal_color = beautiful.bat_normal
 
   local percentage = wibox.widget({
     id = "percent_text",

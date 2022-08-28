@@ -18,19 +18,13 @@ local os = os
 
 local function widget()
   local header = wibox.widget({
-    {
-      markup = helpers.ui.colorize_text("Tasks", beautiful.dash_header_color),
-      font = beautiful.header_font .. "20",
-      widget = wibox.widget.textbox,
-      align = "center",
-      valign = "center",
-    },
+    helpers.ui.create_dash_widget_header("Tasks"),
     margins = dpi(5),
     widget = wibox.container.margin,
   })
  
   local placeholder = wibox.widget({
-    markup = helpers.ui.colorize_text("No tasks found", beautiful.xforeground),
+    markup = helpers.ui.colorize_text("No tasks found", beautiful.fg),
     align = "center",
     valign = "center",
     widget = wibox.widget.textbox,
@@ -94,7 +88,7 @@ local function widget()
     end
 
     -- more urgent tasks should be red
-    local desc_color = beautiful.xforeground
+    local desc_color = beautiful.fg
     if urg > 7 then
       desc_color = beautiful.nord11
     end

@@ -16,7 +16,7 @@ local table = table
 
 local function widget()
   local placeholder = wibox.widget({
-    markup = helpers.ui.colorize_text("No events found", beautiful.xforeground),
+    markup = helpers.ui.colorize_text("No events found", beautiful.fg),
     align = "center",
     valign = "center",
     font = beautiful.font .. "12",
@@ -31,13 +31,7 @@ local function widget()
   })
 
   local header = wibox.widget({
-    {
-      markup = helpers.ui.colorize_text("Events", beautiful.dash_header_color),
-      font = beautiful.header_font .. "20",
-      widget = wibox.widget.textbox,
-      align = "center",
-      valign = "center",
-    },
+    helpers.ui.create_dash_widget_header("Events"),
     margins = dpi(5),
     widget = wibox.container.margin,
   })
@@ -59,14 +53,14 @@ local function widget()
   local function create_calendar_entry(date, time, desc)
     local datetime_text = date .. " " .. time
     local datetime = wibox.widget({
-      markup = helpers.ui.colorize_text(datetime_text, beautiful.xforeground),
+      markup = helpers.ui.colorize_text(datetime_text, beautiful.fg),
       align = "left",
       valign = "center",
       widget = wibox.widget.textbox,
     })
 
     local desc_ = wibox.widget({
-      markup = helpers.ui.colorize_text("   " .. desc, beautiful.xforeground),
+      markup = helpers.ui.colorize_text("   " .. desc, beautiful.fg),
       align = "left",
       valign = "center",
       widget = wibox.widget.textbox,

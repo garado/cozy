@@ -16,7 +16,7 @@ local app_launcher
 local function create_launcher_entry(icon, program)
   local widget = widgets.button.text.normal({
     text = icon,
-    text_normal_bg = beautiful.xforeground,
+    text_normal_bg = beautiful.fg,
     normal_bg = beautiful.wibar_bg,
     animate_size = false,
     size = 20,
@@ -40,7 +40,7 @@ app_launcher = awful.popup({
       spacing = dpi(5),
       layout = wibox.layout.fixed.vertical,
     },
-    bg = beautiful.dark_polar_night,
+    bg = beautiful.wibar_bg,
     widget = wibox.container.background,
   },
   x = dpi(50),
@@ -52,8 +52,8 @@ app_launcher = awful.popup({
 
 local widget = widgets.button.text.normal({
   text = "",
-  text_normal_bg = beautiful.xforeground,
-  normal_bg = beautiful.dark_polar_night,
+  text_normal_bg = beautiful.fg,
+  normal_bg = beautiful.wibar_bg,
   animate_size = false,
   size = 12,
   on_release = function()

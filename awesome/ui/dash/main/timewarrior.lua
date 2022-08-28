@@ -24,8 +24,8 @@ local function create_topic_buttons()
   local function create_topic_button(topic)
     return widgets.button.text.normal({
       text = topic,
-      text_normal_bg = beautiful.xforeground,
-      normal_bg = beautiful.nord1,
+      text_normal_bg = beautiful.fg,
+      normal_bg = beautiful.surface0,
       animate_size = false,
       font = beautiful.font,
       size = 12,
@@ -52,7 +52,7 @@ end
 
 function ui_timew_stopped()
   local text = wibox.widget({
-    markup = helpers.ui.colorize_text("Start a new session", beautiful.xforeground),
+    markup = helpers.ui.colorize_text("Start a new session", beautiful.fg),
     valign = "center",
     align = "center",
     widget = wibox.widget.textbox,
@@ -69,7 +69,7 @@ end
 local function create_ui_text(header, text, text_size)
   local header = wibox.widget({
     {
-      markup = helpers.ui.colorize_text(header, beautiful.nord3),
+      markup = helpers.ui.colorize_text(header, beautiful.subtitle),
       font = beautiful.font_name .. "Bold 10", 
       valign = "center",
       align = "center",
@@ -80,7 +80,7 @@ local function create_ui_text(header, text, text_size)
   })
 
   local text = wibox.widget({
-    markup = helpers.ui.colorize_text(text, beautiful.xforeground),
+    markup = helpers.ui.colorize_text(text, beautiful.fg),
     font = beautiful.alt_font_name .. text_size,
     valign = "center",
     align = "center",
@@ -127,14 +127,14 @@ function ui_timew_started()
       -- total tracked time today across all tags
       local total_cmd = "timew sum | tail -n 2"
       awful.spawn.easy_async_with_shell(total_cmd, function(stdout)
-        local markup = helpers.ui.colorize_text(format_time(stdout), beautiful.xforeground)
+        local markup = helpers.ui.colorize_text(format_time(stdout), beautiful.fg)
         total_all_tags.children[2]:set_markup_silently(markup)
       end)
       
       -- current session time
       local curr_cmd = "timew | tail -n 1"
       awful.spawn.easy_async_with_shell(curr_cmd, function(stdout)
-        local markup = helpers.ui.colorize_text(format_time(stdout), beautiful.xforeground)
+        local markup = helpers.ui.colorize_text(format_time(stdout), beautiful.fg)
         current_time.children[2]:set_markup_silently(markup)
       end)
     end
@@ -145,14 +145,14 @@ function ui_timew_started()
   local cmd = "timew | head -n 1"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local tag = string.gsub(stdout, "Tracking ", "")
-    local markup = helpers.ui.colorize_text(tag, beautiful.xforeground)
+    local markup = helpers.ui.colorize_text(tag, beautiful.fg)
     current_tag.children[2]:set_markup_silently(markup)
   end)
 
   local stop_button = widgets.button.text.normal({
     text = "Stop",
-    text_normal_bg = beautiful.xforeground,
-    normal_bg = beautiful.nord1,
+    text_normal_bg = beautiful.fg,
+    normal_bg = beautiful.surface0,
     animate_size = false,
     font = beautiful.font,
     size = 12,

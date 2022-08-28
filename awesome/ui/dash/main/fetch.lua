@@ -21,8 +21,8 @@ local widget = wibox.widget({
 -- Aesthetics
 local function create_entry(title, value)
   -- Make things pretty
-  local colorized_title = helpers.ui.colorize_text(title .. " " , beautiful.nord10)
-  local colorized_value = helpers.ui.colorize_text(value, beautiful.xforeground)
+  local colorized_title = helpers.ui.colorize_text(title .. " " , beautiful.fetch_title)
+  local colorized_value = helpers.ui.colorize_text(value, beautiful.fetch_bg)
   local entry = wibox.widget({
     {
       markup = colorized_title,

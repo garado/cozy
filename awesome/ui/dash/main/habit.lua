@@ -79,7 +79,7 @@ local function create_habit_ui()
   -- creates just one habit
   local function create_habit_ui_entry(habit_name, graph_id, frequency)
     local habit_name = wibox.widget({
-      markup = helpers.ui.colorize_text(habit_name, beautiful.xforeground),
+      markup = helpers.ui.colorize_text(habit_name, beautiful.fg),
       font = beautiful.font_name .. "12",
       align = "right",
       valign = "center",
@@ -87,7 +87,7 @@ local function create_habit_ui()
     })
 
     local freq = wibox.widget({
-      markup = helpers.ui.colorize_text(frequency, beautiful.nord9),
+      markup = helpers.ui.colorize_text(frequency, beautiful.habit_freq),
       font = beautiful.font_name .. "10",
       align = "right",
       valign = "center",
@@ -131,11 +131,11 @@ local function create_habit_ui()
         if string.find(stdout, date) ~= nil then
           -- habit was completed 
           checked = true
-          text_color = beautiful.xforeground
+          text_color = beautiful.hab_check_fg
           qty = 0 -- pressing button will set habit to this value
         else
           checked = false
-          text_color = beautiful.nord3
+          text_color = beautiful.hab_uncheck_fg
           qty = 1
         end
 
@@ -148,8 +148,8 @@ local function create_habit_ui()
             forced_height = dpi(20),
             border_width = dpi(0),
             check_shape = gears.shape.circle,
-            check_color = beautiful.nord10,
-            bg = beautiful.nord0,
+            check_color = beautiful.hab_check_bg,
+            bg = beautiful.hab_uncheck_bg,
             paddings = dpi(0),
             shape = gears.shape.circle,
             widget = wibox.widget.checkbox,
@@ -168,8 +168,8 @@ local function create_habit_ui()
           -- update ui
           local box = checkbox.children[1]
           box.checked = not box.checked
-          local text_color = box.checked and beautiful.xforeground 
-              or not box.checked and beautiful.nord3
+          local text_color = box.checked and beautiful.hab_check_fg
+              or not box.checked and beautiful.hab_uncheck_fg
           local text = checkbox.children[2]
           text.markup = helpers.ui.colorize_text(checkbox_text, text_color)
 

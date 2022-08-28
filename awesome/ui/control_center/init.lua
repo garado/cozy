@@ -28,7 +28,7 @@ return function(s)
         layout = wibox.layout.fixed.vertical,
       },
       widget = wibox.container.background,
-      bg = beautiful.dark_polar_night,
+      bg = beautiful.ctrl_bg,
     },
     widget = wibox.container.margin,
   })

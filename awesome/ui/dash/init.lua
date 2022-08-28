@@ -56,7 +56,7 @@ return function(s)
     for i,v in ipairs(tab_icons) do
       local widget = widgets.button.text.normal({
         text = v,
-        text_normal_bg = beautiful.xforeground,
+        text_normal_bg = beautiful.fg,
         normal_bg = beautiful.dash_tab_bg,
         animate_size = false,
         size = 15,
@@ -109,9 +109,9 @@ return function(s)
       tablist_pos = index
 
       local tab = tab_bar.children[1].children[tablist_pos]
-      tab:set_color(beautiful.nord10)
+      tab:set_color(beautiful.main_accent)
       local prev_tab = tab_bar.children[1].children[old_index]
-      prev_tab:set_color(beautiful.xforeground)
+      prev_tab:set_color(beautiful.fg)
     end
 
     local function prev_tab()
@@ -122,9 +122,9 @@ return function(s)
       tablist_pos = index
 
       local tab = tab_bar.children[1].children[tablist_pos]
-      tab:set_color(beautiful.nord10)
+      tab:set_color(beautiful.main_accent)
       local prev_tab = tab_bar.children[1].children[old_index]
-      prev_tab:set_color(beautiful.xforeground)
+      prev_tab:set_color(beautiful.fg)
     end
 
     -- I thought about making h/l navigate between interactive
@@ -179,6 +179,6 @@ return function(s)
   })
       
   local main_tab_icon = tab_bar.children[1].children[1]
-  main_tab_icon:set_color(beautiful.nord10)
+  main_tab_icon:set_color(beautiful.main_accent)
 
 end

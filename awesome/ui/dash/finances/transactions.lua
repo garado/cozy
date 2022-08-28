@@ -18,8 +18,8 @@ return function()
   local ledger_file = user_vars.ledger.ledger_file
  
   local transaction_header = wibox.widget({
-    markup = helpers.ui.colorize_text("Transaction history", beautiful.nord3),
-    font = beautiful.header_font_name .. "Light 20",
+    markup = helpers.ui.colorize_text("Transaction history", beautiful.subtext),
+    font = beautiful.alt_font_name .. "Light 20",
     widget = wibox.widget.textbox,
   })
 
@@ -37,20 +37,20 @@ return function()
     local i, j = string.find(category, "Expenses:")
     local amount_color
     if i == nil then
-      amount_color = beautiful.nord14
+      amount_color = beautiful.expense_fg
     else
-      amount_color = beautiful.nord11
+      amount_color = beautiful.income_fg
     end
 
     local date_text = wibox.widget({
-      markup = helpers.ui.colorize_text(date, beautiful.xforeground),
-      font = beautiful.header_font_name .. "14",
+      markup = helpers.ui.colorize_text(date, beautiful.fg),
+      font = beautiful.alt_font_name .. "14",
       widget = wibox.widget.textbox,
     })
     
     local title_text = wibox.widget({
-      markup = helpers.ui.colorize_text(title, beautiful.xforeground),
-      font = beautiful.header_font_name .. "14",
+      markup = helpers.ui.colorize_text(title, beautiful.fg),
+      font = beautiful.alt_font_name .. "14",
       widget = wibox.widget.textbox,
     })
     
@@ -58,13 +58,13 @@ return function()
     amount_ = string.gsub(amount_, "-", "")
     local amount_text = wibox.widget({
       markup = helpers.ui.colorize_text(amount_, amount_color),
-      font = beautiful.header_font_name .. "14",
+      font = beautiful.alt_font_name .. "14",
       widget = wibox.widget.textbox,
       forced_width = dpi(120),
     })
 
     local category_text = wibox.widget({
-      markup = helpers.ui.colorize_text(category, beautiful.xforeground),
+      markup = helpers.ui.colorize_text(category, beautiful.fg),
       widget = wibox.widget.textbox,
     })
 

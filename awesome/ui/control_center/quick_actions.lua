@@ -87,8 +87,8 @@ end
 local function create_quick_action(icon, name, func)
   local quick_action = widgets.button.text.normal({
     text = icon,
-    text_normal_bg = beautiful.xforeground,
-    normal_bg = beautiful.wibar_bg,
+    text_normal_bg = beautiful.fg,
+    normal_bg = beautiful.ctrl_bg,
     animate_size = false,
     size = 20,
     on_release = function()
