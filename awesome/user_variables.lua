@@ -1,7 +1,7 @@
 return {
   -- available themes:
   -- nord_dark, dracula, tokyo_night 
-  theme = "dracula",
+  theme = "nord_dark",
   display_name = "Display Name",
   goals = {
     "Update user_vars",
