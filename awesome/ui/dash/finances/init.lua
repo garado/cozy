@@ -18,7 +18,6 @@ local animation = require("modules.animation")
 local naughty = require("naughty")
 
 local transactions = require("ui.dash.finances.transactions")()
-local breakdown = require("ui.dash.finances.monthly_spending")
 local balance = require("ui.dash.finances.balance")
 
 local finances_header = wibox.widget({
@@ -39,7 +38,6 @@ return wibox.widget({
         layout = wibox.layout.fixed.vertical,
       },
       {
-        breakdown,
         layout = wibox.layout.fixed.vertical,
       },
       layout = wibox.layout.fixed.horizontal,

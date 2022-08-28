@@ -123,10 +123,10 @@ local function create_chart()
       legend.children[1]:add(create_legend_entry(cat, amt_text, color_palette[i]))
     end
 
-    -- yay animations :)
-    -- still a little janky
+    -- arc chart animation
     arc_chart.values = tmp_arc_values
     local section_index = 1
+    local max_index = #arc_chart.values
     local relative_max = arc_values[1]
     local sub = 0
     local arc_chart_animation = animation:new({
@@ -139,12 +139,15 @@ local function create_chart()
           arc_chart:emit_signal("widget::redraw_needed")
         else
           arc_chart.values[section_index] = arc_values[section_index]
-          section_index = section_index + 1
-          sub = relative_max
-          relative_max = relative_max + arc_values[section_index]
+          if section_index < max_index then
+            section_index = section_index + 1
+            sub = relative_max
+            relative_max = relative_max + arc_values[section_index]
+          end
         end
 
-        -- for some reason the animation doesn't end properly
+        -- the animation doesn't end properly (probably something to
+        -- do with it being a decimal number)
         -- so this is a hacky fix to make the animation end
         if pos >= math.floor(arc_chart.max_value)  then
           self:stop()

@@ -79,7 +79,7 @@ return function()
     transaction_history:add(widget)
   end
  
-  -- Grab last 10 transactions
+  -- grab last 10 transactions
   local cmd = "ledger -f " .. ledger_file .. " csv expenses reimbursements income | head -10"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     for str in string.gmatch(stdout, "([^\n]+)") do
@@ -95,6 +95,7 @@ return function()
       local title = t[2]
       local category = t[3]
       local amount = t[4]
+      amount = string.format("%.2f", tonumber(amount))
       create_transaction_entry(date, title, category, amount)
     end
   end)

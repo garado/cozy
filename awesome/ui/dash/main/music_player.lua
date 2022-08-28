@@ -141,7 +141,7 @@ playerctl_daemon:connect_signal("metadata", function(_, title, artist, album_pat
 		artist = "Nothing Playing"
 	end
 	if album_path == "" then
-		album_path = gears.filesystem.get_configuration_dir() .. "theme/assets/no_music.png"
+		album_path = gears.filesystem.get_configuration_dir() .. "theme/assets/no_music.jpg"
 	end
 
 	music_art:set_image(gears.surface.load_uncached(album_path))

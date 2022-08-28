@@ -15,13 +15,11 @@ local widgets = require("ui.widgets")
 local os = os
 
 -- Import
-local habit_overview = require("ui.dash.habit.weekly_overview")
 
 local habit_tab_header = wibox.widget({
 })
 
 -- Assemble
 return wibox.widget({
-  habit_overview,
   layout = wibox.layout.fixed.horizontal,
 })

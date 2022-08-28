@@ -63,7 +63,7 @@ awful.keyboard.append_global_keybindings({
   awful.key({ mod }, "j", function()
     awesome.emit_signal("dash::toggle", s)
   end, { description = "dash", group = "Awesome" }),
-  
+ 
   awful.key({ mod }, "k", function()
     awesome.emit_signal("control_center::toggle", s)
   end, { description = "control center", group = "Awesome" }),
@@ -121,6 +121,12 @@ awful.keyboard.append_global_keybindings({
     awful.spawn.easy_async(cmd, function() end)
   end, { description = "screenshot (whole screen)", group = "Hotkeys" }),
 
+  awful.key({mod, shift }, "m", function()
+    local machi = require("modules/layout-machi")
+    local editor = machi.editor.create()
+    editor.start_interactive()
+  end),
+
   -----
 
   --  █░░ ▄▀█ █░█ █▄░█ █▀▀ █░█ █▀▀ █▀█ █▀
@@ -160,67 +166,51 @@ client.connect_signal("request::default_keybindings", function()
     end, { description = "floating", group = "Client" }),
 
     -- Toggle fullscreen
-    awful.key({ ctrl, shift }, "f", function()
+    awful.key({ ctrl, shift }, "c", function()
       client.focus.fullscreen = not client.focus.fullscreen
       client.focus:raise()
     end, { description = "fullscreen", group = "Client" }),
+
+    -- Toggle sticky
+    awful.key({ ctrl, shift }, "d", function()
+      client.focus.sticky = not client.focus.sticky
+    end, { description = "sticky", group = "Client" }),
    
     -- Close window
     awful.key({ ctrl, shift }, "w", function()
       client.focus:kill()
     end, { description = "close", group = "Client" }),
-   
-    -- Bling tab containers
-    awful.key({ ctrl, shift }, "t", bling.module.tabbed.pick, { group = "Client", description = "tab group: add with cursor"}),
-
-    awful.key({ ctrl, shift }, "r", bling.module.tabbed.pop, { group = "Client", description = "tab group: remove focused"}),
-
-    awful.key({ alt }, "Tab", function()
-      bling.module.tabbed.iter(1)
-    end, { group = "Client", description = "tab group: focus next (+shift for prev)"}),
-
-    awful.key({ alt, shift }, "Tab", function()
-      bling.module.tabbed.iter(-1)
-    end),
-
+  
     -- Layout-aware resizing
-    awful.key({ mod, shift   }, "h", function () resize_horizontal(0.05) end,
-              { group = "Layout", description = "(tiled, vimlike) inc size horizontally" }),
-    awful.key({ mod, shift   }, "l", function () resize_horizontal(-0.05) end),
-    awful.key({ mod, shift   }, "k", function () resize_vertical(-0.05) end),
-    awful.key({ mod, shift   }, "j", function () resize_vertical(0.05) end),
+    awful.key({ alt, shift   }, "h", function () resize_horizontal(0.05) end,
+    { group = "Client", description = "(v) resize" }),
+    awful.key({ alt, shift   }, "l", function () resize_horizontal(-0.05) end),
+    awful.key({ alt, shift   }, "k", function () resize_vertical(-0.05) end),
+    awful.key({ alt, shift   }, "j", function () resize_vertical(0.05) end),
 
   -- Changing focus
-  awful.key({ alt, shift }, "h", function()
-    awful.client.focus.bydirection("left")
-  end, {description = "(vimlike) focus left", group = "Client"}),
-  
-  awful.key({ alt, shift }, "j", function()
-    awful.client.focus.bydirection("down")
+  awful.key({ alt }, "Tab", function()
+    awful.client.focus.byidx(1)
   end),
 
-  awful.key({ alt, shift }, "k", function()
-    awful.client.focus.bydirection("up")
-  end),
-
-  awful.key({ alt, shift }, "l", function()
-    awful.client.focus.bydirection("right")
+  awful.key({ alt , shift }, "Tab", function()
+    awful.client.focus.byidx(-1)
   end),
 
   -- Swapping clients
-  awful.key({ ctrl, shift }, "h", function()
+  awful.key({ mod, shift }, "h", function()
     awful.client.swap.bydirection("left")
-  end, { description = "(vimlike) swap left", group = "Client"}),
+  end, { description = "(v) swap left", group = "Client"}),
 
-  awful.key({ shift, ctrl }, "j", function()
+  awful.key({ mod, shift }, "j", function()
     awful.client.swap.bydirection("down")
   end),
 
-  awful.key({ shift, ctrl }, "k", function()
+  awful.key({ mod, shift }, "k", function()
     awful.client.swap.bydirection("up")
   end),
 
-  awful.key({ shift, ctrl }, "l", function()
+  awful.key({ mod, shift }, "l", function()
     awful.client.swap.bydirection("right")
   end),
 
@@ -267,4 +257,18 @@ awful.keyboard.append_global_keybindings({
     end,
   })
 })
+
+client.connect_signal("request::default_mousebindings", function()
+    awful.mouse.append_client_mousebindings({
+        awful.button({ }, 1, function (c)
+            c:activate { context = "mouse_click" }
+        end),
+        awful.button({ mod }, 1, function (c)
+            c:activate { context = "mouse_click", action = "mouse_move"  }
+        end),
+        awful.button({ mod }, 3, function (c)
+            c:activate { context = "mouse_click", action = "mouse_resize"}
+        end),
+    })
+end)
 

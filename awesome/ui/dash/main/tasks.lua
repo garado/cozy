@@ -104,6 +104,8 @@ local function widget()
       markup = helpers.ui.colorize_text(desc, desc_color),
       align = "left",
       widget = wibox.widget.textbox,
+      ellipsize = "end",
+      forced_width = dpi(360),
     })
 
     local due_ = wibox.widget({
