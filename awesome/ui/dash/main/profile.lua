@@ -26,9 +26,10 @@ local function create_profile()
     },
     border_width = dpi(0),
     shape = gears.shape.circle,
-    widget = wibox.container.background,
+    bg = beautiful.pfp_bg,
     forced_width = dpi(100),
     forced_height = dpi(100),
+    widget = wibox.container.background,
   })
 
   local display_name = user_vars.display_name

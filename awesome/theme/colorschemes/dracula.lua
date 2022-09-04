@@ -56,7 +56,7 @@ theme.crust         = theme.custom2   -- widget bg
 theme.mantle        = theme.bg2       -- 
 theme.surface0      = theme.bg        -- dash button bg 
 theme.surface1      = theme.comment   --
-theme.overlay       = theme.cl        -- album art filters
+theme.overlay0      = theme.cl        -- album art filters
 
 -- typography
 theme.fg            = theme.fg        -- main text

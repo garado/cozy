@@ -41,7 +41,7 @@ This is a port of my old Eww config. I've decided to keep maintaining the Eww co
 </ul>
 
 <h2>🔧 Install and configure</h2>
-<b>NOTE: This setup is incomplete, somewhat buggy, and under constant development.</b> Because of that, I don't recommend daily driving it quite yet.
+<b>NOTE: This setup is incomplete and under constant development.</b> If you want to use it, be prepared to update frequently.
 
 
 <details><summary><b>Install</b></summary>
@@ -83,28 +83,47 @@ Make sure you update <code>configuration/apps.lua</code> with your default termi
 
 Change theme in `user_vars.lua`.
 
-If you want to create your own theme, start use the default nord_dark theme as a template.
-
-Built-in themes: nord_dark, dracula, tokyo_night
+Built-in themes: nord_dark, dracula, tokyo_night, gruvbox_dark, gruvbox_light, catppuccin_macchiato
 <ul>
   <li>
     <details><summary><b>nord_dark</b></summary>
       <p align="center">
-        <img title="" width="800" src="assets/nord_dark.png">
+        <img title="" width="800" src="assets/themes/nord_dark.png">
       </p>
     </details>
   </li>
   <li>
     <details><summary><b>dracula</b></summary>
       <p align="center">
-        <img title="" width="800" src="assets/dracula.png">
+        <img title="" width="800" src="assets/themes/dracula.png">
+      </p>
+    </details>
+  </li>
+  <li>
+    <details><summary><b>catpuccin_macchiato</b></summary>
+      <p align="center">
+        <img title="" width="800" src="assets/themes/catppuccin_macchiato.png">
       </p>
     </details>
   </li>
   <li>
     <details><summary><b>tokyo_night</b></summary>
       <p align="center">
-        <img title="" width="800" src="assets/tokyo_night.png">
+        <img title="" width="800" src="assets/themes/tokyo_night.png">
+      </p>
+    </details>
+  </li>
+  <li>
+    <details><summary><b>gruvbox_dark</b></summary>
+      <p align="center">
+        <img title="" width="800" src="assets/themes/gruvbox_dark.png">
+      </p>
+    </details>
+  </li>
+  <li>
+    <details><summary><b>gruvbox_light</b></summary>
+      <p align="center">
+        <img title="" width="800" src="assets/themes/gruvbox_light.png">
       </p>
     </details>
   </li>
@@ -162,8 +181,6 @@ Built-in themes: nord_dark, dracula, tokyo_night
 
 <ul>
   <li>Quick actions</li>
-  <li>Power menu</li>
-  <li>Volume/brightness control</li>
 </ul>
 
 </details>
@@ -171,7 +188,6 @@ Built-in themes: nord_dark, dracula, tokyo_night
 <details><summary><b>Bar</b></summary>
 
 <ul>
-  <li>Volume/brightness control</li>
   <li>Variable bar orientation!</li>
   <li>Systray</li>
   <li>Better app launcher</li>

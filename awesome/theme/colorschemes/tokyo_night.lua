@@ -76,7 +76,7 @@ theme.crust         = theme.bg_dark2  -- widget bg
 theme.mantle        = theme.bg_dark
 theme.surface0      = theme.bg_highlight -- dash button bg 
 theme.surface1      = theme.dark3     --
-theme.overlay       = theme.bg_highlight -- album art filters
+theme.overlay0      = theme.bg_highlight -- album art filters
 
 -- typography
 theme.fg            = theme.fg      -- main text

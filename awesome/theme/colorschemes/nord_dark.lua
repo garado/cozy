@@ -59,18 +59,20 @@ end
 
 -- color groupings
 -- inspiration taken from the catppuccin style guide
+
 -- background colors
-theme.base          = theme.nord16  -- dash, wibar
-theme.crust         = theme.nord17  -- widget bg
-theme.mantle        = theme.nord18  -- 
-theme.surface0      = theme.nord18  -- dash button bg 
-theme.surface1      = theme.nord0   --
-theme.overlay       = theme.nord0   -- album art filters
+theme.base          = theme.nord16  -- dark bg
+theme.crust         = theme.nord17  -- medium bg
+theme.mantle        = theme.nord0   -- light bg
+theme.surface0      = theme.nord18  -- bg for interactive elements (eg buttons)
+theme.surface1      = theme.nord0   -- slightly darker version of above 
+theme.overlay0      = theme.nord0   -- currently only used for album art filter 
+theme.overlay1      = theme.nord2   -- border colors
 
 -- typography
 theme.fg            = theme.nord4   -- main text
-theme.subtitle      = theme.nord3
-theme.subtext       = theme.nord2
+theme.subtitle      = theme.nord3   -- secondary text
+theme.subtext       = theme.nord2   -- tertiary text
 theme.main_accent   = theme.nord10  -- primary accent color
 
 -- misc (used in task, battery, and finance widgets)
