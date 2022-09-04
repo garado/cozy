@@ -45,7 +45,7 @@ local function rotate_screen_func()
 end
 
 -- lenovo laptops have a conservation mode that
--- stops charging when battery hits 55-60%
+-- stops the battery from charging when it hits 55-60%
 local function conservation_mode_func()
   local cmd = "ideapad-cm status"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
@@ -68,7 +68,7 @@ local function onboard_func()
 end
 
 -- spawn floating term window
--- i just use python as calculator lol
+-- i just use python as calculator 
 local function calculator_func()
   awful.spawn(term .. " -e python", {
     floating  = true,
@@ -88,7 +88,7 @@ local function create_quick_action(icon, name, func)
   local quick_action = widgets.button.text.normal({
     text = icon,
     text_normal_bg = beautiful.fg,
-    normal_bg = beautiful.ctrl_bg,
+    normal_bg = beautiful.ctrl_qa_btn_bg,
     animate_size = false,
     size = 20,
     on_release = function()
@@ -98,7 +98,12 @@ local function create_quick_action(icon, name, func)
   })
 
   return wibox.widget({
-    quick_action,
+    {
+      quick_action,
+      forced_width = dpi(50),
+      forced_height = dpi(50),
+      widget = wibox.container.margin,
+    },
     widget = wibox.container.place,
   })
 end
@@ -106,25 +111,30 @@ end
 -- Creating the quick action buttons
 -- Arguments: icon name func 
 local widget = wibox.widget({
-  create_quick_action("", "Rotate", rotate_screen_func),
-  create_quick_action("", "Conservation mode", conservation_mode_func), 
-  create_quick_action("", "Onboard", onboard_func), 
-  create_quick_action("", "Calculator", calculator_func),
+  {
+    create_quick_action("", "Rotate", rotate_screen_func),
+    create_quick_action("", "Conservation mode", conservation_mode_func), 
+    create_quick_action("", "Onboard", onboard_func), 
+    create_quick_action("", "Calculator", calculator_func),
 
-  -- unfinished --
-  create_quick_action("", "Nightshift", ""),
-  create_quick_action("", "Rotate bar", ""),
-  create_quick_action("", "Screenshot", ""),
-  create_quick_action("", "Timer", ""),
+    -- unfinished --
+    create_quick_action("", "Timer", ""),
+    create_quick_action("", "Nightshift", ""),
+    create_quick_action("", "Rotate bar", ""),
+    create_quick_action("", "Screenshot", ""),
+    create_quick_action("", "Mic", ""),
+    create_quick_action("", "Switch theme", ""),
 
-  -- 
-  --  
+    -- 
+    --  
 
-  spacing = dpi(5),
-  forced_num_rows = 2,
-  forced_num_cols = 4,
-  homogeneous = true,
-  layout = wibox.layout.grid,
+    spacing = dpi(15),
+    forced_num_rows = 2,
+    forced_num_cols = 5,
+    homogeneous = true,
+    layout = wibox.layout.grid,
+  },
+  widget = wibox.container.place,
 })
 
 return widget
