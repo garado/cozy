@@ -2,39 +2,34 @@
 -- █░█ █▀█ █░░ █░█ █▀▄▀█ █▀▀   █▄░█ █▀█ ▀█▀ █ █▀▀ █▀
 -- ▀▄▀ █▄█ █▄▄ █▄█ █░▀░█ ██▄   █░▀█ █▄█ ░█░ █ █▀░ ▄█
 
--- UNBELIEVABLY JANK
--- couldnt find a cleaner way to replace notification
--- so we're stuck with this bs
-
 local awful = require("awful")
 local naughty = require("naughty")
 
-awesome.connect_signal("module::volume", function()
-  awful.spawn.easy_async_with_shell("pamixer --get-volume",
-    function(stdout)
-      local val = string.gsub(stdout, '%W','')
-      val = tonumber(val)
+local volnotif
 
-      if not notif then
-        notif = naughty.notification { 
-          title = "Volume",
-          app_name = "System notification",
-          category = "device",
-          message = "Volume at " .. val .. "%",
-          auto_reset_timeout = true,
-          timeout = 1.25,
-        }
-      else
-        notif:destroy()
-        notif = naughty.notification { 
-          title = "Volume",
-          app_name = "System notification",
-          category = "device",
-          message = "Volume at " .. val .. "%",
-          auto_reset_timeout = true,
-          timeout = 1.25,
-        }
+awesome.connect_signal("module::volume", function()
+  awful.spawn.easy_async_with_shell("pamixer --get-volume-human",
+    function(stdout)
+      local val = string.gsub(stdout, '[\n\r]','')
+
+      if volnotif and volnotif.is_expired then
+        volnotif:destroy()
+        volnotif = nil
       end
-    end
-  )
+
+      if not volnotif then
+        volnotif = naughty.notification {
+          title = "Volume",
+          app_name = "System notification",
+          message = "Volume at " .. val,
+          timeout = 1.25,
+          auto_reset_timeout = true,
+        }
+        volnotif:connect_signal("destroyed", function()
+          volnotif = nil
+        end)
+      else
+        volnotif.message = "Volume at " .. val
+      end
+    end)
 end)

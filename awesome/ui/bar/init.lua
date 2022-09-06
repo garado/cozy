@@ -13,11 +13,12 @@ local animation = require("modules.animation")
 return function(s)
   -- IMPORTS --
   local clock = require("ui.bar.clock")
-  local battery = require("ui.bar.battery")(s)
-  local volume = require("ui.bar.volume")()
-  local brightness = require("ui.bar.brightness")()
+  local battery = require("ui.bar.battery")
+  local volume = require("ui.bar.volume")
+  local brightness = require("ui.bar.brightness")
   local app_launcher = require("ui.bar.app_launcher")
   local systray = require("ui.bar.systray")
+  local notif = require("ui.bar.notif")
 
   -- TAGLIST --
 	local modkey = "Mod4"
@@ -138,9 +139,8 @@ return function(s)
             {
               brightness,
               volume,
+              notif,
               battery, 
-              -- system tray
-              -- notif panel
               clock,
               --systray,
               spacing = dpi(8),

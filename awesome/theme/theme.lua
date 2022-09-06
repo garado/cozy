@@ -62,6 +62,7 @@ theme.bat_low         = theme.bat_low         or theme.red
 theme.slider_bg       = theme.slider_bg       or theme.surface1
 theme.brightbar_fg    = theme.brightbar_fg    or theme.main_accent
 theme.volbar_fg       = theme.volbar_fg       or theme.main_accent
+theme.notif_toggle_fg = theme.notif_toggle_fg or theme.main_accent
 theme.wibar_clock     = theme.wibar_clock     or theme.fg
 
 -- Control center

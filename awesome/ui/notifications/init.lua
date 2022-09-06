@@ -19,6 +19,7 @@ naughty.config.defaults.ontop = true
 naughty.config.defaults.timeout = 5
 naughty.config.defaults.title = "Notification"
 naughty.config.defaults.position = "top_right"
+naughty.config.defaults.auto_reset_timeout = true
 
 local function get_oldest_notification()
   for _, notification in ipairs(naughty.active) do
@@ -54,6 +55,8 @@ end)
 
 naughty.connect_signal("request::display", function(n)
   local accent_color = beautiful.random_accent_color()
+  n.font = beautiful.font .. "10"
+  n.fg = beautiful.fg
 
 	--- table of icons
 	local app_icons = {
@@ -111,19 +114,26 @@ naughty.connect_signal("request::display", function(n)
     }),
   })
 
-  local message = wibox.widget({
-    widget = wibox.container.scroll.horizontal,
-    step_function = wibox.container.scroll.step_functions.waiting_nonlinear_back_and_forth,
-    fps = 60,
-    speed = 100,
-    widgets.text({
-      font = beautiful.font,
-      color = beautiful.fg,
-      size = 10,
-      text = n.message,
-    }),
-  })
- 
+  -- dumb hack - bright/vol notifs need to be replaceable
+  local anim
+  local message
+  if n.title == "Brightness" or n.title == "Volume" then
+    message = naughty.widget.message
+  else
+    message = wibox.widget({
+      widgets.text({
+        font = beautiful.font,
+        size = 10,
+        color = beautiful.fg,
+        text = n.message,
+      }),
+      step_function = wibox.container.scroll.step_functions.waiting_nonlinear_back_and_forth,
+      fps = 60,
+      speed = 100,
+      widget = wibox.container.scroll.horizontal,
+    })
+  end
+
   local function action_layout(num_actions)
     if num_actions > 2 then
       return wibox.layout.flex.vertical
@@ -269,19 +279,34 @@ naughty.connect_signal("request::display", function(n)
     },
   })
 
-	local anim = animation:new({
-		duration = n.timeout,
-		target = 0,
-		easing = animation.easing.linear,
-		reset_on_stop = false,
-		update = function(self, pos)
-			timeout_bar.value = 100 - pos
-		end,
-	})
+  local function new_anim()
+    return animation:new({
+		  duration = n.timeout,
+		  target = 0,
+		  easing = animation.easing.linear,
+		  reset_on_stop = false,
+		  update = function(self, pos)
+		  	timeout_bar.value = 100 - dpi(pos)
+        print(timeout_bar.value)
+		  end
+	  })
+  end
 
-	anim:connect_signal("ended", function()
-		n:destroy()
-	end)
+  local anim = new_anim()
+
+  awesome.connect_signal("module::volume", function()
+    timeout_bar.value = 100
+    anim:stop()
+    anim = new_anim()
+    anim:set(100)
+  end)
+
+  awesome.connect_signal("module::brightness", function()
+    timeout_bar.value = 100
+    anim:stop()
+    anim = new_anim()
+    anim:set(100)
+  end)
 
   if n.timeout > 0 then
     anim:set(100)
