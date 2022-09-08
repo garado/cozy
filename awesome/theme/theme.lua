@@ -1,3 +1,4 @@
+
 -- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀
 -- ░█░ █▀█ ██▄ █░▀░█ ██▄
 
@@ -10,8 +11,12 @@ local dpi = xresources.apply_dpi
 local theme_name = require("user_variables").theme
 local theme = require("theme/colorschemes/" .. theme_name)
 
+-- theme-agnostic settings
 theme.pfp = gears.surface.load_uncached(gfs.get_configuration_dir() .. "theme/assets/pfp.png")
-theme.transparent = "#ffffff00"
+
+-- automagically match system color schemes with awesome
+-- color scheme
+local switch = require("theme/theme_switcher")()
 
 -- █▀▀ █▀█ █▄░█ ▀█▀ █▀
 -- █▀░ █▄█ █░▀█ ░█░ ▄█
@@ -22,9 +27,10 @@ theme.alt_font = theme.alt_font_name .. "Regular "
 
 -- █░█ █   █▀▀ █░░ █▀▀ █▀▄▀█ █▀▀ █▄░█ ▀█▀ █▀
 -- █▄█ █   ██▄ █▄▄ ██▄ █░▀░█ ██▄ █░▀█ ░█░ ▄█
--- Dashboard
 -- element name       = dont touch if it was  OR  set to default value
 --                      custom set already        if not assigned yet
+
+-- Dashboard
 theme.dash_bg         = theme.dash_bg         or theme.base
 theme.dash_widget_bg  = theme.dash_widget_bg  or theme.crust
 theme.dash_header_fg  = theme.dash_header_fg  or theme.main_accent
@@ -75,6 +81,11 @@ theme.ctrl_qa_btn_bg            = theme.ctrl_qa_btn_bg or theme.surface0
 theme.ctrl_lowerbar_bg          = theme.ctrl_lowerbar_bg  or theme.base
 theme.ctrl_power_options_bg     = theme.ctrl_power_options_bg or theme.mantle
 theme.ctrl_power_options_btn_fg = theme.ctrl_power_options_btn_ or theme.fg 
+
+-- Settings
+theme.settings_cancel_btn_bg = theme.settings_cancel_btn_bg or theme.base
+theme.settings_apply_btn_bg = theme.settings_apply_btn_bg or theme.base
+
 
 -- Notifications
 theme.notif_bg          = theme.notif_bg          or theme.crust

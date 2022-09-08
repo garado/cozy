@@ -11,7 +11,9 @@ local math = math
 
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
-theme.wallpaper = gears.surface.load_uncached(gfs.get_configuration_dir() .. "theme/assets/walls/gruvbox_dark.png")
+local awesome_cfg = gfs.get_configuration_dir()
+local wall_path = awesome_cfg .. "theme/assets/walls/gruvbox_dark.png"
+theme.wallpaper = gears.surface.load_uncached(wall_path)
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
@@ -69,6 +71,10 @@ theme.hab_uncheck_bg = "#665c54"
 theme.hab_uncheck_fg = "#7c6f64"
 theme.hab_check_bg = "#d5c4a1"
 theme.hab_check_fg = "#665c54"
---theme.pfp_bg = "#458588"
+theme.pfp_bg = "#32302f"
+
+-- theme switcher
+theme.kitty = "Gruvbox Dark"
+theme.nvim = "gruvbox"
 
 return theme

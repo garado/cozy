@@ -19,6 +19,7 @@ local naughty = require("naughty")
 local animation = require("modules.animation")
 local user_vars = require("user_variables")
 
+local os = os
 local string = string
 local tonumber = tonumber
 local table = table
@@ -152,7 +153,10 @@ local function create_chart()
     arc_chart.colors = colors
   end -- end create_chart_sections
 
+  -- build and call ledger command
+  local first_of_month = os.date("%Y/%m/01")
   local cmd = "ledger -f " .. ledger_file .. " -M csv register expenses"
+  cmd = cmd .. " --current  --begin " .. first_of_month
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     -- split on newlines
     local lines = { }
@@ -163,6 +167,7 @@ local function create_chart()
     -- ledger outputs look like this:
     --    Expenses:Personal:Food  $29.50
     --    Expenses:Fees           $0.10   
+    --    Exp:ReallyLongCat:Name  $0.50 
 
     -- subcategories are separated by colons
     -- if (num subcategories) > 1 then
@@ -302,4 +307,4 @@ local widget = wibox.widget({
   widget = wibox.container.place,
 })
 
-return helpers.ui.create_boxed_widget(widget, dpi(300), dpi(300), beautiful.dash_widget_bg)
+return helpers.ui.create_boxed_widget(widget, dpi(0), dpi(310), beautiful.dash_widget_bg)

@@ -1,7 +1,6 @@
 
 -- █▄░█ █▀█ █▀█ █▀▄   █▀▄ ▄▀█ █▀█ █▄▀
 -- █░▀█ █▄█ █▀▄ █▄▀   █▄▀ █▀█ █▀▄ █░█
--- Default theme
 
 local gears = require("gears")
 local gfs = require("gears.filesystem")
@@ -12,7 +11,9 @@ local math = math
 
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
-theme.wallpaper = gears.surface.load_uncached(gfs.get_configuration_dir() .. "theme/assets/walls/nord_dark.png")
+local awesome_cfg = gfs.get_configuration_dir()
+local wall_path = awesome_cfg .. "theme/assets/walls/nord_dark.png"
+theme.wallpaper = gears.surface.load_uncached(wall_path)
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
@@ -85,5 +86,9 @@ theme.yellow = theme.nord13
 -- but if you want even more fine-grained color customization, 
 -- you can control the colors for almost every single UI element 
 -- in theme.lua.
+
+-- theme switcher
+theme.kitty = "Nord"
+theme.nvim = "nord"
 
 return theme

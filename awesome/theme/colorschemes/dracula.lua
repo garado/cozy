@@ -1,5 +1,4 @@
 
-
 -- █▀▄ █▀█ ▄▀█ █▀▀ █░█ █░░ ▄▀█
 -- █▄▀ █▀▄ █▀█ █▄▄ █▄█ █▄▄ █▀█
 
@@ -10,8 +9,11 @@ local theme = dofile(themes_path .. "default/theme.lua")
 local theme_assets = require("beautiful.theme_assets")
 local math = math
 
-
-theme.wallpaper = gears.surface.load_uncached(gfs.get_configuration_dir() .. "theme/assets/walls/dracula.png")
+-- █░█░█ ▄▀█ █░░ █░░ 
+-- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
+local awesome_cfg = gfs.get_configuration_dir()
+local wall_path = awesome_cfg .. "theme/assets/walls/dracula.png"
+theme.wallpaper = gears.surface.load_uncached(wall_path)
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
@@ -69,5 +71,9 @@ theme.main_accent   = theme.purple    -- primary accent color
 -- but if you want even more fine-grained color customization, 
 -- you can control the colors for almost every single UI element 
 -- in theme.lua.
+
+-- settings for theme switcher
+theme.kitty = "Dracula"
+theme.nvim = "chadracula"
 
 return theme
