@@ -10,7 +10,6 @@ local bling = require("modules.bling")
 local gfs = require("gears.filesystem")
 local os = os
 
--- Make key easier to call
 mod = "Mod4"
 alt = "Mod1"
 ctrl = "Control"
@@ -18,29 +17,29 @@ shift = "Shift"
 
 -- Helper functions for sane(er) keyboard resizing in layout.suit.tile.* modes
 local function resize_horizontal(factor)
-    local layout = awful.layout.get(awful.screen.focused())
-    if layout == awful.layout.suit.tile then
-        awful.tag.incmwfact(-factor)
-    elseif layout == awful.layout.suit.tile.left then
-        awful.tag.incmwfact(factor)
-    elseif layout == awful.layout.suit.tile.top then
-        awful.client.incwfact(-factor)
-    elseif layout == awful.layout.suit.tile.bottom then
-        awful.client.incwfact(-factor)
-    end
+  local layout = awful.layout.get(awful.screen.focused())
+  if layout == awful.layout.suit.tile then
+    awful.tag.incmwfact(-factor)
+  elseif layout == awful.layout.suit.tile.left then
+    awful.tag.incmwfact(factor)
+  elseif layout == awful.layout.suit.tile.top then
+    awful.client.incwfact(-factor)
+  elseif layout == awful.layout.suit.tile.bottom then
+    awful.client.incwfact(-factor)
+  end
 end
 
 local function resize_vertical(factor)
-    local layout = awful.layout.get(awful.screen.focused())
-    if layout == awful.layout.suit.tile then
-        awful.client.incwfact(-factor)
-    elseif layout == awful.layout.suit.tile.left then
-        awful.client.incwfact(-factor)
-    elseif layout == awful.layout.suit.tile.top then
-        awful.tag.incmwfact(-factor)
-    elseif layout == awful.layout.suit.tile.bottom then
-        awful.tag.incmwfact(factor)
-    end
+  local layout = awful.layout.get(awful.screen.focused())
+  if layout == awful.layout.suit.tile then
+    awful.client.incwfact(-factor)
+  elseif layout == awful.layout.suit.tile.left then
+    awful.client.incwfact(-factor)
+  elseif layout == awful.layout.suit.tile.top then
+    awful.tag.incmwfact(-factor)
+  elseif layout == awful.layout.suit.tile.bottom then
+    awful.tag.incmwfact(factor)
+  end
 end
 
 -- Global key bindings
@@ -57,7 +56,7 @@ awful.keyboard.append_global_keybindings({
     { description = "quit", group = "Awesome" }),
 
   -- Show help
-  awful.key({ mod }, "s", hotkeys_popup.show_help, 
+  awful.key({ mod }, "s", hotkeys_popup.show_help,
     { description = "help", group = "Awesome"}),
 
   awful.key({ mod }, "j", function()
@@ -67,6 +66,11 @@ awful.keyboard.append_global_keybindings({
   awful.key({ mod }, "k", function()
     awesome.emit_signal("control_center::toggle", s)
   end, { description = "control center", group = "Awesome" }),
+
+  awful.key({ mod }, "l", function()
+    awesome.emit_signal("settings::toggle", s)
+  end, { description = "dash", group = "Awesome" }),
+
 
   -- █░█ █▀█ ▀█▀ █▄▀ █▀▀ █▄█ █▀
   -- █▀█ █▄█ ░█░ █░█ ██▄ ░█░ ▄█
@@ -127,31 +131,29 @@ awful.keyboard.append_global_keybindings({
     editor.start_interactive()
   end),
 
-  -----
-
   --  █░░ ▄▀█ █░█ █▄░█ █▀▀ █░█ █▀▀ █▀█ █▀
   --  █▄▄ █▀█ █▄█ █░▀█ █▄▄ █▀█ ██▄ █▀▄ ▄█
   -- Terminal
   awful.key({ alt }, "Return", function()
     awful.spawn(apps.default.terminal)
-  end, { description = "terminal", group = "Launchers" }), 
+  end, { description = "terminal", group = "Launchers" }),
   
   -- Rofi --
   -- App launcher
   awful.key({ alt }, "r", function()
     awful.spawn(apps.utils.app_launcher)
-  end, { description = "app launcher", group = "Launchers" }), 
+  end, { description = "app launcher", group = "Launchers" }),
 
   -- Tmux presets
   awful.key({ alt }, "e", function()
     awful.spawn(apps.utils.tmux_presets)
-  end, { description = "tmux presets", group = "Launchers" }), 
+  end, { description = "tmux presets", group = "Launchers" }),
 
   -- Bluetooth
   awful.key({ alt }, "b", function()
     awful.spawn(apps.utils.bluetooth)
-  end, { description = "bluetooth", group = "Launchers" }), 
-  
+  end, { description = "bluetooth", group = "Launchers" }),
+
 })
 
 -- █▀▀ █░░ █ █▀▀ █▄░█ ▀█▀
@@ -175,7 +177,13 @@ client.connect_signal("request::default_keybindings", function()
     awful.key({ ctrl, shift }, "d", function()
       client.focus.sticky = not client.focus.sticky
     end, { description = "sticky", group = "Client" }),
-   
+ 
+    -- Maximize
+    awful.key({ ctrl, shift }, "m", function(c)
+      c.maximized = not c.maximized
+      c:raise()
+    end, { description = "(un)maximize", group = "Client" }),
+
     -- Close window
     awful.key({ ctrl, shift }, "w", function()
       client.focus:kill()
@@ -259,16 +267,16 @@ awful.keyboard.append_global_keybindings({
 })
 
 client.connect_signal("request::default_mousebindings", function()
-    awful.mouse.append_client_mousebindings({
-        awful.button({ }, 1, function (c)
-            c:activate { context = "mouse_click" }
-        end),
-        awful.button({ mod }, 1, function (c)
-            c:activate { context = "mouse_click", action = "mouse_move"  }
-        end),
-        awful.button({ mod }, 3, function (c)
-            c:activate { context = "mouse_click", action = "mouse_resize"}
-        end),
-    })
+  awful.mouse.append_client_mousebindings({
+    awful.button({ }, 1, function (c)
+      c:activate { context = "mouse_click" }
+    end),
+    awful.button({ mod }, 1, function (c)
+      c:activate { context = "mouse_click", action = "mouse_move"  }
+    end),
+    awful.button({ mod }, 3, function (c)
+      c:activate { context = "mouse_click", action = "mouse_resize"}
+    end),
+  })
 end)
 
