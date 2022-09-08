@@ -78,8 +78,8 @@ local function widget()
   -- split tsv into lines (events) + their fields
   local function parse_tsv(tsv)
     -- insert each event into a table
-    event_list = {}
-    num_events = 0
+    local event_list = {}
+    local num_events = 0
     for event in string.gmatch(tsv, "[^\r\n]+") do
       num_events = num_events + 1
       table.insert(event_list, event)
@@ -95,7 +95,7 @@ local function widget()
     -- parse tsv
     for i = 1, #event_list do
       -- split on tabs
-      fields = { }
+      local fields = { }
       for field in string.gmatch(event_list[i], "[^\t]+") do
         table.insert(fields, field)
       end
@@ -116,7 +116,7 @@ local function widget()
 
   local function update_calendar()
     local file = gfs.get_cache_dir() .. "calendar/agenda"
-    local cmd = "cat " .. file
+    local cmd = "cat " .. file .. " | head -n 5"
     awful.spawn.easy_async_with_shell(cmd, function(stdout)
       if stdout ~= nil and stdout ~= '' then
         parse_tsv(stdout)
@@ -140,5 +140,5 @@ local function widget()
   return widget
 end
 
-return helpers.ui.create_boxed_widget(widget(), dpi(220), dpi(200), beautiful.dash_widget_bg)
+return helpers.ui.create_boxed_widget(widget(), dpi(0), dpi(190), beautiful.dash_widget_bg)
 

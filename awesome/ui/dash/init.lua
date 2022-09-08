@@ -19,11 +19,11 @@ return function(s)
   -- import tab contents
   local main = require("ui.dash.main")
   local finances = require("ui.dash.finances")
-  local cal = require("ui.dash.cal")
   local habit = require("ui.dash.habit")
+  local cal = require("ui.dash.cal")
  
-  local tablist =   { main, finances, habit,  cal,}
-  local tab_icons = { "",  "",      "",    "",  }
+  local tablist =   { main, finances, habit,  cal }
+  local tab_icons = { "",  "",      "",    "" }
   local tablist_pos = 1
   local tablist_elems = 4
 
@@ -166,7 +166,7 @@ return function(s)
 
   -- build dashboard
   dash = awful.popup({
-    type = "dock",
+    type = "splash",
     minimum_height = dpi(810),
     maximum_height = dpi(810),
     minimum_width = dpi(1350),

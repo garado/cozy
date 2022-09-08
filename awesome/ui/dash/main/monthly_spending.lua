@@ -263,9 +263,12 @@ local widgets = create_chart()
 local breakdown_chart = widgets[1]
 local breakdown_legend = widgets[2]
 
-local checking_cmd = "ledger -f " .. ledger_file .. " balance checking"
-local savings_cmd = "ledger -f " .. ledger_file .. " balance savings"
-local spent_cmd = "ledger -f " .. ledger_file .. " bal -M \\^Expenses | tail -n 1"
+local checking_cmd  = "ledger -f " .. ledger_file .. " balance checking"
+local savings_cmd   = "ledger -f " .. ledger_file .. " balance savings"
+
+local first_of_month = os.date("%Y/%m/01")
+local spent_cmd     = "ledger -f " .. ledger_file .. " bal -M \\^Expenses"
+spent_cmd = spent_cmd .. " --current --begin " .. first_of_month .. " | tail -n 1"
 
 local top = wibox.widget({
   {

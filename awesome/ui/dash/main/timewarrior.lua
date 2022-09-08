@@ -212,5 +212,5 @@ awful.spawn.easy_async_with_shell(cmd, function(stdout)
   end
 end)
 
-return helpers.ui.create_boxed_widget(timew_widget, dpi(0), dpi(350), beautiful.dash_widget_bg)
+return helpers.ui.create_boxed_widget(timew_widget, dpi(0), dpi(340), beautiful.dash_widget_bg)
 
