@@ -1,7 +1,6 @@
 
 -- █▄░█ █▀█ ▀█▀ █ █▀▀ █ █▀▀ ▄▀█ ▀█▀ █ █▀█ █▄░█ █▀
 -- █░▀█ █▄█ ░█░ █ █▀░ █ █▄▄ █▀█ ░█░ █ █▄█ █░▀█ ▄█
----------------- Credit: @rxyhn -----------------
 
 local gears = require("gears")
 local wibox = require("wibox")
@@ -287,7 +286,6 @@ naughty.connect_signal("request::display", function(n)
 		  reset_on_stop = false,
 		  update = function(self, pos)
 		  	timeout_bar.value = 100 - dpi(pos)
-        print(timeout_bar.value)
 		  end
 	  })
   end
@@ -295,21 +293,31 @@ naughty.connect_signal("request::display", function(n)
   local anim = new_anim()
 
   awesome.connect_signal("module::volume", function()
-    timeout_bar.value = 100
-    anim:stop()
-    anim = new_anim()
-    anim:set(100)
+    if n.title == "Volume" then
+      timeout_bar.value = 100
+      anim:stop()
+      anim = new_anim()
+      anim:set(100)
+    end
   end)
 
   awesome.connect_signal("module::brightness", function()
-    timeout_bar.value = 100
-    anim:stop()
-    anim = new_anim()
-    anim:set(100)
+    if n.title == "Brightness" then
+      timeout_bar.value = 100
+      anim:stop()
+      anim = new_anim()
+      anim:set(100)
+    end
   end)
 
   if n.timeout > 0 then
     anim:set(100)
+  end
+
+  if n.title ~= "Volume" and n.title ~= "Brightness" then
+    anim:connect_signal("ended", function()
+      n:destroy()
+    end)
   end
 
 end)

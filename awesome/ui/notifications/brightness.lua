@@ -14,7 +14,7 @@ awesome.connect_signal("module::brightness", function()
       val = tonumber(val)
       val = (val * 100) / 255
       val = math.floor(val, 0)
-      
+
       if not brightnotif then
         brightnotif = naughty.notification {
           title = "Brightness",

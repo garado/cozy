@@ -25,6 +25,7 @@ awesome.connect_signal("module::volume", function()
           timeout = 1.25,
           auto_reset_timeout = true,
         }
+        awesome.emit_signal("volumefuck", volnotif)
         volnotif:connect_signal("destroyed", function()
           volnotif = nil
         end)
@@ -33,3 +34,4 @@ awesome.connect_signal("module::volume", function()
       end
     end)
 end)
+
