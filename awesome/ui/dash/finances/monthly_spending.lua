@@ -21,6 +21,7 @@ local user_vars = require("user_variables")
 local string = string
 local tonumber = tonumber
 local table = table
+local os = os
 local ledger_file = user_vars.ledger.ledger_file
 
 -- arc chart colors
@@ -111,7 +112,9 @@ local function create_chart()
     arc_chart.colors = colors
   end -- end create_chart_sections
 
-  local cmd = "ledger -f " .. ledger_file .. " -M csv register expenses"
+  local date = " --current --begin " .. os.date("%Y/%m/01")
+  local file = " -f " .. ledger_file
+  local cmd = "ledger" .. file .. date .. " -M csv reg expenses"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     -- split on newlines
     local lines = { }
@@ -238,4 +241,4 @@ local widget = wibox.widget({
   widget = wibox.container.place,
 })
 
-return helpers.ui.create_boxed_widget(widget, dpi(300), dpi(300), beautiful.dash_widget_bg)
+return helpers.ui.create_boxed_widget(widget, dpi(0), dpi(250), beautiful.dash_widget_bg)

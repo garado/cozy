@@ -27,10 +27,12 @@ local function create_transaction_entry(date, title, category, amount)
   -- determine color of amount
   -- green for income, red for expense
   local i, j = string.find(category, "Expenses:")
-  local amount_color
+  local amount_color, prefix
   if i == nil then
+    prefix = "+"
     amount_color = beautiful.green
   else
+    prefix = "-"
     amount_color = beautiful.red
   end
 
@@ -51,7 +53,7 @@ local function create_transaction_entry(date, title, category, amount)
   local amount_ = "$" .. amount
   amount_ = string.gsub(amount_, "-", "")
   local amount_text = wibox.widget({
-    markup = helpers.ui.colorize_text(amount_, amount_color),
+    markup = helpers.ui.colorize_text(prefix .. amount_, amount_color),
     font = beautiful.font_name .. "12",
     widget = wibox.widget.textbox,
     forced_width = dpi(90),
@@ -78,7 +80,8 @@ local function create_transaction_entry(date, title, category, amount)
 end
 
 -- grab last 10 transactions
-local cmd = "ledger -f " .. ledger_file .. " csv expenses reimbursements income | head -10"
+local file = " -f " .. ledger_file
+local cmd = "ledger" .. file .. " csv expenses reimbursements income | head -10"
 awful.spawn.easy_async_with_shell(cmd, function(stdout)
   for str in string.gmatch(stdout, "([^\n]+)") do
     local t = { }
@@ -102,8 +105,9 @@ awful.spawn.easy_async_with_shell(cmd, function(stdout)
   end
 end)
 
+-- assemble final widget
 local widget = wibox.widget({
-  helpers.ui.create_dash_widget_header("Transaction history"),
+  helpers.ui.create_dash_widget_header("Transaction History"),
   {
     transaction_history,
     margins = dpi(10),

@@ -31,28 +31,23 @@ local finances_header = wibox.widget({
 -- Assemble everything
 return wibox.widget({
   {
-    finances_header,
     {
       {
-        {
-          balances[2],
-          balances[3],
-          layout = wibox.layout.flex.horizontal,
-        },
-        transactions,
-        spacing = dpi(20),
-        layout = wibox.layout.fixed.vertical,
+        balances[2],
+        balances[3],
+        layout = wibox.layout.flex.horizontal,
       },
-      {
-        monthly_spending,
-        monthly_budget,
-        forced_width = dpi(600),
-        layout = wibox.layout.fixed.vertical,
-      },
-      layout = wibox.layout.fixed.horizontal,
+      transactions,
+      monthly_spending,
+      spacing = dpi(20),
+      layout = wibox.layout.fixed.vertical,
     },
-    spacing = dpi(5),
-    layout = wibox.layout.fixed.vertical,
+    {
+      monthly_budget,
+      forced_width = dpi(600),
+      layout = wibox.layout.fixed.vertical,
+    },
+    layout = wibox.layout.fixed.horizontal,
   },
   margins = dpi(20),
   widget = wibox.container.margin,
