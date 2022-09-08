@@ -1,7 +1,12 @@
+-- █▀ ▄▀█ █▀▄▀█ █▀█ █░░ █▀▀    █░█ █▀ █▀▀ █▀█    █░█ ▄▀█ █▀█ █▀ 
+-- ▄█ █▀█ █░▀░█ █▀▀ █▄▄ ██▄    █▄█ ▄█ ██▄ █▀▄    ▀▄▀ █▀█ █▀▄ ▄█ 
+
+-- Copy this to user_variables.lua
+
 return {
   -- available themes:
-  -- nord_dark, dracula, tokyo_night, gruvbox_dark, gruvbox_light
-  -- catppuccin_latte, catppuccin_mocha
+  -- nord_dark, dracula, tokyo_night, gruvbox_dark,
+  -- gruvbox_light, catppuccin_mocha, catppuccin_latte
   theme = "tokyo_night",
   display_name = "Display Name",
   goals = {

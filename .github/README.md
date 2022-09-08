@@ -64,7 +64,12 @@ cp ~/.config/picom.conf ~/.config/picom.${USER}.conf</code></pre>
 
 Copy configs
 
-<code>cd cozy && cp -r awesome/ rofi/ picom.conf ~/.config/</code>
+<pre><code>cd cozy && cp -r awesome/ rofi/ picom.conf ~/.config/</pre></code>
+
+Copy sample_user_variables.lua to user_variables.lua.
+Edit it how you like.
+
+<pre><code>cp sample_user_variables.lua user_variables.lua</pre></code>
 
 Copy <code>misc/on-add-update-dash</code> and <code>misc/on-modify-update-dash</code> to your Taskwarrior hooks folder (default location is <code>~/.task/hooks</code>). This updates the task widget whenever Taskwarrior tasks are added/modified.
 
@@ -81,7 +86,7 @@ Make sure you update <code>configuration/apps.lua</code> with your default termi
 
 <b>Themes</b>
 
-Change theme in `user_vars.lua`.
+Change theme in `user_variables.lua`.
 
 Built-in themes: nord_dark, dracula, tokyo_night, gruvbox_dark, gruvbox_light, catppuccin_macchiato
 <ul>
