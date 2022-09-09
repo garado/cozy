@@ -6,7 +6,6 @@ local gears = require("gears")
 local gfs = require("gears.filesystem")
 local themes_path = gfs.get_themes_dir()
 local theme = dofile(themes_path .. "default/theme.lua")
-local theme_assets = require("beautiful.theme_assets")
 local math = math
 
 -- █░█░█ ▄▀█ █░░ █░░ 
@@ -70,6 +69,7 @@ theme.hab_uncheck_fg = "#a89984"
 
 -- theme switcher
 theme.kitty = "Gruvbox Light Soft"
-theme.nvim = "gruvbox_light"
+theme.nvim  = "gruvbox_light"
+theme.gtk   = "Gruvbox-Light-B"
 
 return theme

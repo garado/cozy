@@ -64,9 +64,11 @@ theme.hab_uncheck_fg  = "#5b6078"
 theme.hab_uncheck_bg  = "#494d64"
 theme.hab_check_fg    = "#363a4f"
 theme.hab_check_bg    = "#89b4fa"
+theme.switcher_options_bg = "#11111b"
 
 -- settings for theme switcher
 theme.kitty = "Catppuccin-Mocha"
 theme.nvim  = "catppuccin"
+theme.gtk   = "Catppuccin-Mocha-Mauve"
 
 return theme

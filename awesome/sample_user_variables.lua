@@ -1,13 +1,18 @@
 -- █▀ ▄▀█ █▀▄▀█ █▀█ █░░ █▀▀    █░█ █▀ █▀▀ █▀█    █░█ ▄▀█ █▀█ █▀ 
 -- ▄█ █▀█ █░▀░█ █▀▀ █▄▄ ██▄    █▄█ ▄█ ██▄ █▀▄    ▀▄▀ █▀█ █▀▄ ▄█ 
 
--- Copy this to user_variables.lua
+-- Copy this to user_variables.lua!
 
 return {
-  -- available themes:
-  -- nord_dark, dracula, tokyo_night, gruvbox_dark,
-  -- gruvbox_light, catppuccin_mocha, catppuccin_latte
-  theme = "tokyo_night",
+  -- Default themes:
+  -- gruvbox: dark, light
+  -- catppuccin: mocha, latte
+  -- nord: dark
+  -- dracula: dark
+  -- tokyonight: dark
+  theme_name  = "tokyonight",
+  theme_style = "dark",
+  ---
   display_name = "Display Name",
   goals = {
     "Update user_vars",
@@ -31,6 +36,7 @@ return {
     "Open sourcerer",
     "Vim wizard",
     "CLI sorcerer",
+    "Uses Arch, btw",
   },
   habit = {
     -- { name,        graph_id,       frequency},

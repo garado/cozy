@@ -6,7 +6,6 @@ local gears = require("gears")
 local gfs = require("gears.filesystem")
 local themes_path = gfs.get_themes_dir()
 local theme = dofile(themes_path .. "default/theme.lua")
-local theme_assets = require("beautiful.theme_assets")
 local math = math
 
 -- █░█░█ ▄▀█ █░░ █░░ 
@@ -71,6 +70,7 @@ theme.pfp_bg = "#ccd0da"
 
 -- settings for theme switcher
 theme.kitty = "Catppuccin-Latte"
-theme.nvim   = "catppuccin_latte"
+theme.nvim  = "catppuccin_latte"
+theme.gtk   = "Catppuccin-Latte-Mauve"
 
 return theme

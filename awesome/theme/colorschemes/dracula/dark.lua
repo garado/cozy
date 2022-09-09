@@ -6,7 +6,6 @@ local gears = require("gears")
 local gfs = require("gears.filesystem")
 local themes_path = gfs.get_themes_dir()
 local theme = dofile(themes_path .. "default/theme.lua")
-local theme_assets = require("beautiful.theme_assets")
 local math = math
 
 -- █░█░█ ▄▀█ █░░ █░░ 
@@ -74,6 +73,7 @@ theme.main_accent   = theme.purple    -- primary accent color
 
 -- settings for theme switcher
 theme.kitty = "Dracula"
-theme.nvim = "chadracula"
+theme.nvim  = "chadracula"
+theme.gtk   = "Dracula"
 
 return theme

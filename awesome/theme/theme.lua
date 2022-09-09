@@ -6,17 +6,19 @@ local gears = require("gears")
 local gfs = require("gears.filesystem")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
+local user_vars = require("user_variables")
 
 -- get user's color scheme
-local theme_name = require("user_variables").theme
-local theme = require("theme/colorschemes/" .. theme_name)
+local theme_name = user_vars.theme_name
+local theme_style = user_vars.theme_style
+local theme = require("theme.colorschemes." .. theme_name .. "." .. theme_style)
 
 -- theme-agnostic settings
 theme.pfp = gears.surface.load_uncached(gfs.get_configuration_dir() .. "theme/assets/pfp.png")
 
 -- automagically match system color schemes with awesome
 -- color scheme
-local switch = require("theme/theme_switcher")()
+require("theme/theme_switcher")()
 
 -- █▀▀ █▀█ █▄░█ ▀█▀ █▀
 -- █▀░ █▄█ █░▀█ ░█░ ▄█
@@ -80,18 +82,20 @@ theme.ctrl_link_bg  = theme.ctrl_link_bg  or theme.surface0
 theme.ctrl_qa_btn_bg            = theme.ctrl_qa_btn_bg or theme.surface0
 theme.ctrl_lowerbar_bg          = theme.ctrl_lowerbar_bg  or theme.base
 theme.ctrl_power_options_bg     = theme.ctrl_power_options_bg or theme.mantle
-theme.ctrl_power_options_btn_fg = theme.ctrl_power_options_btn_ or theme.fg 
+theme.ctrl_power_options_btn_fg = theme.ctrl_power_options_btn_ or theme.fg
 
--- Settings
-theme.settings_cancel_btn_bg = theme.settings_cancel_btn_bg or theme.base
-theme.settings_apply_btn_bg = theme.settings_apply_btn_bg or theme.base
-
+-- Theme switcher
+theme.switcher_cancel_btn_bg  = theme.switcher_cancel_btn_bg  or theme.crust
+theme.switcher_apply_btn_bg   = theme.switcher_apply_btn_bg   or theme.crust
+theme.switcher_options_bg     = theme.switcher_options_bg     or theme.surface0
+theme.switcher_lowerbar_bg    = theme.switcher_lowerbar_bg    or theme.base
+theme.switcher_header_fg      = theme.switcher_header_fg      or theme.main_accent
 
 -- Notifications
 theme.notif_bg          = theme.notif_bg          or theme.crust
 theme.notif_actions_bg  = theme.notif_actions_bg  or theme.mantle
 theme.notif_timeout_bg  = theme.notif_timeout_bg  or theme.mantle
-theme.notif_dismiss_bg  = theme.notif_dismiss_bg  or theme.notif_bg
+theme.notif_dismiss_bg  = theme.notif_dismiss_bg  or theme.crust
 theme.notification_spacing = dpi(10)
 
 -- Gaps
@@ -108,9 +112,9 @@ theme.border_color_normal = theme.border_color_normal or theme.overlay1
 theme.border_radius = 10
 
 -- Hotkeys
-theme.hotkeys_bg = theme.hotkeys_bg   or theme.crust
-theme.hotkeys_fg = theme.hotkeys_fg   or theme.fg
-theme.hotkeys_modifiers_fg = hotkeys_modifiers_fg or  theme.main_accent
+theme.hotkeys_modifiers_fg = theme.hotkeys_modifiers_fg or theme.main_accent
+theme.hotkeys_bg = theme.hotkeys_bg or theme.crust
+theme.hotkeys_fg = theme.hotkeys_fg or theme.fg
 theme.hotkeys_border_width = dpi(0)
 theme.hotkeys_group_margin = dpi(25)
 theme.hotkeys_font = theme.font .. "13"

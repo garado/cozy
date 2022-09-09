@@ -6,9 +6,11 @@
 -- your AwesomeWM color scheme. :-)
 
 local awful = require("awful")
-local theme_name = require("user_variables").theme
-local theme = require("theme/colorschemes/" .. theme_name)
 local gfs = require("gears.filesystem")
+local user_vars = require("user_variables")
+local theme_name = user_vars.theme_name
+local theme_style = user_vars.theme_style
+local theme = require("theme.colorschemes." .. theme_name .. "." .. theme_style)
 
 local function kitty()
   -- This should be set in <colorscheme>.lua
@@ -34,8 +36,20 @@ local function nvim()
   awful.spawn.with_shell(reload_theme_cmd)
 end
 
+local function gtk()
+  local gtk_theme = theme.gtk
+  local cmd = "gsettings set org.gnome.desktop.interface gtk-theme '" .. gtk_theme .. "'"
+  awful.spawn.with_shell(cmd)
+
+  -- restart firefox
+  -- firefox theme is automatically set to current gtk theme
+  --awful.spawn.with_shell("pkill firefox")
+  --awful.spawn.with_shell("firefox &")
+end
+
 return function()
-  if theme.kitty  then kitty() end
-  if theme.nvim   then nvim() end
+  if theme.kitty  then kitty()  end
+  if theme.nvim   then nvim()   end
+  if theme.gtk    then gtk()    end
 end
 

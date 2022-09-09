@@ -6,7 +6,6 @@ local gears = require("gears")
 local gfs = require("gears.filesystem")
 local themes_path = gfs.get_themes_dir()
 local theme = dofile(themes_path .. "default/theme.lua")
-local theme_assets = require("beautiful.theme_assets")
 local math = math
 
 -- █░█░█ ▄▀█ █░░ █░░ 
@@ -66,6 +65,7 @@ theme.notif_actions_bg  = "#292e42"
 
 -- theme switcher
 theme.kitty = "Tokyo Night"
-theme.nvim = "tokyonight"
+theme.nvim  = "tokyonight"
+theme.gtk   = "Tokyonight-Dark-B"
 
 return theme
