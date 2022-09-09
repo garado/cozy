@@ -40,7 +40,9 @@ This is a port of my old Eww config. I've decided to keep maintaining the Eww co
 
 
 <h4>Theme switcher</h4>
-![theme switcher](assets/theme_switcher.mpeg)
+<video width="800" controls>
+  <source src="assets/theme_switcher.mp4" type="video/mp4">
+</video>
 
 <ul>
   <li>Can switch theme for your entire system - not just Awesome!</li>
