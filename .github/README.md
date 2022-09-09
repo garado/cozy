@@ -22,14 +22,12 @@ Hi! This is <b>cozy</b>, my <a href="https://awesomewm.org" target="_blank">Awes
 This is a port of my old Eww config. I've decided to keep maintaining the Eww config <a href="https://github.com/garado/cozy/tree/eww" target="_blank">here</a> because I might leave Awesome one day. (Eww version is heavily wip and won't be updated as often)
 </p>
 
-<h2>🚀 Dashboard</h2>
-
+<h2>🚀 Features</h2>
+<h4>Dashboard</h4>
 <p align="center">
   <img title="" src="assets/dash_main.png" alt="" width="800">
 </p>
 
-
-<b>Features</b>
 <ul>
 <li>Fancy music player (thank you <a href="https://github.com/rxyhn/yoru" target="_blank">rxhyn</a>)</li>
 <li>Calendar (with Google Calendar) </li>
@@ -38,6 +36,16 @@ This is a port of my old Eww config. I've decided to keep maintaining the Eww co
 <li>Interactive habit tracker (with <a href="https://pixe.la" target="_blank">Pixela</a>)</li>
 <li>Fancy finances (with <a href="https://github.com/ledger/" target="_blank">Ledger</a>)</li>
 <li>(WIP) Different tabs to show even more information!</li>
+</ul>
+
+
+<h4>Theme switcher</h4>
+![theme switcher](assets/theme_switcher.mpeg)
+
+<ul>
+  <li>Can switch theme for your entire system - not just Awesome!</li>
+  <li>By default, it switches Kitty, Nvim/NvChad</li>
+  <li>Easily extensible to any applications you use</li>
 </ul>
 
 <h2>🔧 Install and configure</h2>
