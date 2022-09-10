@@ -66,8 +66,6 @@ return function(s)
   local control_center_width = dpi(500)
   local control_center = awful.popup ({
     type = "popup_menu",
-    minimum_height = control_center_height,
-    maximum_height = control_center_height,
     minimum_width = control_center_width,
     maximum_width = control_center_width,
     placement = awful.placement.centered,
@@ -151,10 +149,25 @@ return function(s)
   -- Keybind to toggle (default is Super_L + k)
   awesome.connect_signal("control_center::toggle", function()
     control_center.visible = not control_center.visible
+    if control_center.visible then
+      awesome.emit_signal("dash::close")
+      awesome.emit_signal("settings::close")
+    end
     --if control_center.visible == true then
     --  navigate()
     --end
   end)
+
+  awesome.connect_signal("control_center::open", function()
+    control_center.visible = true
+    awesome.emit_signal("dash::close")
+    awesome.emit_signal("settings::close")
+  end)
+
+  awesome.connect_signal("control_center::close", function()
+    control_center.visible = false
+  end)
+
 
   return control_center
 end

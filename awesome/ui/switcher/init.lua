@@ -314,7 +314,20 @@ return function()
     settings.visible = not settings.visible
     if not settings.visible then
       reset_theme_switcher()
+    else
+      awesome.emit_signal("dash::close")
+      awesome.emit_signal("control_center::close")
     end
+  end)
+
+  awesome.connect_signal("settings::open", function()
+    settings.visible = true
+    awesome.emit_signal("dash::close")
+    awesome.emit_signal("control_center::close")
+  end)
+
+  awesome.connect_signal("settings::close", function()
+    settings.visible = false
   end)
 
   return settings

@@ -58,7 +58,7 @@ local function create_profile()
   })
  
   -- new title every time you open dash
-  awesome.connect_signal("dash::close", function()
+  awesome.connect_signal("dash::closed", function()
     local titles_list = user_vars.titles
     local random_title = titles_list[math.random(#titles_list)]
     title:set_markup(helpers.ui.colorize_text(random_title, beautiful.fg))

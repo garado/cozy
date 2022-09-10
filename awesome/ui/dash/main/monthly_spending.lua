@@ -146,7 +146,7 @@ local function create_chart()
       end,
     })
 
-    awesome.connect_signal("dash::open", function()
+    awesome.connect_signal("dash::opened", function()
       arc_chart_animation:set(arc_chart.max_value)
     end)
 

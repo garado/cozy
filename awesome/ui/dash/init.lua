@@ -152,16 +152,28 @@ return function(s)
       keypressed_callback = keypressed,
     }
   end
-  
+
   -- toggle visibility
   awesome.connect_signal("dash::toggle", function()
     if dash.visible then
-      awesome.emit_signal("dash::close")
+      awesome.emit_signal("dash::closed")
     else
-      awesome.emit_signal("dash::open")
+      awesome.emit_signal("dash::opened")
       navigate()
+      awesome.emit_signal("control_center::close")
+      awesome.emit_signal("settings::close")
     end
     dash.visible = not dash.visible
+  end)
+
+  awesome.connect_signal("dash::open", function()
+    dash.visible = true
+    awesome.emit_signal("dash::opened")
+  end)
+
+  awesome.connect_signal("dash::close", function()
+    dash.visible = false
+    awesome.emit_signal("dash::closed")
   end)
 
   -- build dashboard
