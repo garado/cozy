@@ -9,7 +9,6 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local keygrabber = require("awful.keygrabber")
-local helpers = require("helpers")
 local widgets = require("ui.widgets")
 local naughty = require("naughty")
 
@@ -20,10 +19,10 @@ return function(s)
   local main = require("ui.dash.main")
   local finances = require("ui.dash.finances")
   local habit = require("ui.dash.habit")
-  local cal = require("ui.dash.cal")
- 
-  local tablist =   { main, finances, habit,  cal }
-  local tab_icons = { "",  "",      "",    "" }
+  local agenda = require("ui.dash.agenda")
+
+  local tablist =   { main, finances, habit,  agenda }
+  local tab_icons = { "",  "",      "",    ""    }
   local tablist_pos = 1
   local tablist_elems = 4
 

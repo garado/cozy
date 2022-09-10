@@ -59,6 +59,17 @@ theme.display_name_fg = theme.display_name_fg or theme.main_accent
 theme.pfp_bg          = theme.pfp_bg          or theme.main_accent
 theme.title_fg        = theme.title_fg        or theme.fg
 
+-- Dash: Calendar
+theme.cal_fg = theme.cal_fg or theme.fg
+theme.cal_bg = theme.cal_bg or theme.base
+theme.cal_weekday_fg = theme.cal_weekday_fg or theme.fg
+theme.cal_header_fg = theme.cal_header_fg or theme.fg
+theme.cal_month_bg = theme.cal_month_bg or theme.base
+theme.cal_focus_fg = theme.cal_focus_fg or theme.main_accent
+theme.cal_focus_bg = theme.cal_focus_bg or theme.base
+theme.calendar_spacing = dpi(10)
+theme.calendar_long_weekdays = true
+
 -- Bar
 theme.wibar_bg        = theme.wibar_bg        or theme.base
 theme.wibar_focused   = theme.wibar_focused   or theme.main_accent
