@@ -62,17 +62,26 @@ local button = wibox.widget({
   align = "center",
   valign = "center",
 })
+
 button:connect_signal("button::press", function()
   app_launcher.visible = not app_launcher.visible
+  if app_launcher.visible then
+    require("ui.shared").close_other_popups("app_launcher")
+  end
 end)
 
 button:connect_signal("mouse::enter", function()
   local markup = helpers.ui.colorize_text("", beautiful.wibar_launcher_hover)
   button:set_markup_silently(markup)
 end)
+
 button:connect_signal("mouse::leave", function()
   local markup = helpers.ui.colorize_text("", beautiful.wibar_launcher_app)
   button:set_markup_silently(markup)
+end)
+
+awesome.connect_signal("app_launcher::close", function()
+  app_launcher.visible = false
 end)
 
 return button

@@ -12,7 +12,7 @@ local keygrabber = require("awful.keygrabber")
 local widgets = require("ui.widgets")
 local naughty = require("naughty")
 
-return function(s) 
+return function() 
   local dash
 
   -- import tab contents
@@ -72,16 +72,10 @@ return function(s)
   end
 
   local tab_bar = create_tab_bar()
-
   dash_content:get_children_by_id("content")[1]:add(main)
 
-  local ugh = wibox.widget({
-    tab_bar,
-    dash_content,
-    layout = wibox.layout.align.horizontal,
-  })
-
-  -- DASH KEYBOARD NAVIGATION
+  -- █▄▀ █▀▀ █▄█ █▄▄ █ █▄░█ █▀▄ █▀ 
+  -- █░█ ██▄ ░█░ █▄█ █ █░▀█ █▄▀ ▄█ 
   -- "cursor" is either in tabs or content
   local group_selected = "tab"
   local obj_selected = "user"
@@ -143,7 +137,7 @@ return function(s)
     end
 
     -- Putting all the puzzle pieces together
-    local dash_keygrabber = awful.keygrabber {
+    awful.keygrabber {
       stop_key = "Mod4",
       stop_event = "press",
       autostart = true,
@@ -152,15 +146,15 @@ return function(s)
     }
   end
 
-  -- toggle visibility
+  -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
+  -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
   awesome.connect_signal("dash::toggle", function()
     if dash.visible then
       awesome.emit_signal("dash::closed")
     else
+      require("ui.shared").close_other_popups("dash")
       awesome.emit_signal("dash::opened")
       navigate()
-      awesome.emit_signal("control_center::close")
-      awesome.emit_signal("settings::close")
     end
     dash.visible = not dash.visible
   end)
@@ -175,7 +169,8 @@ return function(s)
     awesome.emit_signal("dash::closed")
   end)
 
-  -- build dashboard
+  -- ▄▀█ █▀ █▀ █▀▀ █▀▄▀█ █▄▄ █░░ █▀▀ 
+  -- █▀█ ▄█ ▄█ ██▄ █░▀░█ █▄█ █▄▄ ██▄ 
   dash = awful.popup({
     type = "splash",
     minimum_height = dpi(810),
@@ -186,10 +181,13 @@ return function(s)
     ontop = true,
     visible = false,
     placement = awful.placement.centered,
-    widget = ugh,
+    widget = ({
+      tab_bar,
+      dash_content,
+      layout = wibox.layout.align.horizontal,
+    }),
   })
-      
+
   local main_tab_icon = tab_bar.children[1].children[1]
   main_tab_icon:set_color(beautiful.main_accent)
-
 end

@@ -258,8 +258,8 @@ cancel_button.visible = false
 styles.visible = false
 
 return function()
-  -- assemble the settings menu
-  local settings_contents = wibox.widget({
+  -- assemble the theme_switcher menu
+  local theme_switcher_contents = wibox.widget({
     {
       {
         {
@@ -296,40 +296,38 @@ return function()
     bg = beautiful.ctrl_bg,
   })
 
-  local settings_width = dpi(500)
-  local settings = awful.popup ({
+  local theme_switcher_width = dpi(500)
+  local theme_switcher = awful.popup ({
     type = "popup_menu",
-    minimum_width = settings_width,
-    maximum_width = settings_width,
+    minimum_width = theme_switcher_width,
+    maximum_width = theme_switcher_width,
     placement = awful.placement.centered,
     bg = beautiful.transparent,
     shape = gears.shape.rect,
     ontop = true,
     visible = false,
-    widget = settings_contents,
+    widget = theme_switcher_contents,
   })
 
-  -- keybind to toggle (default is Super_L + l)
-  awesome.connect_signal("settings::toggle", function()
-    settings.visible = not settings.visible
-    if not settings.visible then
+  -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
+  -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
+  awesome.connect_signal("theme_switcher::toggle", function()
+    theme_switcher.visible = not theme_switcher.visible
+    if not theme_switcher.visible then
       reset_theme_switcher()
     else
-      awesome.emit_signal("dash::close")
-      awesome.emit_signal("control_center::close")
+      require("ui.shared").close_other_popups("theme_switcher")
     end
   end)
 
-  awesome.connect_signal("settings::open", function()
-    settings.visible = true
-    awesome.emit_signal("dash::close")
-    awesome.emit_signal("control_center::close")
+  awesome.connect_signal("theme_switcher::open", function()
+    theme_switcher.visible = true
   end)
 
-  awesome.connect_signal("settings::close", function()
-    settings.visible = false
+  awesome.connect_signal("theme_switcher::close", function()
+    theme_switcher.visible = false
   end)
 
-  return settings
+  return theme_switcher
 end
 

@@ -61,11 +61,11 @@ awful.keyboard.append_global_keybindings({
   end, { description = "dash", group = "Awesome" }),
  
   awful.key({ mod }, "k", function()
-    awesome.emit_signal("control_center::toggle", s)
+    awesome.emit_signal("control_center::toggle")
   end, { description = "control center", group = "Awesome" }),
 
   awful.key({ mod }, "l", function()
-    awesome.emit_signal("settings::toggle", s)
+    awesome.emit_signal("theme_switcher::toggle")
   end, { description = "dash", group = "Awesome" }),
 
 

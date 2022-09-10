@@ -19,10 +19,7 @@ local quick_actions = require("ui.control_center.quick_actions") local uptime = 
 local power_options = require("ui.control_center.power_options")
 local links = require("ui.control_center.links")
 
-return function(s)
-  local screen_height = dpi(s.geometry.height)
-  local screen_width = dpi(s.geometry.width)
-
+return function()
   -- assemble the control center
   local control_center_contents = wibox.widget({
     {
@@ -76,92 +73,17 @@ return function(s)
     widget = control_center_contents,
   })
 
-  -- CTRL CENTER KEYBOARD NAVIGATION
-  -- "cursor" is either in tabs or content
-  local group_selected = "tab"
-  local obj_selected = "user"
-
-  local function dbn(message)
-    naughty.notification {
-      app_name = "custom keygrabber",
-      title = "navigate()",
-      message = message,
-      timeout = 1,
-    }
-  end
-
-  -- keybindings to navigate control center
-  local function navigate()
-    --local content = dash_content:get_children_by_id("content")[1]
-
-    -- "j" and "k" navigate between tabs
-    local function next_tab()
-      local old_index = tablist_pos
-      local index = ((tablist_pos + 1) % tablist_elems)
-      if index == 0 then index = 4 end
-      content:set(1, tablist[index])
-      tablist_pos = index
-
-      local tab = tab_bar.children[1].children[tablist_pos]
-      tab:set_color(beautiful.main_accent)
-      local prev_tab = tab_bar.children[1].children[old_index]
-      prev_tab:set_color(beautiful.fg)
-    end
-
-    local function prev_tab()
-      local old_index = tablist_pos
-      local index = ((tablist_pos - 1) % tablist_elems)
-      if index == 0 then index = 4 end
-      content:set(1, tablist[index])
-      tablist_pos = index
-
-      local tab = tab_bar.children[1].children[tablist_pos]
-      tab:set_color(beautiful.main_accent)
-      local prev_tab = tab_bar.children[1].children[old_index]
-      prev_tab:set_color(beautiful.fg)
-    end
-
-    -- Call functions depending on which key was pressed
-    local function keypressed(self, mod, key, command)
-      local naughty = require("naughty")
-      naughty.notification { message = key } 
-      if key == "j" then
-        next_tab()
-      elseif key == "k" then
-        prev_tab()
-      --elseif key == "h" then
-      --  prev_element()
-      --elseif key == "l" then
-      --  next_element()
-      end
-    end
-
-    -- Putting all the puzzle pieces together
-    local ctrl_keygrabber = awful.keygrabber {
-      stop_key = "Mod4",
-      stop_event = "press",
-      autostart = true,
-      timeout = 10,
-      keypressed_callback = keypressed,
-    }
-  end
-
-  -- Keybind to toggle (default is Super_L + k)
+  -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
+  -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
   awesome.connect_signal("control_center::toggle", function()
     control_center.visible = not control_center.visible
     if control_center.visible then
-      awesome.emit_signal("dash::close")
-      awesome.emit_signal("settings::close")
+      require("ui.shared").close_other_popups("control_center")
     end
-    --if control_center.visible == true then
-    --  navigate()
-    --end
   end)
 
   awesome.connect_signal("control_center::open", function()
     control_center.visible = true
-    awesome.emit_signal("dash::close")
-    awesome.emit_signal("settings::close")
   end)
 
   awesome.connect_signal("control_center::close", function()
@@ -171,5 +93,4 @@ return function(s)
 
   return control_center
 end
-
 
