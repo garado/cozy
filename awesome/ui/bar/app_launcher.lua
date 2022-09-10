@@ -7,14 +7,13 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local dpi = require("beautiful").xresources.apply_dpi
 local helpers = require("helpers")
-local widgets = require("ui.widgets")
 local gears = require("gears")
-local naughty = require("naughty")
+local widgets = require("ui.widgets")
 
 local app_launcher
 
 local function create_launcher_entry(icon, program)
-  local widget = widgets.button.text.normal({
+  local entry = widgets.button.text.normal({
     text = icon,
     text_normal_bg = beautiful.fg,
     normal_bg = beautiful.wibar_bg,
@@ -26,18 +25,24 @@ local function create_launcher_entry(icon, program)
     end,
   })
 
-  return widget
+  return wibox.widget({
+    entry,
+    widget = wibox.container.place,
+  })
 end
 
 app_launcher = awful.popup({
   widget = {
     {
+      helpers.ui.vertical_pad(dpi(5)),
       create_launcher_entry("", "xournalpp"),
       create_launcher_entry("", "foliate"),
       create_launcher_entry("", "alacritty"),
       create_launcher_entry("", "thunar"),
       create_launcher_entry("", "firefox"),
+      helpers.ui.vertical_pad(dpi(5)),
       spacing = dpi(5),
+      forced_width = dpi(60),
       layout = wibox.layout.fixed.vertical,
     },
     bg = beautiful.wibar_bg,
@@ -50,15 +55,24 @@ app_launcher = awful.popup({
   ontop = true,
 })
 
-local widget = widgets.button.text.normal({
-  text = "",
-  text_normal_bg = beautiful.fg,
-  normal_bg = beautiful.wibar_bg,
-  animate_size = false,
-  size = 12,
-  on_release = function()
-    app_launcher.visible = not app_launcher.visible
-  end,
+local button = wibox.widget({
+  markup = helpers.ui.colorize_text("", beautiful.wibar_launcher_app),
+  widget = wibox.widget.textbox,
+  font = beautiful.font .. "12",
+  align = "center",
+  valign = "center",
 })
+button:connect_signal("button::press", function()
+  app_launcher.visible = not app_launcher.visible
+end)
 
-return widget
+button:connect_signal("mouse::enter", function()
+  local markup = helpers.ui.colorize_text("", beautiful.wibar_launcher_hover)
+  button:set_markup_silently(markup)
+end)
+button:connect_signal("mouse::leave", function()
+  local markup = helpers.ui.colorize_text("", beautiful.wibar_launcher_app)
+  button:set_markup_silently(markup)
+end)
+
+return button
