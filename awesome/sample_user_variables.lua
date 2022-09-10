@@ -31,6 +31,10 @@ return {
       "Rice",
     },
   },
+  pixela = {
+    user  = "",
+    token = "",
+  },
   titles = {
     "Mechromancer",
     "Open sourcerer",

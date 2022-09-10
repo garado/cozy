@@ -6,14 +6,12 @@ local awful = require("awful")
 local beautiful = require("beautiful")
 local helpers = require("helpers")
 local wibox = require("wibox")
-local xresources = require("beautiful.xresources") 
-local gears = require("gears") 
+local xresources = require("beautiful.xresources")
+local gears = require("gears")
 local gfs = require("gears.filesystem")
 local user_vars = require("user_variables")
 local dpi = xresources.apply_dpi
 local naughty = require("naughty")
-local widgets = require("ui.widgets")
-local json = require("modules.json")
 
 local os = os
 local string = string
@@ -22,19 +20,60 @@ local string = string
 local habit_list = user_vars.habit
 local habit_widget = wibox.widget({
   {
-    helpers.ui.create_dash_widget_header("Habits"),
+    --helpers.ui.create_dash_widget_header("Habits"),
     spacing = dpi(10),
     layout = wibox.layout.fixed.vertical,
   },
   widget = wibox.container.place
 })
 
+local function update_pixela_err_handling(stderr)
+  if string.find(stderr, "command not found") then
+    naughty.notification {
+      app_name = "System Notification",
+      title = "Pixela API",
+      message = "Pixela 'pi' command not found",
+      timeout = 0,
+    }
+  elseif string.find(stderr, "Please specify username") then
+    naughty.notification {
+      app_name = "System Notification",
+      title = "Pixela API",
+      message = "Pixela username not found - set this in user_vars",
+      timeout = 0,
+    }
+  elseif string.find(stderr, "Please specify password") then
+    naughty.notification {
+      app_name = "System Notification",
+      title = "Pixela API",
+      message = "Pixela password not found - set this in user_vars",
+      timeout = 0,
+    }
+  end
+end
+
 local function update_pixela(graph_id, date, qty)
-  local pi_cmd = "pi pixel update -g " .. graph_id .. " -d " .. date .. " -q " .. qty
-  awful.spawn.easy_async_with_shell(pi_cmd, function(stdout)
-    -- pixela api returns api request status -- check that
-    if string.find(stdout, "Success.") ~= nil then
-      local state = qty == 1 and "complete" or qty == 0 and "not complete"
+  local set_pixela_user, set_pixela_token
+  if user_vars.pixela then
+    set_pixela_user = "export PIXELA_USER_NAME=" .. user_vars.pixela.user
+    set_pixela_token = "export PIXELA_USER_TOKEN=" .. user_vars.pixela.token
+  end
+
+  local graph_id_cmd = " -g " .. graph_id
+  local date_cmd     = " -d " .. date
+  local qty_cmd      = " -q " .. qty
+  local pi_cmd = "~/go/bin/pi pixel update" .. graph_id_cmd .. date_cmd .. qty_cmd
+  local cmd = set_pixela_user .. " ; " .. set_pixela_token .. " ; " .. pi_cmd
+  awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
+    -- Handle command errors
+    if stderr ~= "" then
+      update_pixela_err_handling(stderr)
+      return
+    end
+
+    -- Pixela api returns api request status -- check for success
+    local state = qty == 1 and "complete" or qty == 0 and "not complete"
+    if string.find(stdout, "Success") then
       naughty.notification {
         app_name = "System notification",
         title = "Pixela API",
@@ -57,7 +96,7 @@ local function update_cache(graph_id, date, set_as_complete)
   awful.spawn.easy_async_with_shell("cat " .. file, function(stdout)
     if set_as_complete then
       -- if habit is already completed in cache, do nothing
-      if string.find(stdout, date) ~= nil then 
+      if string.find(stdout, date) ~= nil then
         return
       -- else, mark as completed by writing date to cache
       else
@@ -80,9 +119,9 @@ end
 -- populates habit_widget with habits
 local function create_habit_ui()
   -- creates just one habit
-  local function create_habit_ui_entry(habit_name, graph_id, frequency)
+  local function create_habit_ui_entry(name, graph_id, frequency)
     local habit_name = wibox.widget({
-      markup = helpers.ui.colorize_text(habit_name, beautiful.fg),
+      markup = helpers.ui.colorize_text(name, beautiful.fg),
       font = beautiful.font_name .. "12",
       align = "right",
       valign = "center",
@@ -101,7 +140,7 @@ local function create_habit_ui()
     local habit_entry = wibox.widget({
       id = graph_id,
       {
-        { 
+        {
           habit_name,
           freq,
           forced_width = dpi(125),
@@ -201,5 +240,5 @@ end -- create_habit_ui()
 
 create_habit_ui()
 
-return helpers.ui.create_boxed_widget(habit_widget, dpi(550), dpi(400), beautiful.dash_widget_bg)
+return helpers.ui.create_boxed_widget(habit_widget, dpi(550), dpi(410), beautiful.dash_widget_bg)
 

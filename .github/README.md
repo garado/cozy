@@ -157,11 +157,12 @@ Change the theme and style in `user_variables.lua`.
 - <a href="https://pixe.la/" target="_blank">Read these instructions</a> to create a Pixela account and create your habits
 - Install <a href="https://github.com/a-know/pi" target="_blank">pi</a> (command line Pixela tool)
   - The install instructions on pi's Github page don't work, follow this:
-  - <code>go install github.com/a-know/pi/cmd/pi@latest</code>
-  - Put <code>pi</code> (located in <code>$HOME/go/bin</code>) in your path
-- Set the <code>PIXELA_USER_NAME</code> and <code>PIXELA_USER_TOKEN</code> environment variables
-- Update <code>user_variables.lua</code> with the habits you want to display
-- The <code>utils/dash/habits/cache_habits</code> script caches data from Pixela. Read the script documentation. Run it periodically with a cron job to keep your widget updated. 
+  - `go install github.com/a-know/pi/cmd/pi@latest`
+  - Put `pi` (located in `$HOME/go/bin`) in your path
+  - Set the `PIXELA_USER_NAME` and `PIXELA_USER_TOKEN` environment variables
+    - <b>Note:</b>Some login managers like LightDM don't start Awesome in an interactive shell, which means Awesome won't source your .zshrc/.bashrc/.whateverrc and thus won't recognize your Pixela env vars or path if you set them there. As a workaround you can either put your Pixela env vars and `pi` path in a place that's always sourced like `.zshenv`, or you can put your user name and user token directly in `user_variables.lua`.
+- Update `user_variables.lua` with the habits you want to display
+- The `utils/dash/habits/cache_habits` script caches data from Pixela. Read the script documentation. Run it periodically with a cron job to keep your widget updated. 
 
 
 <b>Finances tracker</b>
