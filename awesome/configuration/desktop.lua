@@ -1,9 +1,8 @@
 local awful = require("awful")
-require("awful.autofocus")
 local gears = require("gears")
-local wibox = require("wibox")
 local beautiful = require("beautiful")
-local bling = require("modules.bling")
+
+require("awful.autofocus")
 
 -- i dont understand this
 client.connect_signal("request::manage", function(c)
@@ -26,34 +25,13 @@ client.connect_signal("mouse::enter", function(c)
 	c:emit_signal("request::activate", "mouse_enter", { raise = false })
 end)
 
--- Flash focus
--- bling.module.flash_focus.enable()
-
--- Tag preview 
---bling.widget.tag_preview.enable({
---	show_client_content = true,
---	scale = 0.20,
---  x = 50,
---  y = 425,
---	honor_workarea = true,
---	honor_padding = true,
---	background_widget = wibox.widget({
---		image = beautiful.wallpaper,
---		horizontal_fit_policy = "fit",
---		vertical_fit_policy = "fit",
---		widget = wibox.widget.imagebox,
---	}),
---})
-
--- WALLPAPER --
+-- Wallpaper
 awful.screen.connect_for_each_screen(function(s)
   if beautiful.wallpaper then
     local wallpaper = beautiful.wallpaper
-    
     if type(wallpaper) == "function" then
       wallpaper = wallpaper(s)
     end
-
     gears.wallpaper.maximized(wallpaper, s, false, nil)
   end
 end)

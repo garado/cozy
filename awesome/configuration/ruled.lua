@@ -1,11 +1,6 @@
 local awful = require("awful")
-local beautiful = require("beautiful")
 local ruled = require("ruled")
 local helpers = require("helpers")
-
--- get screen geometry
-local screen_width = awful.screen.focused().geometry.width
-local screen_height = awful.screen.focused().geometry.height
 
 ruled.client.connect_signal("request::rules", function()
   -- GLOBAL --
@@ -43,18 +38,18 @@ ruled.client.connect_signal("request::rules", function()
       },
       role = {
         "GtkFileChooserDialog",
-        "conversation", 
+        "conversation",
       },
       type = {
         "dialog",
       },
     },
-    properties = { 
+    properties = {
       floating = true,
       placement = helpers.client.centered_client_placement,
     },
   })
- 
+
   ruled.client.append_rule({
     rule_any = {
       instance = {

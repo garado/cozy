@@ -4,16 +4,13 @@
 
 local awful = require("awful")
 local hotkeys_popup = require("awful.hotkeys_popup")
-local beautiful = require("beautiful")
 local apps = require("configuration.apps")
-local bling = require("modules.bling")
-local gfs = require("gears.filesystem")
 local os = os
 
-mod = "Mod4"
-alt = "Mod1"
-ctrl = "Control"
-shift = "Shift"
+local mod = "Mod4"
+local alt = "Mod1"
+local ctrl = "Control"
+local shift = "Shift"
 
 -- Helper functions for sane(er) keyboard resizing in layout.suit.tile.* modes
 local function resize_horizontal(factor)
