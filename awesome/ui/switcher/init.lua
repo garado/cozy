@@ -38,7 +38,6 @@ local curr_theme_sel = wibox.widget({
     id = "theme_style",
     widget = wibox.widget.textbox,
   }),
-  spacing = dpi(2),
   layout = wibox.layout.fixed.horizontal,
 })
 
@@ -116,7 +115,7 @@ styles = wibox.widget ({
 -- █▀░ █▄█ █░▀█ █▄▄ ░█░ █ █▄█ █░▀█ ▄█ 
 
 function reset_theme_switcher()
-  local markup = helpers.ui.colorize_text("Current:" , beautiful.fg)
+  local markup = helpers.ui.colorize_text("Current: " , beautiful.fg)
   theme_sel_textbox:set_markup_silently(markup)
   apply_button.visible = false
   cancel_button.visible = false
@@ -145,7 +144,10 @@ end
 
 -- Edits user_vars with selected theme and style
 function apply_new_theme(theme, style)
-  if style == "" or style == nil then
+  local cfg = gfs.get_configuration_dir()
+  local path = cfg .. "theme/colorschemes/" .. theme .. "/" .. style .. ".lua"
+  local theme_exists = gfs.file_readable(path)
+  if not theme_exists or style == "" or style == nil then
     naughty.notification {
       app_name = "System notification",
       title = "Theme switcher",
@@ -205,7 +207,7 @@ local function create_style_buttons(theme)
 end
 
 local function select_new_theme(theme)
-  local markup = helpers.ui.colorize_text("Selected:" , beautiful.fg)
+  local markup = helpers.ui.colorize_text("Selected: " , beautiful.fg)
   theme_sel_textbox:set_markup_silently(markup)
 
   local theme_markup = helpers.ui.colorize_text(theme, beautiful.fg)
@@ -214,6 +216,7 @@ local function select_new_theme(theme)
   apply_button.visible = true
   cancel_button.visible = true
   styles.visible = true
+  selected_style = ""
 
   create_style_buttons(theme)
 end

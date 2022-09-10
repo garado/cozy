@@ -5,6 +5,7 @@
 local awful = require("awful")
 local gears = require("gears")
 local wibox = require("wibox")
+local helpers = require("helpers")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
@@ -16,9 +17,10 @@ return function(s)
   local battery = require("ui.bar.battery")
   local volume = require("ui.bar.volume")
   local brightness = require("ui.bar.brightness")
-  local app_launcher = require("ui.bar.app_launcher")
   local systray = require("ui.bar.systray")
   local notif = require("ui.bar.notif")
+  local app_launcher = require("ui.bar.app_launcher")
+  local launchers = require("ui.bar.launchers")
 
   -- TAGLIST --
 	local modkey = "Mod4"
@@ -127,12 +129,16 @@ return function(s)
           layout = wibox.layout.align.vertical,
           expand = "none",
           {
-            --{
+            {
               app_launcher,
+              launchers[1],
+              launchers[2],
+              launchers[3],
+              spacing = dpi(15),
               layout = wibox.layout.fixed.vertical,
-            --},
-            --top = dpi(6),
-            --widget = wibox.container.margin,
+            },
+            top = dpi(8),
+            widget = wibox.container.margin,
           },
           tag_list(s),
           {
@@ -180,7 +186,7 @@ return function(s)
       c.screen.bar.visible = true 
     end
   end
- 
+
   --client.connect_signal("property::fullscreen", remove_bar)
   --client.connect_signal("request::unmanage", add_bar)
 end

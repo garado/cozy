@@ -50,14 +50,15 @@ theme.base          = "#1a1b26" -- dash, wibar
 theme.crust         = "#222331" -- widget bg
 theme.mantle        = "#1f2335"
 theme.surface0      = "#292e42" -- dash button bg 
-theme.surface1      = "#545c7e" 
+theme.surface1      = "#545c7e"
 theme.overlay0      = "#292e42" -- album art filters
+theme.overlay1      = "#292e42"
 
 -- typography
 theme.fg            = "#c0caf5" -- main text
-theme.subtitle      = "#a9b1d6" 
-theme.subtext       = "#a9b1d6" 
-theme.main_accent   = "#3d59a1" 
+theme.subtitle      = "#a9b1d6"
+theme.subtext       = "#a9b1d6"
+theme.main_accent   = "#3d59a1"
 
 -- custom
 theme.hab_uncheck_bg    = "#292e42"

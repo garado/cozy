@@ -4,4 +4,5 @@ return {
   tokyonight = require(... .. ".tokyonight"),
   nord = require(... .. ".nord"),
   dracula = require(... .. ".dracula"),
+  kanagawa = require(... .. ".kanagawa"),
 }

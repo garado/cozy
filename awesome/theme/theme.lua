@@ -72,6 +72,11 @@ theme.brightbar_fg    = theme.brightbar_fg    or theme.main_accent
 theme.volbar_fg       = theme.volbar_fg       or theme.main_accent
 theme.notif_toggle_fg = theme.notif_toggle_fg or theme.main_accent
 theme.wibar_clock     = theme.wibar_clock     or theme.fg
+theme.wibar_launcher_app = theme.wibar_launcher_app or theme.fg
+theme.wibar_launcher_dash = theme.wibar_launcher_dash or theme.fg
+theme.wibar_launcher_ctrl = theme.wibar_launcher_ctrl or theme.fg
+theme.wibar_launcher_settings = theme.wibar_launcher_settings or theme.fg
+theme.wibar_launcher_hover = theme.wibar_launcher_hover or theme.main_accent
 
 -- Control center
 theme.ctrl_bg       = theme.ctrl_bg       or theme.crust
@@ -97,14 +102,15 @@ theme.notif_actions_bg  = theme.notif_actions_bg  or theme.mantle
 theme.notif_timeout_bg  = theme.notif_timeout_bg  or theme.mantle
 theme.notif_dismiss_bg  = theme.notif_dismiss_bg  or theme.crust
 theme.notification_spacing = dpi(10)
+theme.notification_border_color = theme.notif_bg
 
 -- Gaps
 theme.useless_gap = dpi(7)
 
 -- Borders
 theme.border_width = dpi(3)
-theme.border_color_active = theme.border_color_active or theme.main_accent
-theme.border_color_normal = theme.border_color_normal or theme.overlay1
+theme.border_color_active = theme.main_accent
+theme.border_color_normal = theme.overlay1
 
 -- Corner radius
 -- (not used for client rounding - used for rounding of other UI

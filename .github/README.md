@@ -18,10 +18,6 @@ Hi! This is <b>cozy</b>, my <a href="https://awesomewm.org" target="_blank">Awes
 <li>looks awesome!</li>
 </ol>
 
-<p>
-This is a port of my old Eww config. I've decided to keep maintaining the Eww config <a href="https://github.com/garado/cozy/tree/eww" target="_blank">here</a> because I might leave Awesome one day. (Eww version is heavily wip and won't be updated as often)
-</p>
-
 <h2>🚀 Features</h2>
 <h4>Dashboard</h4>
 <p align="center">
@@ -40,14 +36,65 @@ This is a port of my old Eww config. I've decided to keep maintaining the Eww co
 
 
 <h4>Theme switcher</h4>
-<video width="800" controls>
-  <source src="assets/theme_switcher.mp4" type="video/mp4">
-</video>
+
+<p align="center">
+  <img title="" src="assets/theme_switcher.gif" alt="" width="800">
+</p>
+
+The theme switcher can set the theme for your entire system - not just Awesome. By default, it switches the Kitty, NvChad, and GTK themes, but it is easily extensible to whichever applications you use.
+
+Built-in themes:
+
+| Theme name | Styles       |
+|------------|--------------|
+| nord       | dark, light  |
+| dracula    | dark         |
+| tokyonight | dark         |
+| gruvbox    | dark, light  |
+| catpuccin  | mocha, latte |
 
 <ul>
-  <li>Can switch theme for your entire system - not just Awesome!</li>
-  <li>By default, it switches Kitty, Nvim/NvChad</li>
-  <li>Easily extensible to any applications you use</li>
+  <li>
+    <details><summary><b>nord</b></summary>
+      <p align="center">
+        <img title="" width="800" src="assets/themes/nord_dark.png">
+      </p>
+      <p align="center">
+        <img title="" width="800" src="assets/themes/nord_light.png">
+      </p>
+    </details>
+  </li>
+  <li>
+    <details><summary><b>dracula</b></summary>
+      <p align="center">
+        <img title="" width="800" src="assets/themes/dracula.png">
+      </p>
+    </details>
+  </li>
+  <li>
+    <details><summary><b>catpuccin</b></summary>
+      <p align="center">
+        <img title="" width="800" src="assets/themes/catppuccin_macchiato.png">
+      </p>
+    </details>
+  </li>
+  <li>
+    <details><summary><b>tokyo_night</b></summary>
+      <p align="center">
+        <img title="" width="800" src="assets/themes/tokyo_night.png">
+      </p>
+    </details>
+  </li>
+  <li>
+    <details><summary><b>gruvbox</b></summary>
+      <p align="center">
+        <img title="" width="800" src="assets/themes/gruvbox_dark.png">
+      </p>
+      <p align="center">
+        <img title="" width="800" src="assets/themes/gruvbox_light.png">
+      </p>
+    </details>
+  </li>
 </ul>
 
 <h2>🔧 Install and configure</h2>
@@ -96,53 +143,8 @@ Make sure you update <code>configuration/apps.lua</code> with your default termi
 
 <b>Themes</b>
 
-Change theme in `user_variables.lua`.
+Change the theme and style in `user_variables.lua`.
 
-Built-in themes: nord_dark, dracula, tokyo_night, gruvbox_dark, gruvbox_light, catppuccin_macchiato
-<ul>
-  <li>
-    <details><summary><b>nord_dark</b></summary>
-      <p align="center">
-        <img title="" width="800" src="assets/themes/nord_dark.png">
-      </p>
-    </details>
-  </li>
-  <li>
-    <details><summary><b>dracula</b></summary>
-      <p align="center">
-        <img title="" width="800" src="assets/themes/dracula.png">
-      </p>
-    </details>
-  </li>
-  <li>
-    <details><summary><b>catpuccin_macchiato</b></summary>
-      <p align="center">
-        <img title="" width="800" src="assets/themes/catppuccin_macchiato.png">
-      </p>
-    </details>
-  </li>
-  <li>
-    <details><summary><b>tokyo_night</b></summary>
-      <p align="center">
-        <img title="" width="800" src="assets/themes/tokyo_night.png">
-      </p>
-    </details>
-  </li>
-  <li>
-    <details><summary><b>gruvbox_dark</b></summary>
-      <p align="center">
-        <img title="" width="800" src="assets/themes/gruvbox_dark.png">
-      </p>
-    </details>
-  </li>
-  <li>
-    <details><summary><b>gruvbox_light</b></summary>
-      <p align="center">
-        <img title="" width="800" src="assets/themes/gruvbox_light.png">
-      </p>
-    </details>
-  </li>
-</ul>
 
 <b>Google Calendar events</b>
 

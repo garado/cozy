@@ -40,11 +40,6 @@ local function gtk()
   local gtk_theme = theme.gtk
   local cmd = "gsettings set org.gnome.desktop.interface gtk-theme '" .. gtk_theme .. "'"
   awful.spawn.with_shell(cmd)
-
-  -- restart firefox
-  -- firefox theme is automatically set to current gtk theme
-  --awful.spawn.with_shell("pkill firefox")
-  --awful.spawn.with_shell("firefox &")
 end
 
 return function()

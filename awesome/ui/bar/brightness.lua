@@ -11,7 +11,6 @@ local beautiful = require("beautiful")
 local dpi = beautiful.xresources.apply_dpi
 local wibox = require("wibox")
 local helpers = require("helpers")
-local naughty = require("naughty")
 local animation = require("modules.animation")
 
 local slider = wibox.widget({
@@ -30,27 +29,17 @@ local slider = wibox.widget({
 })
 
 local icon = wibox.widget({
-  {
-    markup = helpers.ui.colorize_text("滛", beautiful.brightbar_fg),
-    widget = wibox.widget.textbox,
-    font = beautiful.font .. "15",
-    align = "center",
-    valign = "center",
-  },
-  --margins = { top = dpi(5) },
-  widget = wibox.container.margin,
+  markup = helpers.ui.colorize_text("滛", beautiful.brightbar_fg),
+  widget = wibox.widget.textbox,
+  font = beautiful.font .. "15",
+  align = "center",
+  valign = "center",
 })
 
 local widget = wibox.widget({
-  --{
-    slider,
-    icon,
-    layout = wibox.layout.align.vertical,
-  --},
-  --margins = {
-  --  bottom = dpi(10),
-  --},
-  --widget = wibox.container.margin,
+  slider,
+  icon,
+  layout = wibox.layout.align.vertical,
 })
 
 -- Update brightness based on slider value 
@@ -58,8 +47,8 @@ local brightness_slider = slider.children[1]
 brightness_slider:connect_signal("property::value", function()
   local brightness = brightness_slider:get_value()
 	awful.spawn("brightnessctl set " .. brightness .. "%", false)
-  
-  -- Update brightness osd
+
+  -- Trigger brightness notification
 	awesome.emit_signal("module::brightness", brightness)
 end)
 
