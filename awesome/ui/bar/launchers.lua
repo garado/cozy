@@ -34,5 +34,5 @@ end
 return {
   create_launcher("異", "dash::toggle", beautiful.wibar_launcher_dash),
   create_launcher("שּׂ", "control_center::toggle", beautiful.wibar_launcher_ctrl),
-  create_launcher("襁", "settings::toggle", beautiful.wibar_launcher_settings),
+  create_launcher("襁", "theme_switcher::toggle", beautiful.wibar_launcher_settings),
 }

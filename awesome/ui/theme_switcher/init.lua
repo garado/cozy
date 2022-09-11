@@ -12,6 +12,7 @@ local dpi = xresources.apply_dpi
 local helpers = require("helpers")
 local widgets = require("ui.widgets")
 local naughty = require("naughty")
+local nav = require("ui.nav")
 
 local selected_theme = ""
 local selected_style = ""
@@ -22,7 +23,6 @@ local styles
 
 -- █░█░█ █ █▄▄ █▀█ ▀▄▀ █▀▀ █▀ 
 -- ▀▄▀▄▀ █ █▄█ █▄█ █░█ ██▄ ▄█ 
-
 local curr_theme_sel = wibox.widget({
   wibox.widget ({
     -- "Current:" or "Selected:"
@@ -113,7 +113,7 @@ styles = wibox.widget ({
 
 -- █▀▀ █░█ █▄░█ █▀▀ ▀█▀ █ █▀█ █▄░█ █▀ 
 -- █▀░ █▄█ █░▀█ █▄▄ ░█░ █ █▄█ █░▀█ ▄█ 
-
+-- Sets theme switcher back to default settings
 function reset_theme_switcher()
   local markup = helpers.ui.colorize_text("Current: " , beautiful.fg)
   theme_sel_textbox:set_markup_silently(markup)
@@ -222,7 +222,7 @@ local function select_new_theme(theme)
 end
 
 local function create_theme_button(name)
-  return widgets.button.text.normal({
+  local widget = widgets.button.text.normal({
     text = name,
     text_normal_bg = beautiful.fg,
     normal_bg = beautiful.switcher_options_bg,
@@ -233,8 +233,13 @@ local function create_theme_button(name)
       selected_theme = name
       selected_style = ""
       theme_style_textbox:set_markup_silently("", beautiful.fg)
+      return 24
     end
   })
+
+  -- make selectable
+  local theme_button = nav.Elevated:new(widget, name)
+  return theme_button.widget
 end
 
 local function create_theme_buttons()
@@ -326,6 +331,7 @@ return function()
 
   awesome.connect_signal("theme_switcher::close", function()
     theme_switcher.visible = false
+    reset_theme_switcher()
   end)
 
   return theme_switcher

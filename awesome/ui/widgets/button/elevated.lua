@@ -337,6 +337,11 @@ function elevated_button.normal(args)
 
 	local widget = button(args)
 
+  -- custom
+  function widget:nav_release()
+    args.on_release()
+  end
+
 	widget:connect_signal("mouse::enter", function(self, find_widgets_result)
 		effect(widget, args.hover_bg, args.hover_shape, args.hover_border_width, args.hover_border_color)
 		if args.on_hover ~= nil then
@@ -447,7 +452,7 @@ function elevated_button.normal(args)
 		end
 	end)
 
-	return widget
+  return widget
 end
 
 return setmetatable(elevated_button, elevated_button.mt)
