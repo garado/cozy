@@ -42,7 +42,7 @@ end
 theme.base          = "#11111b"  -- dark bg
 theme.crust         = "#191925"  -- medium bg
 theme.mantle        = "#181825"  -- light bg
-theme.surface0      = "#363a4f"  -- bg for interactive elements (eg buttons)
+theme.surface0      = "#11111b"  -- bg for interactive elements (eg buttons)
 theme.surface1      = "#494d64"  -- slightly darker version of above 
 theme.overlay0      = "#6c7086"  -- currently only used for album art filter 
 theme.overlay1      = "#8087a2"  -- border colors

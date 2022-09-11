@@ -56,7 +56,6 @@ local Elevated = Navbase:new(widget, name)
 -- Highlight toggle
 function Elevated:hl_toggle()
   self.highlighted = not self.highlighted
-  local bg = self.widget:get_children_by_id("background_role")[1].bg
   if self.highlighted then
     self.widget:get_children_by_id("background_role")[1].bg = beautiful.overlay0
   else

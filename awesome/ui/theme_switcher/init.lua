@@ -14,7 +14,7 @@ local widgets = require("ui.widgets")
 local naughty = require("naughty")
 local nav = require("ui.nav.navclass")
 local tree = require("ui.nav.tree")
-local navigate = require("ui.nav.navigate")
+local navigate = require("ui.theme_switcher.navigate")
 
 local selected_theme = ""
 local selected_style = ""
@@ -63,8 +63,6 @@ local apply_button = wibox.widget({
   }),
   widget = wibox.container.place,
 })
-nav.Elevated:new(apply_button.children[1], "apply")
-Navtree:append(3, "apply")
 
 local cancel_button
 cancel_button = wibox.widget({
@@ -80,8 +78,6 @@ cancel_button = wibox.widget({
   }),
   widget = wibox.container.place,
 })
-nav.Elevated:new(cancel_button.children[1], "cancel")
-Navtree:append(3, "cancel")
 
 local style_buttons = wibox.widget({
   spacing = dpi(10),
@@ -189,6 +185,12 @@ local function create_style_button(style)
     on_release = function()
       select_new_style(style)
       selected_style = style
+      Navtree:append(3, "apply")
+      Navtree:append(3, "cancel")
+      nav.Elevated:new(apply_button.children[1],  "apply")
+      nav.Elevated:new(cancel_button.children[1], "cancel")
+      apply_button.visible  = true
+      cancel_button.visible = true
     end
   })
   local signal_name = selected_theme .. "_" .. style
@@ -228,8 +230,6 @@ local function select_new_theme(theme)
   local theme_markup = helpers.ui.colorize_text(theme, beautiful.fg)
   theme_name_textbox:set_markup_silently(theme_markup)
 
-  apply_button.visible = true
-  cancel_button.visible = true
   styles.visible = true
   selected_style = ""
 

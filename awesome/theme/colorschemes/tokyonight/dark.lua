@@ -34,7 +34,6 @@ theme.accents = {
   "#41a6b5",
 }
 
-
 function theme.random_accent_color()
   local i = math.random(1, #theme.accents)
   return theme.accents[i]
@@ -52,7 +51,7 @@ theme.mantle        = "#1f2335"
 theme.surface0      = "#292e42" -- dash button bg 
 theme.surface1      = "#545c7e"
 theme.overlay0      = "#292e42" -- album art filters
-theme.overlay1      = "#292e42"
+theme.overlay1      = "#414868" -- selected buttons
 
 -- typography
 theme.fg            = "#c0caf5" -- main text

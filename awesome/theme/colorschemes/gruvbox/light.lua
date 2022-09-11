@@ -43,7 +43,7 @@ theme.crust         = "#f2e5bc"  -- medium bg
 theme.mantle        = "#d5c4a1"  -- light bg
 theme.surface0      = "#bdae93"  -- bg for interactive elements (eg buttons)
 theme.surface1      = "#a89984"  -- slightly darker version of above 
-theme.overlay0      = "#f2e5bc"  -- currently only used for album art filter 
+theme.overlay0      = "#d5c4a1"  -- album art filter, selectable buttons
 theme.overlay1      = "#665c54"  -- border colors
 
 -- typography
@@ -57,8 +57,7 @@ theme.red    = "#9d0006"
 theme.green  = "#79740e"
 theme.yellow = "#d79921"
 
-
-
+-- custom
 theme.wibar_bg = "#928374"
 theme.wibar_occupied = "#665c54"
 theme.pfp_bg = "#a89984"
