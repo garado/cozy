@@ -342,6 +342,14 @@ function elevated_button.normal(args)
     args.on_release()
   end
 
+  function widget:nav_hl_on()
+		self:get_children_by_id("background_role")[1].bg = args.hover_bg
+  end
+
+  function widget:nav_hl_off()
+		self:get_children_by_id("background_role")[1].bg = args.normal_bg
+  end
+
 	widget:connect_signal("mouse::enter", function(self, find_widgets_result)
 		effect(widget, args.hover_bg, args.hover_shape, args.hover_border_width, args.hover_border_color)
 		if args.on_hover ~= nil then

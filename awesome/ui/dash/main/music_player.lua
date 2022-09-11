@@ -100,9 +100,9 @@ local music = wibox.widget({
 					nil,
 					{
 						{
-							widgets.playerctl.previous(20, beautiful.fg, beautiful.playerctl_bg),
-							widgets.playerctl.play(beautiful.fg, beautiful.playerctl_bg),
-							widgets.playerctl.next(20, beautiful.fg, beautiful.playerctl_bg),
+							widgets.playerctl.previous(20, beautiful.playerctl_fg, beautiful.playerctl_bg),
+							widgets.playerctl.play(beautiful.playerctl_fg, beautiful.playerctl_bg),
+							widgets.playerctl.next(20, beautiful.playerctl_fg, beautiful.playerctl_bg),
 							layout = wibox.layout.flex.horizontal,
 						},
 						forced_height = dpi(70),
@@ -145,8 +145,8 @@ playerctl_daemon:connect_signal("metadata", function(_, title, artist, album_pat
 	end
 
 	music_art:set_image(gears.surface.load_uncached(album_path))
-	music_title:set_markup_silently(helpers.ui.colorize_text(title, beautiful.fg))
-	music_artist:set_markup_silently(helpers.ui.colorize_text(artist, beautiful.fg))
+	music_title:set_markup_silently(helpers.ui.colorize_text(title, beautiful.playerctl_fg))
+	music_artist:set_markup_silently(helpers.ui.colorize_text(artist, beautiful.playerctl_fg))
 end)
 
 playerctl_daemon:connect_signal("playback_status", function(_, playing, __)

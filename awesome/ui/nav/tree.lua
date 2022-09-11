@@ -1,7 +1,20 @@
 
 -- ▀█▀ █▀█ █▀▀ █▀▀ 
 -- ░█░ █▀▄ ██▄ ██▄ 
--- This is defined once per widget
+
+-- This is used alongside the navclasses and navigate() function
+-- to move through widgets using keybinds.
+
+-- The Tree class defines the hierarchy of the widget.
+-- It contains the names of selectable elements as strings.
+
+-- The Navclasses create signals to control the UI elements.
+-- When instantiating a new navclass, you pass it the name of the
+-- element as a string and the element to modify.
+
+-- The navigate() function ties the above together - it implements 
+-- a keygrabber to navigate through the tree's hierarchy and interact 
+-- with its elements.
 
 local table = table
 
@@ -9,6 +22,7 @@ local Tree = {
   tree = nil
 }
 
+-- Create base hierarchy
 function Tree:new(levels)
   local o = {}
   o.tree = {}
@@ -22,7 +36,6 @@ function Tree:new(levels)
   return o
 end
 
--- Whole bunch of functions
 function Tree:append(level, name)
   if level ~= nil and name ~= nil then
     table.insert(self.tree[level], name)

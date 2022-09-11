@@ -58,6 +58,8 @@ theme.transparent = "#ffffff00"
 -- custom
 theme.wibar_occupied = "#9fa5b0"
 theme.wibar_empty = "#ced1d6"
+theme.now_playing_fg = "#d8dee9"
+theme.playerctl_fg = "#d8dee9"
 
 -- theme switcher settings
 theme.kitty = "Nord Light"

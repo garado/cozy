@@ -18,11 +18,12 @@ local Navbase = {
   name          = nil,
   selected      = false,
   highlighted   = false,
+  original_bg   = nil,
 }
 
-function Navbase:hl_toggle()   end
-function Navbase:hl_off()   end
-function Navbase:release()     end
+function Navbase:hl_toggle()  end
+function Navbase:hl_off()     end
+function Navbase:release()    end
 
 function Navbase:new(widget, name)
   local o = {}
@@ -57,29 +58,22 @@ local Elevated = Navbase:new(widget, name)
 function Elevated:hl_toggle()
   self.highlighted = not self.highlighted
   if self.highlighted then
-    self.widget:get_children_by_id("background_role")[1].bg = beautiful.overlay0
+    self.widget:nav_hl_on()
   else
-    self.widget:get_children_by_id("background_role")[1].bg = beautiful.surface0
+    self.widget:nav_hl_off()
   end
 end
 
 function Elevated:hl_off()
   self.highlighted = false
-  self.widget:get_children_by_id("background_role")[1].bg = beautiful.surface0
+  self.widget:nav_hl_off()
 end
 
 function Elevated:release()
   self.widget:nav_release()
 end
 
--- █▀▄ ▄▀█ █▀ █░█    █░█░█ █ █▀▄ █▀▀ █▀▀ ▀█▀ █▀ 
--- █▄▀ █▀█ ▄█ █▀█    ▀▄▀▄▀ █ █▄▀ █▄█ ██▄ ░█░ ▄█ 
-local DashWidget = Navbase:new(widget, name)
-
-function DashWidget:hl_toggle()
-end
-
--- Return classes
+-- Return class definitions
 return {
   Elevated = Elevated,
 }
