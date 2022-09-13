@@ -18,23 +18,56 @@ function Navigate:new(tree)
   return setmetatable(o, self)
 end
 
-function Navigate:outer_iter(amt)
+-- Navigate between neighboring boxes.
+function Navigate:iter_between(amt)
+  print("iter between " .. self.current_box.name)
+  -- To get neighbor of current box, access parent.[parent.index + 1]
+  -- Make sure there is a neighboring box.
   local parent = self.current_box.parent
-  local new_box = parent:iter(amt)
-  self.current_box = new_box
-  self.current_box.index = 1
-  print("Nav: iterated. New box is " .. self.current_box.name)
+  if parent and self.current_box:has_neighbor() then
+    local new_box = parent:iter(amt)
+    self.current_box = new_box
+    self.current_box.index = 1
+    local new_current_item = self.current_box:get_current_item()
+    if new_current_item.is_box then
+      self.current_box:get_current_item():iter(amt)
+      self.current_box = new_current_item
+    end
+    print("Nav: iter_between: New box is " .. self.current_box.name)
+    return
+  end
+
+  -- If there is no neighbor, backtrace
+  self.current_box = parent
+  self:iter_between(amt)
+
 end
 
-function Navigate:inner_iter(amt)
+-- Navigate within a box's items.
+function Navigate:iter_within(amt)
+  -- Verify that current box still exists.
+  -- If it doesn't, go to next box.
+  -- (BROKEN! dangling reference)
   local parent = self.current_box.parent
-  if not parent:contains(self.current_box) then
-    self:outer_iter(amt)
+  if parent and not parent:contains(self.current_box) then
+    self:iter_between(amt)
   end
-  print("Nav: iterating within " ..self.current_box.name .. "'s items by " .. amt)
+
+  -- If the current item is a box, iterate within that box.
+  --local passthrough = self.current_box.passthrough
+  local current_item = self.current_box:get_current_item()
+  if current_item.is_box then
+    self.current_box = current_item
+    self:iter_within(amt)
+  end
+
+  -- If the current item is an element, iterate to the next element.
+  -- Returns the item it iterated to if successful.
+  -- Returns nil if unsuccessful, eg if iter amt goes out of item table bounds.
+  print("Nav: iter_within within " ..self.current_box.name .. " by " .. amt)
   local ret = self.current_box:iter(amt)
   if ret == nil then
-    self:outer_iter(amt)
+    self:iter_between(amt)
     if amt > 0 then
       self.current_box:set_index(1)
     else
@@ -64,25 +97,25 @@ function Navigate:release()
   end
 end
 
--- Override these!
-function Navigate:h() self:inner_iter(-1) end
-function Navigate:j() self:inner_iter(1)  end
-function Navigate:k() self:inner_iter(-1) end
-function Navigate:l() self:inner_iter(1)  end
+-- Override these for custom navigation
+function Navigate:h() self:iter_within(-1) end
+function Navigate:j() self:iter_within(1)  end
+function Navigate:k() self:iter_within(-1) end
+function Navigate:l() self:iter_within(1)  end
 
 function Navigate:BackSpace()
-  if self.current_box.name == "root" then
-    self:inner_iter(-1)
+  if self.current_box.parent == nil then
+    self:iter_within(-1)
   else
-    self:outer_iter(-1)
+    self:iter_between(-1)
   end
 end
 
 function Navigate:Tab()
-  if self.current_box.name == "root" then
-    self:inner_iter(1)
+  if self.current_box.parent == nil then
+    self:iter_within(1)
   else
-    self:outer_iter(1)
+    self:iter_between(1)
   end
 end
 

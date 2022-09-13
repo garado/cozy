@@ -10,11 +10,13 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local gears = require("gears")
-local gfs = require("gears.filesystem")
 local helpers = require("helpers")
 local widgets = require("ui.widgets")
 local user_vars = require("user_variables")
 local string = string
+
+local Elevated = require("ui.nav.navclass").Elevated
+local Box = require("ui.nav.box")
 
 local update_ui
 local ui_timew_started, ui_timew_stopped
@@ -104,7 +106,7 @@ function ui_timew_started()
   local current_tag = create_ui_text("WORKING ON", "--", 15)
 
   local tag
-  
+
   -- turns 6:15:08 (H+:MM:SS) into 6h 15m
   local function format_time(str)
     str = string.gsub(str, "[^0-9:]", "")
@@ -130,7 +132,7 @@ function ui_timew_started()
         local markup = helpers.ui.colorize_text(format_time(stdout), beautiful.fg)
         total_all_tags.children[2]:set_markup_silently(markup)
       end)
-      
+
       -- current session time
       local curr_cmd = "timew | tail -n 1"
       awful.spawn.easy_async_with_shell(curr_cmd, function(stdout)

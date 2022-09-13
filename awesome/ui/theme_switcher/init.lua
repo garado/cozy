@@ -23,20 +23,9 @@ local nav_root = Box:new({
   is_circular = true,
 })
 
-local nav_themes = Box:new({
-  name = "nav_themes",
-  parent = nav_root,
-})
-
-local nav_styles = Box:new({
-  name = "nav_styles",
-  parent = nav_root,
-})
-
-local nav_actions = Box:new({
-  name = "nav_actions",
-  parent = nav_root,
-})
+local nav_themes  = Box:new({ name = "nav_themes"  })
+local nav_styles  = Box:new({ name = "nav_styles"  })
+local nav_actions = Box:new({ name = "nav_actions" })
 
 nav_root:append(nav_themes)
 
@@ -143,7 +132,6 @@ styles = wibox.widget ({
 -- █▀░ █▄█ █░▀█ █▄▄ ░█░ █ █▄█ █░▀█ ▄█ 
 -- Sets theme switcher back to default settings
 function reset_theme_switcher()
-  print("reset")
   local markup = helpers.ui.colorize_text("Current: " , beautiful.fg)
   theme_sel_textbox:set_markup_silently(markup)
   apply_button.visible = false

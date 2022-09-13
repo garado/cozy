@@ -8,23 +8,33 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local keygrabber = require("awful.keygrabber")
 local widgets = require("ui.widgets")
-local naughty = require("naughty")
 
-return function() 
+local Box = require("ui.nav.box")
+local elevated = require("ui.nav.navclass").Elevated
+local navigate = require("ui.dash.navigate")
+
+local nav_root = Box:new({
+  name = "root",
+  is_circular = true,
+})
+
+local nav_tabs = Box:new({ name = "tabs" })
+nav_root:append(nav_tabs)
+
+return function()
   local dash
 
   -- import tab contents
-  local main = require("ui.dash.main")
+  local main, nav_main = require("ui.dash.main")()
+  nav_root:append(nav_main)
+
   local finances = require("ui.dash.finances")
   local habit = require("ui.dash.habit")
   local agenda = require("ui.dash.agenda")
 
   local tablist =   { main, finances, habit,  agenda }
   local tab_icons = { "",  "",      "",    ""    }
-  local tablist_pos = 1
-  local tablist_elems = 4
 
   local dash_content = wibox.widget({
     {
@@ -62,9 +72,9 @@ return function()
         on_release = function()
           local fuck = dash_content:get_children_by_id("content")[1]
           fuck:set(1, tablist[i])
-          tablist_pos = i
         end
       })
+      nav_tabs:append(elevated:new(widget))
       tab_bar.children[1]:add(widget)
     end
 
@@ -74,78 +84,6 @@ return function()
   local tab_bar = create_tab_bar()
   dash_content:get_children_by_id("content")[1]:add(main)
 
-  -- █▄▀ █▀▀ █▄█ █▄▄ █ █▄░█ █▀▄ █▀ 
-  -- █░█ ██▄ ░█░ █▄█ █ █░▀█ █▄▀ ▄█ 
-  -- "cursor" is either in tabs or content
-  local group_selected = "tab"
-  local obj_selected = "user"
-
-  local function dbn(message)
-    naughty.notification {
-      app_name = "custom keygrabber",
-      title = "navigate()",
-      message = message,
-      timeout = 1,
-    }
-  end
-
-  -- Vim-like keybindings to navigate dash!
-  local function navigate()
-    local content = dash_content:get_children_by_id("content")[1]
-
-    -- "j" and "k" navigate between tabs
-    local function next_tab()
-      local old_index = tablist_pos
-      local index = ((tablist_pos + 1) % tablist_elems)
-      if index == 0 then index = 4 end
-      content:set(1, tablist[index])
-      tablist_pos = index
-
-      local tab = tab_bar.children[1].children[tablist_pos]
-      tab:set_color(beautiful.main_accent)
-      local prev_tab = tab_bar.children[1].children[old_index]
-      prev_tab:set_color(beautiful.fg)
-    end
-
-    local function prev_tab()
-      local old_index = tablist_pos
-      local index = ((tablist_pos - 1) % tablist_elems)
-      if index == 0 then index = 4 end
-      content:set(1, tablist[index])
-      tablist_pos = index
-
-      local tab = tab_bar.children[1].children[tablist_pos]
-      tab:set_color(beautiful.main_accent)
-      local prev_tab = tab_bar.children[1].children[old_index]
-      prev_tab:set_color(beautiful.fg)
-    end
-
-    -- I thought about making h/l navigate between interactive
-    -- tab elements (e.g. pomodoro) but then decided against it
-
-    -- Call functions depending on which key was pressed
-    local function keypressed(self, mod, key, command)
-      if key == "j" then
-        next_tab()
-      elseif key == "k" then
-        prev_tab()
-      --elseif key == "h" then
-      --  prev_element()
-      --elseif key == "l" then
-      --  next_element()
-      end
-    end
-
-    -- Putting all the puzzle pieces together
-    awful.keygrabber {
-      stop_key = "Mod4",
-      stop_event = "press",
-      autostart = true,
-      timeout = 10,
-      keypressed_callback = keypressed,
-    }
-  end
-
   -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
   -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
   awesome.connect_signal("dash::toggle", function()
@@ -154,7 +92,7 @@ return function()
     else
       require("ui.shared").close_other_popups("dash")
       awesome.emit_signal("dash::opened")
-      navigate()
+      navigate:start(nav_root)
     end
     dash.visible = not dash.visible
   end)

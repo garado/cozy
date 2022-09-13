@@ -8,23 +8,42 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local tree = require("ui.nav.tree")
-local navigate = require("ui.nav.navigate")
 
 -- For navigation
-local navtree = tree:new(4)
+local Box = require("ui.nav.box")
+local nav = require("ui.control_center.navigate")
+
+local nav_root = Box:new({
+  name = "root",
+  circular = true,
+})
 
 -- Import widgets
 -- local profile = require("ui.control_center.profile")
-local quick_actions = require("ui.control_center.quick_actions")(navtree)
 local uptime = require("ui.control_center.uptime")
-local power_opts, power_confirm = require("ui.control_center.power")(navtree)
-local links = require("ui.control_center.links")(navtree)
+
+local _qa = require("ui.control_center.quick_actions")
+local qactions = _qa.widget
+local nav_qactions = _qa.nav
+
+local _links = require("ui.control_center.links")
+local links = _links.widget
+local nav_links = _links.nav
+
+local _pwr = require("ui.control_center.power")
+local power_opts = _pwr.power_opts
+local power_confirm = _pwr.power_confirm
+local nav_power_opts = _pwr.nav_power_opts
+local nav_power_confirm = _pwr.nav_power_confirm
+
+nav_root:append(nav_qactions)
+nav_root:append(nav_links)
+nav_root:append(nav_power_opts)
 
 return function()
   local body = wibox.widget({
     {
-      quick_actions,
+      qactions,
       links,
       spacing = dpi(20),
       layout = wibox.layout.fixed.vertical,
@@ -87,8 +106,9 @@ return function()
     control_center.visible = not control_center.visible
     if control_center.visible then
       require("ui.shared").close_other_popups("control_center")
-      navigate(navtree)
+      nav:start(nav_root)
     else
+      nav:stop()
       power_confirm.visible = false
     end
   end)
@@ -103,10 +123,14 @@ return function()
 
   awesome.connect_signal("ctrl::power_confirm_toggle", function()
     power_confirm.visible = not power_confirm.visible
+    if power_confirm.visible and not nav_root:contains(nav_power_confirm) then
+      nav_root:append(nav_power_confirm)
+    end
   end)
 
   awesome.connect_signal("ctrl::power_confirm_on", function()
     power_confirm.visible = true
+    nav_root:append(nav_power_confirm)
   end)
 
   return control_center

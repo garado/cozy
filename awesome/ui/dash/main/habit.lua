@@ -12,6 +12,12 @@ local gfs = require("gears.filesystem")
 local user_vars = require("user_variables")
 local dpi = xresources.apply_dpi
 local naughty = require("naughty")
+local Box = require("ui.nav.box")
+local Habit = require("ui.nav.navclass").Habit
+
+local nav_dash_habits = Box:new({
+  name = "nav_dash_habits",
+})
 
 local os = os
 local string = string
@@ -206,6 +212,8 @@ local function create_habit_ui()
           layout = wibox.layout.stack,
         })
 
+        nav_dash_habits:append(Habit:new(checkbox))
+
         checkbox:connect_signal("button::press", function()
           -- update ui
           local box = checkbox.children[1]
@@ -240,5 +248,8 @@ end -- create_habit_ui()
 
 create_habit_ui()
 
-return helpers.ui.create_boxed_widget(habit_widget, dpi(550), dpi(410), beautiful.dash_widget_bg)
+return {
+  nav = nav_dash_habits,
+  widget = helpers.ui.create_boxed_widget(habit_widget, dpi(550), dpi(410), beautiful.dash_widget_bg),
+}
 

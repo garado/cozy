@@ -11,7 +11,13 @@ local naughty = require("naughty")
 local widgets = require("ui.widgets")
 local gfs = require("gears.filesystem")
 local apps = require("configuration.apps")
-local nav = require("ui.nav.navclass")
+local Box = require("ui.nav.box")
+local Elevated = require("ui.nav.navclass").Elevated
+
+local nav_qactions = Box:new({
+  name = "qactions",
+  is_circular = false,
+})
 
 local scripts = gfs.get_configuration_dir() .. "utils/ctrl/"
 local term = apps.default.terminal
@@ -83,65 +89,67 @@ local function calculator_func()
   })
 end
 
-return function(navtree)
-  -- Helper function to create a quick action button
-  local function create_quick_action(icon, name, func)
-    local quick_action = widgets.button.text.normal({
-      text = icon,
-      text_normal_bg = beautiful.fg,
-      normal_bg = beautiful.ctrl_qa_btn_bg,
-      animate_size = false,
-      size = 20,
-      on_release = function()
-        func()
-        awesome.emit_signal("control_center::toggle")
-      end
-    })
+-- Helper function to create a quick action button
+local function create_quick_action(icon, name, func)
+  local quick_action = widgets.button.text.normal({
+    text = icon,
+    text_normal_bg = beautiful.fg,
+    normal_bg = beautiful.ctrl_qa_btn_bg,
+    animate_size = false,
+    size = 20,
+    on_release = function()
+      func()
+      awesome.emit_signal("control_center::toggle")
+    end
+  })
 
-    local action = wibox.widget({
-      {
-        quick_action,
-        forced_width = dpi(50),
-        forced_height = dpi(50),
-        widget = wibox.container.margin,
-      },
-      widget = wibox.container.place,
-    })
-
-    navtree:append(1, name)
-    nav.Elevated:new(quick_action, name)
-
-    return action
-  end
-
-  -- Creating the quick action buttons
-  -- Arguments: icon name func 
-  local widget = wibox.widget({
+  local action = wibox.widget({
     {
-      create_quick_action("", "Rotate", rotate_screen_func),
-      create_quick_action("", "Conservation mode", conservation_mode_func),
-      create_quick_action("", "Onboard", onboard_func),
-      create_quick_action("", "Calculator", calculator_func),
-
-      -- unfinished --
-      create_quick_action("", "Timer", ""),
-      create_quick_action("", "Nightshift", ""),
-      create_quick_action("", "Rotate bar", ""),
-      create_quick_action("", "Screenshot", ""),
-      create_quick_action("", "Mic", ""),
-      create_quick_action("", "Switch theme", ""),
-
-      -- 
-      --  
-
-      spacing = dpi(15),
-      forced_num_rows = 2,
-      forced_num_cols = 5,
-      homogeneous = true,
-      layout = wibox.layout.grid,
+      quick_action,
+      forced_width = dpi(50),
+      forced_height = dpi(50),
+      widget = wibox.container.margin,
     },
     widget = wibox.container.place,
   })
 
-  return widget
+  nav_qactions:append(Elevated:new(quick_action))
+  --navtree:append(1, name)
+  --Elevated:new(quick_action, name)
+
+  return action
 end
+
+-- Creating the quick action buttons
+-- Arguments: icon name func 
+local widget = wibox.widget({
+  {
+    create_quick_action("", "Rotate", rotate_screen_func),
+    create_quick_action("", "Conservation mode", conservation_mode_func),
+    create_quick_action("", "Onboard", onboard_func),
+    create_quick_action("", "Calculator", calculator_func),
+
+    -- unfinished --
+    create_quick_action("", "Timer", ""),
+    create_quick_action("", "Nightshift", ""),
+    create_quick_action("", "Rotate bar", ""),
+    create_quick_action("", "Screenshot", ""),
+    create_quick_action("", "Mic", ""),
+    create_quick_action("", "Switch theme", ""),
+
+    -- 
+    --  
+
+    spacing = dpi(15),
+    forced_num_rows = 2,
+    forced_num_cols = 5,
+    homogeneous = true,
+    layout = wibox.layout.grid,
+  },
+  widget = wibox.container.place,
+})
+
+return {
+  widget = widget,
+  nav = nav_qactions
+}

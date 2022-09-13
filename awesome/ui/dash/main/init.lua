@@ -8,17 +8,25 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
+local Box = require("ui.nav.box")
+
+local nav_main = Box:new({ name = "main" })
 
 -- import dash widgets
+local _habit = require("ui.dash.main.habit")
+local habit = _habit.widget
+local nav_habit = _habit.nav
+
 local profile = require("ui.dash.main.profile")
 local timewarrior = require("ui.dash.main.timewarrior")
 local events = require("ui.dash.main.events")
 local tasks = require("ui.dash.main.tasks")
 local music = require("ui.dash.main.music_player")
-local habit = require("ui.dash.main.habit")
 local monthly_spending = require("ui.dash.main.monthly_spending")
 local timedate = require("ui.dash.main.timedate")
 local goals = require("ui.dash.main.goals")
+
+nav_main:append(nav_habit)
 
 -- unused widgets
 -- local links = require("ui.dash.main.links")
@@ -58,4 +66,6 @@ local widget = wibox.widget({
   widget = wibox.container.background,
 }) -- end widget
 
-return widget
+return function()
+  return widget, nav_main
+end

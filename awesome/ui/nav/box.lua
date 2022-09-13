@@ -32,7 +32,9 @@ end
 
 -- Append item to box's item table.
 function Box:append(item)
-  print("Box: appending to "..self.name)
+  if item.is_box then
+    item.parent = self
+  end
   table.insert(self.items, item)
 end
 
@@ -50,6 +52,9 @@ end
 -- Remove item from box's item table.
 function Box:remove_item(item)
   print("Removing "..item.name)
+  if item.is_box then
+    item.parent = nil
+  end
   item:hl_off_recursive()
   if self.items[self.index] == item then
     print("Removing currently indexed item! Adjusting...")
@@ -76,30 +81,30 @@ end
 
 -- Returns if the current Box has a neighbor.
 function Box:has_neighbor()
-  if self.name == "root" then
-    return false
-  end
+  if self.name == "root" then return false end
+  if self.parent == nil then return false end
   return #self.parent.items > 1
 end
 
 -- Iterate through a box's elements by a given amount.
--- Returns the item you iterated to.
+-- Returns the element you iterated to.
 function Box:iter(amount)
   print("Box: iterating through "..self.name)
+
   local new_index = self.index + amount
 
-  -- Next element
+  -- Go to neighbor
   local overflow = new_index > #self.items or new_index == 0
   if not self.circular and overflow and self:has_neighbor() then
-    print("Box: item table overflow in "..self.name)
-    print("Must call outer_iter in parent")
-    return nil
+    print("Box: item table overflow in "..self.name.."; must call outer_iter in parent")
+    return
   end
 
+  -- Iterate like normal
   self.index = new_index % #self.items
   if self.index == 0 then self.index = #self.items end
   --print("Box: " .. self.name .. " iterated. New elem is " .. self.index)
-  print("New index is " .. self.index)
+  --print("New index is " .. self.index)
   return self.items[self.index]
 end
 
