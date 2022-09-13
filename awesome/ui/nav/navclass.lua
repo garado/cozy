@@ -5,56 +5,29 @@
 -- Class definitions for making widgets navigable
 -- with the keyboard
 
-local beautiful = require("beautiful")
-local awful = require("awful")
-local table = table
-
 -- █▄▄ ▄▀█ █▀ █▀▀ 
 -- █▄█ █▀█ ▄█ ██▄ 
--- Only responsible for defining signals and basic vars
+-- Only responsible for defining basic vars
 -- Functions must be overridden in derived classes
-local Navbase = {
-  widget        = nil,
-  name          = nil,
-  selected      = false,
-  highlighted   = false,
-  original_bg   = nil,
-}
-
-function Navbase:hl_toggle()  end
-function Navbase:hl_off()     end
-function Navbase:release()    end
-
-function Navbase:new(widget, name)
+local Navbase = {}
+function Navbase:new(widget)
   local o = {}
   o.widget  = widget
-  o.name    = name or "noname"
-
-  local hl_off = "nav::" .. o.name .. "::hl_off"
-  awesome.connect_signal(hl_off, function()
-    o:hl_off()
-  end)
-
-  local hl_toggle = "nav::" .. o.name .. "::hl_toggle"
-  awesome.connect_signal(hl_toggle, function()
-    o:hl_toggle()
-  end)
-
-  local release = "nav::" .. o.name .. "::release"
-  awesome.connect_signal(release, function()
-    o:release()
-  end)
-
+  o.selected    = false
+  o.highlighted = false
   setmetatable(o, self)
   self.__index = self
   return o
 end
 
+function Navbase:hl_toggle()  end
+function Navbase:hl_off()     end
+function Navbase:release()    end
+
 -- █▀▀ █░░ █▀▀ █░█ ▄▀█ ▀█▀ █▀▀ █▀▄ 
 -- ██▄ █▄▄ ██▄ ▀▄▀ █▀█ ░█░ ██▄ █▄▀ 
-local Elevated = Navbase:new(widget, name)
+local Elevated = Navbase:new(widget)
 
--- Highlight toggle
 function Elevated:hl_toggle()
   self.highlighted = not self.highlighted
   if self.highlighted then

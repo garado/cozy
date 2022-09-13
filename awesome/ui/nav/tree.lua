@@ -2,35 +2,29 @@
 -- ▀█▀ █▀█ █▀▀ █▀▀ 
 -- ░█░ █▀▄ ██▄ ██▄ 
 
--- This is used alongside the navclasses and navigate() function
--- to move through widgets using keybinds.
-
--- The Tree class defines the hierarchy of the widget.
--- It contains the names of selectable elements as strings.
-
--- The Navclasses create signals to control the UI elements.
--- When instantiating a new navclass, you pass it the name of the
--- element as a string and the element to modify.
-
--- The navigate() function ties the above together - it implements 
--- a keygrabber to navigate through the tree's hierarchy and interact 
--- with its elements.
-
 local table = table
 
-local Tree = {
-  tree = nil
-}
+local Tree = {}
+function Tree:new(args)
+  local o = {}
+end
 
--- Create base hierarchy
+
+
+
+
+
+--------------
+
+
+-- Create new instance of Tree class
+local Tree = { }
 function Tree:new(levels)
   local o = {}
   o.tree = {}
-
   for _ = 1, levels do
     table.insert(o.tree, {})
   end
-
   setmetatable(o, self)
   self.__index = self
   return o
@@ -62,28 +56,6 @@ local signals = {
   "hl_toggle",
   "release",
 }
-
-local function iterate_tree(o)
-  if type(o) == 'table' then
-    local s
-    for k,v in pairs(o) do
-      s = iterate_tree(o)
-    end
-    return tostring(s)
-  else
-    return tostring(o)
-  end
-end
-
-function Tree:connect_signals()
-  for i = 1, #signals do
-  end
-end
-
-function Tree:disconnect_signals()
-  for i = 1, #signals do
-  end
-end
 
 local function dump(o)
   if type(o) == 'table' then

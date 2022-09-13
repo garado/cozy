@@ -12,9 +12,35 @@ local dpi = xresources.apply_dpi
 local helpers = require("helpers")
 local widgets = require("ui.widgets")
 local naughty = require("naughty")
-local nav = require("ui.nav.navclass")
-local tree = require("ui.nav.tree")
-local navigate = require("ui.theme_switcher.navigate")
+
+-- for keyboard navigation
+local Box = require("ui.nav.box")
+local Elevated = require("ui.nav.navclass").Elevated
+local Navigate = require("ui.nav.navigate")
+
+local nav_root = Box:new({
+  name = "root",
+  is_circular = true,
+})
+
+local nav_themes = Box:new({
+  name = "nav_themes",
+  parent = nav_root,
+})
+
+local nav_styles = Box:new({
+  name = "nav_styles",
+  parent = nav_root,
+})
+
+local nav_actions = Box:new({
+  name = "nav_actions",
+  parent = nav_root,
+})
+
+nav_root:append(nav_themes)
+
+local nav = Navigate:new()
 
 local selected_theme = ""
 local selected_style = ""
@@ -22,9 +48,6 @@ local selected_style = ""
 -- some necessary forward declarations
 local apply_new_theme, get_current_theme, reset_theme_switcher
 local styles
-
--- for navigable elements
-local Navtree = tree:new(3)
 
 -- █░█░█ █ █▄▄ █▀█ ▀▄▀ █▀▀ █▀ 
 -- ▀▄▀▄▀ █ █▄█ █▄█ █░█ ██▄ ▄█ 
@@ -74,6 +97,7 @@ cancel_button = wibox.widget({
     size = 10,
     on_release = function()
       reset_theme_switcher()
+      awesome.emit_signal("theme_switcher::toggle")
     end,
   }),
   widget = wibox.container.place,
@@ -119,12 +143,16 @@ styles = wibox.widget ({
 -- █▀░ █▄█ █░▀█ █▄▄ ░█░ █ █▄█ █░▀█ ▄█ 
 -- Sets theme switcher back to default settings
 function reset_theme_switcher()
+  print("reset")
   local markup = helpers.ui.colorize_text("Current: " , beautiful.fg)
   theme_sel_textbox:set_markup_silently(markup)
   apply_button.visible = false
   cancel_button.visible = false
   styles.visible = false
-  Navtree:reset_level(2)
+  nav_actions:clear_items()
+  nav_styles:clear_items()
+  nav_root:remove_item(nav_actions)
+  nav_root:remove_item(nav_styles)
   get_current_theme()
 end
 
@@ -172,7 +200,6 @@ local function select_new_style(style)
   local text = " (" .. style .. ")"
   local style_markup = helpers.ui.colorize_text(text, beautiful.fg)
   theme_style_textbox:set_markup_silently(style_markup)
-  awesome.emit_signal("nav::update_navtree", Navtree)
 end
 
 local function create_style_button(style)
@@ -185,17 +212,17 @@ local function create_style_button(style)
     on_release = function()
       select_new_style(style)
       selected_style = style
-      Navtree:append(3, "apply")
-      Navtree:append(3, "cancel")
-      nav.Elevated:new(apply_button.children[1],  "apply")
-      nav.Elevated:new(cancel_button.children[1], "cancel")
       apply_button.visible  = true
       cancel_button.visible = true
+      if not nav_root:contains(nav_actions) then
+        nav_actions:append(Elevated:new(apply_button.children[1]))
+        nav_actions:append(Elevated:new(cancel_button.children[1]))
+        nav_root:append(nav_actions)
+      end
     end
   })
-  local signal_name = selected_theme .. "_" .. style
-  nav.Elevated:new(style_button, signal_name)
-  Navtree:append(2, signal_name)
+
+  nav_styles:append(Elevated:new(style_button))
 
   return wibox.widget ({
     style_button,
@@ -206,12 +233,12 @@ end
 local function create_style_buttons(theme)
   -- remove old style buttons
   style_buttons:reset()
-  Navtree:reset_level(2)
 
   local cfg = gfs.get_configuration_dir()
   local themes_dir = cfg .. "theme/colorschemes/" .. theme .. "/"
   local cmd = "ls " .. themes_dir
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    nav_styles:clear_items()
     for style in string.gmatch(stdout, "[^\n\r]+") do
       if style ~= "init.lua" then
         style = string.gsub(style, ".lua", "")
@@ -219,7 +246,9 @@ local function create_style_buttons(theme)
         style_buttons:add(style_button)
       end
     end
-    awesome.emit_signal("nav::update_navtree", Navtree)
+    if not nav_root:contains(nav_styles) then
+      nav_root:append(nav_styles)
+    end
   end)
 end
 
@@ -244,15 +273,14 @@ local function create_theme_button(name)
     animate_size = false,
     size = 12,
     on_release = function()
+      nav_styles:clear_items()
       select_new_theme(name)
       selected_theme = name
       selected_style = ""
       theme_style_textbox:set_markup_silently("", beautiful.fg)
-      return 24
     end
   })
-  nav.Elevated:new(theme_button, name)
-  Navtree:append(1, name)
+  nav_themes:append(Elevated:new(theme_button))
   return theme_button
 end
 
@@ -335,9 +363,10 @@ return function()
     theme_switcher.visible = not theme_switcher.visible
     if not theme_switcher.visible then
       reset_theme_switcher()
+      nav:stop()
     else
       require("ui.shared").close_other_popups("theme_switcher")
-      navigate(Navtree)
+      nav:start(nav_root)
     end
   end)
 
@@ -348,10 +377,6 @@ return function()
   awesome.connect_signal("theme_switcher::close", function()
     theme_switcher.visible = false
     reset_theme_switcher()
-  end)
-
-  awesome.connect_signal("fuckyou", function()
-    Navtree:print_contents()
   end)
 
   return theme_switcher
