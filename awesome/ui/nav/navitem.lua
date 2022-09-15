@@ -14,23 +14,25 @@ local beautiful = require("beautiful")
 local Base = {}
 function Base:new(widget)
   local o = {}
-  o.widget  = widget
-  o.highlighted = false
+  o.widget      = widget
+  o.selected    = false
+  o.is_area     = false
+  o.is_navitem  = true
   setmetatable(o, self)
   self.__index = self
   return o
 end
 
 -- Override these 3 functions in your custom definition.
-function Base:hl_on()      end
-function Base:hl_off()     end
+function Base:select_on()      end
+function Base:select_off()     end
 function Base:release()    end
 
-function Base:hl_toggle()
-  if self.highlighted then
-    self:hl_off()
+function Base:select_toggle()
+  if self.selected then
+    self:select_off()
   else
-    self:hl_on()
+    self:select_on()
   end
 end
 
@@ -38,13 +40,13 @@ end
 -- ██▄ █▄▄ ██▄ ▀▄▀ █▀█ ░█░ ██▄ █▄▀ 
 local Elevated = Base:new(widget)
 
-function Elevated:hl_on()
-  self.highlighted = true
+function Elevated:select_on()
+  self.selected = true
   self.widget:nav_hl_on()
 end
 
-function Elevated:hl_off()
-  self.highlighted = false
+function Elevated:select_off()
+  self.selected = false
   self.widget:nav_hl_off()
 end
 
@@ -56,23 +58,15 @@ end
 -- █▀█ █▀█ █▄█ █ ░█░ ▄█ 
 local Habit = Base:new(widget)
 
-function Habit:hl_toggle()
-  if self.highlighted then
-    self:hl_off()
-  else
-    self:hl_on()
-  end
-end
-
-function Habit:hl_on()
-  self.highlighted = true
+function Habit:select_on()
+  self.selected = true
   local box = self.widget.children[1]
   box.check_color = "#bf616a"
   box.bg = "#bf616a"
 end
 
-function Habit:hl_off()
-  self.highlighted = false
+function Habit:select_off()
+  self.selected = false
   local box = self.widget.children[1]
   box.bg = not box.checked and beautiful.hab_uncheck_bg
   box.check_color = beautiful.hab_check_bg
@@ -86,13 +80,13 @@ end
 -- █▄▀ █▀█ ▄█ █▀█    ▀▄▀▄▀ █ █▄▀ █▄█ ██▄ ░█░ 
 local Dashwidget = Base:new(widget)
 
-function Dashwidget:hl_on()
-  self.highlighted = true
+function Dashwidget:select_on()
+  self.selected = true
   self.widget.children[1].bg = beautiful.surface0
 end
 
-function Dashwidget:hl_off()
-  self.highlighted = false
+function Dashwidget:select_off()
+  self.selected = false
   self.widget.children[1].bg = beautiful.dash_widget_bg
 end
 
@@ -100,15 +94,15 @@ end
 -- █▄▀ █▀█ ▄█ █▀█    ░█░ █▀█ █▄█ ▄█ 
 local Dashtab = Base:new(widget)
 
-function Dashtab:hl_on()
-  self.highlighted = true
+function Dashtab:select_on()
+  self.selected = true
   self.widget:set_color(beautiful.main_accent)
   self.widget:nav_release()
   self.widget:nav_hl_on()
 end
 
-function Dashtab:hl_off()
-  self.highlighted = false
+function Dashtab:select_off()
+  self.selected = false
   self.widget:nav_hl_off()
   self.widget:set_color(beautiful.dash_tab_fg)
 end
