@@ -15,7 +15,7 @@ local widgets = require("ui.widgets")
 local user_vars = require("user_variables")
 local string = string
 
-local Elevated = require("ui.nav.navclass").Elevated
+local Elevated = require("ui.nav.navitem").Elevated
 local Box = require("ui.nav.box")
 
 local update_ui
@@ -101,11 +101,9 @@ end
 
 function ui_timew_started()
   local current_time = create_ui_text("CURRENT SESSION", "--", 30)
-  local total_this_tag = create_ui_text("TOTAL TAG", "--", 15)
+  --local total_this_tag = create_ui_text("TOTAL TAG", "--", 15)
   local total_all_tags = create_ui_text("TOTAL TODAY", "--", 15)
   local current_tag = create_ui_text("WORKING ON", "--", 15)
-
-  local tag
 
   -- turns 6:15:08 (H+:MM:SS) into 6h 15m
   local function format_time(str)

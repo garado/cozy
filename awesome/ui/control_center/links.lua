@@ -9,12 +9,9 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local widgets = require("ui.widgets")
 local Box = require("ui.nav.box")
-local Elevated = require("ui.nav.navclass").Elevated
+local Elevated = require("ui.nav.navitem").Elevated
 
-local nav_links = Box:new({
-  name = "links",
-  is_circular = false,
-})
+local nav_links = Box:new({ name = "links" })
 
 local function create_link(args)
   local btn = widgets.button.text.normal ({
@@ -24,7 +21,10 @@ local function create_link(args)
     animate_size = false,
     font = beautiful.font,
     size = 12,
-    on_release = args.func
+    on_release = function()
+      args.func()
+      awesome.emit_signal("control_center::toggle")
+    end
   })
 
   nav_links:append(Elevated:new(btn))
@@ -78,7 +78,7 @@ local widget = wibox.widget({
     }),
 
     create_link({
-      name = "r/unixporn",
+      name = "Lua manual",
       func = function()
         awful.spawn("gio open https://www.reddit.com/r/unixporn")
       end

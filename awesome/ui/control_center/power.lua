@@ -9,11 +9,14 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local helpers = require("helpers")
 local widgets = require("ui.widgets")
-local elevated = require("ui.nav.navclass").Elevated
+local elevated = require("ui.nav.navitem").Elevated
 local Box = require("ui.nav.box")
 
+local nav_power = Box:new({ name = "nav_power" })
 local nav_power_opts = Box:new({ name = "power_opts" })
 local nav_power_confirm = Box:new({ name = "power_confirm" })
+
+nav_power:append(nav_power_opts)
 
 local state = "idle"
 local func = nil
@@ -28,10 +31,12 @@ local yes = widgets.button.text.normal({
     if func ~= nil then
       func()
     end
-    nav_power_confirm:clear_items()
+    nav_power:remove_item(nav_power_confirm)
+    --nav_power_confirm:clear_items()
     awesome.emit_signal("ctrl::power_confirm_toggle")
   end
 })
+nav_power_confirm:append(elevated:new(yes))
 
 local no = widgets.button.text.normal({
   text = "No",
@@ -41,10 +46,12 @@ local no = widgets.button.text.normal({
   size = 12,
   on_release = function()
     state = "idle"
-    nav_power_confirm:clear_items()
+    nav_power:remove_item(nav_power_confirm)
+    --nav_power_confirm:clear_items()
     awesome.emit_signal("ctrl::power_confirm_toggle")
   end
 })
+nav_power_confirm:append(elevated:new(no))
 
 local confirmation = wibox.widget({
   {
@@ -74,7 +81,7 @@ local confirmation = wibox.widget({
 })
 
 local function set_confirmation_text(text)
-  local text = text:gsub("^%l", string.upper) .. "?"
+  text = text:gsub("^%l", string.upper) .. "?"
   local markup = helpers.ui.colorize_text(text, beautiful.fg)
   confirmation:get_children_by_id("dialogue")[1]:set_markup_silently(markup)
   state = "confirming"
@@ -88,8 +95,9 @@ local function create_power_btn(icon, confirm_text, cmd)
     animate_size = false,
     size = 13,
     on_release = function()
-      nav_power_confirm:append(elevated:new(yes))
-      nav_power_confirm:append(elevated:new(no))
+      if not nav_power:contains(nav_power_confirm) then
+        nav_power:append(nav_power_confirm)
+      end
       set_confirmation_text(confirm_text)
       awesome.emit_signal("ctrl::power_confirm_on")
       func = function()
@@ -131,9 +139,6 @@ local options = wibox.widget({
   widget = wibox.container.background,
 })
 
-return {
-  power_opts = options,
-  power_confirm = confirmation,
-  nav_power_opts = nav_power_opts,
-  nav_power_confirm = nav_power_confirm,
-}
+return function()
+  return options, confirmation, nav_power
+end

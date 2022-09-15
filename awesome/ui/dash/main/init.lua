@@ -2,8 +2,6 @@
 -- █▀▄ ▄▀█ █▀ █░█ ▀   █▀▄▀█ ▄▀█ █ █▄░█
 -- █▄▀ █▀█ ▄█ █▀█ ▄   █░▀░█ █▀█ █ █░▀█
 
-local awful = require("awful")
-local gears = require("gears")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
@@ -13,9 +11,7 @@ local Box = require("ui.nav.box")
 local nav_main = Box:new({ name = "main" })
 
 -- import dash widgets
-local _habit = require("ui.dash.main.habit")
-local habit = _habit.widget
-local nav_habit = _habit.nav
+local nav_habit, habit = require("ui.dash.main.habit")()
 
 local profile = require("ui.dash.main.profile")
 local timewarrior = require("ui.dash.main.timewarrior")

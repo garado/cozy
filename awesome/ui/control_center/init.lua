@@ -11,7 +11,21 @@ local dpi = xresources.apply_dpi
 
 -- For navigation
 local Box = require("ui.nav.box")
-local nav = require("ui.control_center.navigate")
+local nav = require("ui.nav.navigate")
+nav:set_rules({
+  qactions = {
+    j = 5,
+    k = -5,
+    --j = nav:get_index() > 5 and 1 or 5,
+    --k = nav:get_index() < 5 and -5 or 1
+  },
+  links = {
+    j = 2,
+    k = -2,
+    --j = nav:get_index() > 4 and 1 or 2,
+    --k = nav:get_index() < 3 and -1 or -2,
+  }
+})
 
 local nav_root = Box:new({
   name = "root",
@@ -30,15 +44,12 @@ local _links = require("ui.control_center.links")
 local links = _links.widget
 local nav_links = _links.nav
 
-local _pwr = require("ui.control_center.power")
-local power_opts = _pwr.power_opts
-local power_confirm = _pwr.power_confirm
-local nav_power_opts = _pwr.nav_power_opts
-local nav_power_confirm = _pwr.nav_power_confirm
+local power_opts, power_confirm, nav_power
+power_opts, power_confirm, nav_power = require("ui.control_center.power")()
 
 nav_root:append(nav_qactions)
 nav_root:append(nav_links)
-nav_root:append(nav_power_opts)
+nav_root:append(nav_power)
 
 return function()
   local body = wibox.widget({
@@ -123,14 +134,10 @@ return function()
 
   awesome.connect_signal("ctrl::power_confirm_toggle", function()
     power_confirm.visible = not power_confirm.visible
-    if power_confirm.visible and not nav_root:contains(nav_power_confirm) then
-      nav_root:append(nav_power_confirm)
-    end
   end)
 
   awesome.connect_signal("ctrl::power_confirm_on", function()
     power_confirm.visible = true
-    nav_root:append(nav_power_confirm)
   end)
 
   return control_center

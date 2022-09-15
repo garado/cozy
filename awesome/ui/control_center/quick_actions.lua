@@ -12,12 +12,9 @@ local widgets = require("ui.widgets")
 local gfs = require("gears.filesystem")
 local apps = require("configuration.apps")
 local Box = require("ui.nav.box")
-local Elevated = require("ui.nav.navclass").Elevated
+local Elevated = require("ui.nav.navitem").Elevated
 
-local nav_qactions = Box:new({
-  name = "qactions",
-  is_circular = false,
-})
+local nav_qactions = Box:new({ name = "qactions" })
 
 local scripts = gfs.get_configuration_dir() .. "utils/ctrl/"
 local term = apps.default.terminal

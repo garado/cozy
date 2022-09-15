@@ -11,15 +11,29 @@ local dpi = xresources.apply_dpi
 local widgets = require("ui.widgets")
 
 local Box = require("ui.nav.box")
-local elevated = require("ui.nav.navclass").Elevated
-local navigate = require("ui.dash.navigate")
+local dashtab = require("ui.nav.navitem").Dashtab
+local Navigate = require("ui.nav.navigate")
+
+-- Specify how to navigate through widgets
+local nav = Navigate:new()
+nav:set_rules({
+  nav_dash_habits = {
+    j = 4,
+    k = -4,
+  }
+})
 
 local nav_root = Box:new({
   name = "root",
-  is_circular = true,
+  circular = true,
 })
 
-local nav_tabs = Box:new({ name = "tabs" })
+local nav_tabs = Box:new({
+  name = "tabs",
+  circular = true,
+})
+local nav_dash_contents = Box:new({ name = "dash_contents" })
+
 nav_root:append(nav_tabs)
 
 return function()
@@ -27,7 +41,6 @@ return function()
 
   -- import tab contents
   local main, nav_main = require("ui.dash.main")()
-  nav_root:append(nav_main)
 
   local finances = require("ui.dash.finances")
   local habit = require("ui.dash.habit")
@@ -35,6 +48,7 @@ return function()
 
   local tablist =   { main, finances, habit,  agenda }
   local tab_icons = { "",  "",      "",    ""    }
+  local wtf =       { nav_main, nil, nil, nil }
 
   local dash_content = wibox.widget({
     {
@@ -63,18 +77,29 @@ return function()
     })
 
     for i,v in ipairs(tab_icons) do
-      local widget = widgets.button.text.normal({
+      local widget
+      widget = widgets.button.text.normal({
         text = v,
         text_normal_bg = beautiful.fg,
         normal_bg = beautiful.dash_tab_bg,
         animate_size = false,
         size = 15,
         on_release = function()
-          local fuck = dash_content:get_children_by_id("content")[1]
-          fuck:set(1, tablist[i])
+          local contents = dash_content:get_children_by_id("content")[1]
+          contents:set(1, tablist[i])
+          nav_dash_contents:remove_index(1)
+          if wtf[i] ~= nil then
+            if not nav_root:contains(nav_dash_contents) then
+              nav_root:append(nav_dash_contents)
+            end
+            nav_dash_contents:append(wtf[i])
+          end
+          if wtf[i] == nil then
+            nav_root:remove_item(nav_dash_contents)
+          end
         end
       })
-      nav_tabs:append(elevated:new(widget))
+      nav_tabs:append(dashtab:new(widget))
       tab_bar.children[1]:add(widget)
     end
 
@@ -89,10 +114,11 @@ return function()
   awesome.connect_signal("dash::toggle", function()
     if dash.visible then
       awesome.emit_signal("dash::closed")
+      nav_root:hl_off_recursive()
     else
       require("ui.shared").close_other_popups("dash")
       awesome.emit_signal("dash::opened")
-      navigate:start(nav_root)
+      nav:start(nav_root)
     end
     dash.visible = not dash.visible
   end)
@@ -126,6 +152,6 @@ return function()
     }),
   })
 
-  local main_tab_icon = tab_bar.children[1].children[1]
-  main_tab_icon:set_color(beautiful.main_accent)
+  --local main_tab_icon = tab_bar.children[1].children[1]
+  --main_tab_icon:set_color(beautiful.main_accent)
 end

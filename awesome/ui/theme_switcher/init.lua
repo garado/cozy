@@ -15,12 +15,12 @@ local naughty = require("naughty")
 
 -- for keyboard navigation
 local Box = require("ui.nav.box")
-local Elevated = require("ui.nav.navclass").Elevated
+local Elevated = require("ui.nav.navitem").Elevated
 local Navigate = require("ui.nav.navigate")
 
 local nav_root = Box:new({
   name = "root",
-  is_circular = true,
+  circular = true,
 })
 
 local nav_themes  = Box:new({ name = "nav_themes"  })
