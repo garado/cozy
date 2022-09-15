@@ -8,7 +8,7 @@
 -- when you iterate through it using its index field.
 
 -- A box can be circular (iterating through it wraps around),
--- or linears (returns nil when you iterate through the whole thing).
+-- or linear (returns nil when you iterate through the whole thing).
 
 -- A box also remembers its parent.
 
@@ -71,10 +71,13 @@ function Box:hl_off_recursive()
 end
 
 function Box:remove_index(index)
-  --print("Removing index "..index)
-  if self.items[index] then
-    if self.items[index].is_box then
-      --print("Removing "..self.items[index].name)
+  local item = self.items[index]
+  if item then
+    -- Turn off highlight
+    if item.is_box then
+      item:hl_off_recursive()
+    else
+      item:hl_off()
     end
     table.remove(self.items, index)
   end
@@ -82,13 +85,11 @@ end
 
 -- Remove item from box's item table.
 function Box:remove_item(item)
-  --print("Removing "..item.name)
   if item.is_box then
     item.parent = nil
   end
   item:hl_off_recursive()
   if self.items[self.index] == item then
-    --print("Removing currently indexed item from "..self.name.."! Adjusting...")
     self.index = 1
   end
   for i = 1, #self.items do
@@ -142,12 +143,21 @@ function Box:iter(amount)
   return self.items[self.index]
 end
 
-function Box:set_index(index)
-  self.index = index
+-- Remove all child items that aren't the given box
+function Box:remove_all_except_item(item)
+  -- Item must be a box
+  if item and not item.is_box then return end
+  for i = 1, #self.items do
+    local curr = self.items[i]
+    if curr.is_box and not curr == item then
+      table.remove(self.items, curr)
+    end
+  end
 end
 
-function Box:reset_index()
-  self.index = #self.items > 0 and 1 or 0
+function Box:reset()
+  self:hl_off_recursive()
+  self.index = 1
 end
 
 function Box:clear_items()

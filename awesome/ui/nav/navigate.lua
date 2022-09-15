@@ -41,11 +41,16 @@ function Navigate:iter_between(amt)
     --self:iter_between(amt)
   end
 
+  if self.current_box.iter_between_hl_persist then
+    self.current_box:get_current_item():hl_toggle()
+  end
   --print("Nav: iter_between: current box is "..self.current_box.name)
 
   -- If there is an associated widget, toggle highlight
   if self.current_box.widget then
-    self.current_box.widget:hl_toggle()
+    if not self.current_box.iter_between_hl_persist then
+      self.current_box.widget:hl_toggle()
+    end
   end
 
   -- If there is no parent, you are at the root of the tree,
@@ -149,16 +154,16 @@ function Navigate:iter_within(amt)
     if amt > 0 then amt = 1 else amt = -1 end
     self:iter_between(amt)
     if amt > 0 then
-      self.current_box:set_index(1)
+      self.current_box.index = 1
     else
-      self.current_box:set_index(#self.current_box.items)
+      self.current_box.index = #self.current_box.items
     end
   end
 end
 
 function Navigate:hl_toggle()
   local item = self.current_box:get_current_item()
-  if item and not item.is_box then
+  if item and not item.is_box and not self.current_box.iter_between_hl_persist then
     item:hl_toggle()
   end
 end
@@ -266,16 +271,16 @@ function Navigate:start(root)
   local function keypressed(_, _, key, _)
     if key ~= "Return"  then self:hl_toggle() end
 
-    if     key == "h" then
+    if     key == "h" or key == "H" then
       self:key("h", -1)
       --self:h()
-    elseif key == "j" then
+    elseif key == "j" or key == "J" then
       self:key("j", 1)
       --self:j()
-    elseif key == "k" then
+    elseif key == "k" or key == "K" then
       self:key("k", -1)
       --self:k()
-    elseif key == "l" then
+    elseif key == "l" or key == "L" then
       self:key("l", 1)
       --self:l()
     elseif key == "BackSpace" then
