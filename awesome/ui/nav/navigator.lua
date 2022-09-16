@@ -148,16 +148,21 @@ function Navigator:find_next_area(start_area, direction)
 
     -- look through area for the next navitem to select
     direction = direction > 0 and 1 or -1
+    local left = direction < 0
+    local right = direction > 0
 
-    navprint("starting search through item table for "..area.name.." starting at index "..area.index)
-    navprint("item table has "..#area.items.." elements")
-    navprint("direction is "..direction)
+    navprint("starting search through item table of "..area.name.." starting at index "..area.index.."; iterating by "..direction)
     set_spaces()
 
-    -- THIS LOOP DOESNT EXECUTE WHEN ITERATING BACKWARDS
-    -- BETWEEN AREAS!!!! WHAT THE FUCK
-    for i = area.index, #area.items, direction do
-      print("HELLO I AM IN THE LOOP")
+    -- set bounds for iteration
+    local bounds
+    if left then
+      bounds = 1
+    elseif right then
+      bounds = #area.items
+    end
+
+    for i = area.index, bounds, direction do
       navprint("checking "..area.name.."["..i.."]:")
       area.index = i
       local item = area.items[i]
@@ -167,10 +172,10 @@ function Navigator:find_next_area(start_area, direction)
         return area, i
       elseif item.is_area and not item.visited then
         navprint("is area called "..item.name)
-        if direction > 0 then
+        if right then
           navprint("it is a neighbor to the right.")
           item.index = 1
-        else
+        elseif left then
           navprint("it is a neighbor to the left.")
           item.index = #item.items
         end
