@@ -10,26 +10,29 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 
 -- For navigation
-local Box = require("ui.nav.box")
-local nav = require("ui.nav.navigate")
-nav:set_rules({
-  qactions = {
-    j = 5,
-    k = -5,
-    --j = nav:get_index() > 5 and 1 or 5,
-    --k = nav:get_index() < 5 and -5 or 1
-  },
-  links = {
-    j = 2,
-    k = -2,
-    --j = nav:get_index() > 4 and 1 or 2,
-    --k = nav:get_index() < 3 and -1 or -2,
-  }
-})
+local Area = require("ui.nav.area")
+local Navigator = require("ui.nav.navigator")
 
-local nav_root = Box:new({
+local nav_root = Area:new({
   name = "root",
   circular = true,
+})
+
+local nav = Navigator:new({
+  root = nav_root,
+  rules = {
+    qactions = {
+      j = 5,
+      k = -5,
+    },
+    links = {
+      j = 2,
+      k = -2,
+    },
+    power_opts = {
+
+    }
+  }
 })
 
 -- Import widgets

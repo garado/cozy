@@ -14,22 +14,22 @@ local widgets = require("ui.widgets")
 local naughty = require("naughty")
 
 -- for keyboard navigation
-local Box = require("ui.nav.box")
+local Area = require("ui.nav.area")
 local Elevated = require("ui.nav.navitem").Elevated
-local Navigate = require("ui.nav.navigate")
+local Navigator = require("ui.nav.navigator")
 
-local nav_root = Box:new({
+local nav_root = Area:new({
   name = "root",
   circular = true,
 })
 
-local nav_themes  = Box:new({ name = "nav_themes"  })
-local nav_styles  = Box:new({ name = "nav_styles"  })
-local nav_actions = Box:new({ name = "nav_actions" })
+local nav_themes  = Area:new({ name = "nav_themes"  })
+local nav_styles  = Area:new({ name = "nav_styles"  })
+local nav_actions = Area:new({ name = "nav_actions" })
 
 nav_root:append(nav_themes)
 
-local nav = Navigate:new()
+local nav = Navigator:new({ root = nav_root })
 
 local selected_theme = ""
 local selected_style = ""
@@ -137,8 +137,8 @@ function reset_theme_switcher()
   apply_button.visible = false
   cancel_button.visible = false
   styles.visible = false
-  nav_actions:clear_items()
-  nav_styles:clear_items()
+  nav_actions:remove_all_items()
+  nav_styles:remove_all_items()
   nav_root:remove_item(nav_actions)
   nav_root:remove_item(nav_styles)
   get_current_theme()
@@ -226,7 +226,7 @@ local function create_style_buttons(theme)
   local themes_dir = cfg .. "theme/colorschemes/" .. theme .. "/"
   local cmd = "ls " .. themes_dir
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    nav_styles:clear_items()
+    nav_styles:remove_all_items()
     for style in string.gmatch(stdout, "[^\n\r]+") do
       if style ~= "init.lua" then
         style = string.gsub(style, ".lua", "")
@@ -261,7 +261,7 @@ local function create_theme_button(name)
     animate_size = false,
     size = 12,
     on_release = function()
-      nav_styles:clear_items()
+      nav_styles:remove_all_items()
       select_new_theme(name)
       selected_theme = name
       selected_style = ""
@@ -354,7 +354,7 @@ return function()
       nav:stop()
     else
       require("ui.shared").close_other_popups("theme_switcher")
-      nav:start(nav_root)
+      nav:start()
     end
   end)
 

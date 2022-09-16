@@ -14,6 +14,7 @@ function Area:new(args)
   o.index     = 1
   o.is_area   = true
   o.is_navitem = false
+  o.visited   = false
   o.circular  = args.circular or false
   self.__index = self
   return setmetatable(o, self)
@@ -77,9 +78,6 @@ end
 
 -- Remove a specific item from area's item table.
 function Area:remove_item(item)
-  if self.name == "root" then
-    print("remove_item start root index: "..self.index)
-  end
   if item.is_area then
     item.parent = nil
   end
@@ -91,11 +89,9 @@ function Area:remove_item(item)
     if item == self.items[i] then
       table.remove(self.items, i)
       self.index = self.index - 1
+      if self.index < 0 then self.index = 1 end
       return
     end
-  end
-  if self.name == "root" then
-    print("remove_item end root index: "..self.index)
   end
 end
 
@@ -115,15 +111,12 @@ end
 -- Iterate through an area's item table by a given amount.
 -- Returns the item that it iterated to.
 function Area:iter(amount)
-  print("--iterating through "..self.name..", which contains "..tostring(#self.items).." items, and whose current index is "..tostring(self.index))
   local new_index = self.index + amount
-  print("--The iterated index is "..tostring(new_index))
 
   -- If iterating went out of item table's bounds and the area isn't
   -- circular, then return nil.
   local overflow = new_index > #self.items or new_index < 0
   if not self.circular and overflow then
-    print("-- overflow")
     return
   end
 
@@ -132,7 +125,6 @@ function Area:iter(amount)
   if self.index == 0 then
     self.index = #self.items
   end
-  print("--new index for "..self.name.." is "..tostring(self.index))
   return self.items[self.index]
 end
 
@@ -155,9 +147,6 @@ end
 -- Remove all child items except for the given area
 -- Returns true if successful, false otherwise
 function Area:remove_all_except_item(item)
-  --if self.name == "root" then
-  --  print("remove_aei start root index: "..self.index.." and removing all except "..item.name)
-  --end
   -- Item must be an area
   if item and not item.is_area then
     return false
@@ -169,14 +158,14 @@ function Area:remove_all_except_item(item)
   end
 
   -- Execute
-  -- ugh fuck some bullshit with self index in here
   for i = 1, #self.items do
     local curr = self.items[i]
     if curr.is_area and not (curr == item) then
       table.remove(self.items, i)
-    else
-      -- i dont fucking know
-      self.index = i
+      if i < self.index then
+        self.index = self.index - 1
+        if self.index < 0 then self.index = 1 end
+      end
     end
   end
   --if self.name == "root" then
@@ -215,10 +204,20 @@ end
 
 function Area:is_empty() return #self.items == 0 end
 
+-- Sets visited = false for area and all child areas
+function Area:reset_visited_recursive()
+  self.visited = false
+  for i = 1, #self.items do
+    if self.items[i].is_area then
+      self.items[i]:reset_visited_recursive()
+    end
+  end
+end
+
 -- Print area contents.
 function Area:dump(space)
   space = space or ""
-  print(space.."'"..self.name.." ("..tostring(self.index)..")': "..#self.items.." items")
+  print(space.."'"..self.name.."["..tostring(self.index).."]': "..#self.items.." items")
   space = space .. "  "
   for i = 1, #self.items do
     if self.items[i].is_area then

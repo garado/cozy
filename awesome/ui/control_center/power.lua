@@ -10,11 +10,11 @@ local dpi = xresources.apply_dpi
 local helpers = require("helpers")
 local widgets = require("ui.widgets")
 local elevated = require("ui.nav.navitem").Elevated
-local Box = require("ui.nav.box")
+local Area = require("ui.nav.area")
 
-local nav_power = Box:new({ name = "nav_power" })
-local nav_power_opts = Box:new({ name = "power_opts" })
-local nav_power_confirm = Box:new({ name = "power_confirm" })
+local nav_power = Area:new({ name = "nav_power" })
+local nav_power_opts = Area:new({ name = "power_opts" })
+local nav_power_confirm = Area:new({ name = "power_confirm" })
 
 nav_power:append(nav_power_opts)
 
@@ -32,7 +32,6 @@ local yes = widgets.button.text.normal({
       func()
     end
     nav_power:remove_item(nav_power_confirm)
-    --nav_power_confirm:clear_items()
     awesome.emit_signal("ctrl::power_confirm_toggle")
   end
 })
@@ -47,7 +46,6 @@ local no = widgets.button.text.normal({
   on_release = function()
     state = "idle"
     nav_power:remove_item(nav_power_confirm)
-    --nav_power_confirm:clear_items()
     awesome.emit_signal("ctrl::power_confirm_toggle")
   end
 })

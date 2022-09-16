@@ -8,10 +8,10 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local widgets = require("ui.widgets")
-local Box = require("ui.nav.box")
+local Area = require("ui.nav.area")
 local Elevated = require("ui.nav.navitem").Elevated
 
-local nav_links = Box:new({ name = "links" })
+local nav_links = Area:new({ name = "links" })
 
 local function create_link(args)
   local btn = widgets.button.text.normal ({

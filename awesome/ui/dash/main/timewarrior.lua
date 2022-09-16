@@ -16,15 +16,24 @@ local user_vars = require("user_variables")
 local string = string
 
 local Elevated = require("ui.nav.navitem").Elevated
-local Box = require("ui.nav.box")
+local Dashwidget = require("ui.nav.navitem").Dashwidget
+local Area = require("ui.nav.area")
+
+local nav_timewarrior = Area:new({ name = "timewarrior" })
+local nav_timew_topics = Area:new({ name = "timew_topics" })
+local nav_timew_actions = Area:new({ name = "timew_actions" })
+
+--nav_timewarrior:append(nav_timew_topics)
+nav_timewarrior:append(nav_timew_actions)
 
 local update_ui
 local ui_timew_started, ui_timew_stopped
 
 local function create_topic_buttons()
+  local topic_list = user_vars.pomo.topics
 
   local function create_topic_button(topic)
-    return widgets.button.text.normal({
+    local button = widgets.button.text.normal({
       text = topic,
       text_normal_bg = beautiful.fg,
       normal_bg = beautiful.surface0,
@@ -36,6 +45,11 @@ local function create_topic_buttons()
         update_ui(ui_timew_started())
       end
     })
+    if #nav_timew_topics.items < #topic_list then
+      print("appending "..topic)
+      nav_timew_topics:append(Elevated:new(button))
+    end
+    return button
   end
 
   local topic_buttons = wibox.widget({
@@ -43,7 +57,6 @@ local function create_topic_buttons()
     layout = wibox.layout.fixed.vertical,
   })
 
-  local topic_list = user_vars.pomo.topics
   for i = 1, #topic_list do
     local button = create_topic_button(topic_list[i])
     topic_buttons:add(button)
@@ -72,7 +85,7 @@ local function create_ui_text(header, text, text_size)
   local header = wibox.widget({
     {
       markup = helpers.ui.colorize_text(header, beautiful.subtitle),
-      font = beautiful.font_name .. "Bold 10", 
+      font = beautiful.font_name .. "Bold 10",
       valign = "center",
       align = "center",
       widget = wibox.widget.textbox,
@@ -94,8 +107,7 @@ local function create_ui_text(header, text, text_size)
     text,
     layout = wibox.layout.fixed.vertical,
   })
-
-end
+end -- create_topic_buttons
 
 --------
 
@@ -163,6 +175,8 @@ function ui_timew_started()
     end
   })
 
+  nav_timew_actions:append(Elevated:new(stop_button))
+
   return wibox.widget({
     {
       current_time,
@@ -212,5 +226,11 @@ awful.spawn.easy_async_with_shell(cmd, function(stdout)
   end
 end)
 
-return helpers.ui.create_boxed_widget(timew_widget, dpi(0), dpi(340), beautiful.dash_widget_bg)
+local container = helpers.ui.create_boxed_widget(timew_widget, dpi(0), dpi(340), beautiful.dash_widget_bg)
+
+nav_timewarrior.widget = Dashwidget:new(container)
+
+return function()
+  return nav_timewarrior, container
+end
 

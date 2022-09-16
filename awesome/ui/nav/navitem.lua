@@ -18,6 +18,7 @@ function Base:new(widget)
   o.selected    = false
   o.is_area     = false
   o.is_navitem  = true
+  o.visited     = false
   setmetatable(o, self)
   self.__index = self
   return o

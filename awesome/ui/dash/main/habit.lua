@@ -12,11 +12,11 @@ local gfs = require("gears.filesystem")
 local user_vars = require("user_variables")
 local dpi = xresources.apply_dpi
 local naughty = require("naughty")
-local Box = require("ui.nav.box")
+local Area = require("ui.nav.area")
 local Habit = require("ui.nav.navitem").Habit
 local Dashwidget = require("ui.nav.navitem").Dashwidget
 
-local nav_dash_habits = Box:new({
+local nav_dash_habits = Area:new({
   name = "nav_dash_habits",
 })
 
@@ -125,6 +125,8 @@ end
 
 -- creates just one habit
 local function create_habit_ui_entry(name, graph_id, frequency)
+  local nav_habit = Area:new({ name = name })
+
   local habit_name = wibox.widget({
     markup = helpers.ui.colorize_text(name, beautiful.fg),
     font = beautiful.font_name .. "12",
