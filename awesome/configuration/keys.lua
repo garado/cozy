@@ -5,6 +5,7 @@
 local awful = require("awful")
 local hotkeys_popup = require("awful.hotkeys_popup")
 local apps = require("configuration.apps")
+local bling = require("modules.bling")
 local os = os
 
 local mod = "Mod4"
@@ -39,17 +40,28 @@ local function resize_vertical(factor)
   end
 end
 
+local scratchpad = bling.module.scratchpad {
+    command = "kitty --class spad --session sessions/scratchpad",
+    rule = { instance = "spad" },
+    sticky = true,
+    autoclose = true,
+    floating = true,
+    geometry = {x=360, y=90, height=900, width=1200},
+    reapply = true,
+    dont_focus_before_close  = false,
+}
+
 -- Global key bindings
 awful.keyboard.append_global_keybindings({
 
   -- ▄▀█ █░█░█ █▀▀ █▀ █▀█ █▀▄▀█ █▀▀
   -- █▀█ ▀▄▀▄▀ ██▄ ▄█ █▄█ █░▀░█ ██▄
   -- Restart awesome
-  awful.key({ shift, alt }, "r", awesome.restart, 
+  awful.key({ shift, alt }, "r", awesome.restart,
     { description = "reload", group = "Awesome" }),
 
   -- Quit awesome
-  awful.key({ shift, alt }, "q", awesome.quit, 
+  awful.key({ shift, alt }, "q", awesome.quit,
     { description = "quit", group = "Awesome" }),
 
   -- Show help
@@ -59,7 +71,7 @@ awful.keyboard.append_global_keybindings({
   awful.key({ mod }, "j", function()
     awesome.emit_signal("dash::toggle", s)
   end, { description = "dash", group = "Awesome" }),
- 
+
   awful.key({ mod }, "k", function()
     awesome.emit_signal("control_center::toggle")
   end, { description = "control center", group = "Awesome" }),
@@ -115,7 +127,7 @@ awful.keyboard.append_global_keybindings({
     local cmd = "scrot " .. home  .. "/Pictures/Screenshots/%b%d::%H%M%S.png --silent -s -e 'xclip -selection clipboard -t image/png -i $f'"
     awful.spawn.easy_async(cmd, function() end)
   end, { description = "screenshot (select)", group = "Hotkeys" }),
-  
+
   awful.key({ mod, alt }, "s", function()
     local home = os.getenv("HOME")
     local cmd = "scrot " .. home  .. "/Pictures/Screenshots/%b%d::%H%M%S.png --silent 'xclip -selection clipboard -t image/png -i $f'"
@@ -134,7 +146,11 @@ awful.keyboard.append_global_keybindings({
   awful.key({ alt }, "Return", function()
     awful.spawn(apps.default.terminal)
   end, { description = "terminal", group = "Launchers" }),
-  
+
+  awful.key({ alt }, "p", function()
+    scratchpad:toggle()
+  end, { description = "scratchpad", group = "Launchers"}),
+
   -- Rofi --
   -- App launcher
   awful.key({ alt }, "r", function()
@@ -185,7 +201,7 @@ client.connect_signal("request::default_keybindings", function()
     awful.key({ ctrl, shift }, "w", function()
       client.focus:kill()
     end, { description = "close", group = "Client" }),
-  
+
     -- Layout-aware resizing
     awful.key({ alt, shift   }, "h", function () resize_horizontal(0.05) end,
     { group = "Client", description = "(v) resize" }),
@@ -226,11 +242,11 @@ end)
 -- ▀▄▀▄▀ █▄█ █▀▄ █░█ ▄█ █▀▀ █▀█ █▄▄ ██▄ ▄█
 awful.keyboard.append_global_keybindings({
   -- Switch to prev/next workspaces 
-  awful.key({ mod }, "Tab", awful.tag.viewnext, 
+  awful.key({ mod }, "Tab", awful.tag.viewnext,
     {description = "view next workspace", group = "Workspace" }),
-  awful.key({ mod, shift }, "Tab", awful.tag.viewprev, 
+  awful.key({ mod, shift }, "Tab", awful.tag.viewprev,
     {description = "view previous workspace", group = "Workspace" }),
- 
+
   -- View nth workspace
   awful.key({
     modifiers = { mod },
