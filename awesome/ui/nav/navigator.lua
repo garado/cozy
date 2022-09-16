@@ -3,7 +3,6 @@
 -- █░▀█ █▀█ ▀▄▀ █ █▄█ █▀█ ░█░ █▄█ █▀▄ 
 
 local awful = require("awful")
-local table = table
 
 -- For printing stacktrace
 local debug_mode = true
@@ -20,30 +19,33 @@ end
 
 ---
 
+-- Class definition
 local Navigator = {}
 function Navigator:new(args)
   args = args or {}
+
   local o = {}
   o.root        = args.root or nil
   o.curr_area   = nil
   o.keygrabber  = nil
   o.rules       = args.rules or nil
-  o.stack       = {}
   o.start_area  = nil
+
   self.__index = self
   return setmetatable(o, self)
 end
 
 -- Action functions
+
+-- Toggle selection highlight for the current item.
+-- Also toggle for any widgets associated with its parent area (recursive).
 function Navigator:select_toggle()
   local item = self.curr_area:get_curr_item()
   if item and not item.is_area then
     item:select_toggle()
   end
+  self.curr_area:select_toggle_recurse_up()
 end
-
-function Navigator:select_off() end
-function Navigator:select_on() end
 
 function Navigator:release()
   navprint("::release")
@@ -53,7 +55,7 @@ function Navigator:release()
   end
 end
 
--- Syntax helper functions
+-- Helper functions because access syntax is gross
 function Navigator:parent()
   if self.curr_area then
     return self.curr_area.parent
@@ -70,45 +72,19 @@ function Navigator:name()
   return self.curr_area.name
 end
 
--- Stack helper functions
-function Navigator:stack_push(value)
-  set_spaces()
-  remove_spaces()
-  table.insert(self.stack, 1, value)
-end
-
-function Navigator:stack_pop()
-  set_spaces()
-  remove_spaces()
-  local head = self.stack[1]
-  table.remove(self.stack, 1)
-  return head
-end
-
-function Navigator:stack_clear()
-  set_spaces()
-  remove_spaces()
-  self.stack = {}
-end
-
-function Navigator:stack_empty()
-  set_spaces()
-  remove_spaces()
-  return #self.stack == 0
-end
-
--- returns true if the target area is a direct neighbor of the
+-- Returns true if the target area is a direct neighbor of the
 -- starting area, false otherwise
-function Navigator:is_direct_neighbor(target_area)
+function Navigator:is_direct_neighbor(target)
   local start_area = self.start_area
   if not start_area.parent then return false end
-  return start_area.parent:contains(target_area)
+  return start_area.parent:contains(target)
 end
 
--- needed for widgets with dynamic content
--- returns true if the current area exists
--- returns false if it doesn't and we had to find the nearest neighbor
-function Navigator:check_curr_area_exists(direction)
+-- Returns true if the current area exists, false if it doesn't
+-- If it doesn't exist, this finds the nearest suitable area and
+-- moves there
+-- Needed in case of widgets with dynamic content
+function Navigator:check_curr_area_exists()
   navprint("::check_curr_area_exists: "..self.curr_area.name)
   set_spaces()
 
@@ -132,104 +108,86 @@ function Navigator:check_curr_area_exists(direction)
   return true
 end
 
-function Navigator:search_area_for_next_navitem(area, index)
-end
-
--- Abandon hope all ye who enter here
 -- Return the next area with a suitable navitem that we can navigate to.
 function Navigator:find_next_area(start_area, direction)
   navprint("::find_next_area: start area is "..start_area.name..", with index "..start_area.index)
   set_spaces()
 
-  --navprint("pushing "..start_area.name.." to the stack")
-  --o.start_area  = nil
-  --self:stack_push(start_area)
   start_area.visited = true
+  local area = start_area
 
- -- navprint("starting while loop through stack contents")
+  -- determine if navigating left or right
+  direction = direction > 0 and 1 or -1
+  local left = direction < 0
+  local right = direction > 0
 
-  --while not self:stack_empty() do
-    set_spaces()
-    local area = start_area
-    --local area = self:stack_pop()
-    --navprint("popping "..area.name.." off the stack")
+  navprint("starting search through item table of "..area.name.." starting at index "..area.index.."; iterating by "..direction)
+  set_spaces()
 
-    -- i may need a hl toggle somewhere here
+  -- set bounds for iteration
+  local bounds
+  if left then
+    bounds = 1
+  elseif right then
+    bounds = #area.items
+  end
 
-    -- look through area for the next navitem to select
-    direction = direction > 0 and 1 or -1
-    local left = direction < 0
-    local right = direction > 0
+  -- look through area's item table for next navitem to select
+  for i = area.index, bounds, direction do
+    navprint("checking "..area.name.."["..i.."]:")
+    area.index = i
+    local item = area.items[i]
 
-    navprint("starting search through item table of "..area.name.." starting at index "..area.index.."; iterating by "..direction)
-    set_spaces()
+    if item.is_navitem then
+      navprint("found suitable next navitem in "..area.name.."["..area.index.."]! returning...")
+      return area, i
+    elseif item.is_area and not item.visited then
+      navprint("is area called "..item.name)
 
-    -- set bounds for iteration
-    local bounds
-    if left then
-      bounds = 1
-    elseif right then
-      bounds = #area.items
-    end
+      -- increment index only for direct neighbors
+      local direct_neighbor = self:is_direct_neighbor(item)
 
-    for i = area.index, bounds, direction do
-      navprint("checking "..area.name.."["..i.."]:")
-      area.index = i
-      local item = area.items[i]
-
-      if item.is_navitem then
-        navprint("found suitable next navitem in "..area.name.."["..area.index.."]! returning...")
-        return area, i
-      elseif item.is_area and not item.visited then
-        navprint("is area called "..item.name)
-
-        -- increment index only for direct neighbors
-        local direct_neighbor = self:is_direct_neighbor(item)
-
-        if right and direct_neighbor then
-          navprint("it is a neighbor to the right. setting index to 1")
-          item.index = 1
-        elseif left and direct_neighbor then
-          navprint("it is a neighbor to the left.")
-          navprint("setting index to max")
-          item.index = #item.items
-        end
-
-        if direct_neighbor then
-          navprint("it is a direct neighbor of the ACTUAL starting area "..self.start_area.name)
-        else
-          navprint("it is NOT a direct neighbor of the ACTUAL starting area "..self.start_area.name)
-        end
-
-        return self:find_next_area(item, direction)
-      elseif item.is_area and item.visited then
-        navprint("is area called "..item.name..", but it has been visited already. moving on...")
+      if right and direct_neighbor then
+        navprint("it is a neighbor to the right. setting index to 1")
+        item.index = 1
+      elseif left and direct_neighbor then
+        navprint("it is a neighbor to the left.")
+        navprint("setting index to max")
+        item.index = #item.items
       end
+
+      if direct_neighbor then
+        navprint("it is a direct neighbor of the ACTUAL starting area "..self.start_area.name)
+      else
+        navprint("it is NOT a direct neighbor of the ACTUAL starting area "..self.start_area.name)
+      end
+
+      return self:find_next_area(item, direction)
+    elseif item.is_area and item.visited then
+      navprint("is area called "..item.name..", but it has been visited already. moving on...")
     end
-    remove_spaces()
+  end
+  remove_spaces()
 
-    -- if we get here, that means the current area has no selectable
-    -- navitems anywhere in its children
-    -- need to backtrace and look for neighboring areas
+  -- If we get here, that means the current area has no suitable  
+  -- next navitem anywhere in its item table
+  -- So we need to backtrace and look in neighboring areas
 
-    navprint("current area "..area.name.." does not have any selectable navitems - must backtrace")
+  navprint("current area "..area.name.." does not have any selectable navitems - must backtrace")
 
-    -- but if there is no parent then we can't backtrace.
-    -- just return and do nothing.
-    if not area.parent then
-      navprint("no parent found - cannot backtrace!")
-      navprint("that means this must be the root area.")
-      navprint("traversing within...")
-      self.curr_area = area
-      self.curr_area:iter(direction)
-      return self:iter_within_area(direction)
-    else
-      return self:find_next_area(area.parent, direction)
-    end
-
-
-    remove_spaces()
-  --end
+  -- But if there is no parent then we can't backtrace, so
+  -- force iterate within the current area.
+  -- This should *ONLY* happen with the root area!
+  if not area.parent then
+    navprint("no parent found - cannot backtrace!")
+    navprint("that means this must be the root area.")
+    navprint("traversing within...")
+    self.curr_area = area
+    self.curr_area:iter(direction)
+    return self:iter_within_area(direction)
+  else
+    return self:find_next_area(area.parent, direction)
+  end
 
   navprint("could not find next area")
 
@@ -245,7 +203,7 @@ function Navigator:iter_between_areas(val)
   -- toggle highlight if necessary
   if self.curr_area.widget then
     navprint("toggling highlight for the area")
-    self.curr_area:select_toggle()
+    --self.curr_area:select_toggle()
   end
 
   -- check if parent exists
@@ -273,10 +231,10 @@ function Navigator:iter_between_areas(val)
   navprint("new current area is "..self:name().."["..self.curr_area.index.."]")
 
   -- toggle highlight if necessary
-  if self.curr_area.widget then
-    navprint("toggling highlight for the area")
-    self.curr_area:select_toggle()
-  end
+  --if self.curr_area.widget then
+  --  navprint("toggling highlight for the area")
+  --  self.curr_area:select_toggle_recurse_up()
+  --end
 
 
   remove_spaces()
@@ -376,6 +334,8 @@ function Navigator:start()
       self:backspace()
     elseif key == "Tab" then
       self:tab()
+    elseif key == "Shift" then
+      -- wait
     elseif key == "Return" then
       self:release()
     elseif key == "q" then -- debug: print current hierarchy
@@ -392,8 +352,8 @@ function Navigator:start()
     autostart = true,
     keypressed_callback = keypressed,
     stop_callback = function()
-      self:select_off()
       self.curr_area = self.root
+      self.root:reset()
     end
   }
 end

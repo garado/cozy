@@ -41,6 +41,16 @@ function Area:select_toggle()
   end
 end
 
+-- Useful for if you have nested areas.
+function Area:select_toggle_recurse_up()
+  if self.widget then
+    self.widget:select_toggle()
+  end
+  if self.parent then
+    self.parent:select_toggle_recurse_up()
+  end
+end
+
 -- Turn off highlight for associated widget
 function Area:select_off()
   if self.widget then
@@ -179,7 +189,18 @@ end
 -- Deselect any children and set the index back to 1.
 function Area:reset()
   self:select_off_recursive()
+  self:reset_visited_recursive()
+  self:reset_index_recursive()
   self.index = 1
+end
+
+function Area:reset_index_recursive()
+  self.index = 1
+  for i = 1, #self.items do
+    if self.items[i].is_area then
+      self.items[i]:reset_index_recursive()
+    end
+  end
 end
 
 -- Remove all items from area.
@@ -187,12 +208,6 @@ function Area:remove_all_items()
   for i = 1, #self.items do
     table.remove(self.items, i)
   end
-
-  -- what the fuck is this?
-  --self.index = self.index + 1
-  --if self.index > #self.items then
-  --  self.index = 1
-  --end
 
   self.index = 1
 end

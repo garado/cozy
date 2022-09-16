@@ -6,6 +6,7 @@
 -- with the keyboard
 
 local beautiful = require("beautiful")
+local helpers = require("helpers")
 
 -- █▄▄ ▄▀█ █▀ █▀▀ 
 -- █▄█ █▀█ ▄█ ██▄ 
@@ -62,8 +63,8 @@ local Habit = Base:new(widget)
 function Habit:select_on()
   self.selected = true
   local box = self.widget.children[1]
-  box.check_color = "#bf616a"
-  box.bg = "#bf616a"
+  box.check_color = beautiful.red
+  box.bg = beautiful.red
 end
 
 function Habit:select_off()
@@ -83,7 +84,7 @@ local Dashwidget = Base:new(widget)
 
 function Dashwidget:select_on()
   self.selected = true
-  self.widget.children[1].bg = beautiful.surface0
+  self.widget.children[1].bg = beautiful.surface2 or beautiful.surface0
 end
 
 function Dashwidget:select_off()
