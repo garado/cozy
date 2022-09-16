@@ -29,6 +29,7 @@ function Navigator:new(args)
   o.keygrabber  = nil
   o.rules       = args.rules or nil
   o.stack       = {}
+  o.start_area  = nil
   self.__index = self
   return setmetatable(o, self)
 end
@@ -96,6 +97,14 @@ function Navigator:stack_empty()
   return #self.stack == 0
 end
 
+-- returns true if the target area is a direct neighbor of the
+-- starting area, false otherwise
+function Navigator:is_direct_neighbor(target_area)
+  local start_area = self.start_area
+  if not start_area.parent then return false end
+  return start_area.parent:contains(target_area)
+end
+
 -- needed for widgets with dynamic content
 -- returns true if the current area exists
 -- returns false if it doesn't and we had to find the nearest neighbor
@@ -133,6 +142,7 @@ function Navigator:find_next_area(start_area, direction)
   set_spaces()
 
   --navprint("pushing "..start_area.name.." to the stack")
+  --o.start_area  = nil
   --self:stack_push(start_area)
   start_area.visited = true
 
@@ -172,12 +182,23 @@ function Navigator:find_next_area(start_area, direction)
         return area, i
       elseif item.is_area and not item.visited then
         navprint("is area called "..item.name)
-        if right then
-          navprint("it is a neighbor to the right.")
+
+        -- increment index only for direct neighbors
+        local direct_neighbor = self:is_direct_neighbor(item)
+
+        if right and direct_neighbor then
+          navprint("it is a neighbor to the right. setting index to 1")
           item.index = 1
-        elseif left then
+        elseif left and direct_neighbor then
           navprint("it is a neighbor to the left.")
+          navprint("setting index to max")
           item.index = #item.items
+        end
+
+        if direct_neighbor then
+          navprint("it is a direct neighbor of the ACTUAL starting area "..self.start_area.name)
+        else
+          navprint("it is NOT a direct neighbor of the ACTUAL starting area "..self.start_area.name)
         end
 
         return self:find_next_area(item, direction)
@@ -314,8 +335,9 @@ end
 
 -- Gets rule for a specific key
 function Navigator:key(key, default)
-  local box_name = self.curr_area.name
-  local rule_exists = self.rules and self.rules[box_name] and self.rules[box_name][key]
+  self.start_area = self.curr_area
+  local area_name = self.curr_area.name
+  local rule_exists = self.rules and self.rules[area_name] and self.rules[area_name][key]
   if rule_exists then
     self:iter_within_area(self:get_rule(key))
   else
@@ -324,10 +346,12 @@ function Navigator:key(key, default)
 end
 
 function Navigator:backspace()
+  self.start_area = self.curr_area
   self:iter_between_areas(-1)
 end
 
 function Navigator:tab()
+  self.start_area = self.curr_area
   self:iter_between_areas(1)
 end
 

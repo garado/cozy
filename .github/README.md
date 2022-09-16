@@ -25,6 +25,7 @@ Hi! This is <b>cozy</b>, my <a href="https://awesomewm.org" target="_blank">Awes
 </p>
 
 <ul>
+<li><b>Fully keyboard navigable!</b></li>
 <li>Fancy music player (thank you <a href="https://github.com/rxyhn/yoru" target="_blank">rxhyn</a>)</li>
 <li>Calendar (with Google Calendar) </li>
 <li>To do list (with <a href="https://taskwarrior.org/" target="_blank">Taskwarrior</a>)</li>
