@@ -42,7 +42,7 @@ Hi! This is <b>cozy</b>, my <a href="https://awesomewm.org" target="_blank">Awes
   <img title="" src="assets/theme_switcher.gif" alt="" width="800">
 </p>
 
-The theme switcher can set the theme for your entire system - not just Awesome. By default, it switches the Kitty, NvChad, and GTK themes, but it is easily extensible to whichever applications you use.
+The theme switcher can set the theme for your entire system - not just Awesome. By default, it switches Kitty and NvChad themes, but it is easily extensible to whichever applications you use.
 
 Built-in themes:
 
