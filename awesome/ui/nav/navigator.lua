@@ -30,6 +30,7 @@ function Navigator:new(args)
   o.keygrabber  = nil
   o.rules       = args.rules or nil
   o.start_area  = nil
+  o.start_index = 0
   o.last_key    = ""
 
   self.__index = self
@@ -114,7 +115,7 @@ function Navigator:check_curr_area_exists()
   if not parent then
     navprint("the current area's parent doesn't exist - moving to root")
     self.curr_area = self.root
-    self.curr_area.index = 1
+    --self.curr_area.index = 1
     self.curr_area:select_off_recursive()
     remove_spaces()
     return false
@@ -167,15 +168,24 @@ function Navigator:find_next_area(start_area, direction)
 
   navprint("bounds are ".. bounds)
 
+  --local searching_start_area = self.start_area == area
+  --local at_edge = area.index == 1 or area.index == #area.items
+  --if searching_start_area and at_edge then
+  --  if area.index == 1 and left then area.index = #area.items end
+  --  if area.index == #area.items and right then area.index = 1 end
+  --end
+
   -- look through area's item table for next navitem to select
   for i = area.index, bounds, direction do
     navprint("checking "..area.name.."["..i.."]:")
     area.index = i
     local item = area.items[i]
 
-    if item.is_navitem then
+    if item.is_navitem and not item.visited then
       navprint("found suitable next navitem in "..area.name.."["..area.index.."]! returning...")
       return area, i
+    elseif item.is_navitem and item.visited then
+      navprint("found a navitem, but it's been visited - moving on")
     elseif item.is_area and not item.visited then
       navprint("is area called "..item.name)
 
@@ -218,13 +228,22 @@ function Navigator:find_next_area(start_area, direction)
     navprint("that means this must be the root area.")
     navprint("traversing within...")
     self.curr_area = area
+    local old_index = self.curr_area.index
     self.curr_area:iter(direction)
+    local new_index = self.curr_area.index
+
+    -- if wrapping around the root,
+    -- set indices accordingly
+    if old_index > new_index then
+      self.curr_area:reset_index_recursive()
+    else
+      self.curr_area:max_index_recursive()
+    end
+
     return self:iter_within_area(direction)
   else
     return self:find_next_area(area.parent, direction)
   end
-
-  remove_spaces()
 end
 
 function Navigator:iter_between_areas(val)
@@ -290,9 +309,23 @@ function Navigator:iter_within_area(val)
     if not next_item then
       navprint("there was no next element within "..area.name)
       navprint("moving to the next area")
-      return self:find_next_area(area, val)
+      curr_item.visited = true
+      local new_area, new_index = self:find_next_area(area, val)
+      self.curr_area = new_area
+      self.curr_area.index = new_index
     else
+
+      -- but if there was no next area... force iter within
+      --local searching_start_area = self.start_area == area
+      --local at_edge = area.index == 1 or area.index == #area.items
+      --if searching_start_area and at_edge then
+      --  navprint("rrrrrrrrrr")
+      --  if area.index == 1 and val < 0 then area.index = #area.items end
+      --  if area.index == #area.items and val > 0then area.index = 1 end
+      --end
+
       navprint("next element found at index "..area.index)
+
       return area, area.index
     end
   end
@@ -314,6 +347,7 @@ end
 -- Execute function for direction keys (hjkl/arrows)
 function Navigator:key(key, default)
   self.start_area = self.curr_area
+  self.start_index = self.curr_area.index
   local area_name = self.curr_area.name
   local rule_exists = self.rules and self.rules[area_name] and self.rules[area_name][key]
   if rule_exists then
@@ -333,11 +367,13 @@ end
 
 function Navigator:backspace()
   self.start_area = self.curr_area
+  self.start_index = self.curr_area.index
   self:iter_between_areas(-1)
 end
 
 function Navigator:tab()
   self.start_area = self.curr_area
+  self.start_index = self.curr_area.index
   self:iter_between_areas(1)
 end
 

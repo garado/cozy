@@ -194,6 +194,15 @@ function Area:reset()
   self.index = 1
 end
 
+function Area:max_index_recursive()
+  self.index = #self.items
+  for i = 1, #self.items do
+    if self.items[i].is_area then
+      self.items[i]:max_index_recursive()
+    end
+  end
+end
+
 function Area:reset_index_recursive()
   self.index = 1
   for i = 1, #self.items do
@@ -225,6 +234,8 @@ function Area:reset_visited_recursive()
   for i = 1, #self.items do
     if self.items[i].is_area then
       self.items[i]:reset_visited_recursive()
+    elseif self.items[i].is_navitem then
+      self.items[i].visited = false
     end
   end
 end

@@ -1,7 +1,6 @@
 
 -- █▄░█ ▄▀█ █░█ █▀█ █░█ █░░ █▀▀ █▀ 
 -- █░▀█ █▀█ ▀▄▀ █▀▄ █▄█ █▄▄ ██▄ ▄█ 
-
 -- Custom keynav rules for control center
 
 local Navigator = require("ui.nav.navigator")
@@ -11,7 +10,7 @@ local navigator = Navigator:new()
 local qactions = {}
 qactions["j"] = function(index)
   if index <= 5 then
-    return 5, false
+    return 5
   elseif index > 5 and index < 9 then
     navigator:set_area("links")
     navigator.curr_area.index = 1
@@ -25,7 +24,7 @@ end
 
 qactions["k"] = function(index)
   if index > 5 then
-    return -5, false
+    return -5
   else
     navigator:set_area("power_opts")
     return 0, true
@@ -37,7 +36,7 @@ qactions["h"] = function(index)
     navigator.curr_area.index = navigator.curr_area.index + 4
     return 0, true
   else
-    return -1, false
+    return -1
   end
 end
 
@@ -46,7 +45,7 @@ qactions["l"] = function(index)
     navigator.curr_area.index = navigator.curr_area.index - 4
     return 0, true
   else
-    return 1, false
+    return 1
   end
 end
 
@@ -54,7 +53,7 @@ end
 local links = {}
 links["j"] = function(index)
   if index < 5 then
-    return 2, false
+    return 2
   else
     navigator:set_area("power_opts")
     navigator.curr_area.index = 1
@@ -72,16 +71,16 @@ links["k"] = function(index)
     navigator.curr_area.index = 10
     return 0, true
   else
-    return -2, false
+    return -2
   end
 end
 
 local power_opts = {}
 local function links_horizontal(index)
   if index % 2 == 1 then
-    return 1, false
+    return 1
   else
-    return -1, false
+    return -1
   end
 end
 
