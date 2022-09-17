@@ -11,29 +11,13 @@ local dpi = xresources.apply_dpi
 
 -- For navigation
 local Area = require("ui.nav.area")
-local Navigator = require("ui.nav.navigator")
+local navigator = require("ui.control_center.navrules")
 
 local nav_root = Area:new({
   name = "root",
   circular = true,
 })
-
-local nav = Navigator:new({
-  root = nav_root,
-  rules = {
-    qactions = {
-      j = 5,
-      k = -5,
-    },
-    links = {
-      j = 2,
-      k = -2,
-    },
-    power_opts = {
-
-    }
-  }
-})
+navigator.root = nav_root
 
 -- Import widgets
 -- local profile = require("ui.control_center.profile")
@@ -120,9 +104,9 @@ return function()
     control_center.visible = not control_center.visible
     if control_center.visible then
       require("ui.shared").close_other_popups("control_center")
-      nav:start(nav_root)
+      navigator:start()
     else
-      nav:stop()
+      navigator:stop()
       power_confirm.visible = false
     end
   end)

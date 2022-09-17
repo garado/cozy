@@ -68,6 +68,8 @@ function Area:select_off_recursive()
       self.items[i]:select_off_recursive()
     else
       self.items[i]:select_off()
+      if self.items[i].selected then
+      end
     end
   end
 end
@@ -86,11 +88,8 @@ function Area:remove_index(index)
   end
 end
 
--- Remove a specific item from area's item table.
+-- Remove a specific area from area's item table.
 function Area:remove_item(item)
-  if item.is_area then
-    item.parent = nil
-  end
   item:select_off_recursive()
   if self.items[self.index] == item then
     self.index = 1
@@ -116,6 +115,9 @@ function Area:contains(item)
     end
   end
   return false
+end
+
+function Area:set_index(index)
 end
 
 -- Iterate through an area's item table by a given amount.
@@ -178,9 +180,6 @@ function Area:remove_all_except_item(item)
       end
     end
   end
-  --if self.name == "root" then
-  --  print("remove_aei end root index: "..self.index)
-  --end
 
   return #self.items == 1 and self.items[1] == item
 end

@@ -13,8 +13,14 @@ local elevated = require("ui.nav.navitem").Elevated
 local Area = require("ui.nav.area")
 
 local nav_power = Area:new({ name = "nav_power" })
-local nav_power_opts = Area:new({ name = "power_opts" })
-local nav_power_confirm = Area:new({ name = "power_confirm" })
+local nav_power_opts = Area:new({
+  name = "power_opts",
+  circular = true
+})
+local nav_power_confirm = Area:new({
+  name = "power_confirm",
+  circular = true,
+})
 
 nav_power:append(nav_power_opts)
 

@@ -72,6 +72,26 @@ function Navigator:name()
   return self.curr_area.name
 end
 
+-- Set navigator area to a specific area
+function Navigator:set_area(target, start_area)
+  if target == "root" then
+    self.curr_area = self.root
+    return
+  end
+
+  local area = start_area or self.root
+  for i = 1, #area.items do
+    if area.items[i].is_area then
+      if area.items[i].name == target then
+        self.curr_area = area.items[i]
+        return
+      else
+        self:set_area(target, area.items[i])
+      end
+    end
+  end
+end
+
 -- Returns true if the target area is a direct neighbor of the
 -- starting area, false otherwise
 function Navigator:is_direct_neighbor(target)
@@ -94,12 +114,21 @@ function Navigator:check_curr_area_exists()
     navprint("the current area's parent doesn't exist - moving to root")
     self.curr_area = self.root
     self.curr_area.index = 1
+    self.curr_area:select_off_recursive()
     remove_spaces()
     return false
   elseif not parent:contains(self.curr_area) then
     navprint("the current area no longer exists - trying to find nearest neighbor")
-    self.curr_area = parent
-    self:iter_within(1) -- should this be 1?
+    self.curr_area:select_off_recursive()
+    local next_area, new_index = self:find_next_area(self.curr_area, 1)
+    if not next_area then
+      navprint("couldnt find next area!")
+    else
+      self.curr_area = next_area
+      self.index = new_index
+    end
+    --self.curr_area = parent
+    --self:iter_within(1) -- should this be 1?
     remove_spaces()
     return false
   end
@@ -189,8 +218,6 @@ function Navigator:find_next_area(start_area, direction)
     return self:find_next_area(area.parent, direction)
   end
 
-  navprint("could not find next area")
-
   remove_spaces()
 end
 
@@ -199,12 +226,6 @@ function Navigator:iter_between_areas(val)
   set_spaces()
 
   self:check_curr_area_exists()
-
-  -- toggle highlight if necessary
-  if self.curr_area.widget then
-    navprint("toggling highlight for the area")
-    --self.curr_area:select_toggle()
-  end
 
   -- check if parent exists
   if not self:parent() then
@@ -229,13 +250,6 @@ function Navigator:iter_between_areas(val)
   self.curr_area = next_area
   self.curr_area.index = new_index
   navprint("new current area is "..self:name().."["..self.curr_area.index.."]")
-
-  -- toggle highlight if necessary
-  --if self.curr_area.widget then
-  --  navprint("toggling highlight for the area")
-  --  self.curr_area:select_toggle_recurse_up()
-  --end
-
 
   remove_spaces()
 end
@@ -297,7 +311,15 @@ function Navigator:key(key, default)
   local area_name = self.curr_area.name
   local rule_exists = self.rules and self.rules[area_name] and self.rules[area_name][key]
   if rule_exists then
-    self:iter_within_area(self:get_rule(key))
+    local rule = self:get_rule(key)
+    local custom_nav_logic = false
+    local amount = 0
+    if type(rule) == "function" then
+      amount, custom_nav_logic = rule(self.curr_area.index)
+    end
+    if not custom_nav_logic then
+      self:iter_within_area(amount)
+    end
   else
     self:iter_within_area(default)
   end
@@ -334,8 +356,6 @@ function Navigator:start()
       self:backspace()
     elseif key == "Tab" then
       self:tab()
-    elseif key == "Shift" then
-      -- wait
     elseif key == "Return" then
       self:release()
     elseif key == "q" then -- debug: print current hierarchy
