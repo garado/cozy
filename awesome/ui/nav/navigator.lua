@@ -30,6 +30,7 @@ function Navigator:new(args)
   o.keygrabber  = nil
   o.rules       = args.rules or nil
   o.start_area  = nil
+  o.last_key    = ""
 
   self.__index = self
   return setmetatable(o, self)
@@ -139,7 +140,7 @@ end
 
 -- Return the next area with a suitable navitem that we can navigate to.
 function Navigator:find_next_area(start_area, direction)
-  navprint("::find_next_area: start area is "..start_area.name..", with index "..start_area.index)
+  navprint("::find_next_area: start area is "..start_area.name..", with index "..start_area.index..". direction is "..direction)
   set_spaces()
 
   start_area.visited = true
@@ -151,15 +152,20 @@ function Navigator:find_next_area(start_area, direction)
   local right = direction > 0
 
   navprint("starting search through item table of "..area.name.." starting at index "..area.index.."; iterating by "..direction)
+  navprint("item table has "..#area.items.." items")
   set_spaces()
 
   -- set bounds for iteration
-  local bounds
+  local bounds = 1
   if left then
     bounds = 1
   elseif right then
     bounds = #area.items
+  else
+    bounds = #area.items
   end
+
+  navprint("bounds are ".. bounds)
 
   -- look through area's item table for next navitem to select
   for i = area.index, bounds, direction do
@@ -305,7 +311,7 @@ function Navigator:get_rule(key)
   end
 end
 
--- Gets rule for a specific key
+-- Execute function for direction keys (hjkl/arrows)
 function Navigator:key(key, default)
   self.start_area = self.curr_area
   local area_name = self.curr_area.name
@@ -313,7 +319,7 @@ function Navigator:key(key, default)
   if rule_exists then
     local rule = self:get_rule(key)
     local custom_nav_logic = false
-    local amount = 0
+    local amount = rule
     if type(rule) == "function" then
       amount, custom_nav_logic = rule(self.curr_area.index)
     end
@@ -364,6 +370,7 @@ function Navigator:start()
     end
 
     if key ~= "Return" and key ~= "q" then self:select_toggle() end
+    self.last_key = "key"
   end
 
   self.keygrabber = awful.keygrabber {

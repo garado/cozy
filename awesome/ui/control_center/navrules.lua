@@ -5,7 +5,6 @@
 -- Custom keynav rules for control center
 
 local Navigator = require("ui.nav.navigator")
-
 local navigator = Navigator:new()
 
 -- Quick actions are a 2x5 grid

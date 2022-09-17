@@ -125,8 +125,6 @@ end
 
 -- creates just one habit
 local function create_habit_ui_entry(name, graph_id, frequency)
-  local nav_habit = Area:new({ name = name })
-
   local habit_name = wibox.widget({
     markup = helpers.ui.colorize_text(name, beautiful.fg),
     font = beautiful.font_name .. "12",
@@ -228,8 +226,6 @@ local function create_habit_ui_entry(name, graph_id, frequency)
         -- update data
         update_cache(graph_id, date, box.checked)
         qty = not qty
-        --if qty == 1 then qty = 0 end
-        --if qty == 0 then qty = 1 end
       end)
 
       days:add(checkbox)

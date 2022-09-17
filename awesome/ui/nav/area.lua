@@ -127,8 +127,9 @@ function Area:iter(amount)
 
   -- If iterating went out of item table's bounds and the area isn't
   -- circular, then return nil.
-  local overflow = new_index > #self.items or new_index < 0
+  local overflow = new_index > #self.items or new_index <= 0
   if not self.circular and overflow then
+    print("overflow!")
     return
   end
 

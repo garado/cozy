@@ -24,7 +24,7 @@ local nav_timew_topics = Area:new({ name = "timew_topics" })
 local nav_timew_actions = Area:new({ name = "timew_actions" })
 
 --nav_timewarrior:append(nav_timew_topics)
-nav_timewarrior:append(nav_timew_actions)
+--nav_timewarrior:append(nav_timew_actions)
 
 local update_ui
 local ui_timew_started, ui_timew_stopped
@@ -43,6 +43,8 @@ local function create_topic_buttons()
       on_release = function()
         awful.spawn("timew start " .. topic)
         update_ui(ui_timew_started())
+        nav_timewarrior:append(nav_timew_actions)
+        nav_timewarrior:remove_item(nav_timew_topics)
       end
     })
     if #nav_timew_topics.items < #topic_list then
@@ -172,6 +174,8 @@ function ui_timew_started()
       awful.spawn.with_shell("timew stop")
       minute_timer:stop()
       update_ui(ui_timew_stopped())
+      nav_timewarrior:remove_item(nav_timew_actions)
+      nav_timewarrior:append(nav_timew_topics)
     end
   })
 
@@ -221,8 +225,10 @@ awful.spawn.easy_async_with_shell(cmd, function(stdout)
   local content = timew_widget:get_children_by_id("content")[1]
   if stdout:find("no active time tracking") then
     content:set(1, ui_timew_stopped())
+    nav_timewarrior:append(nav_timew_topics)
   else
     content:set(1, ui_timew_started())
+    nav_timewarrior:append(nav_timew_actions)
   end
 end)
 

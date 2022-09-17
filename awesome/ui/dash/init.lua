@@ -12,26 +12,17 @@ local widgets = require("ui.widgets")
 
 local Area = require("ui.nav.area")
 local Dashtab = require("ui.nav.navitem").Dashtab
-local Navigator = require("ui.nav.navigator")
+local navigator = require("ui.dash.navrules")
 
 local nav_root = Area:new({
   name = "root",
   circular = true,
 })
+navigator.root = nav_root
 
 local nav_tabs = Area:new({
   name = "tabs",
   circular = true,
-})
-
-local nav = Navigator:new({
-  root = nav_root,
-  rules = {
-    nav_dash_habits = {
-      j = 4,
-      k = -4,
-    }
-  }
 })
 
 nav_root:append(nav_tabs)
@@ -115,7 +106,7 @@ return function()
     else
       require("ui.shared").close_other_popups("dash")
       awesome.emit_signal("dash::opened")
-      nav:start()
+      navigator:start()
     end
     dash.visible = not dash.visible
   end)
