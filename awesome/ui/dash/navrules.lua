@@ -17,7 +17,7 @@ habit["j"] = function(index)
 end
 
 habit["k"] = function(index)
-  if index < 4 then
+  if index <= 4 then
     return 28
   else
     return -4

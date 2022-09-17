@@ -38,15 +38,14 @@ function theme.random_accent_color()
   return theme.accents[i]
 end
 
-theme.bg_d0 = "#11111b"
-theme.bg    = "#181825"
-theme.bg_l0 = "#1e1e2e"
-theme.bg_l1 = "#313244"
-theme.bg_l2 = "#45475a"
-theme.bg_l3 = "#363a3f"
-theme.fg    = "#cdd6f4"
-theme.fg_l  = "#cdd6f4"
-theme.fg_d  = "#363a4f"
+theme.bg      = "#11111b"
+theme.bg_l0   = "#181825"
+theme.bg_l1   = "#1e1e2e"
+theme.bg_l2   = "#313244"
+theme.bg_l3   = "#45475a"
+theme.fg      = "#cdd6f4"
+theme.fg_alt  = "#585b70"
+theme.fg_sub  = "#585b70"
 
 theme.main_accent = "#89b4fa"
 theme.red         = "#f38ba8"
@@ -55,15 +54,12 @@ theme.yellow      = "#f9e2af"
 theme.transparent = "#ffffff00"
 
 ---- custom
---theme.hab_uncheck_fg  = "#5b6078"
---theme.hab_uncheck_bg  = "#494d64"
---theme.hab_check_fg    = "#363a4f"
---theme.hab_check_bg    = "#89b4fa"
---theme.switcher_opt_btn_bg = "#11111b"
+theme.hab_selected_bg = "#d20f39"
+theme.hab_check_fg    = "#1e1e2e"
 
 -- settings for theme switcher
 theme.kitty = "Catppuccin-Mocha"
-theme.nvim  = "catppuccin"
+theme.nvchad  = "catppuccin"
 theme.gtk   = "Catppuccin-Mocha-Mauve"
 
 return theme

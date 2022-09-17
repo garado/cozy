@@ -30,7 +30,7 @@ local func = nil
 local yes = widgets.button.text.normal({
   text = "Yes",
   text_normal_bg = beautiful.fg,
-  normal_bg = beautiful.switcher_options_bg,
+  normal_bg = beautiful.switcher_opt_btn_bg,
   animate_size = false,
   size = 12,
   on_release = function()
@@ -46,7 +46,7 @@ nav_power_confirm:append(elevated:new(yes))
 local no = widgets.button.text.normal({
   text = "No",
   text_normal_bg = beautiful.fg,
-  normal_bg = beautiful.switcher_options_bg,
+  normal_bg = beautiful.switcher_opt_btn_bg,
   animate_size = false,
   size = 12,
   on_release = function()
@@ -80,7 +80,7 @@ local confirmation = wibox.widget({
     widget = wibox.container.place,
   },
   forced_height = dpi(60),
-  bg = beautiful.ctrl_power_options_bg,
+  bg = beautiful.ctrl_powopt_bg,
   widget = wibox.container.background,
 })
 
@@ -94,8 +94,8 @@ end
 local function create_power_btn(icon, confirm_text, cmd)
   local btn = widgets.button.text.normal({
     text = icon,
-    text_normal_bg = beautiful.ctrl_power_options_btn_fg,
-    normal_bg = beautiful.ctrl_power_options_bg,
+    text_normal_bg = beautiful.ctrl_powopt_btn_fg,
+    normal_bg = beautiful.ctrl_powopt_bg,
     animate_size = false,
     size = 13,
     on_release = function()
@@ -139,7 +139,7 @@ local options = wibox.widget({
     widget = wibox.container.place,
   },
   forced_width = dpi(220),
-  bg = beautiful.ctrl_power_options_bg,
+  bg = beautiful.ctrl_powopt_bg,
   widget = wibox.container.background,
 })
 

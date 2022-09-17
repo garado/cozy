@@ -37,7 +37,7 @@ local filter_color = {
 	type = "linear",
 	from = { 0, 0 },
 	to = { 0, 200 },
-	stops = { { 0, beautiful.album_filter_1}, { 1, beautiful.album_filter_2 .. "cc" } },
+	stops = { { 0, beautiful.mus_filter_1}, { 1, beautiful.mus_filter_2 .. "cc" } },
 }
 
 local music_art_filter = wibox.widget({
@@ -100,9 +100,9 @@ local music = wibox.widget({
 					nil,
 					{
 						{
-							widgets.playerctl.previous(20, beautiful.playerctl_fg, beautiful.playerctl_bg),
-							widgets.playerctl.play(beautiful.playerctl_fg, beautiful.playerctl_bg),
-							widgets.playerctl.next(20, beautiful.playerctl_fg, beautiful.playerctl_bg),
+							widgets.playerctl.previous(20, beautiful.mus_control_fg, beautiful.mus_control_bg),
+							widgets.playerctl.play(beautiful.mus_control_fg, beautiful.mus_control_bg),
+							widgets.playerctl.next(20, beautiful.mus_control_fg, beautiful.mus_control_bg),
 							layout = wibox.layout.flex.horizontal,
 						},
 						forced_height = dpi(70),
@@ -145,15 +145,15 @@ playerctl_daemon:connect_signal("metadata", function(_, title, artist, album_pat
 	end
 
 	music_art:set_image(gears.surface.load_uncached(album_path))
-	music_title:set_markup_silently(helpers.ui.colorize_text(title, beautiful.playerctl_fg))
-	music_artist:set_markup_silently(helpers.ui.colorize_text(artist, beautiful.playerctl_fg))
+	music_title:set_markup_silently(helpers.ui.colorize_text(title, beautiful.mus_control_fg))
+	music_artist:set_markup_silently(helpers.ui.colorize_text(artist, beautiful.mus_control_fg))
 end)
 
 playerctl_daemon:connect_signal("playback_status", function(_, playing, __)
 	if playing then
-		music_text:set_markup_silently(helpers.ui.colorize_text("Now Playing", beautiful.now_playing_fg))
+		music_text:set_markup_silently(helpers.ui.colorize_text("Now Playing", beautiful.mus_playing_fg))
 	else
-		music_text:set_markup_silently(helpers.ui.colorize_text("Music", beautiful.now_playing_fg))
+		music_text:set_markup_silently(helpers.ui.colorize_text("Music", beautiful.mus_playing_fg))
 	end
 end)
 

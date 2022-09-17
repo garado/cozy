@@ -11,7 +11,7 @@ local naughty = require("naughty")
 
 local notif_enabled_icon = ""
 local notif_disabled_icon = ""
-local notif_icon_color = beautiful.notif_toggle_fg
+local notif_icon_color = beautiful.wibar_notif_fg
 local notif_button = wibox.widget({
   align = "center",
   valign = "center",

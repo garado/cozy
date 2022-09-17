@@ -15,7 +15,7 @@ local app_launcher
 local function create_launcher_entry(icon, program)
   local entry = widgets.button.text.normal({
     text = icon,
-    text_normal_bg = beautiful.fg,
+    text_normal_bg = beautiful.wibar_fg,
     normal_bg = beautiful.wibar_bg,
     animate_size = false,
     size = 20,
@@ -56,7 +56,7 @@ app_launcher = awful.popup({
 })
 
 local button = wibox.widget({
-  markup = helpers.ui.colorize_text("", beautiful.wibar_launcher_app),
+  markup = helpers.ui.colorize_text("", beautiful.wibar_launch_app),
   widget = wibox.widget.textbox,
   font = beautiful.font .. "12",
   align = "center",
@@ -71,12 +71,12 @@ button:connect_signal("button::press", function()
 end)
 
 button:connect_signal("mouse::enter", function()
-  local markup = helpers.ui.colorize_text("", beautiful.wibar_launcher_hover)
+  local markup = helpers.ui.colorize_text("", beautiful.wibar_launch_hover)
   button:set_markup_silently(markup)
 end)
 
 button:connect_signal("mouse::leave", function()
-  local markup = helpers.ui.colorize_text("", beautiful.wibar_launcher_app)
+  local markup = helpers.ui.colorize_text("", beautiful.wibar_launch_app)
   button:set_markup_silently(markup)
 end)
 

@@ -34,28 +34,25 @@ function theme.random_accent_color()
   return theme.accents[i]
 end
 
-theme.bg_d0 = "#101017"
-theme.bg    = "#16161d" -- base
-theme.bg_l0 = "#1f1f28" -- crust
-theme.bg_l1 = "#2a2a37" -- mantle
-theme.bg_l2 = "#363646" -- surface0
-theme.bg_l3 = "#54546d" -- overlay0?
-theme.fg    = "#dcd7ba" -- fg
-theme.fg_l  = "#c8c093" -- subtitle
-theme.fg_d  = "#727169" -- subtitle
+theme.bg_d0   = "#101017"
+theme.bg      = "#16161d"
+theme.bg_l0   = "#1f1f28"
+theme.bg_l1   = "#232331"
+theme.bg_l2   = "#363646"
+theme.bg_l3   = "#54546d"
+theme.fg      = "#dcd7ba"
+theme.fg_alt  = "#c8c093"
+theme.fg_sub  = "#727169"
 
-theme.main_accent = "#2d4f67" -- overlay1 (border color)
+theme.main_accent = "#2d4f67"
 theme.red         = "#c34043"
 theme.green       = "#76946a"
 theme.yellow      = "#dca561"
 theme.transparent = "#ffffff00"
 
--- custom
---theme.hab_uncheck_bg = "#2a2a37"
-
 -- theme switcher settings
 theme.kitty = "kanagawabones"
-theme.nvim  = "kanagawa"
+theme.nvchad  = "kanagawa"
 theme.gtk   = "Nordic"
 
 return theme

@@ -2,22 +2,11 @@
 -- █▄░█ ▄▀█ █░█ █ █▀▀ ▄▀█ ▀█▀ █▀█ █▀█ 
 -- █░▀█ █▀█ ▀▄▀ █ █▄█ █▀█ ░█░ █▄█ █▀▄ 
 
+-- I barely understand the algorithm here. Don't ask.
+-- Something something depth first traversal through tree.
+-- Algos aren't my thing lol
+
 local awful = require("awful")
-
--- For printing stacktrace
-local debug_mode = true
-local spaces = ""
-local function set_spaces()
-  spaces = spaces .. "  "
-end
-local function remove_spaces()
-  spaces = string.gsub(spaces, "^  ", "")
-end
-local function navprint(msg)
-  if debug_mode then print(spaces..msg) end
-end
-
----
 
 -- Class definition
 local Navigator = {}
@@ -50,7 +39,6 @@ function Navigator:select_toggle()
 end
 
 function Navigator:release()
-  navprint("::release")
   local item = self:curr_item()
   if item and not item.is_area then
     item:release()
@@ -107,42 +95,33 @@ end
 -- moves there
 -- Needed in case of widgets with dynamic content
 function Navigator:check_curr_area_exists()
-  navprint("::check_curr_area_exists: "..self.curr_area.name)
-  set_spaces()
+  if not self.curr_area then return end
 
   local parent = self:parent()
 
   if not parent then
-    navprint("the current area's parent doesn't exist - moving to root")
     self.curr_area = self.root
     --self.curr_area.index = 1
     self.curr_area:select_off_recursive()
-    remove_spaces()
     return false
   elseif not parent:contains(self.curr_area) then
-    navprint("the current area no longer exists - trying to find nearest neighbor")
     self.curr_area:select_off_recursive()
     local next_area, new_index = self:find_next_area(self.curr_area, 1)
     if not next_area then
-      navprint("couldnt find next area!")
     else
       self.curr_area = next_area
       self.index = new_index
     end
     --self.curr_area = parent
     --self:iter_within(1) -- should this be 1?
-    remove_spaces()
     return false
   end
 
-  remove_spaces()
   return true
 end
 
 -- Return the next area with a suitable navitem that we can navigate to.
 function Navigator:find_next_area(start_area, direction)
-  navprint("::find_next_area: start area is "..start_area.name..", with index "..start_area.index..". direction is "..direction)
-  set_spaces()
 
   start_area.visited = true
   local area = start_area
@@ -151,10 +130,6 @@ function Navigator:find_next_area(start_area, direction)
   direction = direction > 0 and 1 or -1
   local left = direction < 0
   local right = direction > 0
-
-  navprint("starting search through item table of "..area.name.." starting at index "..area.index.."; iterating by "..direction)
-  navprint("item table has "..#area.items.." items")
-  set_spaces()
 
   -- set bounds for iteration
   local bounds = 1
@@ -166,67 +141,42 @@ function Navigator:find_next_area(start_area, direction)
     bounds = #area.items
   end
 
-  navprint("bounds are ".. bounds)
-
-  --local searching_start_area = self.start_area == area
-  --local at_edge = area.index == 1 or area.index == #area.items
-  --if searching_start_area and at_edge then
-  --  if area.index == 1 and left then area.index = #area.items end
-  --  if area.index == #area.items and right then area.index = 1 end
-  --end
-
   -- look through area's item table for next navitem to select
   for i = area.index, bounds, direction do
-    navprint("checking "..area.name.."["..i.."]:")
     area.index = i
     local item = area.items[i]
 
     if item.is_navitem and not item.visited then
-      navprint("found suitable next navitem in "..area.name.."["..area.index.."]! returning...")
       return area, i
     elseif item.is_navitem and item.visited then
-      navprint("found a navitem, but it's been visited - moving on")
     elseif item.is_area and not item.visited then
-      navprint("is area called "..item.name)
 
       -- increment index only for direct neighbors
       local direct_neighbor = self:is_direct_neighbor(item)
 
       if right and direct_neighbor then
-        navprint("it is a neighbor to the right. setting index to 1")
         item.index = 1
       elseif left and direct_neighbor then
-        navprint("it is a neighbor to the left.")
-        navprint("setting index to max")
         item.index = #item.items
       end
 
       if direct_neighbor then
-        navprint("it is a direct neighbor of the ACTUAL starting area "..self.start_area.name)
       else
-        navprint("it is NOT a direct neighbor of the ACTUAL starting area "..self.start_area.name)
       end
 
       return self:find_next_area(item, direction)
     elseif item.is_area and item.visited then
-      navprint("is area called "..item.name..", but it has been visited already. moving on...")
     end
   end
-  remove_spaces()
 
   -- If we get here, that means the current area has no suitable  
   -- next navitem anywhere in its item table
   -- So we need to backtrace and look in neighboring areas
 
-  navprint("current area "..area.name.." does not have any selectable navitems - must backtrace")
-
   -- But if there is no parent then we can't backtrace, so
   -- force iterate within the current area.
   -- This should *ONLY* happen with the root area!
   if not area.parent then
-    navprint("no parent found - cannot backtrace!")
-    navprint("that means this must be the root area.")
-    navprint("traversing within...")
     self.curr_area = area
     local old_index = self.curr_area.index
     self.curr_area:iter(direction)
@@ -237,7 +187,11 @@ function Navigator:find_next_area(start_area, direction)
     if old_index > new_index then
       self.curr_area:reset_index_recursive()
     else
-      self.curr_area:max_index_recursive()
+      if left then
+        self.curr_area:max_index_recursive()
+      elseif right then
+        self.curr_area:reset_index_recursive()
+      end
     end
 
     return self:iter_within_area(direction)
@@ -247,43 +201,32 @@ function Navigator:find_next_area(start_area, direction)
 end
 
 function Navigator:iter_between_areas(val)
-  navprint("::iter_between_areas: "..self:name().." by "..val)
-  set_spaces()
 
   self:check_curr_area_exists()
 
   -- check if parent exists
   if not self:parent() then
-    navprint("the current area has no parent, so we can't iterate between its areas")
-    navprint("this means we're at root")
-    navprint("iterating within root instead...")
     self:iter_within_area(val)
     return
   end
 
-  navprint("calling find_next_area on parent")
   self.curr_area.visited = true
   local start_area = self:parent()
 
   -- the parent's currently selected item is the current area
   -- so we need to iterate the parent to make sure it doesnt search the 
   -- current area again
-  navprint("iterating parent by "..val.." so we don't search the current area "..self.curr_area.name.." again")
   start_area:iter(val)
 
   local next_area, new_index = self:find_next_area(start_area, val)
   self.curr_area = next_area
   self.curr_area.index = new_index
-  navprint("new current area is "..self:name().."["..self.curr_area.index.."]")
 
-  remove_spaces()
 end
 
 -- Navigate within the current area's items.
 -- Returns the area.
 function Navigator:iter_within_area(val)
-  navprint("::iter_within_area: "..self:name().." by "..val)
-  set_spaces()
 
   self:check_curr_area_exists()
 
@@ -292,47 +235,28 @@ function Navigator:iter_within_area(val)
 
   -- if the current item is an area, iterate within that area
   if curr_item.is_area then
-    navprint("the currently selected item is an area called "..curr_item.name..". recursing...")
     self.curr_area = curr_item
-    remove_spaces()
     return self:iter_within_area(0)
   end
 
   -- if current item is an element, go to the next element
   if curr_item.is_navitem then
-    navprint("the currently selected item is an element (at index "..area.index.."), moving to next element")
 
     local next_item = area:iter(val)
 
     -- if iterating through the current area didn't return anything, 
     -- then you need iterate to the next area.
     if not next_item then
-      navprint("there was no next element within "..area.name)
-      navprint("moving to the next area")
       curr_item.visited = true
       local new_area, new_index = self:find_next_area(area, val)
       self.curr_area = new_area
       self.curr_area.index = new_index
     else
-
-      -- but if there was no next area... force iter within
-      --local searching_start_area = self.start_area == area
-      --local at_edge = area.index == 1 or area.index == #area.items
-      --if searching_start_area and at_edge then
-      --  navprint("rrrrrrrrrr")
-      --  if area.index == 1 and val < 0 then area.index = #area.items end
-      --  if area.index == #area.items and val > 0then area.index = 1 end
-      --end
-
-      navprint("next element found at index "..area.index)
-
       return area, area.index
     end
   end
 
   -- should never get here!
-
-  remove_spaces()
 end
 
 -- Functions for handling keypresses

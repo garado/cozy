@@ -34,32 +34,25 @@ function theme.random_accent_color()
   return theme.accents[i]
 end
 
-theme.bg_d0 = "#dee4ef"
-theme.bg    = "#d8dee9" -- base
-theme.bg_l0 = "#ced4df" -- crust
-theme.bg_l1 = "#bac0cb" -- mantle
-theme.bg_l2 = "#b0b6c1" -- surface0
-theme.bg_l3 = "#a1a7b2" -- overlay0?
-theme.fg    = "#2e3440" -- fg
-theme.fg_l  = "#434c5e" -- fg
-theme.fg_d  = "#434c5e" -- subtitle
+theme.bg_d0   = "#dee4ef"
+theme.bg      = "#d8dee9"
+theme.bg_l0   = "#ced4df"
+theme.bg_l1   = "#bac0cb"
+theme.bg_l2   = "#b0b6c1"
+theme.bg_l3   = "#a1a7b2"
+theme.fg      = "#2e3440"
+theme.fg_sub  = "#4c566a"
+theme.fg_alt  = "#6e788f"
 
-theme.main_accent = "#5e81ac"
+theme.main_accent = "#6181a1"
 theme.red         = "#bf616a"
 theme.green       = "#75905e"
 theme.yellow      = "#ebcb8b"
 theme.transparent = "#ffffff00"
 
--- custom
---theme.wibar_occupied 
---theme.wibar_occupied = "#9fa5b0"
---theme.wibar_empty = "#ced1d6"
---theme.mus_playing_fg = "#d8dee9"
---theme.mus_control_fg = "#d8dee9"
-
 -- theme switcher settings
 theme.kitty = "Nord Light"
-theme.nvim  = "onenord_light"
+theme.nvchad  = "onenord_light"
 theme.gtk   = "Graphite-Light-nord"
 
 return theme

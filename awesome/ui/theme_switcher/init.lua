@@ -16,7 +16,7 @@ local naughty = require("naughty")
 -- for keyboard navigation
 local Area = require("ui.nav.area")
 local Elevated = require("ui.nav.navitem").Elevated
-local Navigator = require("ui.nav.navigator")
+local navigator = require("ui.theme_switcher.navrules")
 
 local nav_root = Area:new({
   name = "root",
@@ -28,8 +28,7 @@ local nav_styles  = Area:new({ name = "nav_styles"  })
 local nav_actions = Area:new({ name = "nav_actions" })
 
 nav_root:append(nav_themes)
-
-local nav = Navigator:new({ root = nav_root })
+navigator.root = nav_root
 
 local selected_theme = ""
 local selected_style = ""
@@ -66,7 +65,7 @@ local apply_button = wibox.widget({
   widgets.button.text.normal({
     text = "Apply",
     text_normal_bg = beautiful.fg,
-    normal_bg = beautiful.switcher_apply_btn_bg,
+    normal_bg = beautiful.switcher_act_btn_bg,
     animate_size = false,
     size = 10,
     on_release = function()
@@ -81,16 +80,18 @@ cancel_button = wibox.widget({
   widgets.button.text.normal({
     text = "Cancel",
     text_normal_bg = beautiful.fg,
-    normal_bg = beautiful.switcher_cancel_btn_bg,
+    normal_bg = beautiful.switcher_act_btn_bg,
     animate_size = false,
     size = 10,
     on_release = function()
       reset_theme_switcher()
-      awesome.emit_signal("theme_switcher::toggle")
+      --awesome.emit_signal("theme_switcher::toggle")
     end,
   }),
   widget = wibox.container.place,
 })
+nav_actions:append(Elevated:new(apply_button.children[1]))
+nav_actions:append(Elevated:new(cancel_button.children[1]))
 
 local style_buttons = wibox.widget({
   spacing = dpi(10),
@@ -137,7 +138,6 @@ function reset_theme_switcher()
   apply_button.visible = false
   cancel_button.visible = false
   styles.visible = false
-  nav_actions:remove_all_items()
   nav_styles:remove_all_items()
   nav_root:remove_item(nav_actions)
   nav_root:remove_item(nav_styles)
@@ -194,7 +194,7 @@ local function create_style_button(style)
   local style_button = widgets.button.text.normal({
     text = style,
     text_normal_bg = beautiful.fg,
-    normal_bg = beautiful.switcher_options_bg,
+    normal_bg = beautiful.switcher_opt_btn_bg,
     animate_size = false,
     size = 12,
     on_release = function()
@@ -203,8 +203,6 @@ local function create_style_button(style)
       apply_button.visible  = true
       cancel_button.visible = true
       if not nav_root:contains(nav_actions) then
-        nav_actions:append(Elevated:new(apply_button.children[1]))
-        nav_actions:append(Elevated:new(cancel_button.children[1]))
         nav_root:append(nav_actions)
       end
     end
@@ -257,7 +255,7 @@ local function create_theme_button(name)
   local theme_button = widgets.button.text.normal({
     text = name,
     text_normal_bg = beautiful.fg,
-    normal_bg = beautiful.switcher_options_bg,
+    normal_bg = beautiful.switcher_opt_btn_bg,
     animate_size = false,
     size = 12,
     on_release = function()
@@ -323,13 +321,13 @@ return function()
           },
           widget = wibox.container.place,
         },
-        bg = beautiful.switcher_lowerbar_bg,
+        bg = beautiful.switcher_lowbar_bg,
         widget = wibox.container.background,
       },
       layout = wibox.layout.fixed.vertical,
     },
     widget = wibox.container.background,
-    bg = beautiful.ctrl_bg,
+    bg = beautiful.switcher_bg,
   })
 
   local theme_switcher_width = dpi(500)
@@ -351,10 +349,10 @@ return function()
     theme_switcher.visible = not theme_switcher.visible
     if not theme_switcher.visible then
       reset_theme_switcher()
-      nav:stop()
+      navigator:stop()
     else
       require("ui.shared").close_other_popups("theme_switcher")
-      nav:start()
+      navigator:start()
     end
   end)
 

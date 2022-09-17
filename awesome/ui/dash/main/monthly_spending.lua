@@ -26,7 +26,7 @@ local table = table
 local ledger_file = user_vars.ledger.ledger_file
 
 -- arc chart colors
-local color_palette = beautiful.arcchart_colors
+local color_palette = beautiful.cash_arccolors
 
 local function create_chart()
   local chart = wibox.widget({
@@ -64,7 +64,7 @@ local function create_chart()
     })
 
     local amount_ = wibox.widget({
-      markup = helpers.ui.colorize_text("— $" .. amount, beautiful.legend_amount),
+      markup = helpers.ui.colorize_text("— $" .. amount, beautiful.cash_alttext_fg),
       widget = wibox.widget.textbox,
       valign = "center",
       align = "start",
@@ -225,7 +225,7 @@ end -- end create_chart
 -- ledger_cmd   command that produces the necessary data
 local function get_account_value(header_text, ledger_cmd)
   local header = wibox.widget({
-    markup = helpers.ui.colorize_text(header_text, beautiful.account_title),
+    markup = helpers.ui.colorize_text(header_text, beautiful.cash_acct_name),
     widget = wibox.widget.textbox,
     font = beautiful.font_name .. "11",
     align = "center",

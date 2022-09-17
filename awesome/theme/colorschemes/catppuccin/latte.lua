@@ -2,6 +2,8 @@
 -- █▀▀ ▄▀█ ▀█▀ █▀█ █▀█ █░█ █▀▀ █▀▀ █ █▄░█    █░░ ▄▀█ ▀█▀ ▀█▀ █▀▀ 
 -- █▄▄ █▀█ ░█░ █▀▀ █▀▀ █▄█ █▄▄ █▄▄ █ █░▀█    █▄▄ █▀█ ░█░ ░█░ ██▄ 
 
+-- This theme sucks and I couldn't get it looking right
+
 local gears = require("gears")
 local gfs = require("gears.filesystem")
 local themes_path = gfs.get_themes_dir()
@@ -40,15 +42,15 @@ function theme.random_accent_color()
   return theme.accents[i]
 end
 
-theme.bg_d0 = "#"
-theme.bg    = "#eff1f5"
-theme.bg_l0 = "#e6e9ef"
-theme.bg_l1 = "#dce0e8"
-theme.bg_l2 = "#ccd0da"
-theme.bg_l3 = "#bcc0cc"
-theme.fg    = "#4c4f69"
-theme.fg_l  = "#6c6f85"
-theme.fg_d  = "#6c6f85"
+theme.bg_d0   = "#"
+theme.bg      = "#eff1f5"
+theme.bg_l0   = "#e6e9ef"
+theme.bg_l1   = "#dce0e8"
+theme.bg_l2   = "#ccd0da"
+theme.bg_l3   = "#bcc0cc"
+theme.fg      = "#4c4f69"
+theme.fg_alt  = "#6c6f85"
+theme.fg_sub  = "#6c6f85"
 
 theme.main_accent = "#7287fd"
 theme.red         = "#e78284"
@@ -56,16 +58,12 @@ theme.green       = "#40a02b"
 theme.yellow      = "#df8e1d"
 
 -- custom
---theme.wibar_bg = "#dce0e8"
---theme.wibar_occupied = "#9ca0b0"
---theme.wibar_empty = "#ccd0da"
---theme.wibar_focused = "#b0b4ed"
---theme.hab_check_fg = "#dce0e8"
---theme.prof_pfp_bg = "#ccd0da"
+theme.wibar_focused = "#b0b4ed"
+theme.prof_pfp_bg   = "#b0b4ed"
 
 -- settings for theme switcher
 theme.kitty = "Catppuccin-Latte"
-theme.nvim  = "catppuccin_latte"
+theme.nvchad  = "catppuccin_latte"
 theme.gtk   = "Catppuccin-Latte-Mauve"
 
 return theme

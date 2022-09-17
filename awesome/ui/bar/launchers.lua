@@ -23,7 +23,7 @@ local function create_launcher(icon, signal, color)
     awesome.emit_signal(signal)
   end)
   button:connect_signal("mouse::enter", function()
-    button:set_markup_silently(markup(icon, beautiful.wibar_launcher_hover))
+    button:set_markup_silently(markup(icon, beautiful.wibar_launch_hover))
   end)
   button:connect_signal("mouse::leave", function()
     button:set_markup_silently(markup(icon, color))
@@ -32,7 +32,7 @@ local function create_launcher(icon, signal, color)
 end
 
 return {
-  create_launcher("異", "dash::toggle", beautiful.wibar_launcher_dash),
-  create_launcher("שּׂ", "control_center::toggle", beautiful.wibar_launcher_ctrl),
-  create_launcher("襁", "theme_switcher::toggle", beautiful.wibar_launcher_settings),
+  create_launcher("異", "dash::toggle", beautiful.wibar_launch_dash),
+  create_launcher("שּׂ", "control_center::toggle", beautiful.wibar_launch_ctrl),
+  create_launcher("襁", "theme_switcher::toggle", beautiful.wibar_launch_theme),
 }

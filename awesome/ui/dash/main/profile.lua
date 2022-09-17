@@ -26,7 +26,7 @@ local function create_profile()
     },
     border_width = dpi(0),
     shape = gears.shape.circle,
-    bg = beautiful.pfp_bg,
+    bg = beautiful.prof_pfp_bg,
     forced_width = dpi(100),
     forced_height = dpi(100),
     widget = wibox.container.background,
@@ -35,7 +35,7 @@ local function create_profile()
   local display_name = user_vars.display_name
   local name = wibox.widget({
     widget = wibox.widget.textbox,
-    markup = helpers.ui.colorize_text(display_name, beautiful.display_name_fg),
+    markup = helpers.ui.colorize_text(display_name, beautiful.prof_name_fg),
     font = beautiful.font_name .. "18",
     align = "center",
     valign = "center",
@@ -43,7 +43,7 @@ local function create_profile()
   
   local host = wibox.widget({
     widget = wibox.widget.textbox,
-    markup = helpers.ui.colorize_text("@andromeda", beautiful.title_fg),
+    markup = helpers.ui.colorize_text("@andromeda", beautiful.prof_title_fg),
     font = beautiful.font_name .. "18",
     align = "center",
     valign = "center",

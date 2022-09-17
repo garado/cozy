@@ -96,9 +96,12 @@ function Area:remove_item(item)
   end
   for i = 1, #self.items do
     if item == self.items[i] then
+      if i < self.index then
+        self.index = self.index - 1
+      elseif i == self.index then
+        self:iter(1)
+      end
       table.remove(self.items, i)
-      self.index = self.index - 1
-      if self.index < 0 then self.index = 1 end
       return
     end
   end
@@ -120,6 +123,15 @@ end
 function Area:set_index(index)
 end
 
+function Area:iter_force_circular(amount)
+  local new_index = self.index + amount
+  self.index = new_index % #self.items
+  if self.index == 0 then
+    self.index = #self.items
+  end
+  return self.items[self.index]
+end
+
 -- Iterate through an area's item table by a given amount.
 -- Returns the item that it iterated to.
 function Area:iter(amount)
@@ -129,7 +141,6 @@ function Area:iter(amount)
   -- circular, then return nil.
   local overflow = new_index > #self.items or new_index <= 0
   if not self.circular and overflow then
-    print("overflow!")
     return
   end
 
@@ -139,22 +150,6 @@ function Area:iter(amount)
     self.index = #self.items
   end
   return self.items[self.index]
-end
-
-function Area:iter_without_set(amount)
-  local new_index = self.index + amount
-
-  -- If iterating went out of item table's bounds and the area isn't
-  -- circular, then return nil.
-  local overflow = new_index > #self.items or new_index < 0
-  if not self.circular and overflow then
-    return
-  end
-
-  -- Otherwise, iterate like normal.
-  new_index = new_index % #self.items
-  if new_index == 0 then new_index = #self.items end
-  return self.items[new_index]
 end
 
 -- Remove all child items except for the given area

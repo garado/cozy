@@ -17,8 +17,8 @@ local slider = wibox.widget({
   {
     bar_shape = gears.shape.rounded_bar,
     bar_height = dpi(10),
-    bar_color = beautiful.slider_bg,
-    bar_active_color = beautiful.brightbar_fg,
+    bar_color = beautiful.wibar_slider_bg,
+    bar_active_color = beautiful.wibar_bright_fg,
     handle_width = dpi(0),
     value = 25,
     widget = wibox.widget.slider,
@@ -29,7 +29,7 @@ local slider = wibox.widget({
 })
 
 local icon = wibox.widget({
-  markup = helpers.ui.colorize_text("滛", beautiful.brightbar_fg),
+  markup = helpers.ui.colorize_text("滛", beautiful.wibar_bright_fg),
   widget = wibox.widget.textbox,
   font = beautiful.font .. "15",
   align = "center",

@@ -36,7 +36,7 @@ local function create_topic_buttons()
     local button = widgets.button.text.normal({
       text = topic,
       text_normal_bg = beautiful.fg,
-      normal_bg = beautiful.surface0,
+      normal_bg = beautiful.timew_btn_bg,
       animate_size = false,
       font = beautiful.font,
       size = 12,
@@ -86,7 +86,7 @@ end
 local function create_ui_text(header, text, text_size)
   local header = wibox.widget({
     {
-      markup = helpers.ui.colorize_text(header, beautiful.subtitle),
+      markup = helpers.ui.colorize_text(header, beautiful.timew_header_fg),
       font = beautiful.font_name .. "Bold 10",
       valign = "center",
       align = "center",
@@ -166,7 +166,7 @@ function ui_timew_started()
   local stop_button = widgets.button.text.normal({
     text = "Stop",
     text_normal_bg = beautiful.fg,
-    normal_bg = beautiful.surface0,
+    normal_bg = beautiful.timew_btn_bg,
     animate_size = false,
     font = beautiful.font,
     size = 12,

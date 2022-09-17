@@ -35,15 +35,14 @@ function theme.random_accent_color()
   return theme.accents[i]
 end
 
-theme.bg_d0 = "#383635"
-theme.bg    = "#282828"
-theme.bg_l0 = "#3c3836"
-theme.bg_l1 = "#504945"
-theme.bg_l2 = "#665c54"
-theme.bg_l3 = "#7c6f64"
-theme.fg    = "#fbf1c7"
-theme.fg_l  = "#d5c4a1"
-theme.fg_d  = "#928374"
+theme.bg      = "#1d2021"
+theme.bg_l0   = "#282828"
+theme.bg_l1   = "#383635"
+theme.bg_l2   = "#504945"
+theme.bg_l3   = "#7c6f64"
+theme.fg      = "#fbf1c7"
+theme.fg_alt  = "#d5c4a1"
+theme.fg_sub  = "#928374"
 
 theme.main_accent = "#928374"
 theme.red         = "#fb4934"
@@ -51,16 +50,14 @@ theme.green       = "#b8bb26"
 theme.yellow      = "#fabd2f"
 theme.transparent = "#ffffff00"
 
--- Custom
---theme.hab_uncheck_bg = "#665c54"
---theme.hab_uncheck_fg = "#7c6f64"
---theme.hab_check_bg = "#d5c4a1"
---theme.hab_check_fg = "#665c54"
---theme.prof_pfp_bg = "#32302f"
+-- custom
+theme.wibar_focused = "#504945"
+theme.wibar_empty   = "#282828"
+theme.prof_pfp_bg   = "#383635"
 
 -- theme switcher
 theme.kitty = "Gruvbox Dark"
-theme.nvim  = "gruvbox"
+theme.nvchad  = "gruvbox"
 theme.gtk   = "Gruvbox-Dark-B"
 
 return theme

@@ -18,7 +18,10 @@ theme.pfp = gears.surface.load_uncached(gfs.get_configuration_dir() .. "theme/as
 
 -- Automagically match system color schemes with awesome
 -- color scheme
-require("theme/theme_switcher")()
+local do_theme_integration = user_vars.theme_switch_integration
+if do_theme_integration then
+  require("theme/theme_switcher")()
+end
 
 -- █▀▀ █▀█ █▄░█ ▀█▀ █▀
 -- █▀░ █▄█ █░▀█ ░█░ ▄█
@@ -32,36 +35,45 @@ theme.alt_font = theme.alt_font_name .. "Regular "
 -- Dashboard
 theme.dash_bg         = theme.dash_bg         or theme.bg
 theme.dash_widget_bg  = theme.dash_widget_bg  or theme.bg_l0
+theme.dash_widget_sel = theme.dash_widget_sel or theme.bg_l1
 theme.dash_header_fg  = theme.dash_header_fg  or theme.main_accent
 theme.dash_tab_fg     = theme.dash_tab_fg     or theme.fg
 theme.dash_tab_bg     = theme.dash_tab_bg     or theme.bg_l0
+
 theme.prof_name_fg    = theme.prof_name_fg    or theme.main_accent
 theme.prof_pfp_bg     = theme.prof_pfp_bg     or theme.main_accent
 theme.prof_title_fg   = theme.prof_title_fg   or theme.fg
+
 theme.timedate        = theme.timedate        or theme.main_accent
+
 theme.mus_filter_1    = theme.mus_filter_1    or theme.bg_l3
 theme.mus_filter_2    = theme.mus_filter_2    or theme.bg_l3
 theme.mus_playing_fg  = theme.mus_playing_fg  or theme.fg
 theme.mus_control_bg  = theme.mus_control_bg  or theme.main_accent.."00"
 theme.mus_control_fg  = theme.mus_control_fg  or theme.fg
-theme.task_due_fg     = theme.task_due_fg     or theme.fg_d
+
+theme.task_due_fg     = theme.task_due_fg     or theme.fg_sub
+
 theme.cash_arccolors  = theme.cash_arccolors  or theme.accents
 theme.cash_income_fg  = theme.cash_income_fg  or theme.green
 theme.cash_expense_fg = theme.cash_expense_fg or theme.red
-theme.cash_subtext_fg = theme.cash_subtext_fg or theme.fg_l
-theme.cash_acct_name  = theme.cash_acct_name  or theme.fg_l
+theme.cash_alttext_fg = theme.cash_alttext_fg or theme.fg_alt
+theme.cash_acct_name  = theme.cash_acct_name  or theme.fg_sub
+
 theme.hab_freq        = theme.hab_freq        or theme.main_accent
 theme.hab_uncheck_fg  = theme.hab_uncheck_fg  or theme.fg
 theme.hab_uncheck_bg  = theme.hab_uncheck_bg  or theme.bg_l2
 theme.hab_check_fg    = theme.hab_check_fg    or theme.fg
 theme.hab_check_bg    = theme.hab_check_bg    or theme.main_accent
 theme.hab_selected_bg = theme.hab_selected_bg or theme.red
-theme.timew_header_fg = theme.timew_header_fg or theme.fg_d
+theme.hab_selected_fg = theme.hab_selected_fg or theme.fg
+
+theme.timew_header_fg = theme.timew_header_fg or theme.fg_sub
 theme.timew_btn_bg    = theme.timew_btn_bg    or theme.bg_l2
+
 theme.fetch_title     = theme.fetch_title     or theme.main_accent
 theme.fetch_value     = theme.fetch_value     or theme.fg
 
--- Dash: Calendar
 theme.cal_fg = theme.cal_fg or theme.fg
 theme.cal_bg = theme.cal_bg or theme.bg
 theme.cal_weekday_fg = theme.cal_weekday_fg or theme.fg
@@ -74,26 +86,28 @@ theme.calendar_long_weekdays = true
 
 -- Bar
 theme.wibar_bg        = theme.wibar_bg        or theme.bg
-theme.wibar_focused   = theme.wibar_focused   or theme.main_accent
-theme.wibar_occupied  = theme.wibar_occupied  or theme.fg
+theme.wibar_fg        = theme.wibar_fg        or theme.fg
+theme.wibar_accent    = theme.wibar_accent    or theme.main_accent
+theme.wibar_focused   = theme.wibar_focused   or theme.wibar_accent
+theme.wibar_occupied  = theme.wibar_occupied  or theme.fg_alt
 theme.wibar_empty     = theme.wibar_empty     or theme.bg_l1
 theme.wibar_bat_grn   = theme.bat_chargin     or theme.green
-theme.wibar_bat_nrml  = theme.wibar_bat_nrml  or theme.fg
+theme.wibar_bat_nrml  = theme.wibar_bat_nrml  or theme.wibar_fg
 theme.wibar_bat_red   = theme.wibar_bat_red   or theme.red
 theme.wibar_slider_bg = theme.wibar_slider_bg or theme.bg_l2
-theme.wibar_bright_fg = theme.wibar_bright_fg or theme.main_accent
-theme.wibar_vol_fg    = theme.wibar_vol_fg    or theme.main_accent
-theme.wibar_notif_fg  = theme.wibar_notif_fg  or theme.main_accent
-theme.wibar_clock     = theme.wibar_clock     or theme.fg
-theme.wibar_launch_app    = theme.wibar_launch_app    or theme.fg
-theme.wibar_launch_dash   = theme.wibar_launch_dash   or theme.fg
-theme.wibar_launch_ctrl   = theme.wibar_launch_ctrl   or theme.fg
-theme.wibar_launch_theme  = theme.wibar_launch_theme  or theme.fg
+theme.wibar_bright_fg = theme.wibar_bright_fg or theme.wibar_accent
+theme.wibar_vol_fg    = theme.wibar_vol_fg    or theme.wibar_accent
+theme.wibar_notif_fg  = theme.wibar_notif_fg  or theme.wibar_accent
+theme.wibar_clock     = theme.wibar_clock     or theme.wibar_fg
+theme.wibar_launch_app    = theme.wibar_launch_app    or theme.wibar_fg
+theme.wibar_launch_dash   = theme.wibar_launch_dash   or theme.wibar_fg
+theme.wibar_launch_ctrl   = theme.wibar_launch_ctrl   or theme.wibar_fg
+theme.wibar_launch_theme  = theme.wibar_launch_theme  or theme.wibar_fg
 
 -- Control center
 theme.ctrl_bg       = theme.ctrl_bg       or theme.bg_l0
-theme.ctrl_host     = theme.ctrl_host     or theme.fg_l
-theme.ctrl_uptime   = theme.ctrl_uptime   or theme.fg_l
+theme.ctrl_host     = theme.ctrl_host     or theme.fg_alt
+theme.ctrl_uptime   = theme.ctrl_uptime   or theme.fg_alt
 theme.ctrl_link_fg  = theme.ctrl_link_fg  or theme.fg
 theme.ctrl_link_bg  = theme.ctrl_link_bg  or theme.bg_l2
 theme.ctrl_qa_btn_bg     = theme.ctrl_qa_btn_bg     or theme.bg_l2
@@ -121,8 +135,8 @@ theme.useless_gap = dpi(7)
 
 -- Borders
 theme.border_width = dpi(3)
-theme.border_color_active = theme.main_accent
-theme.border_color_normal = theme.bg_l1
+theme.border_color_active = theme._border_color_active or theme.main_accent
+theme.border_color_normal = theme._border_color_normal or theme.bg_l1
 
 -- Corner radius
 -- (not used for client rounding - used for rounding of other UI

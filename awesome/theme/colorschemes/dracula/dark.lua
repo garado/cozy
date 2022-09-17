@@ -39,10 +39,10 @@ theme.bg_l1 = "#282a36"
 theme.bg_l2 = "#343746"
 theme.bg_l3 = "#44475a"
 theme.fg    = "#f8f8f2"
-theme.fg_l  = "#6272a4"
-theme.fg_d  = "#6d43a0"
+theme.fg_alt  = "#6272a4"
+theme.fg_sub  = "#6d43a0"
 
-theme.main_accent = "#6d43a0"
+theme.main_accent = "#956bc8"
 theme.red         = "#ff5555"
 theme.yellow      = "#f1fa8c"
 theme.green       = "#50fa7b"
@@ -50,7 +50,7 @@ theme.transparent = "#ffffff00"
 
 -- for theme switcher
 theme.kitty = "Dracula"
-theme.nvim  = "chadracula"
+theme.nvchad  = "chadracula"
 theme.gtk   = "Dracula"
 
 return theme

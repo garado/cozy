@@ -40,7 +40,7 @@ local function create_systray()
 	})
 
 	local arrow = wbutton.text.state ({
-		text_normal_bg = beautiful.fg,
+		text_normal_bg = beautiful.wibar_fg,
 		normal_bg = beautiful.wibar_bg,
     font = beautiful.font,
     animate_size = false,

@@ -10,9 +10,9 @@ local gears = require("gears")
 local dpi = require("beautiful").xresources.apply_dpi
 local helpers = require("helpers")
 
-local charging_color = beautiful.bat_charging
-local low_color = beautiful.bat_low
-local normal_color = beautiful.bat_normal
+local charging_color = beautiful.wibar_bat_grn
+local low_color = beautiful.wibar_bat_red
+local normal_color = beautiful.wibar_bat_nrml
 
 local percentage = wibox.widget({
   id = "percent_text",

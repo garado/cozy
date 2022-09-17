@@ -17,8 +17,8 @@ local slider = wibox.widget({
   {
     bar_shape = gears.shape.rounded_bar,
     bar_height = dpi(10),
-    bar_color = beautiful.slider_bg,
-    bar_active_color = beautiful.volbar_fg,
+    bar_color = beautiful.wibar_slider_bg,
+    bar_active_color = beautiful.wibar_vol_fg,
     handle_width = dpi(0),
     value = 25,
     widget = wibox.widget.slider,
@@ -30,7 +30,7 @@ local slider = wibox.widget({
 
 local icon = wibox.widget({
   {
-    markup = helpers.ui.colorize_text("", beautiful.volbar_fg),
+    markup = helpers.ui.colorize_text("", beautiful.wibar_vol_fg),
     widget = wibox.widget.textbox,
     font = beautiful.font .. "13",
     align = "center",
@@ -67,13 +67,13 @@ awesome.connect_signal("module::volume", function()
       local out = string.gsub(stdout, '%W','')
       local outnum = tonumber(out)
       if out == "muted" or outnum < 6 then
-        vol_icon:set_markup(helpers.ui.colorize_text("婢", beautiful.volbar_fg))
+        vol_icon:set_markup(helpers.ui.colorize_text("婢", beautiful.wibar_vol_fg))
       elseif outnum < 33 then
-        vol_icon:set_markup(helpers.ui.colorize_text("奄", beautiful.volbar_fg))
+        vol_icon:set_markup(helpers.ui.colorize_text("奄", beautiful.wibar_vol_fg))
       elseif outnum < 66 then
-        vol_icon:set_markup(helpers.ui.colorize_text("奔", beautiful.volbar_fg))
+        vol_icon:set_markup(helpers.ui.colorize_text("奔", beautiful.wibar_vol_fg))
       else
-        vol_icon:set_markup(helpers.ui.colorize_text("墳", beautiful.volbar_fg))
+        vol_icon:set_markup(helpers.ui.colorize_text("墳", beautiful.wibar_vol_fg))
       end
     end
   )

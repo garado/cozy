@@ -12,6 +12,7 @@ return {
   -- tokyonight: dark
   theme_name  = "tokyonight",
   theme_style = "dark",
+  theme_switch_integration = false,
   ---
   display_name = "Display Name",
   goals = {

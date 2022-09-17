@@ -63,8 +63,8 @@ local Habit = Base:new(widget)
 function Habit:select_on()
   self.selected = true
   local box = self.widget.children[1]
-  box.check_color = beautiful.red
-  box.bg = beautiful.red
+  box.check_color = beautiful.hab_selected_bg
+  box.bg = beautiful.hab_selected_bg
 end
 
 function Habit:select_off()
@@ -80,11 +80,11 @@ end
 
 -- █▀▄ ▄▀█ █▀ █░█    █░█░█ █ █▀▄ █▀▀ █▀▀ ▀█▀ 
 -- █▄▀ █▀█ ▄█ █▀█    ▀▄▀▄▀ █ █▄▀ █▄█ ██▄ ░█░ 
-local Dashwidget = Base:new(widget)
+local Dashwidget = Base:new(...)
 
 function Dashwidget:select_on()
   self.selected = true
-  self.widget.children[1].bg = beautiful.surface2 or beautiful.surface0
+  self.widget.children[1].bg = beautiful.dash_widget_sel
 end
 
 function Dashwidget:select_off()
@@ -94,7 +94,7 @@ end
 
 -- █▀▄ ▄▀█ █▀ █░█    ▀█▀ ▄▀█ █▄▄ █▀ 
 -- █▄▀ █▀█ ▄█ █▀█    ░█░ █▀█ █▄█ ▄█ 
-local Dashtab = Base:new(widget)
+local Dashtab = Base:new(...)
 
 function Dashtab:select_on()
   self.selected = true

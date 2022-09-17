@@ -11,14 +11,14 @@ local math = math
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
 local awesome_cfg = gfs.get_configuration_dir()
-local wall_path = awesome_cfg .. "theme/assets/walls/tokyo_night.png"
+local wall_path = awesome_cfg .. "theme/assets/walls/tokyo_night.jpg"
 theme.wallpaper = gears.surface.load_uncached(wall_path)
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
 
 -- Colors taken from:
--- https://github.com/folke/tokyonight.nvim
+-- https://github.com/folke/tokyonight.nvchad
 
 theme.accents = {
   "#7aa2f7",
@@ -46,8 +46,8 @@ theme.bg_l1 = "#1f2335"
 theme.bg_l2 = "#292e42"
 theme.bg_l3 = "#414868"
 theme.fg    = "#a9b1d6"
-theme.fg_l  = "#c0caf5"
-theme.fg_d  = "#414868"
+theme.fg_alt  = "#c0caf5"
+theme.fg_sub  = "#414868"
 
 theme.main_accent   = "#3d59a1"
 theme.red         = "#f7768e"
@@ -61,7 +61,7 @@ theme.transparent = "#ffffff00"
 
 -- theme switcher
 theme.kitty = "Tokyo Night"
-theme.nvim  = "tokyonight"
+theme.nvchad  = "tokyonight"
 theme.gtk   = "Tokyonight-Dark-B"
 
 return theme
