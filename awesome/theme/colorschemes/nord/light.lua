@@ -34,32 +34,28 @@ function theme.random_accent_color()
   return theme.accents[i]
 end
 
--- background colors
-theme.base          = "#d8dee9" -- dark bg
-theme.crust         = "#ced4df" -- medium bg
-theme.mantle        = "#eceff4" -- light bg
-theme.surface0      = "#bac0cb" -- bg for interactive elements (eg buttons)
-theme.surface1      = "#bac0cb" -- slightly darker version of above 
-theme.overlay0      = "#6181a1" -- currently only used for album art filter 
-theme.overlay1      = "#434c5e" -- border colors
+theme.bg_d0 = "#dee4ef"
+theme.bg    = "#d8dee9" -- base
+theme.bg_l0 = "#ced4df" -- crust
+theme.bg_l1 = "#bac0cb" -- mantle
+theme.bg_l2 = "#b0b6c1" -- surface0
+theme.bg_l3 = "#a1a7b2" -- overlay0?
+theme.fg    = "#2e3440" -- fg
+theme.fg_l  = "#434c5e" -- fg
+theme.fg_d  = "#434c5e" -- subtitle
 
--- typography
-theme.fg            = "#2e3440" -- main text
-theme.subtitle      = "#434c5e" -- secondary text
-theme.subtext       = "#395979" -- tertiary text
-theme.main_accent   = "#5e81ac" -- primary accent color
-
--- misc (used in task, battery, and finance widgets)
-theme.red    = "#bf616a"
-theme.green  = "#75905e"
-theme.yellow = "#ebcb8b"
+theme.main_accent = "#5e81ac"
+theme.red         = "#bf616a"
+theme.green       = "#75905e"
+theme.yellow      = "#ebcb8b"
 theme.transparent = "#ffffff00"
 
 -- custom
-theme.wibar_occupied = "#9fa5b0"
-theme.wibar_empty = "#ced1d6"
-theme.now_playing_fg = "#d8dee9"
-theme.playerctl_fg = "#d8dee9"
+--theme.wibar_occupied 
+--theme.wibar_occupied = "#9fa5b0"
+--theme.wibar_empty = "#ced1d6"
+--theme.mus_playing_fg = "#d8dee9"
+--theme.mus_control_fg = "#d8dee9"
 
 -- theme switcher settings
 theme.kitty = "Nord Light"

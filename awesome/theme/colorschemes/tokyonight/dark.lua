@@ -39,29 +39,25 @@ function theme.random_accent_color()
   return theme.accents[i]
 end
 
+theme.bg_d0 = "#141520"
+theme.bg    = "#1a1b26"
+theme.bg_l0 = "#222331"
+theme.bg_l1 = "#1f2335"
+theme.bg_l2 = "#292e42"
+theme.bg_l3 = "#414868"
+theme.fg    = "#a9b1d6"
+theme.fg_l  = "#c0caf5"
+theme.fg_d  = "#414868"
+
+theme.main_accent   = "#3d59a1"
 theme.red         = "#f7768e"
 theme.green       = "#9ece6a"
 theme.yellow      = "#e0af68"
 theme.transparent = "#ffffff00"
 
--- background colors
-theme.base          = "#1a1b26" -- dash, wibar
-theme.crust         = "#222331" -- widget bg
-theme.mantle        = "#1f2335"
-theme.surface0      = "#292e42" -- dash button bg 
-theme.surface1      = "#545c7e"
-theme.overlay0      = "#292e42" -- album art filters
-theme.overlay1      = "#414868" -- selected buttons
-
--- typography
-theme.fg            = "#c0caf5" -- main text
-theme.subtitle      = "#a9b1d6"
-theme.subtext       = "#a9b1d6"
-theme.main_accent   = "#3d59a1"
-
 -- custom
-theme.hab_uncheck_bg    = "#292e42"
-theme.notif_actions_bg  = "#292e42"
+--theme.hab_uncheck_bg    = "#292e42"
+--theme.notif_actions_bg  = "#292e42"
 
 -- theme switcher
 theme.kitty = "Tokyo Night"

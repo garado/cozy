@@ -40,33 +40,28 @@ function theme.random_accent_color()
   return theme.accents[i]
 end
 
--- background colors
-theme.base          = "#eff1f5"  -- dark bg
-theme.crust         = "#e6e9ef"  -- medium bg
-theme.mantle        = "#e6e9ef"  -- light bg
-theme.surface0      = "#ccd0da"  -- bg for interactive elements (eg buttons)
-theme.surface1      = "#bcc0cc"  -- slightly darker version of above 
-theme.overlay0      = "#acb0be"  -- currently only used for album art filter 
-theme.overlay1      = "#9ca0b0"  -- border colors
+theme.bg_d0 = "#"
+theme.bg    = "#eff1f5"
+theme.bg_l0 = "#e6e9ef"
+theme.bg_l1 = "#dce0e8"
+theme.bg_l2 = "#ccd0da"
+theme.bg_l3 = "#bcc0cc"
+theme.fg    = "#4c4f69"
+theme.fg_l  = "#6c6f85"
+theme.fg_d  = "#6c6f85"
 
--- typography
-theme.fg            = "#4c4f69"  -- main text
-theme.subtitle      = "#5c5f77"  -- secondary text
-theme.subtext       = "#6c6f85"  -- tertiary text
-theme.main_accent   = "#4c4f69"  -- primary accent color
-
--- misc (used in task, battery, and finance widgets)
-theme.red    = "#e78284"
-theme.green  = "#40a02b"
-theme.yellow = "#df8e1d"
+theme.main_accent = "#7287fd"
+theme.red         = "#e78284"
+theme.green       = "#40a02b"
+theme.yellow      = "#df8e1d"
 
 -- custom
-theme.wibar_bg = "#dce0e8"
-theme.wibar_occupied = "#9ca0b0"
-theme.wibar_empty = "#ccd0da"
-theme.wibar_focused = "#b0b4ed"
-theme.hab_check_fg = "#dce0e8"
-theme.pfp_bg = "#ccd0da"
+--theme.wibar_bg = "#dce0e8"
+--theme.wibar_occupied = "#9ca0b0"
+--theme.wibar_empty = "#ccd0da"
+--theme.wibar_focused = "#b0b4ed"
+--theme.hab_check_fg = "#dce0e8"
+--theme.prof_pfp_bg = "#ccd0da"
 
 -- settings for theme switcher
 theme.kitty = "Catppuccin-Latte"

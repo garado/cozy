@@ -38,33 +38,28 @@ function theme.random_accent_color()
   return theme.accents[i]
 end
 
--- background colors
-theme.base          = "#11111b"  -- dark bg
-theme.crust         = "#191925"  -- medium bg
-theme.mantle        = "#181825"  -- light bg
-theme.surface0      = "#11111b"  -- bg for interactive elements (eg buttons)
-theme.surface1      = "#494d64"  -- slightly darker version of above 
-theme.overlay0      = "#6c7086"  -- currently only used for album art filter 
-theme.overlay1      = "#8087a2"  -- border colors
+theme.bg_d0 = "#11111b"
+theme.bg    = "#181825"
+theme.bg_l0 = "#1e1e2e"
+theme.bg_l1 = "#313244"
+theme.bg_l2 = "#45475a"
+theme.bg_l3 = "#363a3f"
+theme.fg    = "#cdd6f4"
+theme.fg_l  = "#cdd6f4"
+theme.fg_d  = "#363a4f"
 
--- typography
-theme.fg            = "#cad3f5"  -- main text
-theme.subtitle      = "#bac2de"  -- secondary text
-theme.subtext       = "#a6adc8"  -- tertiary text
-theme.main_accent   = "#89b4fa"  -- primary accent color
-
--- misc (used in task, battery, and finance widgets)
-theme.red    = "#f38ba8"
-theme.green  = "#a6e3a1"
-theme.yellow = "#f9e2af"
+theme.main_accent = "#89b4fa"
+theme.red         = "#f38ba8"
+theme.green       = "#a6e3a1"
+theme.yellow      = "#f9e2af"
 theme.transparent = "#ffffff00"
 
--- custom
-theme.hab_uncheck_fg  = "#5b6078"
-theme.hab_uncheck_bg  = "#494d64"
-theme.hab_check_fg    = "#363a4f"
-theme.hab_check_bg    = "#89b4fa"
-theme.switcher_options_bg = "#11111b"
+---- custom
+--theme.hab_uncheck_fg  = "#5b6078"
+--theme.hab_uncheck_bg  = "#494d64"
+--theme.hab_check_fg    = "#363a4f"
+--theme.hab_check_bg    = "#89b4fa"
+--theme.switcher_opt_btn_bg = "#11111b"
 
 -- settings for theme switcher
 theme.kitty = "Catppuccin-Mocha"

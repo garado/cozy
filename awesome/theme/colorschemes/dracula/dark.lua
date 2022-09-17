@@ -32,30 +32,23 @@ function theme.random_accent_color()
   return theme.accents[i]
 end
 
--- color groupings
--- inspiration taken from the catppuccin style guide
--- background colors
-theme.base          = "#191a21"
-theme.crust         = "#1e1f29"
-theme.mantle        = "#343746"
-theme.surface0      = "#282a36"
-theme.surface1      = "#6272a4"
-theme.overlay0      = "#44475a"
-theme.overlay1      = "#44475a"
+theme.bg_d0 = "#13141b"
+theme.bg    = "#191a21"
+theme.bg_l0 = "#1e1f29"
+theme.bg_l1 = "#282a36"
+theme.bg_l2 = "#343746"
+theme.bg_l3 = "#44475a"
+theme.fg    = "#f8f8f2"
+theme.fg_l  = "#6272a4"
+theme.fg_d  = "#6d43a0"
 
--- typography
-theme.fg            = "#f8f8f2"
-theme.subtitle      = "#44475a"
-theme.subtext       = "#44475a"
-theme.main_accent   = "#bd93f0"
-
--- misc
-theme.red = "#ff5555"
-theme.yellow = "#f1fa8c"
-theme.green = "#50fa7b"
+theme.main_accent = "#6d43a0"
+theme.red         = "#ff5555"
+theme.yellow      = "#f1fa8c"
+theme.green       = "#50fa7b"
 theme.transparent = "#ffffff00"
 
--- settings for theme switcher
+-- for theme switcher
 theme.kitty = "Dracula"
 theme.nvim  = "chadracula"
 theme.gtk   = "Dracula"

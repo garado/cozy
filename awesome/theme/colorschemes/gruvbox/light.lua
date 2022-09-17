@@ -34,37 +34,30 @@ function theme.random_accent_color()
   return theme.accents[i]
 end
 
--- color groupings
--- inspiration taken from the catppuccin style guide
+theme.bg_d0 = "#f5ebc1"
+theme.bg    = "#fbf1c7"
+theme.bg_l0 = "#ebdbb2"
+theme.bg_l1 = "#d5c4a1"
+theme.bg_l2 = "#bdae93"
+theme.bg_l3 = "#bdae93"
+theme.fg    = "#282828"
+theme.fg_l  = "#504945"
+theme.fg_d  = "#7c6f64"
 
--- background colors
-theme.base          = "#fbf1c7"  -- dark bg
-theme.crust         = "#f2e5bc"  -- medium bg
-theme.mantle        = "#d5c4a1"  -- light bg
-theme.surface0      = "#bdae93"  -- bg for interactive elements (eg buttons)
-theme.surface1      = "#a89984"  -- slightly darker version of above 
-theme.overlay0      = "#d5c4a1"  -- album art filter, selectable buttons
-theme.overlay1      = "#665c54"  -- border colors
+theme.main_accent = "#504945"
+theme.red         = "#9d0006"
+theme.green       = "#79740e"
+theme.yellow      = "#d79921"
+theme.transparent = "#ffffff00"
 
--- typography
-theme.fg            = "#282828"  -- main text
-theme.subtitle      = "#3c3836"  -- secondary text
-theme.subtext       = "#504945"  -- tertiary text
-theme.main_accent   = "#3c3836"  -- primary accent color
-
--- misc (used in task, battery, and finance widgets)
-theme.red    = "#9d0006"
-theme.green  = "#79740e"
-theme.yellow = "#d79921"
-
--- custom
-theme.wibar_bg = "#928374"
-theme.wibar_occupied = "#665c54"
-theme.pfp_bg = "#a89984"
-theme.hab_check_bg = "#665c54"
-theme.hab_check_fg = "#fcf1c7"
-theme.hab_uncheck_bg = "#bdae93"
-theme.hab_uncheck_fg = "#a89984"
+-- Custom
+--theme.wibar_bg = "#928374"
+--theme.wibar_occupied = "#665c54"
+--theme.prof_pfp_bg = "#a89984"
+--theme.hab_check_bg = "#665c54"
+--theme.hab_check_fg = "#fcf1c7"
+--theme.hab_uncheck_bg = "#bdae93"
+--theme.hab_uncheck_fg = "#a89984"
 
 -- theme switcher
 theme.kitty = "Gruvbox Light Soft"
