@@ -14,11 +14,12 @@ local navigator = require("ui.control_center.navrules")
 -- Import widgets
 local uptime = require("ui.control_center.uptime")
 local profile = require("ui.control_center.profile")
+local stats = require("ui.control_center.stats")
 local fetch = require("ui.control_center.fetch")
 local nav_picom, picom = require("ui.control_center.picom")()
 local power_opts, power_confirm, nav_power = require("ui.control_center.power")()
 local nav_qactions, qactions = require("ui.control_center.quick_actions")()
-local nav_links, links = require("ui.control_center.links")()
+--local nav_links, links = require("ui.control_center.links")()
 
 -- For keynav
 local nav_root = Area:new({
@@ -37,10 +38,11 @@ return function()
     {
       profile,
       fetch,
+      stats,
       picom,
       qactions,
       --links,
-      spacing = dpi(20),
+      spacing = dpi(25),
       layout = wibox.layout.fixed.vertical,
     },
     margins = dpi(25),

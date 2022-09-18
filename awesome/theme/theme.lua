@@ -105,6 +105,7 @@ theme.wibar_launch_ctrl   = theme.wibar_launch_ctrl   or theme.wibar_fg
 theme.wibar_launch_theme  = theme.wibar_launch_theme  or theme.wibar_fg
 
 -- Control center
+theme.ctrl_fg       = theme.ctrl_fg       or theme.fg
 theme.ctrl_bg       = theme.ctrl_bg       or theme.bg_l0
 theme.ctrl_host     = theme.ctrl_host     or theme.fg_alt
 theme.ctrl_uptime   = theme.ctrl_uptime   or theme.fg_alt
@@ -115,11 +116,17 @@ theme.ctrl_lowerbar_bg   = theme.ctrl_lowerbar_bg   or theme.bg
 theme.ctrl_powopt_bg     = theme.ctrl_powopt_bg     or theme.bg_l1
 theme.ctrl_powopt_btn_fg = theme.ctrl_powopt_btn_fg or theme.fg
 
+theme.ctrl_cpu_accent = theme.ctrl_cpu_accent or theme.main_accent
+theme.ctrl_ram_accent = theme.ctrl_ram_accent or theme.main_accent
+theme.ctrl_hdd_accent = theme.ctrl_hdd_accent or theme.main_accent
+
 theme.ctrl_header_fg = theme.ctrl_header_fg or theme.fg
 theme.ctrl_pfp_bg   = theme.ctrl_pfp_bg or theme.main_accent
 
 theme.ctrl_fetch_accent = theme.ctrl_fetch_accent or theme.main_accent
 theme.ctrl_fetch_value  = theme.ctrl_fetch_value  or theme.fg
+
+theme.ctrl_stats_bg   = theme.ctrl_stats_bg or theme.bg_l2
 
 -- Theme switcher
 theme.switcher_bg          = theme.switcher_bg         or theme.bg_l0

@@ -64,7 +64,6 @@ local function create_fetch()
     extract_entry(stdout, "host")
     extract_entry(stdout, "wm")
     extract_entry(stdout, "pkg")
-    extract_entry(stdout, "shell")
   end)
 end
 
