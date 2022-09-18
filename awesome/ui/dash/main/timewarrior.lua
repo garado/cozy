@@ -19,41 +19,41 @@ local Elevated = require("ui.nav.navitem").Elevated
 local Dashwidget = require("ui.nav.navitem").Dashwidget
 local Area = require("ui.nav.area")
 
-local nav_timewarrior = Area:new({ name = "timewarrior" })
-local nav_timew_topics = Area:new({ name = "timew_topics" })
+local nav_timewarrior   = Area:new({ name = "timewarrior" })
+local nav_timew_topics  = Area:new({
+  name = "timew_topics",
+  circular = true,
+})
 local nav_timew_actions = Area:new({ name = "timew_actions" })
-
---nav_timewarrior:append(nav_timew_topics)
---nav_timewarrior:append(nav_timew_actions)
 
 local update_ui
 local ui_timew_started, ui_timew_stopped
+local topic_list = user_vars.pomo.topics
 
-local function create_topic_buttons()
-  local topic_list = user_vars.pomo.topics
-
-  local function create_topic_button(topic)
-    local button = widgets.button.text.normal({
-      text = topic,
-      text_normal_bg = beautiful.fg,
-      normal_bg = beautiful.timew_btn_bg,
-      animate_size = false,
-      font = beautiful.font,
-      size = 12,
-      on_release = function()
-        awful.spawn("timew start " .. topic)
-        update_ui(ui_timew_started())
-        nav_timewarrior:append(nav_timew_actions)
-        nav_timewarrior:remove_item(nav_timew_topics)
-      end
-    })
-    if #nav_timew_topics.items < #topic_list then
-      print("appending "..topic)
-      nav_timew_topics:append(Elevated:new(button))
+-- Creates a button to start timew tracking for a given
+-- topic (aka tag).
+local function create_topic_button(topic)
+  local topic_btn = widgets.button.text.normal({
+    text = topic,
+    text_normal_bg = beautiful.fg,
+    normal_bg = beautiful.timew_btn_bg,
+    animate_size = true,
+    font = beautiful.font,
+    size = 12,
+    on_release = function()
+      awful.spawn("timew start " .. topic)
+      nav_timewarrior:append(nav_timew_actions)
+      nav_timewarrior:remove_item(nav_timew_topics)
+      update_ui(ui_timew_started())
     end
-    return button
-  end
+  })
+  nav_timew_topics:append(Elevated:new(topic_btn))
+  return topic_btn
+end
 
+-- Loops through all topics set in user_vars and creates a button
+-- for each.
+local function create_topic_buttons()
   local topic_buttons = wibox.widget({
     spacing = dpi(10),
     layout = wibox.layout.fixed.vertical,
@@ -66,7 +66,35 @@ local function create_topic_buttons()
 
   return topic_buttons
 end
+local topic_buttons = create_topic_buttons()
 
+-- Creates a subsection.
+-- Subsections: current session, working on, total today
+local function create_ui_subheader(header, text, text_size)
+  local _header = wibox.widget({
+    markup = helpers.ui.colorize_text(header, beautiful.timew_header_fg),
+    font = beautiful.font_name .. "Bold 10",
+    valign = "center",
+    align = "center",
+    widget = wibox.widget.textbox,
+  })
+
+  local _text = wibox.widget({
+    markup = helpers.ui.colorize_text(text, beautiful.fg),
+    font = beautiful.alt_font_name .. text_size,
+    valign = "center",
+    align = "center",
+    widget = wibox.widget.textbox,
+  })
+
+  return wibox.widget({
+    _header,
+    _text,
+    layout = wibox.layout.fixed.vertical,
+  })
+end
+
+-- Create the UI for the widget when timew is stopped.
 function ui_timew_stopped()
   local text = wibox.widget({
     markup = helpers.ui.colorize_text("Start a new session", beautiful.fg),
@@ -77,47 +105,17 @@ function ui_timew_stopped()
 
   return wibox.widget({
     text,
-    create_topic_buttons(),
+    topic_buttons,
     spacing = dpi(10),
     layout = wibox.layout.fixed.vertical,
   })
 end
 
-local function create_ui_text(header, text, text_size)
-  local header = wibox.widget({
-    {
-      markup = helpers.ui.colorize_text(header, beautiful.timew_header_fg),
-      font = beautiful.font_name .. "Bold 10",
-      valign = "center",
-      align = "center",
-      widget = wibox.widget.textbox,
-    },
-    current_time_text,
-    layout = wibox.layout.fixed.vertical,
-  })
-
-  local text = wibox.widget({
-    markup = helpers.ui.colorize_text(text, beautiful.fg),
-    font = beautiful.alt_font_name .. text_size,
-    valign = "center",
-    align = "center",
-    widget = wibox.widget.textbox,
-  })
-
-  return wibox.widget({
-    header,
-    text,
-    layout = wibox.layout.fixed.vertical,
-  })
-end -- create_topic_buttons
-
---------
-
+-- Create UI for when timew is started.
 function ui_timew_started()
-  local current_time = create_ui_text("CURRENT SESSION", "--", 30)
-  --local total_this_tag = create_ui_text("TOTAL TAG", "--", 15)
-  local total_all_tags = create_ui_text("TOTAL TODAY", "--", 15)
-  local current_tag = create_ui_text("WORKING ON", "--", 15)
+  local current_time = create_ui_subheader("CURRENT SESSION", "--", 30)
+  local total_all_tags = create_ui_subheader("TOTAL TODAY", "--", 15)
+  local current_tag = create_ui_subheader("WORKING ON", "--", 15)
 
   -- turns 6:15:08 (H+:MM:SS) into 6h 15m
   local function format_time(str)
@@ -132,7 +130,7 @@ function ui_timew_started()
     return txt
   end
 
-  -- update current time and total time every 60 seconds
+  -- Update current time and total time every 60 seconds
   local minute_timer = gears.timer {
     timeout = 60,
     call_now = true,
@@ -173,9 +171,9 @@ function ui_timew_started()
     on_release = function()
       awful.spawn.with_shell("timew stop")
       minute_timer:stop()
-      update_ui(ui_timew_stopped())
-      nav_timewarrior:remove_item(nav_timew_actions)
       nav_timewarrior:append(nav_timew_topics)
+      nav_timewarrior:remove_item(nav_timew_actions)
+      update_ui(ui_timew_stopped())
     end
   })
 
@@ -197,7 +195,7 @@ function ui_timew_started()
     stop_button,
     layout = wibox.layout.fixed.vertical,
   })
-end
+end -- ui_timew_started
 
 -- assemble widget
 local timew_widget = wibox.widget({
@@ -226,6 +224,7 @@ awful.spawn.easy_async_with_shell(cmd, function(stdout)
   if stdout:find("no active time tracking") then
     content:set(1, ui_timew_stopped())
     nav_timewarrior:append(nav_timew_topics)
+    nav_timewarrior.index = 1
   else
     content:set(1, ui_timew_started())
     nav_timewarrior:append(nav_timew_actions)

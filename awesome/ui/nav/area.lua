@@ -35,6 +35,7 @@ end
 
 -- Actions for area's attached widget
 function Area:release() end
+
 function Area:select_toggle()
   if self.widget then
     self.widget:select_toggle()
@@ -43,9 +44,13 @@ end
 
 -- Useful for if you have nested areas.
 function Area:select_toggle_recurse_up()
-  if self.widget then
-    self.widget:select_toggle()
+  -- Current item
+  if self.items[self.index] and self.items[self.index].is_navitem then
+    self.items[self.index]:select_toggle()
   end
+
+  -- Area widgets
+  if self.widget then self.widget:select_toggle() end
   if self.parent then
     self.parent:select_toggle_recurse_up()
   end
@@ -212,7 +217,6 @@ function Area:remove_all_items()
   for i = 1, #self.items do
     table.remove(self.items, i)
   end
-
   self.index = 1
 end
 

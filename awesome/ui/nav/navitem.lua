@@ -40,7 +40,7 @@ end
 
 -- █▀▀ █░░ █▀▀ █░█ ▄▀█ ▀█▀ █▀▀ █▀▄ 
 -- ██▄ █▄▄ ██▄ ▀▄▀ █▀█ ░█░ ██▄ █▄▀ 
-local Elevated = Base:new(widget)
+local Elevated = Base:new(...)
 
 function Elevated:select_on()
   self.selected = true
@@ -58,7 +58,7 @@ end
 
 -- █░█ ▄▀█ █▄▄ █ ▀█▀ █▀ 
 -- █▀█ █▀█ █▄█ █ ░█░ ▄█ 
-local Habit = Base:new(widget)
+local Habit = Base:new(...)
 
 function Habit:select_on()
   self.selected = true

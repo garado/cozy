@@ -31,11 +31,9 @@ end
 -- Toggle selection highlight for the current item.
 -- Also toggle for any widgets associated with its parent area (recursive).
 function Navigator:select_toggle()
-  local item = self.curr_area:get_curr_item()
-  if item and not item.is_area then
-    item:select_toggle()
+  if self.curr_area then
+    self.curr_area:select_toggle_recurse_up()
   end
-  self.curr_area:select_toggle_recurse_up()
 end
 
 function Navigator:release()
@@ -307,7 +305,6 @@ function Navigator:start()
 
   local function keypressed(_, _, key, _)
     self.root:reset_visited_recursive()
-    spaces = ""
     if key ~= "Return" and key ~= "q"  then self:select_toggle() end
 
     if     key == "h" or key == "H" then
