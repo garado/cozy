@@ -6,7 +6,6 @@
 -- with the keyboard
 
 local beautiful = require("beautiful")
-local helpers = require("helpers")
 
 -- █▄▄ ▄▀█ █▀ █▀▀ 
 -- █▄█ █▀█ ▄█ ██▄ 
@@ -26,9 +25,9 @@ function Base:new(widget)
 end
 
 -- Override these 3 functions in your custom definition.
-function Base:select_on()      end
-function Base:select_off()     end
-function Base:release()    end
+function Base:select_on()   end
+function Base:select_off()  end
+function Base:release()     end
 
 function Base:select_toggle()
   if self.selected then
@@ -113,7 +112,6 @@ function Dashtab:release()
   self.widget:nav_release()
 end
 
--- Return class definitions
 return {
   Elevated = Elevated,
   Habit = Habit,

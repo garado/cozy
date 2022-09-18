@@ -21,12 +21,11 @@ function Navigator:new(args)
   o.start_area  = nil
   o.start_index = 0
   o.last_key    = ""
+  o.shift_active = false
 
   self.__index = self
   return setmetatable(o, self)
 end
-
--- Action functions
 
 -- Toggle selection highlight for the current item.
 -- Also toggle for any widgets associated with its parent area (recursive).
@@ -57,7 +56,9 @@ function Navigator:curr_item()
 end
 
 function Navigator:name()
-  return self.curr_area.name
+  if self.curr_area then
+    return self.curr_area.name
+  end
 end
 
 -- Set navigator area to a specific area
@@ -83,35 +84,36 @@ end
 -- Returns true if the target area is a direct neighbor of the
 -- starting area, false otherwise
 function Navigator:is_direct_neighbor(target)
+  -- To check for neighbors there needs to be a parent we can access
+  -- If there isn't a parent, assume it's not a neighbor
   local start_area = self.start_area
   if not start_area.parent then return false end
+
   return start_area.parent:contains(target)
 end
 
 -- Returns true if the current area exists, false if it doesn't
--- If it doesn't exist, this finds the nearest suitable area and
--- moves there
+-- If it doesn't exist, this finds the nearest suitable area and moves there
 -- Needed in case of widgets with dynamic content
 function Navigator:check_curr_area_exists()
   if not self.curr_area then return end
-
   local parent = self:parent()
 
   if not parent then
+    -- If parent doesn't exist, then either we're at root,
+    -- or the current area was cut off of the tree
     self.curr_area = self.root
-    --self.curr_area.index = 1
     self.curr_area:select_off_recursive()
     return false
   elseif not parent:contains(self.curr_area) then
+    -- If the parent doesn't contain the current area, that means
+    -- it was removed at some point. So find the next suitable area
     self.curr_area:select_off_recursive()
     local next_area, new_index = self:find_next_area(self.curr_area, 1)
-    if not next_area then
-    else
+    if next_area then
       self.curr_area = next_area
       self.index = new_index
     end
-    --self.curr_area = parent
-    --self:iter_within(1) -- should this be 1?
     return false
   end
 
@@ -120,9 +122,8 @@ end
 
 -- Return the next area with a suitable navitem that we can navigate to.
 function Navigator:find_next_area(start_area, direction)
-
-  start_area.visited = true
   local area = start_area
+  start_area.visited = true
 
   -- determine if navigating left or right
   direction = direction > 0 and 1 or -1
@@ -146,10 +147,8 @@ function Navigator:find_next_area(start_area, direction)
 
     if item.is_navitem and not item.visited then
       return area, i
-    elseif item.is_navitem and item.visited then
     elseif item.is_area and not item.visited then
-
-      -- increment index only for direct neighbors
+      -- Increment index only for direct neighbors
       local direct_neighbor = self:is_direct_neighbor(item)
 
       if right and direct_neighbor then
@@ -158,12 +157,7 @@ function Navigator:find_next_area(start_area, direction)
         item.index = #item.items
       end
 
-      if direct_neighbor then
-      else
-      end
-
       return self:find_next_area(item, direction)
-    elseif item.is_area and item.visited then
     end
   end
 
@@ -173,7 +167,7 @@ function Navigator:find_next_area(start_area, direction)
 
   -- But if there is no parent then we can't backtrace, so
   -- force iterate within the current area.
-  -- This should *ONLY* happen with the root area!
+  -- This should only happen with the root area
   if not area.parent then
     self.curr_area = area
     local old_index = self.curr_area.index
@@ -198,52 +192,48 @@ function Navigator:find_next_area(start_area, direction)
   end
 end
 
+-- Leave the current area and move to a neighboring area
 function Navigator:iter_between_areas(val)
-
   self:check_curr_area_exists()
 
-  -- check if parent exists
+  -- If parent doesn't exist, then we can't access any neighbors,
+  -- so force iterating within the current area
   if not self:parent() then
-    self:iter_within_area(val)
-    return
+    return self:iter_within_area(val)
   end
 
-  self.curr_area.visited = true
-  local start_area = self:parent()
-
-  -- the parent's currently selected item is the current area
+  -- The parent's currently selected item is the current area,
   -- so we need to iterate the parent to make sure it doesnt search the 
   -- current area again
+  local start_area = self:parent()
   start_area:iter(val)
 
+  -- Check neighbors
+  self.curr_area.visited = true
   local next_area, new_index = self:find_next_area(start_area, val)
   self.curr_area = next_area
   self.curr_area.index = new_index
-
 end
 
 -- Navigate within the current area's items.
 -- Returns the area.
 function Navigator:iter_within_area(val)
-
   self:check_curr_area_exists()
-
   local area = self.curr_area
   local curr_item = self.curr_area:get_curr_item()
 
-  -- if the current item is an area, iterate within that area
+  -- If the current item is an area, iterate within that area
   if curr_item.is_area then
     self.curr_area = curr_item
     return self:iter_within_area(0)
   end
 
-  -- if current item is an element, go to the next element
+  -- If current item is an element, iterate to next element like normal
   if curr_item.is_navitem then
-
     local next_item = area:iter(val)
 
-    -- if iterating through the current area didn't return anything, 
-    -- then you need iterate to the next area.
+    -- If iterating through the current area didn't return anything, 
+    -- then you need to check the next area.
     if not next_item then
       curr_item.visited = true
       local new_area, new_index = self:find_next_area(area, val)
@@ -253,8 +243,6 @@ function Navigator:iter_within_area(val)
       return area, area.index
     end
   end
-
-  -- should never get here!
 end
 
 -- Functions for handling keypresses
@@ -268,10 +256,11 @@ end
 
 -- Execute function for direction keys (hjkl/arrows)
 function Navigator:key(key, default)
-  self.start_area = self.curr_area
-  self.start_index = self.curr_area.index
+  self.start_area   = self.curr_area
+  self.start_index  = self.curr_area.index
   local area_name = self.curr_area.name
   local rule_exists = self.rules and self.rules[area_name] and self.rules[area_name][key]
+
   if rule_exists then
     local rule = self:get_rule(key)
     local custom_nav_logic = false
@@ -288,17 +277,22 @@ function Navigator:key(key, default)
 end
 
 function Navigator:backspace()
-  self.start_area = self.curr_area
-  self.start_index = self.curr_area.index
+  self.start_area   = self.curr_area
+  self.start_index  = self.curr_area.index
   self:iter_between_areas(-1)
 end
 
 function Navigator:tab()
-  self.start_area = self.curr_area
-  self.start_index = self.curr_area.index
-  self:iter_between_areas(1)
+  self.start_area   = self.curr_area
+  self.start_index  = self.curr_area.index
+
+  -- Shift+Tab should go backwards.
+  local amt = self.shift_active and -1 or 1
+
+  self:iter_between_areas(amt)
 end
 
+-- Initialize and start keygrabber
 function Navigator:start()
   self.curr_area = self.root.items[1]
   self:select_toggle()
@@ -321,6 +315,8 @@ function Navigator:start()
       self:tab()
     elseif key == "Return" then
       self:release()
+    elseif key == "Shift_R" or key == "Shift_L" then
+      self.shift_active = true
     elseif key == "q" then -- debug: print current hierarchy
       print("\nDUMP: Current pos is "..self.curr_area.name.."("..self.curr_area.index..")")
       self.root:dump()
@@ -330,11 +326,18 @@ function Navigator:start()
     self.last_key = "key"
   end
 
+  local function keyreleased(_, _, key, _)
+    if key == "Shift_R" or key == "Shift_L" then
+      self.shift_active = false
+    end
+  end
+
   self.keygrabber = awful.keygrabber {
     stop_key = "Mod4",
     stop_event = "press",
     autostart = true,
     keypressed_callback = keypressed,
+    keyreleased_callback = keyreleased,
     stop_callback = function()
       self.curr_area = self.root
       self.root:reset()

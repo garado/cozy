@@ -2,7 +2,8 @@
 -- ▄▀█ █▀█ █▀▀ ▄▀█ 
 -- █▀█ █▀▄ ██▄ █▀█ 
 
--- Basic unit for the nav hierarchy. Can contain navitems or child areas.
+-- Basic unit for the nav tree. Can contain navitems or child areas.
+-- Very messy right now and needs more documentation (but it works!)
 
 local Area = {}
 function Area:new(args)
@@ -20,6 +21,8 @@ function Area:new(args)
   return setmetatable(o, self)
 end
 
+-- ▄▀█ █▀▀ █▀▀ █▀▀ █▀ █▀    █▀▀ █░█ █▄░█ █▀▀ ▀█▀ █ █▀█ █▄░█ █▀ 
+-- █▀█ █▄▄ █▄▄ ██▄ ▄█ ▄█    █▀░ █▄█ █░▀█ █▄▄ ░█░ █ █▄█ █░▀█ ▄█ 
 -- Override equality operator to check if 2 boxes are equal.
 function Area:__eq(b)
   return self.name == b.name
@@ -31,52 +34,6 @@ function Area:append(item)
     item.parent = self
   end
   table.insert(self.items, item)
-end
-
--- Actions for area's attached widget
-function Area:release() end
-
-function Area:select_toggle()
-  if self.widget then
-    self.widget:select_toggle()
-  end
-end
-
--- Useful for if you have nested areas.
-function Area:select_toggle_recurse_up()
-  -- Current item
-  if self.items[self.index] and self.items[self.index].is_navitem then
-    self.items[self.index]:select_toggle()
-  end
-
-  -- Area widgets
-  if self.widget then self.widget:select_toggle() end
-  if self.parent then
-    self.parent:select_toggle_recurse_up()
-  end
-end
-
--- Turn off highlight for associated widget
-function Area:select_off()
-  if self.widget then
-    self.widget:select_off()
-  end
-end
-
--- Turn off highlight for all child items
-function Area:select_off_recursive()
-  if self.widget then
-    self.widget:select_off()
-  end
-  for i = 1, #self.items do
-    if self.items[i].is_area then
-      self.items[i]:select_off_recursive()
-    else
-      self.items[i]:select_off()
-      if self.items[i].selected then
-      end
-    end
-  end
 end
 
 -- Remove an item from a given index in the item table.
@@ -92,6 +49,26 @@ function Area:remove_index(index)
     table.remove(self.items, index)
   end
 end
+
+-- Returns if current area contains a given area.
+function Area:contains(item)
+  if not item.is_area then return end
+  for i = 1, #self.items do
+    if self.items[i].is_area then
+      if self.items[i] == item then
+        return true
+      end
+    end
+  end
+  return false
+end
+
+-- Return the currently selected item within the item table.
+function Area:get_curr_item()
+  return self.items[self.index]
+end
+
+function Area:is_empty() return #self.items == 0 end
 
 -- Remove a specific area from area's item table.
 function Area:remove_item(item)
@@ -112,49 +89,12 @@ function Area:remove_item(item)
   end
 end
 
--- Returns if current area contains a given area.
-function Area:contains(item)
-  if not item.is_area then return end
+-- Remove all items from area.
+function Area:remove_all_items()
   for i = 1, #self.items do
-    if self.items[i].is_area then
-      if self.items[i] == item then
-        return true
-      end
-    end
+    table.remove(self.items, i)
   end
-  return false
-end
-
-function Area:set_index(index)
-end
-
-function Area:iter_force_circular(amount)
-  local new_index = self.index + amount
-  self.index = new_index % #self.items
-  if self.index == 0 then
-    self.index = #self.items
-  end
-  return self.items[self.index]
-end
-
--- Iterate through an area's item table by a given amount.
--- Returns the item that it iterated to.
-function Area:iter(amount)
-  local new_index = self.index + amount
-
-  -- If iterating went out of item table's bounds and the area isn't
-  -- circular, then return nil.
-  local overflow = new_index > #self.items or new_index <= 0
-  if not self.circular and overflow then
-    return
-  end
-
-  -- Otherwise, iterate like normal.
-  self.index = new_index % #self.items
-  if self.index == 0 then
-    self.index = #self.items
-  end
-  return self.items[self.index]
+  self.index = 1
 end
 
 -- Remove all child items except for the given area
@@ -194,6 +134,79 @@ function Area:reset()
   self.index = 1
 end
 
+-- ▄▀█ █▀▀ ▀█▀ █ █▀█ █▄░█    █▀▀ █░█ █▄░█ █▀▀ ▀█▀ █ █▀█ █▄░█ █▀ 
+-- █▀█ █▄▄ ░█░ █ █▄█ █░▀█    █▀░ █▄█ █░▀█ █▄▄ ░█░ █ █▄█ █░▀█ ▄█ 
+-- Actions for area's attached widget
+
+-- You should not be able to directly interact with the area widget
+function Area:release() end
+
+-- Toggle selection for the current item and also all areas within
+-- the branch.
+function Area:select_toggle_recurse_up()
+  -- Toggle current item
+  if self.items[self.index] and self.items[self.index].is_navitem then
+    self.items[self.index]:select_toggle()
+  end
+
+  -- Toggle area widgets
+  if self.widget then self.widget:select_toggle() end
+
+  if self.parent then
+    self.parent:select_toggle_recurse_up()
+  end
+end
+
+-- Turn off highlight for associated widget
+function Area:select_off()
+  if self.widget then
+    self.widget:select_off()
+  end
+end
+
+-- Turn off highlight for all child items
+function Area:select_off_recursive()
+  if self.widget then
+    self.widget:select_off()
+  end
+  for i = 1, #self.items do
+    if self.items[i].is_area then
+      self.items[i]:select_off_recursive()
+    else
+      self.items[i]:select_off()
+    end
+  end
+end
+
+function Area:iter_force_circular(amount)
+  local new_index = self.index + amount
+  self.index = new_index % #self.items
+  if self.index == 0 then
+    self.index = #self.items
+  end
+  return self.items[self.index]
+end
+
+-- Iterate through an area's item table by a given amount.
+-- Returns the item that it iterated to.
+function Area:iter(amount)
+  local new_index = self.index + amount
+
+  -- If iterating went out of item table's bounds and the area isn't
+  -- circular, then return nil.
+  local overflow = new_index > #self.items or new_index <= 0
+  if not self.circular and overflow then
+    return
+  end
+
+  -- Otherwise, iterate like normal.
+  self.index = new_index % #self.items
+  if self.index == 0 then
+    self.index = #self.items
+  end
+  return self.items[self.index]
+end
+
 function Area:max_index_recursive()
   self.index = #self.items
   for i = 1, #self.items do
@@ -211,21 +224,6 @@ function Area:reset_index_recursive()
     end
   end
 end
-
--- Remove all items from area.
-function Area:remove_all_items()
-  for i = 1, #self.items do
-    table.remove(self.items, i)
-  end
-  self.index = 1
-end
-
--- Return the currently selected item within the item table.
-function Area:get_curr_item()
-  return self.items[self.index]
-end
-
-function Area:is_empty() return #self.items == 0 end
 
 -- Sets visited = false for area and all child areas
 function Area:reset_visited_recursive()
