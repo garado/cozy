@@ -8,41 +8,38 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-
--- For navigation
 local Area = require("ui.nav.area")
 local navigator = require("ui.control_center.navrules")
 
+-- Import widgets
+local uptime = require("ui.control_center.uptime")
+local profile = require("ui.control_center.profile")
+local fetch = require("ui.control_center.fetch")
+local nav_picom, picom = require("ui.control_center.picom")()
+local power_opts, power_confirm, nav_power = require("ui.control_center.power")()
+local nav_qactions, qactions = require("ui.control_center.quick_actions")()
+local nav_links, links = require("ui.control_center.links")()
+
+-- For keynav
 local nav_root = Area:new({
   name = "root",
   circular = true,
+  nav = navigator,
 })
 navigator.root = nav_root
-
--- Import widgets
--- local profile = require("ui.control_center.profile")
-local uptime = require("ui.control_center.uptime")
-
-local _qa = require("ui.control_center.quick_actions")
-local qactions = _qa.widget
-local nav_qactions = _qa.nav
-
-local _links = require("ui.control_center.links")
-local links = _links.widget
-local nav_links = _links.nav
-
-local power_opts, power_confirm, nav_power
-power_opts, power_confirm, nav_power = require("ui.control_center.power")()
-
+nav_root:append(nav_picom)
 nav_root:append(nav_qactions)
-nav_root:append(nav_links)
+--nav_root:append(nav_links)
 nav_root:append(nav_power)
 
 return function()
   local body = wibox.widget({
     {
+      profile,
+      fetch,
+      picom,
       qactions,
-      links,
+      --links,
       spacing = dpi(20),
       layout = wibox.layout.fixed.vertical,
     },
@@ -85,7 +82,7 @@ return function()
     bg = beautiful.ctrl_bg,
   })
 
-  local control_center_width = dpi(500)
+  local control_center_width = dpi(450)
   local control_center = awful.popup ({
     type = "popup_menu",
     minimum_width = control_center_width,

@@ -92,7 +92,19 @@ local widget = wibox.widget({
   widget = wibox.container.place,
 })
 
-return {
-  widget = widget,
-  nav = nav_links
-}
+local cont = wibox.widget({
+  {
+    text = "LINKS",
+    align = "center",
+    valign = "center",
+    font = beautiful.font_name .. "10",
+    widget = wibox.widget.textbox,
+  },
+  widget,
+  spacing = dpi(10),
+  layout = wibox.layout.fixed.vertical,
+})
+
+return function()
+  return nav_links, cont
+end

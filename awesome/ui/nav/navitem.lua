@@ -55,6 +55,26 @@ function Elevated:release()
   self.widget:nav_release()
 end
 
+-- █▀█ ▄▀█ █▀▀ ▀█▀ █ █▀█ █▄░█ 
+-- ▀▀█ █▀█ █▄▄ ░█░ █ █▄█ █░▀█ 
+local Qaction = Base:new(...)
+
+function Qaction:select_on()
+  self.selected = true
+  self.widget:nav_hover()
+  self.widget:nav_hl_on()
+end
+
+function Qaction:select_off()
+  self.selected = false
+  self.widget:nav_hl_off()
+end
+
+function Qaction:release()
+  self.widget:nav_release()
+end
+
+
 -- █░█ ▄▀█ █▄▄ █ ▀█▀ █▀ 
 -- █▀█ █▀█ █▄█ █ ░█░ ▄█ 
 local Habit = Base:new(...)
@@ -114,6 +134,7 @@ end
 
 return {
   Elevated = Elevated,
+  Qaction = Qaction,
   Habit = Habit,
   Dashtab = Dashtab,
   Dashwidget = Dashwidget,

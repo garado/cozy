@@ -342,6 +342,10 @@ function elevated_button.normal(args)
     args.on_release()
   end
 
+  function widget:nav_hover()
+    args.on_hover()
+  end
+
   function widget:nav_hl_on()
 		self:get_children_by_id("background_role")[1].bg = args.hover_bg
   end

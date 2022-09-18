@@ -176,8 +176,10 @@ function ui_timew_started()
       update_ui(ui_timew_stopped())
     end
   })
-
-  nav_timew_actions:append(Elevated:new(stop_button))
+  local _stop = Elevated:new(stop_button)
+  if not nav_timew_actions:contains(_stop) then
+    nav_timew_actions:append(Elevated:new(stop_button))
+  end
 
   return wibox.widget({
     {
@@ -185,7 +187,6 @@ function ui_timew_started()
       {
         current_tag,
         total_all_tags,
-        --total_this_tag,
         spacing = dpi(20),
         layout = wibox.layout.fixed.horizontal,
       },

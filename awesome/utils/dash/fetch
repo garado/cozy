@@ -38,5 +38,9 @@ cpu=$(echo $cpu | sed -e s/^"model name : "//)
 echo "cpu:$cpu"
 
 # shell
-shell=$(echo $SHELL | sed -e s:/usr/bin/::)
+shell=$(echo $SHELL | sed -e s:/usr/bin/:: | sed -e s:/bin/::)
 echo "shell:$shell"
+
+#host
+host=$(hostname)
+echo "host:$host"

@@ -115,6 +115,12 @@ theme.ctrl_lowerbar_bg   = theme.ctrl_lowerbar_bg   or theme.bg
 theme.ctrl_powopt_bg     = theme.ctrl_powopt_bg     or theme.bg_l1
 theme.ctrl_powopt_btn_fg = theme.ctrl_powopt_btn_fg or theme.fg
 
+theme.ctrl_header_fg = theme.ctrl_header_fg or theme.fg
+theme.ctrl_pfp_bg   = theme.ctrl_pfp_bg or theme.main_accent
+
+theme.ctrl_fetch_accent = theme.ctrl_fetch_accent or theme.main_accent
+theme.ctrl_fetch_value  = theme.ctrl_fetch_value  or theme.fg
+
 -- Theme switcher
 theme.switcher_bg          = theme.switcher_bg         or theme.bg_l0
 theme.switcher_act_btn_bg  = theme.switcher_act_btn_bg or theme.bg_l0

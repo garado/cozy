@@ -54,12 +54,23 @@ local curr_theme_sel = wibox.widget({
     id = "theme_style",
     widget = wibox.widget.textbox,
   }),
+  forced_height = dpi(50),
   layout = wibox.layout.fixed.horizontal,
 })
 
 local theme_sel_textbox   = curr_theme_sel.children[1]
 local theme_name_textbox  = curr_theme_sel.children[2]
 local theme_style_textbox = curr_theme_sel.children[3]
+
+local action_buttons = wibox.widget({
+  {
+    forced_height = dpi(50),
+    spacing = dpi(15),
+    layout = wibox.layout.fixed.horizontal,
+  },
+  visible = false,
+  widget = wibox.container.place,
+})
 
 local apply_button = wibox.widget({
   widgets.button.text.normal({
@@ -85,11 +96,13 @@ cancel_button = wibox.widget({
     size = 10,
     on_release = function()
       reset_theme_switcher()
-      --awesome.emit_signal("theme_switcher::toggle")
     end,
   }),
   widget = wibox.container.place,
 })
+
+action_buttons.children[1]:add(apply_button)
+action_buttons.children[1]:add(cancel_button)
 nav_actions:append(Elevated:new(apply_button.children[1]))
 nav_actions:append(Elevated:new(cancel_button.children[1]))
 
@@ -135,8 +148,7 @@ styles = wibox.widget ({
 function reset_theme_switcher()
   local markup = helpers.ui.colorize_text("Current: " , beautiful.fg)
   theme_sel_textbox:set_markup_silently(markup)
-  apply_button.visible = false
-  cancel_button.visible = false
+  action_buttons.visible = false
   styles.visible = false
   nav_styles:remove_all_items()
   nav_root:remove_item(nav_actions)
@@ -200,8 +212,7 @@ local function create_style_button(style)
     on_release = function()
       select_new_style(style)
       selected_style = style
-      apply_button.visible  = true
-      cancel_button.visible = true
+      action_buttons.visible = true
       if not nav_root:contains(nav_actions) then
         nav_root:append(nav_actions)
       end
@@ -267,7 +278,14 @@ local function create_theme_button(name)
     end
   })
   nav_themes:append(Elevated:new(theme_button))
-  return theme_button
+  return wibox.widget({
+    {
+      theme_button,
+      forced_width = dpi(200),
+      widget = wibox.container.background,
+    },
+    widget = wibox.container.place,
+  })
 end
 
 local function create_theme_buttons()
@@ -287,8 +305,6 @@ end
 -- execute
 get_current_theme()
 create_theme_buttons()
-apply_button.visible = false
-cancel_button.visible = false
 styles.visible = false
 
 return function()
@@ -313,11 +329,8 @@ return function()
         {
           {
             curr_theme_sel,
-            apply_button,
-            cancel_button,
-            forced_height = dpi(50),
-            spacing = dpi(10),
-            layout = wibox.layout.fixed.horizontal,
+            action_buttons,
+            layout = wibox.layout.fixed.vertical,
           },
           widget = wibox.container.place,
         },
@@ -330,7 +343,7 @@ return function()
     bg = beautiful.switcher_bg,
   })
 
-  local theme_switcher_width = dpi(500)
+  local theme_switcher_width = dpi(350)
   local theme_switcher = awful.popup ({
     type = "popup_menu",
     minimum_width = theme_switcher_width,
