@@ -31,12 +31,12 @@ local qaction_header
 -- A bunch of functions that the quick actions call.
 
 -- Helper functions
-local function qa_notify(title, msg)
+local function qa_notify(title, msg, timeout)
   naughty.notification {
     app_name = "Quick actions",
     title = title,
     message = msg,
-    timeout = 2,
+    timeout = timeout or 2,
   }
 end
 
@@ -187,6 +187,10 @@ qaction_header = wibox.widget({
   widget = wibox.widget.textbox,
 })
 
+local function incomplete()
+  qa_notify("Oops!", "This quick action hasn't been implemented yet.", 5)
+end
+
 -- Creating the quick action buttons
 local qactions = wibox.widget({
   {
@@ -201,11 +205,11 @@ local qactions = wibox.widget({
       create_quick_action("", "Nightshift", nightshift_func, row1),
 
       -- unfinished --
-      create_quick_action("", "Timer", "", row2),
-      create_quick_action("便", "Rotate bar", "", row2),
-      create_quick_action("", "Journal", "", row2),
-      create_quick_action("", "Eyebleach", "", row2),
-      create_quick_action("", "Do not disturb", "", row2),
+      create_quick_action("", "Timer", incomplete, row2),
+      create_quick_action("便", "Rotate bar", incomplete, row2),
+      create_quick_action("", "Journal", incomplete, row2),
+      create_quick_action("", "Eyebleach", incomplete, row2),
+      create_quick_action("", "Do not disturb", incomplete, row2),
 
       spacing = dpi(15),
       forced_num_rows = 2,
