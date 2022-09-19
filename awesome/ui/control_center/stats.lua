@@ -113,8 +113,9 @@ local function disk()
   local percent = ui.children[2]
   local bar = ui.children[3].children[1]
 
+  -- Update every 10 minutes
   local cmd = [[bash -c "df -h /home|grep '^/' | awk '{print $5}'"]]
-	watch(cmd, 180, function(_, stdout)
+	watch(cmd, 600, function(_, stdout)
 		local space_consumed = stdout:match("(%d+)")
     bar.value = tonumber(space_consumed)
     local markup = helpers.ui.colorize_text(space_consumed.."%", beautiful.ctrl_fg)

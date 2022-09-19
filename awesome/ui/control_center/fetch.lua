@@ -13,7 +13,7 @@ local dpi = xresources.apply_dpi
 -- Base widget to append to
 local widget = wibox.widget({
   {
-    spacing = dpi(5),
+    spacing = dpi(2),
     layout = wibox.layout.fixed.vertical,
   },
   widget = wibox.container.place,

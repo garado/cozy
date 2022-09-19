@@ -14,7 +14,12 @@ local helpers = require("helpers")
 local Area = require("ui.nav.area")
 local Elevated = require("ui.nav.navitem").Elevated
 
-local nav_picom = Area:new({ name = "picom" })
+local nav_picom = Area:new({
+  name = "picom",
+  is_row = true,
+  circular = true,
+})
+
 local cfg = gfs.get_configuration_dir()
 local picom_cfgs = cfg .. "utils/ctrl/picom/"
 
