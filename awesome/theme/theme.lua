@@ -51,6 +51,7 @@ theme.mus_filter_2    = theme.mus_filter_2    or theme.bg_l3
 theme.mus_playing_fg  = theme.mus_playing_fg  or theme.fg
 theme.mus_control_bg  = theme.mus_control_bg  or theme.main_accent.."00"
 theme.mus_control_fg  = theme.mus_control_fg  or theme.fg
+theme.mus_bg          = theme.mus_bg          or theme.bg_l2
 
 theme.task_due_fg     = theme.task_due_fg     or theme.fg_sub
 
@@ -103,6 +104,7 @@ theme.wibar_launch_app    = theme.wibar_launch_app    or theme.wibar_fg
 theme.wibar_launch_dash   = theme.wibar_launch_dash   or theme.wibar_fg
 theme.wibar_launch_ctrl   = theme.wibar_launch_ctrl   or theme.wibar_fg
 theme.wibar_launch_theme  = theme.wibar_launch_theme  or theme.wibar_fg
+theme.wibar_launch_hover  = theme.wibar_launch_hover  or theme.main_accent
 
 -- Control center
 theme.ctrl_fg       = theme.ctrl_fg       or theme.fg

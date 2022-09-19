@@ -15,7 +15,12 @@ function Area:new(args)
   o.index     = 1
   o.is_area   = true
   o.is_navitem = false
+  o.is_row    = args.is_row or false
+  o.is_column = args.is_column or false
+  o.group_name = args.group_name or nil
+  o.selected  = false
   o.visited   = false
+  o.nav       = args.nav or nil
   o.circular  = args.circular or false
   self.__index = self
   return setmetatable(o, self)
@@ -32,6 +37,10 @@ end
 function Area:append(item)
   if item.is_area then
     item.parent = self
+    if self.nav then
+      print("appending nav to item "..item.name)
+      item.nav = self.nav
+    end
   end
   table.insert(self.items, item)
 end
@@ -72,16 +81,18 @@ function Area:is_empty() return #self.items == 0 end
 
 -- Remove a specific area from area's item table.
 function Area:remove_item(item)
-  item:select_off_recursive()
-  if self.items[self.index] == item then
-    self.index = 1
+  if self.nav then
+    print("Removing item "..item.name.." from "..self.name.." and notifying navigator")
+    self.nav:emit_signal("nav::area_removed", self, item)
   end
+  item:select_off_recursive()
+  --if self.items[self.index] == item then
+  --  self.index = 1
+  --end
   for i = 1, #self.items do
     if item == self.items[i] then
-      if i < self.index then
+      if i <= self.index then
         self.index = self.index - 1
-      elseif i == self.index then
-        self:iter(1)
       end
       table.remove(self.items, i)
       return
@@ -144,7 +155,8 @@ function Area:release() end
 -- Toggle selection for the current item and also all areas within
 -- the branch.
 function Area:select_toggle_recurse_up()
-  -- Toggle current item
+  -- Toggle self and current item
+  self.selected = not self.selected
   if self.items[self.index] and self.items[self.index].is_navitem then
     self.items[self.index]:select_toggle()
   end
@@ -152,6 +164,7 @@ function Area:select_toggle_recurse_up()
   -- Toggle area widgets
   if self.widget then self.widget:select_toggle() end
 
+  -- Recurse up through the navtree
   if self.parent then
     self.parent:select_toggle_recurse_up()
   end
@@ -166,9 +179,8 @@ end
 
 -- Turn off highlight for all child items
 function Area:select_off_recursive()
-  if self.widget then
-    self.widget:select_off()
-  end
+  if self.widget then self.widget:select_off() end
+  self.selected = false
   for i = 1, #self.items do
     if self.items[i].is_area then
       self.items[i]:select_off_recursive()

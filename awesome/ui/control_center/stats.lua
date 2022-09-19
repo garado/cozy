@@ -3,6 +3,7 @@
 -- ▄█ ░█░ █▀█ ░█░ ▄█ 
 
 -- cpu, ram, disk usage
+-- credit: rxyhn
 
 local awful = require("awful")
 local beautiful = require("beautiful")
