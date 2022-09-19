@@ -12,8 +12,8 @@ local helpers = require("helpers")
 local widgets = require("ui.widgets")
 local gfs = require("gears.filesystem")
 local apps = require("configuration.apps")
-local Area = require("ui.nav.area")
-local Qaction = require("ui.nav.navitem").Qaction
+local Area = require("modules.keynav.area")
+local Qaction = require("modules.keynav.navitem").Qaction
 
 local nav_qactions = Area:new({
   name = "qactions",

@@ -1,0 +1,3 @@
+[submodule "awesome/modules/keynav"]
+	path = awesome/modules/keynav
+	url = https://github.com/garado/awesome-keynav.git

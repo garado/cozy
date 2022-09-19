@@ -6,7 +6,7 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local Area = require("ui.nav.area")
+local Area = require("modules.keynav.area")
 
 local nav_main = Area:new({ name = "main" })
 

@@ -12,9 +12,9 @@ local gfs = require("gears.filesystem")
 local user_vars = require("user_variables")
 local dpi = xresources.apply_dpi
 local naughty = require("naughty")
-local Area = require("ui.nav.area")
-local Habit = require("ui.nav.navitem").Habit
-local Dashwidget = require("ui.nav.navitem").Dashwidget
+local Area = require("modules.keynav.area")
+local Habit = require("modules.keynav.navitem").Habit
+local Dashwidget = require("modules.keynav.navitem").Dashwidget
 
 local nav_dash_habits = Area:new({
   name = "nav_dash_habits",

@@ -9,9 +9,10 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local widgets = require("ui.widgets")
-local Area = require("ui.nav.area")
-local Dashtab = require("ui.nav.navitem").Dashtab
-local Navigator = require("ui.nav.navigator")
+
+local Area = require("modules.keynav.area")
+local Dashtab = require("modules.keynav.navitem").Dashtab
+local Navigator = require("modules.keynav").navigator
 
 local navigator, nav_root = Navigator:new()
 
@@ -134,7 +135,6 @@ return function()
       layout = wibox.layout.align.horizontal,
     }),
   })
-
 
   nav_root:append(nav_main)
   --local main_tab_icon = tab_bar.children[1].children[1]

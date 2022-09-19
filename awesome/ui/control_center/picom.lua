@@ -11,8 +11,8 @@ local dpi = xresources.apply_dpi
 local awful = require("awful")
 local gfs = require("gears.filesystem")
 local helpers = require("helpers")
-local Area = require("ui.nav.area")
-local Elevated = require("ui.nav.navitem").Elevated
+local Area = require("modules.keynav.area")
+local Elevated = require("modules.keynav.navitem").Elevated
 
 local nav_picom = Area:new({
   name = "picom",

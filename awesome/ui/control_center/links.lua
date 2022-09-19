@@ -8,8 +8,8 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local widgets = require("ui.widgets")
-local Area = require("ui.nav.area")
-local Elevated = require("ui.nav.navitem").Elevated
+local Area = require("modules.keynav.area")
+local Elevated = require("modules.keynav.navitem").Elevated
 
 local nav_links = Area:new({ name = "links" })
 

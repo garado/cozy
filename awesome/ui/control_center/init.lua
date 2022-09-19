@@ -8,7 +8,8 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local Navigator = require("ui.nav.navigator")
+
+local Navigator = require("modules.keynav.navigator")
 
 local navigator, nav_root = Navigator:new()
 

@@ -12,9 +12,11 @@ local dpi = xresources.apply_dpi
 local helpers = require("helpers")
 local widgets = require("ui.widgets")
 local naughty = require("naughty")
-local Area = require("ui.nav.area")
-local Elevated = require("ui.nav.navitem").Elevated
-local Navigator = require("ui.nav.navigator")
+
+local keynav = require("modules.keynav")
+local Area = keynav.area
+local Navigator = keynav.navigator
+local Elevated = keynav.navitem.Elevated
 
 -- keynav setup
 local navigator, nav_root = Navigator:new()
