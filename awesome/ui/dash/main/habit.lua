@@ -18,6 +18,8 @@ local Dashwidget = require("ui.nav.navitem").Dashwidget
 
 local nav_dash_habits = Area:new({
   name = "nav_dash_habits",
+  circular = true,
+  is_grid_container = true,
 })
 
 local os = os
@@ -125,6 +127,13 @@ end
 
 -- creates just one habit
 local function create_habit_ui_entry(name, graph_id, frequency)
+  local nav_habit = Area:new({
+    name = name,
+    is_row = true,
+    circular = true,
+    row_wrap_vertical = true,
+  })
+
   local habit_name = wibox.widget({
     markup = helpers.ui.colorize_text(name, beautiful.fg),
     font = beautiful.font_name .. "12",
@@ -211,7 +220,7 @@ local function create_habit_ui_entry(name, graph_id, frequency)
         layout = wibox.layout.stack,
       })
 
-      nav_dash_habits:append(Habit:new(checkbox))
+      nav_habit:append(Habit:new(checkbox))
 
       checkbox:connect_signal("button::press", function()
         -- update ui
@@ -230,6 +239,7 @@ local function create_habit_ui_entry(name, graph_id, frequency)
 
       days:add(checkbox)
     end -- end for
+    nav_dash_habits:append(nav_habit)
     habit_widget.children[1]:add(habit_entry)
   end) -- end async
 end -- end create_habit_entry

@@ -12,23 +12,22 @@ local dpi = xresources.apply_dpi
 local helpers = require("helpers")
 local widgets = require("ui.widgets")
 local naughty = require("naughty")
-
--- for keyboard navigation
 local Area = require("ui.nav.area")
 local Elevated = require("ui.nav.navitem").Elevated
-local navigator = require("ui.theme_switcher.navrules")
+local Navigator = require("ui.nav.navigator")
 
-local nav_root = Area:new({
-  name = "root",
-  circular = true,
-})
-
+-- keynav setup
+local navigator, nav_root = Navigator:new()
 local nav_themes  = Area:new({ name = "nav_themes"  })
-local nav_styles  = Area:new({ name = "nav_styles"  })
-local nav_actions = Area:new({ name = "nav_actions" })
-
+local nav_styles  = Area:new({
+  name = "nav_styles",
+  is_row = true
+})
+local nav_actions = Area:new({
+  name = "nav_actions",
+  is_row = true
+})
 nav_root:append(nav_themes)
-navigator.root = nav_root
 
 local selected_theme = ""
 local selected_style = ""

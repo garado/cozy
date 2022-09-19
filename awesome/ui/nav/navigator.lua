@@ -4,6 +4,7 @@
 
 local awful = require("awful")
 local gobject = require("gears.object")
+local area = require("ui.nav.area")
 
 -- For printing stacktrace
 local debug_mode = false
@@ -26,7 +27,11 @@ function Navigator:new(args)
   args = args or {}
 
   local o = gobject{}
-  o.root        = args.root or nil
+  o.root  = area:new({
+    name = "root",
+    circular = true,
+    nav = o,
+  })
   o.curr_area   = nil
   o.keygrabber  = nil
   o.rules       = args.rules or nil
@@ -37,12 +42,11 @@ function Navigator:new(args)
   o.shift_active = false
 
   o:connect_signal("nav::area_removed", function(navigator, parent, removed_area)
-    print("Navigator: caught area_removed signal from "..parent.name)
     self:handle_removed_area(navigator, parent, removed_area)
   end)
 
   self.__index = self
-  return setmetatable(o, self)
+  return setmetatable(o, self), o.root
 end
 
 -- Action functions
@@ -112,9 +116,7 @@ function Navigator:handle_removed_area(navigator, parent, removed_area)
   navprint("Navigator: handle_removed_area from "..parent.name)
   set_spaces()
 
-  navprint("dumping parent area")
   removed_area.visited = true
-  parent:dump()
 
   if navigator.curr_area == removed_area then
     navprint("uh oh im in the removed area")
@@ -371,40 +373,35 @@ end
 function Navigator:iter_row(key, default)
   navprint("::iter_row")
   set_spaces()
-  if key == "j" then
+
+  local vertical = key == "j" or key == "h"
+  local horizontal = key == "h" or key == "l"
+  local jump = key == "tab" or key == "backspace"
+
+  local amt
+  if key == "j" or key == "l" or key == "tab" then
+    amt = 1
+  else
+    amt = -1
+  end
+
+  if vertical then
     local old_index = self.curr_area.index
-    self:iter_between_areas(1)
+    self:iter_between_areas(amt)
     if self.last_area.parent == self.curr_area.parent then
       self.curr_area.index = old_index
     end
-  elseif key == "k" then
-    local old_index = self.curr_area.index
-    self:iter_between_areas(-1)
-    if self.last_area.parent == self.curr_area.parent then
-      self.curr_area.index = old_index
-    end
-  elseif key == "h" then
-    self:iter_within_area(-1)
-  elseif key == "l" then
-    self:iter_within_area(1)
-  elseif key == "tab" then
+  elseif horizontal then
+    self:iter_within_area(amt)
+  elseif jump then
     local parent = self.curr_area.parent
     local row_within_root = not (parent and parent.parent)
-    if row_within_root then
-      self:iter_between_areas(1)
+    local is_grid_element = parent and parent.is_grid_container
+    if row_within_root or not is_grid_element then
+      self:iter_between_areas(amt)
     else
       self.curr_area = self.curr_area.parent
-      self:iter_between_areas(1)
-    end
-  elseif key == "backspace" then
-    local parent = self.curr_area.parent
-    local row_within_root = not (parent and parent.parent)
-    if row_within_root then
-      navprint("row within root")
-      self:iter_between_areas(-1)
-    else
-      self.curr_area = self.curr_area.parent
-      self:iter_between_areas(-1)
+      self:iter_between_areas(amt)
     end
   end
 end

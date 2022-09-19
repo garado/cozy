@@ -17,7 +17,7 @@ function Area:new(args)
   o.is_navitem = false
   o.is_row    = args.is_row or false
   o.is_column = args.is_column or false
-  o.group_name = args.group_name or nil
+  o.is_grid_container = args.is_grid_container or false
   o.selected  = false
   o.visited   = false
   o.nav       = args.nav or nil

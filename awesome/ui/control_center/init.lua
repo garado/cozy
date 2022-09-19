@@ -8,8 +8,9 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local Area = require("ui.nav.area")
-local navigator = require("ui.control_center.navrules")
+local Navigator = require("ui.nav.navigator")
+
+local navigator, nav_root = Navigator:new()
 
 -- Import widgets
 local uptime = require("ui.control_center.uptime")
@@ -17,27 +18,25 @@ local profile = require("ui.control_center.profile")
 local stats = require("ui.control_center.stats")
 local fetch = require("ui.control_center.fetch")
 local nav_picom, picom = require("ui.control_center.picom")()
-local power_opts, power_confirm, nav_power = require("ui.control_center.power")()
 local nav_qactions, qactions = require("ui.control_center.quick_actions")()
---local nav_links, links = require("ui.control_center.links")()
+local power_opts, power_confirm, nav_power = require("ui.control_center.power")()
+-- local nav_links, links = require("ui.control_center.links")()
 
--- For keynav
-local nav_root = Area:new({
-  name = "root",
-  circular = true,
-  nav = navigator,
-})
-navigator.root = nav_root
 nav_root:append(nav_picom)
 nav_root:append(nav_qactions)
---nav_root:append(nav_links)
 nav_root:append(nav_power)
 
 return function()
   local body = wibox.widget({
     {
-      profile,
-      fetch,
+      {
+        {
+          profile,
+          fetch,
+          layout = wibox.layout.fixed.horizontal,
+        },
+        widget = wibox.container.place,
+      },
       stats,
       picom,
       qactions,
@@ -75,7 +74,14 @@ return function()
   power_confirm.visible = false
   local control_center_contents = wibox.widget({
     {
-      body,
+      {
+        body,
+        margins = {
+          top = dpi(10),
+          bottom = dpi(10),
+        },
+        widget = wibox.container.margin,
+      },
       lower_tab,
       power_confirm,
       layout = wibox.layout.fixed.vertical,
@@ -119,6 +125,10 @@ return function()
   end)
 
   awesome.connect_signal("ctrl::power_confirm_toggle", function()
+    if not power_confirm.visible then
+      navigator:set_area("nav_power_opts")
+      navigator.curr_area:iter(0)
+    end
     power_confirm.visible = not power_confirm.visible
   end)
 

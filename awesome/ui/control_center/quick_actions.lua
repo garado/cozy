@@ -15,7 +15,12 @@ local apps = require("configuration.apps")
 local Area = require("ui.nav.area")
 local Qaction = require("ui.nav.navitem").Qaction
 
-local nav_qactions = Area:new({ name = "qactions" })
+local nav_qactions = Area:new({
+  name = "qactions",
+  is_row = true,
+  is_grid_container = true,
+  circular = true,
+})
 
 local scripts = gfs.get_configuration_dir() .. "utils/ctrl/"
 local term = apps.default.terminal
@@ -31,6 +36,7 @@ local function qa_notify(title, msg)
     app_name = "Quick actions",
     title = title,
     message = msg,
+    timeout = 2,
   }
 end
 
@@ -53,7 +59,7 @@ end
 
 -- lenovo laptops have a conservation mode that
 -- stops the battery from charging when it hits 55-60%
-local function conservation_mode_func()
+local function consmode_func()
   local cmd = "ideapad-cm status"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local cm_cmd
@@ -90,17 +96,28 @@ local function calculator_func()
   awesome.emit_signal("control_center::toggle")
 end
 
--- Controls picom settings
-local picom_settings = {"max", "med", "min", "off"}
-local picom_settings_current = 1
-local function picom_func()
-  qa_notify("Picom", picom_settings[picom_settings_current])
-  picom_settings_current = (picom_settings_current + 1) % #picom_settings
-  if picom_settings_current == 0 then picom_settings_current = #picom_settings end
+-- Toggle redshift
+local function nightshift_func()
+  local lat = 32
+  local long = -122
+  local cmd = "pidof redshift"
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    local message
+    local redshift_active = stdout ~= ""
+    if redshift_active then
+      awful.spawn.with_shell("pkill redshift")
+      message = "Disabled"
+    else
+      local coords = lat .. ":" .. long
+      awful.spawn.with_shell("redshift -l " .. coords)
+      message = "Enabled"
+    end
+    qa_notify("Nightshift", message)
+  end)
 end
 
 -- Helper function to create a quick action button
-local function create_quick_action(icon, name, func)
+local function create_quick_action(icon, name, func, area)
   local quick_action = widgets.button.text.normal({
     text = icon,
     text_normal_bg = beautiful.fg,
@@ -108,7 +125,7 @@ local function create_quick_action(icon, name, func)
     animate_size = false,
     size = 20,
     on_release = function()
-      func()
+      if func then func() end
     end,
     on_hover = function()
       local markup = string.upper(name)
@@ -127,18 +144,38 @@ local function create_quick_action(icon, name, func)
     widget = wibox.container.place,
   })
 
-  nav_qactions:append(Qaction:new(quick_action))
+  area:append(Qaction:new(quick_action))
   return action
 end
 
 -- █░█ █ 
 -- █▄█ █ 
 
--- restore qaction header when leaving the area
+local row1 = Area:new({
+  name = "qaction_row1",
+  is_row = true,
+  group_name = "nav_qactions",
+  circular = true,
+})
+
+local row2 = Area:new({
+  name = "qaction_row2",
+  is_row = true,
+  group_name = "nav_qactions",
+  circular = true,
+})
+
+-- Restore quick action header when leaving the area
 awesome.connect_signal("nav::area_changed", function(last_area_name)
-  if last_area_name == "qactions" then
-    local text = helpers.ui.colorize_text("QUICK ACTIONS", beautiful.ctrl_header_fg)
-    qaction_header:set_markup_silently(text)
+  local valid_areas = {
+    ["qactions"]      = true,
+    ["qactions_row1"] = true,
+    ["qactions_row2"] = true,
+  }
+  local selected = nav_qactions.selected
+  if not selected and not valid_areas[last_area_name] or last_area_name == "" then
+    local markup = helpers.ui.colorize_text("QUICK ACTIONS", beautiful.ctrl_header_fg)
+    qaction_header:set_markup_silently(markup)
   end
 end)
 
@@ -151,26 +188,24 @@ qaction_header = wibox.widget({
 })
 
 -- Creating the quick action buttons
--- Arguments: icon name func 
 local qactions = wibox.widget({
   {
     qaction_header,
     {
-      create_quick_action("", "Rotate", rotate_screen_func),
-      create_quick_action("", "Conservation mode", conservation_mode_func),
-      create_quick_action("", "Onboard", onboard_func),
-      create_quick_action("", "Calculator", calculator_func),
-      create_quick_action("", "Animations", picom_func),
+      -- create_quick_action arguments:
+      -- icon name function navarea
+      create_quick_action("", "Rotate", rotate_screen_func, row1),
+      create_quick_action("", "Conservation mode", consmode_func, row1),
+      create_quick_action("", "Onboard", onboard_func, row1),
+      create_quick_action("", "Calculator", calculator_func, row1),
+      create_quick_action("", "Nightshift", nightshift_func, row1),
 
       -- unfinished --
-      create_quick_action("", "Timer", ""),
-      create_quick_action("", "Nightshift", ""),
-      create_quick_action("", "Rotate bar", ""),
-      create_quick_action("", "Screenshot", ""),
-      create_quick_action("", "Mic", ""),
-
-      -- 
-      --  
+      create_quick_action("", "Timer", "", row2),
+      create_quick_action("便", "Rotate bar", "", row2),
+      create_quick_action("", "Journal", "", row2),
+      create_quick_action("", "Eyebleach", "", row2),
+      create_quick_action("", "Do not disturb", "", row2),
 
       spacing = dpi(15),
       forced_num_rows = 2,
@@ -183,6 +218,9 @@ local qactions = wibox.widget({
   },
   widget = wibox.container.place,
 })
+
+nav_qactions:append(row1)
+nav_qactions:append(row2)
 
 return function()
   return nav_qactions, qactions

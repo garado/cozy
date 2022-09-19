@@ -9,16 +9,11 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local widgets = require("ui.widgets")
-
 local Area = require("ui.nav.area")
 local Dashtab = require("ui.nav.navitem").Dashtab
-local navigator = require("ui.dash.navrules")
+local Navigator = require("ui.nav.navigator")
 
-local nav_root = Area:new({
-  name = "root",
-  circular = true,
-})
-navigator.root = nav_root
+local navigator, nav_root = Navigator:new()
 
 local nav_tabs = Area:new({
   name = "tabs",
