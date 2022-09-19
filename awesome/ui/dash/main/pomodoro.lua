@@ -2,6 +2,8 @@
 -- █▀█ █▀█ █▀▄▀█ █▀█ █▀▄ █▀█ █▀█ █▀█
 -- █▀▀ █▄█ █░▀░█ █▄█ █▄▀ █▄█ █▀▄ █▄█
 
+-- This widget is unused, buggy, and hasn't been maintained in a while
+
 local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")

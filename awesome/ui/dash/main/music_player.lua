@@ -120,7 +120,7 @@ local music = wibox.widget({
 			},
 			layout = wibox.layout.stack,
 		},
-		bg = beautiful.nord3,
+    bg = beautiful.mus_bg,
 		shape = helpers.ui.rrect(beautiful.border_radius),
 		forced_width = dpi(200),
 		forced_height = dpi(200),

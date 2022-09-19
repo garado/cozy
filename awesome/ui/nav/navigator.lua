@@ -374,7 +374,7 @@ function Navigator:iter_row(key, default)
   navprint("::iter_row")
   set_spaces()
 
-  local vertical = key == "j" or key == "h"
+  local vertical = key == "j" or key == "k"
   local horizontal = key == "h" or key == "l"
   local jump = key == "tab" or key == "backspace"
 
