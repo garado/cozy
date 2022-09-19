@@ -36,6 +36,13 @@ Hi! This is <b>cozy</b>, my <a href="https://awesomewm.org" target="_blank">Awes
 </ul>
 
 
+<h4>Control center</h4>
+<p align="center">
+  <img title="" src="assets/control_center.gif" alt="" width="400">
+</p>
+Also fully keyboard navigable!
+
+
 <h4>Theme switcher</h4>
 
 <p align="center">
