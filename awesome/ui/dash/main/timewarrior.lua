@@ -5,7 +5,7 @@
 -- Starts/stops Timewarrior time tracking.
 
 local awful = require("awful")
-local watch = require("awful.widget.watch")
+local gears = require("gears")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
@@ -25,8 +25,8 @@ local nav_timew_actions = Area:new({ name = "timew_actions" })
 
 local update_ui, init_start_ui
 local ui_started, ui_stopped
+local minute_timer
 local topic_list = user_vars.pomo.topics
-
 
 -- Creates a subsection.
 -- Subsections: current session, working on, total today
@@ -110,6 +110,7 @@ ui_stopped = wibox.widget({
   layout = wibox.layout.fixed.vertical,
 })
 
+
 -- █▀ ▀█▀ ▄▀█ █▀█ ▀█▀ █▀▀ █▀▄ 
 -- ▄█ ░█░ █▀█ █▀▄ ░█░ ██▄ █▄▀ 
 -- When Timewarrior is started, show the current session time,
@@ -121,6 +122,7 @@ local current_tag = create_ui_subsection("WORKING ON", "--", 15)
 -- Timewarrior reports time in H+:MM:SS format (6:15:08)
 -- But I prefer it in 6h 15m format.
 local function format_time(str)
+  print("FORMAT TIME: input was "..str)
   str = string.gsub(str, "[^0-9:]", "")
   str = string.gsub(str, ":[0-9]+$", "")
   local hour_str = string.gsub(str, ":[0-9]+$", "")
@@ -129,26 +131,12 @@ local function format_time(str)
   local min = tonumber(min_str)
   local txt = "--"
   if min  then txt = min .. "m" end
-  if hour then txt = hour .. "h " .. txt end
+  if hour and not hour == 0 then txt = hour .. "h " .. txt end
+  print("FORMAT TIME: output is "..txt)
   return txt
 end
 
--- Init timers to be used.
-local _, total_watch_timer = watch(
-  [[bash -c timew sum | tail -n 2]], 60, function(_, stdout)
-    local markup = helpers.ui.colorize_text(format_time(stdout), beautiful.fg)
-    total_all_tags.children[2]:set_markup_silently(markup)
-  end
-)
-total_watch_timer:stop()
-
-local _, current_watch_timer = watch(
-  [[bash -c timew | tail -n 1]], 60, function(_, stdout)
-    local markup = helpers.ui.colorize_text(format_time(stdout), beautiful.fg)
-    current_time.children[2]:set_markup_silently(markup)
-  end
-)
-current_watch_timer:stop()
+-- Init timer to be used.
 
 local stop_button = widgets.button.text.normal({
   text = "Stop",
@@ -159,8 +147,7 @@ local stop_button = widgets.button.text.normal({
   size = 12,
   on_release = function()
     awful.spawn.with_shell("timew stop")
-    total_watch_timer:stop()
-    current_watch_timer:stop()
+    minute_timer:stop()
     nav_timewarrior:append(nav_timew_topics)
     nav_timewarrior:remove_item(nav_timew_actions)
     update_ui(ui_stopped)
@@ -186,9 +173,6 @@ ui_started = wibox.widget({
 
 -- What to do when switching to timew start mode
 function init_start_ui()
-  if not total_watch_timer.started then total_watch_timer:start() end
-  if not current_watch_timer.started then current_watch_timer:start() end
-
   -- Update current tag
   local cmd = "timew | head -n 1"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
@@ -196,6 +180,27 @@ function init_start_ui()
     local markup = helpers.ui.colorize_text(tag, beautiful.fg)
     current_tag.children[2]:set_markup_silently(markup)
   end)
+  minute_timer = gears.timer {
+    timeout = 60,
+    call_now = true,
+    autostart = false,
+    callback = function()
+      -- total tracked time today across all tags
+      local total_cmd = "timew sum | tail -n 2"
+      awful.spawn.easy_async_with_shell(total_cmd, function(stdout)
+        local markup = helpers.ui.colorize_text(format_time(stdout), beautiful.fg)
+        total_all_tags.children[2]:set_markup_silently(markup)
+      end)
+
+      -- current session time
+      local curr_cmd = "timew | tail -n 1"
+      awful.spawn.easy_async_with_shell(curr_cmd, function(stdout)
+        local markup = helpers.ui.colorize_text(format_time(stdout), beautiful.fg)
+        current_time.children[2]:set_markup_silently(markup)
+      end)
+    end
+  }
+  minute_timer:start()
 end
 
 -- Assemble widget
