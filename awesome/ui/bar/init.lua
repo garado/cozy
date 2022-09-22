@@ -5,7 +5,6 @@
 local awful = require("awful")
 local gears = require("gears")
 local wibox = require("wibox")
-local helpers = require("helpers")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
@@ -78,10 +77,10 @@ return function(s)
 					self:set_widget(indicator)
 
 					if c3.selected then
-						self.widget.children[1].bg = beautiful.wibar_focused, 
+						self.widget.children[1].bg = beautiful.wibar_focused,
 						self.indicator_animation:set(dpi(20))
 					elseif #c3:clients() == 0 then
-						self.widget.children[1].bg = beautiful.wibar_empty, 
+						self.widget.children[1].bg = beautiful.wibar_empty,
 						self.indicator_animation:set(dpi(10))
 					else
 						self.widget.children[1].bg = beautiful.wibar_occupied,
@@ -90,10 +89,10 @@ return function(s)
 				end,
 				update_callback = function(self, c3, _)
 					if c3.selected then
-						self.widget.children[1].bg = beautiful.wibar_focused, 
+						self.widget.children[1].bg = beautiful.wibar_focused,
 						self.indicator_animation:set(dpi(20))
 					elseif #c3:clients() == 0 then
-						self.widget.children[1].bg = beautiful.wibar_empty, 
+						self.widget.children[1].bg = beautiful.wibar_empty,
 						self.indicator_animation:set(dpi(10))
 					else
 						self.widget.children[1].bg = beautiful.wibar_occupied,
@@ -115,7 +114,7 @@ return function(s)
   -- assembling the bar
   s.bar = awful.popup({
     screen = s,
-    type = "dock", 
+    type = "dock",
     minimum_height = s.geometry.height,
     maximum_height = s.geometry.height,
     minimum_width = dpi(40),
@@ -169,7 +168,7 @@ return function(s)
   s.bar:struts({
     left = s.bar.maximum_width,
   })
-  
+
   -- SETTINGS --
   -- Bar visibility
   local function remove_bar(c)
@@ -183,7 +182,7 @@ return function(s)
   -- i dont really understand this one
   local function add_bar(c)
     if c.fullscreen or c.maximized then
-      c.screen.bar.visible = true 
+      c.screen.bar.visible = true
     end
   end
 

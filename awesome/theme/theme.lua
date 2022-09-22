@@ -60,6 +60,8 @@ theme.cash_income_fg  = theme.cash_income_fg  or theme.green
 theme.cash_expense_fg = theme.cash_expense_fg or theme.red
 theme.cash_alttext_fg = theme.cash_alttext_fg or theme.fg_alt
 theme.cash_acct_name  = theme.cash_acct_name  or theme.fg_sub
+theme.cash_action_btn = theme.cash_action_btn or theme.bg_l2
+theme.cash_budgetbar_bg = theme.cash_budgetbar_bg or theme.bg_l1
 
 theme.hab_freq        = theme.hab_freq        or theme.main_accent
 theme.hab_uncheck_fg  = theme.hab_uncheck_fg  or theme.fg

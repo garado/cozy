@@ -59,7 +59,6 @@ local function create_fetch()
   local cfg = gfs.get_configuration_dir()
   local script = cfg .. "utils/dash/fetch"
   awful.spawn.easy_async_with_shell(script, function(stdout)
-    print(stdout)
     extract_entry(stdout, "os")
     extract_entry(stdout, "host")
     extract_entry(stdout, "wm")

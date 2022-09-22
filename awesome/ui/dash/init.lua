@@ -23,18 +23,18 @@ local nav_tabs = Area:new({
 
 nav_root:append(nav_tabs)
 
-return function()
+return function(s)
   local dash
 
   -- import tab contents
   local main, nav_main = require("ui.dash.main")()
-  local finances = require("ui.dash.finances")
+  local cash, nav_cash = require("ui.dash.finances")()
   local habit = require("ui.dash.habit")
   local agenda = require("ui.dash.agenda")
 
-  local tablist =   { main, finances, habit,  agenda }
+  local tablist =   { main, cash, habit,  agenda }
   local tab_icons = { "",  "",      "",    ""    }
-  local navitems =  { nav_main, nil,  nil,    nil    }
+  local navitems =  { nav_main, nav_cash,  nil,    nil    }
 
   local dash_content = wibox.widget({
     {
@@ -99,6 +99,7 @@ return function()
     if dash.visible then
       awesome.emit_signal("dash::closed")
       nav_root:reset()
+      navigator:stop()
     else
       require("ui.shared").close_other_popups("dash")
       awesome.emit_signal("dash::opened")
@@ -119,11 +120,13 @@ return function()
 
   -- ▄▀█ █▀ █▀ █▀▀ █▀▄▀█ █▄▄ █░░ █▀▀ 
   -- █▀█ ▄█ ▄█ ██▄ █░▀░█ █▄█ █▄▄ ██▄ 
+  local swidth = s.geometry.width
+  local sheight = s.geometry.height
   dash = awful.popup({
     type = "splash",
     minimum_height = dpi(810),
     maximum_height = dpi(810),
-    minimum_width = dpi(1350),
+    minimum_width = dpi(1350), -- 70% of screen
     maximum_width = dpi(1350),
     bg = beautiful.transparent,
     ontop = true,

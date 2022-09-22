@@ -11,36 +11,26 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local helpers = require("helpers")
 local user_vars = require("user_variables")
-
+local widgets = require("ui.widgets")
 local string = string
-
 local ledger_file = user_vars.ledger.ledger_file
 
-local header = wibox.widget({
-  markup = helpers.ui.colorize_text("Total balance", beautiful.dash_bg),
-  widget = wibox.widget.textbox,
-  font = beautiful.font_name .. "Regular 12",
-  align = "left",
-  valign = "center",
-})
-
 local function get_account_value(header_text, account)
-  local header = wibox.widget({
-    markup = helpers.ui.colorize_text(header_text, beautiful.dash_bg),
-    widget = wibox.widget.textbox,
-    font = beautiful.font_name .. "Light 12",
-    align = "center",
+  local header = widgets.text({
+    text = string.upper(header_text),
+    color = beautiful.dash_bg,
+    size = 11,
+    halign = "center",
     valign = "center",
   })
 
-  local total = wibox.widget({
-    markup = helpers.ui.colorize_text("$--.--", beautiful.dash_bg),
-    widget = wibox.widget.textbox,
-    font = beautiful.alt_font_name .. "20",
-    align = "center",
+  local total = widgets.text({
+    text = "$--.--",
+    color = beautiful.dash_bg,
+    halign = "center",
     valign = "center",
   })
-  
+
   -- Get data
   -- This assumes only one savings/checking account, could be easily extended though
   local cmd = "ledger -f " .. ledger_file .. " balance checking savings"
@@ -51,21 +41,15 @@ local function get_account_value(header_text, account)
       local str_assets = string.find(str, "Assets")
       local str_checking  = string.find(str, "Checking")
       local str_savings = string.find(str, "Savings")
-        
-      -- Remove everything except #s, periods, and dollar signs from string
-      local str_stripped = string.gsub(str, "[^0-9$.]", "")
 
+      -- Remove everything except # $ . from string
+      local str_stripped = string.gsub(str, "[^0-9$.]", "")
       if str_assets ~= nil and account == "balance" then
-        local markup = helpers.ui.colorize_text(str_stripped, beautiful.dash_bg)
-        total:set_markup_silently(markup)
+        total:set_text(str_stripped)
       elseif str_checking ~= nil and account == "checking" then
-        local text = str_stripped
-        local markup = helpers.ui.colorize_text(text, beautiful.dash_bg)
-        total:set_markup_silently(markup)
+        total:set_text(str_stripped)
       elseif str_savings ~= nil and account == "savings" then
-        local text = str_stripped
-        local markup = helpers.ui.colorize_text(text, beautiful.dash_bg)
-        total:set_markup_silently(markup)
+        total:set_text(str_stripped)
       end
     end
   end)
@@ -81,11 +65,17 @@ local function get_account_value(header_text, account)
   })
 end
 
-local _bal = get_account_value("Total balance", "balance")
-local _checking = get_account_value("Checking", "checking")
-local _savings = get_account_value("Savings", "savings")
-local bal = helpers.ui.create_boxed_widget(_bal, dpi(200), dpi(110), beautiful.main_accent)
-local checking = helpers.ui.create_boxed_widget(_checking, dpi(200), dpi(110), beautiful.main_accent)
-local savings = helpers.ui.create_boxed_widget(_savings, dpi(200), dpi(110), beautiful.main_accent)
+local bal = get_account_value("Total balance", "balance")
+local bal_box = helpers.ui.create_boxed_widget(bal, dpi(200), dpi(110), beautiful.main_accent)
 
-return { bal, checking, savings }
+local checking = get_account_value("Checking", "checking")
+local checking_box = helpers.ui.create_boxed_widget(checking, dpi(200), dpi(110), beautiful.main_accent)
+
+local savings = get_account_value("Savings", "savings")
+local savings_box = helpers.ui.create_boxed_widget(savings, dpi(200), dpi(110), beautiful.main_accent)
+
+return {
+  bal_box,
+  checking_box,
+  savings_box,
+}

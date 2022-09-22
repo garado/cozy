@@ -15,12 +15,10 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local gears = require("gears")
 local helpers = require("helpers")
-local naughty = require("naughty")
 local user_vars = require("user_variables")
 
 local string = string
 local tonumber = tonumber
-local math = math
 local table = table
 local ledger_file = user_vars.ledger.ledger_file
 local budget_file = user_vars.ledger.budget_file
@@ -29,7 +27,7 @@ local function create_graph()
 
   -- called on output of ledger command
   local function parse(stdout)
-    local budget_entries = { } 
+    local budget_entries = { }
 
     -- split into lines
     local lines = { }
@@ -61,51 +59,36 @@ local function create_graph()
 
   -- bars will be appended here 
   local bars = wibox.widget({
-    spacing = dpi(10),
+    spacing = dpi(15),
     layout = wibox.layout.flex.vertical,
   })
 
   -- creates a single budget bar
   local function create_budget_entry(entry, i)
-    local spent = string.gsub(entry[1], "[^0-9.]", "")
-    spent = tonumber(spent)
-    local budgeted = string.gsub(entry[2], "[^0-9.]", "")
-    budgeted = tonumber(budgeted)
-    local percent = string.gsub(entry[4], "[^0-9]", "")
-    percent = tonumber(percent)
+    local _spent = string.gsub(entry[1], "[^0-9.]", "")
+    local spent = tonumber(_spent)
+    local _budgeted = string.gsub(entry[2], "[^0-9.]", "")
+    local budgeted = tonumber(_budgeted)
+    local _percent = string.gsub(entry[4], "[^0-9]", "")
+    local percent = tonumber(_percent)
     local category = entry[5]
 
-    -- assemble the wibox
     local random_accent = beautiful.accents[i]
     local bar = wibox.widget({
-      capacity = 2,
-      min_value = 0,
-      max_value = tonumber(budgeted),
-      background_color = beautiful.dash_widget_bg,
-      nan_color = beautiful.red,
-      group_colors = { 
-        random_accent, 
-        beautiful.surface1,
-      },
-      stack = true,
-      scale = true,
-      clamp_bars = true,
-      step_spacing = dpi(0),
-      -- this gets rotated, so the height is
-      -- actually the width and vice versa
-      step_width = dpi(5),
-      forced_width = dpi(15),
-      forced_height = dpi(300),
-      widget = wibox.widget.graph,
+      color = random_accent,
+      background_color = beautiful.cash_budgetbar_bg,
+      value = spent,
+      max_value = budgeted,
+      border_width = dpi(0),
+      forced_width = dpi(320),
+      forced_height = dpi(5),
+      widget = wibox.widget.progressbar,
     })
 
     local text_color
     if spent < budgeted then
-      bar:add_value(spent, 1)
-      bar:add_value(budgeted - spent, 2)
       text_color = beautiful.fg
     else
-      bar:add_value(budgeted, 1)
       text_color = beautiful.red
     end
 
@@ -139,11 +122,7 @@ local function create_graph()
         forced_height = dpi(30),
         layout = wibox.layout.align.horizontal,
       },
-      {
-        bar,
-        direction = "west",
-        widget = wibox.container.rotate,
-      },
+      bar,
       spacing = dpi(3),
       layout = wibox.layout.fixed.vertical,
     })
@@ -176,4 +155,4 @@ local function create_graph()
   })
 end
 
-return helpers.ui.create_boxed_widget(create_graph(), dpi(0), dpi(450), beautiful.dash_widget_bg)
+return helpers.ui.create_boxed_widget(create_graph(), dpi(0), dpi(600), beautiful.dash_widget_bg)
