@@ -2,28 +2,25 @@
 -- ▀█▀ ▄▀█ █▀ █▄▀ █▀    █▀▄ ▄▀█ █▀ █░█ █▄▄ █▀█ ▄▀█ █▀█ █▀▄ 
 -- ░█░ █▀█ ▄█ █░█ ▄█    █▄▀ █▀█ ▄█ █▀█ █▄█ █▄█ █▀█ █▀▄ █▄▀ 
 
-local awful = require("awful")
-local beautiful = require("beautiful")
-local helpers = require("helpers")
 local wibox = require("wibox")
 local xresources = require("beautiful.xresources")
-local gears = require("gears")
-local gfs = require("gears.filesystem")
 local dpi = xresources.apply_dpi
-local naughty = require("naughty")
-local widgets = require("ui.widgets")
-local os = os
-
 local area = require("modules.keynav.area")
 local nav_tasks = area:new({ name = "tasks" })
 
 -- import
 local tag_list, nav_tags = require("ui.dash.tasks.tag_list")()
 local project_list = wibox.widget({
-  forced_num_cols = 2,
-  forced_num_rows = 2,
+  {
+    spacing = dpi(15),
+    layout = wibox.layout.fixed.vertical,
+  },
+  {
+    spacing = dpi(15),
+    layout = wibox.layout.fixed.vertical,
+  },
   spacing = dpi(15),
-  layout = wibox.layout.grid,
+  layout = wibox.layout.fixed.horizontal,
 })
 require("ui.dash.tasks.project")("mech", project_list)
 
