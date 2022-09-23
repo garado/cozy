@@ -20,7 +20,7 @@ local nav_tasks = area:new({ name = "tasks" })
 -- import
 local tag_list, nav_tags = require("ui.dash.tasks.tag_list")()
 local project_list = wibox.widget({
-  forced_num_cols = 3,
+  forced_num_cols = 2,
   forced_num_rows = 2,
   spacing = dpi(15),
   layout = wibox.layout.grid,
@@ -35,7 +35,6 @@ local tasks_dashboard = wibox.widget({
     project_list,
     {
       tag_list,
-      fill_space = true,
       layout = wibox.layout.fixed.vertical,
     },
     spacing = dpi(15),

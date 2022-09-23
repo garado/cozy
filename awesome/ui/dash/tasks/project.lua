@@ -23,22 +23,73 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local textbox = require("ui.widgets.text")
 local helpers = require("helpers")
+local ui = require("helpers.ui")
+local json = require("modules.json")
+
+local function format_due_date(due)
+  if not due or due == "" then return "no due date" end
+
+  -- taskwarrior returns due date as string
+  -- convert that to a lua timestamp
+  local pattern = "(%d%d%d%d)(%d%d)(%d%d)T(%d%d)(%d%d)(%d%d)Z"
+  local xyear, xmon, xday, xhr, xmin, xsec = due:match(pattern)
+  local ts = os.time({
+    year = xyear, month = xmon, day = xday,
+    hour = xhr, min = xmin, sec = xsec })
+
+  -- turn timestamp into human-readable format
+  local now = os.time()
+  local time_difference = ts - now
+  local abs_time_difference = math.abs(time_difference)
+  local days_rem = math.floor(abs_time_difference / 86400)
+  local hours_rem = math.floor(abs_time_difference / 3600)
+
+  -- due date formatting
+  local due_date_text
+  if days_rem >= 1 then -- in x days / x days ago
+    due_date_text = days_rem .. " day"
+    if days_rem > 1 then
+      due_date_text = due_date_text .. "s"
+    end
+  else -- in x hours / in <1 hour / etc
+    if hours_rem == 1 then
+      due_date_text = hours_rem .. " hour"
+    elseif hours_rem < 1 then
+      due_date_text = "&lt;1 hour"
+    else
+      due_date_text = hours_rem .. " hours"
+    end
+  end
+
+  if time_difference < 0 then -- overdue
+    due_date_text = due_date_text .. " ago"
+  else
+    due_date_text = "in " .. due_date_text
+  end
+
+  return due_date_text
+end
 
 -- ▀█▀ ▄▀█ █▀ █▄▀ █▀ 
 -- ░█░ █▀█ ▄█ █░█ ▄█ 
 -- Returns tasks associated with a given project.
 local function create_task(name, due_date)
-  local taskname = textbox({
-    text = name:gsub("%^l", string.upper),
-    font = beautiful.alt_font,
-    size = 15,
+  name = name:gsub("%^l", string.upper)
+  local taskname = wibox.widget({
+    markup = ui.colorize_text(name, beautiful.fg),
+    font = beautiful.font_name .. "11",
+    ellipsize = "end",
+    forced_width = dpi(310),
+    widget = wibox.widget.textbox,
   })
 
-  local due = textbox({
-    text = due_date,
-    font = beautiful.alt_font,
-    size = 12,
-    color = beautiful.fg_sub,
+  local due = wibox.widget({
+    markup = ui.colorize_text(due_date, beautiful.fg_sub),
+    font = beautiful.font_name .. "11",
+    halign = "right",
+    align = "center",
+    forced_width = dpi(130),
+    widget = wibox.widget.textbox,
   })
 
   return wibox.widget({
@@ -49,25 +100,25 @@ local function create_task(name, due_date)
   })
 end
 
-local function create_all_tasks(project)
-  local cmd = ""
+local function create_all_tasks(tag, project, widget)
+  local cmd = "task tag:"..tag.." proj:'"..project.."' status:pending export rc.json.array=on"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    local empty_json = "[\n]\n"
+    if stdout ~= empty_json and stdout ~= "" then
+      local tasklist = json.decode(stdout)
+      for i, _ in ipairs(tasklist) do
+        local desc = tasklist[i]["description"]
+        local due  = format_due_date(tasklist[i]["due"])
+        print(desc .. due)
+        widget:add(create_task(desc, due))
+      end
+    end
   end)
 end
 
 -- █▀█ █▀█ █▀█ ░░█ █▀▀ █▀▀ ▀█▀    █▀ █░█ █▀▄▀█ █▀▄▀█ ▄▀█ █▀█ █▄█ 
 -- █▀▀ █▀▄ █▄█ █▄█ ██▄ █▄▄ ░█░    ▄█ █▄█ █░▀░█ █░▀░█ █▀█ █▀▄ ░█░ 
 local function create_project_summary(project_name, tag)
-  local tasks = wibox.widget({
-    create_task("Prelab", "in 2 days"),
-    create_task("Prelab", "in 2 days"),
-    create_task("Prelab", "in 2 days"),
-    create_task("Prelab", "in 2 days"),
-    create_task("Prelab", "in 2 days"),
-    create_task("Prelab", "in 2 days"),
-    spacing = dpi(8),
-    layout = wibox.layout.fixed.vertical,
-  })
 
   local accent = beautiful.random_accent_color()
   if project_name == "(none)" then project_name = "No project" end
@@ -107,6 +158,12 @@ local function create_project_summary(project_name, tag)
     widget = wibox.widget.progressbar,
   })
 
+  local tasks = wibox.widget({
+    spacing = dpi(8),
+    layout = wibox.layout.fixed.vertical,
+  })
+  create_all_tasks(tag, project_name, tasks)
+
   local project = wibox.widget({
     {
       {
@@ -129,12 +186,13 @@ local function create_project_summary(project_name, tag)
         tasks,
         layout = wibox.layout.fixed.vertical
       },
-      top = dpi(5),
+      top = dpi(10),
       bottom = dpi(18),
       left = dpi(25),
       right = dpi(25),
       widget = wibox.container.margin,
     },
+    forced_width = dpi(500),
     bg = beautiful.dash_widget_bg,
     shape = gears.shape.rounded_rect,
     widget = wibox.container.background,
@@ -175,9 +233,14 @@ return function(tag, widget)
   local cmd = "task context none ; task tag:"..tag.." projects"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local projects = parse_taskw_projects(stdout)
-    widget:reset()
+    local fuck = {}
     for i = 1, #projects do
-      widget:add(create_project_summary(projects[i]["name"], tag))
+      table.insert(fuck, create_project_summary(projects[i]["name"], tag))
+    end
+    widget:reset()
+    for i = 1, #fuck do
+      widget:add(fuck[i])
     end
   end)
 end
+

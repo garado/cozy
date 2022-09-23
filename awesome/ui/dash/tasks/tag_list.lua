@@ -8,10 +8,10 @@ local beautiful = require("beautiful")
 local wibox = require("wibox")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
+local gears = require("gears")
 local widgets = require("ui.widgets")
 local helpers = require("helpers")
 local elevated = require("modules.keynav.navitem").Elevated
-local dashwidget = require("modules.keynav.navitem").Dashwidget
 local Area = require("modules.keynav.area")
 
 local nav_tags = Area:new({
@@ -26,7 +26,6 @@ local function parse_taskw_tags(stdout)
   local tags = {}
 
   for line in string.gmatch(stdout, "[^\r\n]+") do
-    print(line)
     -- the task count is the string of numbers at end of line
     -- so to get the task count, remove everything except for that
     local count = string.gsub(line, "[^%d+$]", "")
@@ -79,13 +78,21 @@ end)
 
 local widget = wibox.widget({
   {
-    helpers.ui.create_dash_widget_header("Tags"),
-    tag_list,
-    spacing = dpi(10),
-    forced_width = dpi(150),
-    layout = wibox.layout.fixed.vertical,
+    {
+      helpers.ui.create_dash_widget_header("Tags"),
+      tag_list,
+      spacing = dpi(10),
+      forced_width = dpi(150),
+      fill_space = false,
+      layout = wibox.layout.fixed.vertical,
+    },
+    widget = wibox.container.place
   },
-  widget = wibox.container.place
+  forced_height = dpi(300),
+  forced_width = dpi(350),
+  bg = beautiful.dash_widget_bg,
+  shape = gears.shape.rounded_rect,
+  widget = wibox.container.background,
 })
 
 return function()
