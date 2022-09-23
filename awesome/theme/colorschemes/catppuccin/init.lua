@@ -1,4 +1,4 @@
 return {
-  latte = require(... .. ".latte"),
+  --latte = require(... .. ".latte"),
   mocha = require(... .. ".mocha"),
 }

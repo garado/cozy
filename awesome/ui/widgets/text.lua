@@ -90,16 +90,16 @@ end
 local function new(args)
 	args = args or {}
 
-	args.width = args.width or nil
+	args.width  = args.width or nil
 	args.height = args.height or nil
-	args.halign = args.halign or nil
-	args.valign = args.valign or nil
-	args.font = args.font or beautiful.font_name or nil
-	args.bold = args.bold ~= nil and args.bold or false
+	args.halign = args.halign or "center"
+	args.valign = args.valign or "center"
+	args.font   = args.font or beautiful.font_name or nil
+	args.bold   = args.bold ~= nil and args.bold or false
 	args.italic = args.italic ~= nil and args.italic or false
-	args.size = args.size or 20
-	args.color = args.color or beautiful.xforeground
-	args.text = args.text ~= nil and args.text or ""
+	args.size   = args.size or 20
+	args.color  = args.color or beautiful.fg
+	args.text   = args.text ~= nil and args.text or ""
 
 	local widget = wibox.widget({
 		widget = wibox.widget.textbox,

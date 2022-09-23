@@ -3,30 +3,26 @@
 -- ░█░ █▀▄ █▀█ █░▀█ ▄█ █▀█ █▄▄ ░█░ █ █▄█ █░▀█ ▄█
 
 local awful = require("awful")
-local gears = require("gears")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local keygrabber = require("awful.keygrabber")
 local helpers = require("helpers")
 local user_vars = require("user_variables")
-local animation = require("modules.animation")
-local naughty = require("naughty")
 
 local ledger_file = user_vars.ledger.ledger_file
 
 -- create_transaction_entry() will populate this widget with entries
 local transaction_history = wibox.widget({
-  spacing = dpi(2),
+  spacing = dpi(4),
   layout = wibox.layout.flex.vertical,
 })
 
 local function create_transaction_entry(date, title, category, amount)
-  
+
   -- determine color of amount
   -- green for income, red for expense
-  local i, j = string.find(category, "Expenses:")
+  local i, _ = string.find(category, "Expenses:")
   local amount_color, prefix
   if i == nil then
     prefix = "+"
@@ -41,7 +37,7 @@ local function create_transaction_entry(date, title, category, amount)
     font = beautiful.font_name .. "12",
     widget = wibox.widget.textbox,
   })
-  
+
   local title_text = wibox.widget({
     markup = helpers.ui.colorize_text(title, beautiful.fg),
     font = beautiful.font_name .. "12",
@@ -49,7 +45,7 @@ local function create_transaction_entry(date, title, category, amount)
     ellipsize = "end",
     forced_width = dpi(250),
   })
-  
+
   local amount_ = "$" .. amount
   amount_ = string.gsub(amount_, "-", "")
   local amount_text = wibox.widget({
@@ -69,6 +65,7 @@ local function create_transaction_entry(date, title, category, amount)
       date_text,
       amount_text,
       title_text,
+      forced_height = dpi(20),
       spacing = dpi(10),
       layout = wibox.layout.fixed.horizontal,
     },
@@ -91,7 +88,7 @@ awful.spawn.easy_async_with_shell(cmd, function(stdout)
         table.insert(t, field)
       end
     end
-   
+
     local date = t[1]
     local pattern = "(%d%d%d%d)/(%d%d)/(%d%d)"
     local xyear, xmon, xday = date:match(pattern)
@@ -117,4 +114,4 @@ local widget = wibox.widget({
   widget = wibox.container.place,
 })
 
-return helpers.ui.create_boxed_widget(widget, dpi(500), dpi(340), beautiful.dash_widget_bg) 
+return helpers.ui.create_boxed_widget(widget, dpi(0), dpi(900), beautiful.dash_widget_bg)

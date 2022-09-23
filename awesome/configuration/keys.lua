@@ -6,6 +6,7 @@ local awful = require("awful")
 local hotkeys_popup = require("awful.hotkeys_popup")
 local apps = require("configuration.apps")
 local bling = require("modules.bling")
+local naughty = require("naughty")
 local os = os
 
 local mod = "Mod4"
@@ -69,14 +70,17 @@ awful.keyboard.append_global_keybindings({
     { description = "help", group = "Awesome"}),
 
   awful.key({ mod }, "j", function()
+    scratchpad:turn_off()
     awesome.emit_signal("dash::toggle", s)
   end, { description = "dash", group = "Awesome" }),
 
   awful.key({ mod }, "k", function()
+    scratchpad:turn_off()
     awesome.emit_signal("control_center::toggle")
   end, { description = "control center", group = "Awesome" }),
 
   awful.key({ mod }, "l", function()
+    scratchpad:turn_off()
     awesome.emit_signal("theme_switcher::toggle")
   end, { description = "dash", group = "Awesome" }),
 
@@ -103,16 +107,16 @@ awful.keyboard.append_global_keybindings({
 		awful.spawn("pamixer -u ; pamixer -d 5", false)
 		awesome.emit_signal("module::volume")
 	end),
-  
+
 	awful.key({}, "XF86AudioMute", function()
 		awful.spawn("pamixer -t", false)
 		awesome.emit_signal("module::volume")
 	end),
-  
+
   awful.key({ mod }, "XF86AudioLowerVolume", function()
     awful.spawn("playerctl play-pause", false)
   end, { description = "play/pause track", group = "Hotkeys" }),
-  
+
   awful.key({ mod }, "XF86AudioMute", function()
     awful.spawn("playerctl previous", false)
   end, { description = "previous track", group = "Hotkeys" }),
@@ -134,11 +138,9 @@ awful.keyboard.append_global_keybindings({
     awful.spawn.easy_async(cmd, function() end)
   end, { description = "screenshot (whole screen)", group = "Hotkeys" }),
 
-  awful.key({mod, shift }, "m", function()
-    local machi = require("modules/layout-machi")
-    local editor = machi.editor.create()
-    editor.start_interactive()
-  end),
+  awful.key({ mod }, "n", function()
+    naughty.destroy_all_notifications()
+  end, { description = "dismiss notifications", group = "Hotkeys" }),
 
   --  █░░ ▄▀█ █░█ █▄░█ █▀▀ █░█ █▀▀ █▀█ █▀
   --  █▄▄ █▀█ █▄█ █░▀█ █▄▄ █▀█ ██▄ █▀▄ ▄█
@@ -147,7 +149,10 @@ awful.keyboard.append_global_keybindings({
     awful.spawn(apps.default.terminal)
   end, { description = "terminal", group = "Launchers" }),
 
-  awful.key({ alt }, "p", function()
+  awful.key({ mod }, "p", function()
+    awesome.emit_signal("dash::close")
+    awesome.emit_signal("control_center::close")
+    awesome.emit_signal("theme_switcher::close")
     scratchpad:toggle()
   end, { description = "scratchpad", group = "Launchers"}),
 
@@ -181,7 +186,7 @@ client.connect_signal("request::default_keybindings", function()
     end, { description = "floating", group = "Client" }),
 
     -- Toggle fullscreen
-    awful.key({ ctrl, shift }, "c", function()
+    awful.key({ ctrl, shift }, "f", function()
       client.focus.fullscreen = not client.focus.fullscreen
       client.focus:raise()
     end, { description = "fullscreen", group = "Client" }),

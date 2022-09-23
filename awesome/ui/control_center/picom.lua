@@ -32,6 +32,12 @@ local function create_option_btn(opt)
     font = beautiful.font,
     size = 11,
     on_release = function()
+      -- Create backup of user's config if it doesn't exist 
+      local backup = "~/.config/picom.user.conf"
+      if not gfs.file_readable(backup) then
+        awful.spawn.with_shell("cp ~/.config/picom.conf " .. backup)
+      end
+
       local fname = picom_cfgs .. opt .. ".conf"
       local cmd = "cp " .. fname .. " ~/.config/picom.conf"
       awful.spawn.with_shell(cmd)

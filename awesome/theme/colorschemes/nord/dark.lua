@@ -29,11 +29,6 @@ theme.accents = {
   "#b48ead",
 }
 
-function theme.random_accent_color()
-  local i = math.random(1, #theme.accents)
-  return theme.accents[i]
-end
-
 theme.bg_d0   = "#1a1e26"
 theme.bg      = "#20242c"
 theme.bg_l0   = "#272c36"

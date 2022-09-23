@@ -84,7 +84,7 @@ local function widget()
       num_events = num_events + 1
       table.insert(event_list, event)
     end
-    
+
     -- remove placeholder if events were found
     if num_events > 0 then
       events:remove(1)
@@ -109,9 +109,9 @@ local function widget()
       local format_date = os.date("%a %b %d", ts)
 
       local time = fields[2]
-      local desc = fields[5]
+      local desc = fields[6]
       create_calendar_entry(format_date, time, desc)
-    end 
+    end
   end
 
   local function update_calendar()

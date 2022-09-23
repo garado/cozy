@@ -13,9 +13,7 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local gears = require("gears")
 local helpers = require("helpers")
-local naughty = require("naughty")
 local user_vars = require("user_variables")
 
 local string = string
@@ -42,11 +40,11 @@ local function create_chart()
       border_width = 0,
       widget = wibox.container.arcchart,
     },
-    forced_height = dpi(150),
-    forced_width = dpi(150),
+    forced_height = dpi(120),
+    forced_width = dpi(120),
     widget = wibox.container.place,
   })
-  
+
   local function create_legend_entry(text, amount, color)
     local circle = wibox.widget({
       markup = helpers.ui.colorize_text("", color),
@@ -77,8 +75,8 @@ local function create_chart()
         layout = wibox.layout.fixed.horizontal,
         forced_width = dpi(300),
     })
-    
-    return legend_entry 
+
+    return legend_entry
   end -- end create_legend_entry()
 
   local legend = wibox.widget({
@@ -88,13 +86,13 @@ local function create_chart()
     },
     widget = wibox.container.place,
   })
- 
+
   local function create_chart_sections(entries, num_entries, total_spending)
     local arc_values = { }
     local colors = { }
     local arc_text = chart:get_children_by_id("text")[1]
     local arc_chart = chart:get_children_by_id("arc")[1]
-    
+
     arc_chart.min_value = 0
     arc_chart.max_value = tonumber(total_spending)
 
@@ -121,7 +119,7 @@ local function create_chart()
     for str in stdout:gmatch("[^\r\n]+") do
       table.insert(lines, str)
     end
-      
+
     -- ledger outputs look like this:
     --    Expenses:Personal:Food  $29.50
     --    Expenses:Fees           $0.10   
@@ -178,53 +176,9 @@ local function create_chart()
   return { chart, legend }
 end -- end create_chart
 
--- header_text  account name to display   
--- ledger_cmd   command that produces the necessary data
-local function get_account_value(header_text, ledger_cmd)
-  local header = wibox.widget({
-    markup = helpers.ui.colorize_text(header_text, beautiful.cash_acct_name),
-    widget = wibox.widget.textbox,
-    font = beautiful.font_name .. "11",
-    align = "center",
-    valign = "center",
-  })
-
-  local balance_ = wibox.widget({
-    markup = helpers.ui.colorize_text("$--.--", beautiful.fg),
-    widget = wibox.widget.textbox,
-    font = beautiful.alt_font_name .. "15",
-    align = "center",
-    valign = "center",
-  })
-
-  awful.spawn.easy_async_with_shell(ledger_cmd, function(stdout)
-    balance = string.gsub(stdout, "[^0-9.]", "")
-    balance = string.gsub(balance, "%s+", "")
-    local markup = helpers.ui.colorize_text("$" .. balance, beautiful.fg)
-    balance_:set_markup_silently(markup)
-  end)
-
-  local balance = wibox.widget({
-    {
-      header,
-      balance_,
-      layout = wibox.layout.fixed.vertical,
-    },
-    widget = wibox.container.place,
-  })
-
-  return balance
-end
-
 local widgets = create_chart()
 local breakdown_chart = widgets[1]
 local breakdown_legend = widgets[2]
-
-local spent_cmd = "ledger -f " .. ledger_file .. " bal -M \\^Expenses | tail -n 1"
-
-local bottom = wibox.widget({
-  widget = wibox.container.place,
-})
 
 local widget = wibox.widget({
   {
@@ -233,7 +187,7 @@ local widget = wibox.widget({
       breakdown_chart,
       breakdown_legend,
       spacing = dpi(30),
-      layout = wibox.layout.fixed.horizontal,
+      layout = wibox.layout.fixed.vertical,
     },
     spacing = dpi(15),
     layout = wibox.layout.fixed.vertical,
@@ -241,4 +195,11 @@ local widget = wibox.widget({
   widget = wibox.container.place,
 })
 
-return helpers.ui.create_boxed_widget(widget, dpi(0), dpi(250), beautiful.dash_widget_bg)
+awesome.connect_signal("dash::reload_ledger", function()
+  widgets = create_chart()
+  breakdown_chart = widgets[1]
+  breakdown_legend = widgets[2]
+  widget:emit_signal("widget::redraw_needed")
+end)
+
+return helpers.ui.create_boxed_widget(widget, dpi(0), dpi(230), beautiful.dash_widget_bg)

@@ -10,7 +10,6 @@ local xresources = require("beautiful.xresources")
 local gears = require("gears")
 local gfs = require("gears.filesystem")
 local dpi = xresources.apply_dpi
-local naughty = require("naughty")
 
 -- The following is formatting for the calendar
 local styles = {}
@@ -68,7 +67,7 @@ local function decorate_cell(widget, flag, date)
   local d = {year=date.year, month=(date.month or 1), day=(date.day or 1)}
   --local weekday = tonumber(os.date("%w", os.time(d)))
   --local default_bg = (weekday==0 or weekday==6) and "#232323" or "#383838"
-  local default_bg = beautiful.dash_bg
+  local default_bg = beautiful.dash_widget_bg
   local ret = wibox.widget {
     {
       widget,
@@ -87,10 +86,13 @@ local function decorate_cell(widget, flag, date)
 end
 
 local cal = wibox.widget({
-  date = os.date("*t"),
-  widget   = wibox.widget.calendar.month,
-  font = beautiful.font .. "15",
-  fn_embed = decorate_cell,
+  {
+    date = os.date("*t"),
+    widget   = wibox.widget.calendar.month,
+    font = beautiful.font .. "15",
+    fn_embed = decorate_cell,
+  },
+  widget = wibox.container.place,
 })
 
-return cal
+return helpers.ui.create_boxed_widget(cal, dpi(450), dpi(300), beautiful.dash_widget_bg)

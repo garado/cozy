@@ -11,7 +11,8 @@ local math = math
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
 local awesome_cfg = gfs.get_configuration_dir()
-local wall_path = awesome_cfg .. "theme/assets/walls/nord_light.png"
+local wall_path = awesome_cfg .. "theme/assets/walls/murky_peaks.jpg"
+--local wall_path = awesome_cfg .. "theme/assets/walls/nord_light.png"
 theme.wallpaper = gears.surface.load_uncached(wall_path)
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀

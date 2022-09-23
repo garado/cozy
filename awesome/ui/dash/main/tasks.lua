@@ -10,7 +10,6 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local helpers = require("helpers")
-local gfs = require("gears.filesystem")
 
 local json = require("modules.json")
 local math = math
@@ -22,7 +21,7 @@ local function widget()
     margins = dpi(5),
     widget = wibox.container.margin,
   })
- 
+
   local placeholder = wibox.widget({
     markup = helpers.ui.colorize_text("No tasks found", beautiful.fg),
     align = "center",
@@ -43,9 +42,9 @@ local function widget()
       -- convert that to a lua timestamp
       local pattern = "(%d%d%d%d)(%d%d)(%d%d)T(%d%d)(%d%d)(%d%d)Z"
       local xyear, xmon, xday, xhr, xmin, xsec = due:match(pattern)
-      local ts = os.time({ 
-        year = xyear, month = xmon, day = xday, 
-        hour = xhour, min = xmin, sec = xsec })
+      local ts = os.time({
+        year = xyear, month = xmon, day = xday,
+        hour = xhr, min = xmin, sec = xsec })
 
       -- turn timestamp into human-readable format
       local now = os.time()
@@ -53,7 +52,7 @@ local function widget()
       local abs_time_difference = math.abs(time_difference)
       local days_rem = math.floor(abs_time_difference / 86400)
       local hours_rem = math.floor(abs_time_difference / 3600)
- 
+
       -- due date formatting
       local due_date_text
       if days_rem >= 1 then -- in x days / x days ago
@@ -63,14 +62,14 @@ local function widget()
         end
       else -- in x hours / in <1 hour / etc
         if hours_rem == 1 then
-          due_date_text = hours_rem .. " hour" 
+          due_date_text = hours_rem .. " hour"
         elseif hours_rem < 1 then
           due_date_text = "&lt;1 hour"
         else
           due_date_text = hours_rem .. " hours"
         end
       end
-     
+
       if time_difference < 0 then -- overdue
         due_date_text = due_date_text .. " ago"
       else
@@ -127,7 +126,7 @@ local function widget()
       if stdout ~= empty_json and stdout ~= "" then
         task_list:remove(1) -- remove placeholder
         local tasks = json.decode(stdout)
-        for i,v in ipairs(tasks) do
+        for i, _ in ipairs(tasks) do
           local desc = tasks[i]["description"]
           local due  = tasks[i]["due"]
           local urg  = tasks[i]["urgency"]
@@ -159,7 +158,7 @@ local function widget()
     layout = wibox.layout.fixed.vertical,
   })
 
-  return task_widget 
+  return task_widget
 end
 
 return helpers.ui.create_boxed_widget(widget(), dpi(220), dpi(230), beautiful.dash_widget_bg)

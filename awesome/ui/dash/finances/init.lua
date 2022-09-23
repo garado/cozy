@@ -5,31 +5,26 @@
 -- Financial dashboard integrated with Ledger
 -- https://github.com/ledger/
 
-local awful = require("awful")
-local gears = require("gears")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local keygrabber = require("awful.keygrabber")
 local helpers = require("helpers")
 local user_vars = require("user_variables")
-local animation = require("modules.animation")
-local naughty = require("naughty")
+local area = require("modules.keynav.area")
 
-local transactions = require("ui.dash.finances.transactions")
-local balances = require("ui.dash.finances.balances")
-local monthly_spending = require("ui.dash.finances.monthly_spending")
-local monthly_budget = require("ui.dash.finances.monthly_budget")
+local nav_finances = area:new({ name = "finances" })
 
-local finances_header = wibox.widget({
-  markup = helpers.ui.colorize_text("Finances", beautiful.fg),
-  font = beautiful.alt_font_name .. "Medium 30",
-  widget = wibox.widget.textbox,
-})
+local fin = "ui.dash.finances."
+local transactions          = require(fin .. "transactions")
+local balances              = require(fin .. "balances")
+local spending      = require(fin .. "spending")
+local budget        = require(fin .. "budget")
+local nav_actions, actions  = require(fin .. "actions")()
 
--- Assemble everything
-return wibox.widget({
+nav_finances:append(nav_actions)
+
+local widget = wibox.widget({
   {
     {
       {
@@ -37,14 +32,16 @@ return wibox.widget({
         balances[3],
         layout = wibox.layout.flex.horizontal,
       },
+      actions,
+      --spending,
       transactions,
-      monthly_spending,
-      spacing = dpi(20),
+      forced_width = dpi(490),
       layout = wibox.layout.fixed.vertical,
     },
     {
-      monthly_budget,
-      forced_width = dpi(600),
+      budget,
+      --spending,
+      forced_width = dpi(440),
       layout = wibox.layout.fixed.vertical,
     },
     layout = wibox.layout.fixed.horizontal,
@@ -52,3 +49,7 @@ return wibox.widget({
   margins = dpi(20),
   widget = wibox.container.margin,
 })
+
+return function()
+  return widget, nav_finances
+end

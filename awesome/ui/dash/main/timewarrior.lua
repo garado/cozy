@@ -13,6 +13,7 @@ local dpi = xresources.apply_dpi
 local helpers = require("helpers")
 local widgets = require("ui.widgets")
 local user_vars = require("user_variables")
+local naughty = require("naughty")
 local string = string
 
 local Elevated = require("modules.keynav.navitem").Elevated
@@ -122,22 +123,21 @@ local current_tag = create_ui_subsection("WORKING ON", "--", 15)
 -- Timewarrior reports time in H+:MM:SS format (6:15:08)
 -- But I prefer it in 6h 15m format.
 local function format_time(str)
-  print("FORMAT TIME: input was "..str)
-  str = string.gsub(str, "[^0-9:]", "")
-  str = string.gsub(str, ":[0-9]+$", "")
-  local hour_str = string.gsub(str, ":[0-9]+$", "")
-  local min_str = string.gsub(str, "[0-9]+:", "")
-  local hour = tonumber(hour_str)
-  local min = tonumber(min_str)
+  -- remove whitespace and seconds
+  str = string.gsub(str, "[%a+%s+\n\r]", "")
+  str = string.gsub(str, ":%d+$", "")
+
+  local min_str = string.gsub(str, "^%d+:", "")
+  local hour_str = string.gsub(str, ":%d+$", "")
+
   local txt = "--"
-  if min  then txt = min .. "m" end
-  if hour and not hour == 0 then txt = hour .. "h " .. txt end
-  print("FORMAT TIME: output is "..txt)
+  local valid_hour = tonumber(hour_str) and tonumber(hour_str) > 0
+  if min_str  then txt = min_str .. "m" end
+  if hour_str and valid_hour then txt = hour_str .. "h " .. txt end
   return txt
 end
 
 -- Init timer to be used.
-
 local stop_button = widgets.button.text.normal({
   text = "Stop",
   text_normal_bg = beautiful.fg,

@@ -10,31 +10,31 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local widgets = require("ui.widgets")
 
-local Area = require("modules.keynav.area")
-local Dashtab = require("modules.keynav.navitem").Dashtab
-local Navigator = require("modules.keynav").navigator
+local area = require("modules.keynav.area")
+local dashtab = require("modules.keynav.navitem").Dashtab
+local nav = require("modules.keynav").navigator
 
-local navigator, nav_root = Navigator:new()
+local navigator, nav_root = nav:new()
 
-local nav_tabs = Area:new({
+local nav_tabs = area:new({
   name = "tabs",
   circular = true,
 })
 
 nav_root:append(nav_tabs)
 
-return function()
+return function(s)
   local dash
 
   -- import tab contents
-  local main, nav_main = require("ui.dash.main")()
-  local finances = require("ui.dash.finances")
-  local habit = require("ui.dash.habit")
+  local main, nav_main   = require("ui.dash.main")()
+  local cash, nav_cash   = require("ui.dash.finances")()
+  local tasks, nav_tasks = require("ui.dash.tasks")()
   local agenda = require("ui.dash.agenda")
 
-  local tablist =   { main, finances, habit,  agenda }
+  local tablist =   { main, cash, tasks,  agenda }
   local tab_icons = { "",  "",      "",    ""    }
-  local navitems =  { nav_main, nil,  nil,    nil    }
+  local navitems =  { nav_main, nav_cash,  nav_tasks,    nil    }
 
   local dash_content = wibox.widget({
     {
@@ -81,7 +81,7 @@ return function()
           end
         end
       })
-      nav_tabs:append(Dashtab:new(widget))
+      nav_tabs:append(dashtab:new(widget))
       tab_bar.children[1]:add(widget)
     end
 
@@ -99,6 +99,7 @@ return function()
     if dash.visible then
       awesome.emit_signal("dash::closed")
       nav_root:reset()
+      navigator:stop()
     else
       require("ui.shared").close_other_popups("dash")
       awesome.emit_signal("dash::opened")
@@ -119,11 +120,13 @@ return function()
 
   -- ▄▀█ █▀ █▀ █▀▀ █▀▄▀█ █▄▄ █░░ █▀▀ 
   -- █▀█ ▄█ ▄█ ██▄ █░▀░█ █▄█ █▄▄ ██▄ 
+  local swidth = s.geometry.width
+  local sheight = s.geometry.height
   dash = awful.popup({
     type = "splash",
     minimum_height = dpi(810),
     maximum_height = dpi(810),
-    minimum_width = dpi(1350),
+    minimum_width = dpi(1350), -- 70% of screen
     maximum_width = dpi(1350),
     bg = beautiful.transparent,
     ontop = true,

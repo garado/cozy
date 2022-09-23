@@ -8,9 +8,9 @@ local gshape = require("gears.shape")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local capi = { mouse = mouse } 
+local capi = { mouse = mouse }
 
-local _ui = {} 
+local _ui = {}
 
 -- for dashboard
 -- credit: @rxhyn

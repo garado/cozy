@@ -32,6 +32,11 @@ theme.alt_font = theme.alt_font_name .. "Regular "
 
 -- █░█ █   █▀▀ █░░ █▀▀ █▀▄▀█ █▀▀ █▄░█ ▀█▀ █▀
 -- █▄█ █   ██▄ █▄▄ ██▄ █░▀░█ ██▄ █░▀█ ░█░ ▄█
+function theme.random_accent_color()
+  local i = math.random(1, #theme.accents)
+  return theme.accents[i]
+end
+
 -- Dashboard
 theme.dash_bg         = theme.dash_bg         or theme.bg
 theme.dash_widget_bg  = theme.dash_widget_bg  or theme.bg_l0
@@ -60,6 +65,8 @@ theme.cash_income_fg  = theme.cash_income_fg  or theme.green
 theme.cash_expense_fg = theme.cash_expense_fg or theme.red
 theme.cash_alttext_fg = theme.cash_alttext_fg or theme.fg_alt
 theme.cash_acct_name  = theme.cash_acct_name  or theme.fg_sub
+theme.cash_action_btn = theme.cash_action_btn or theme.bg_l2
+theme.cash_budgetbar_bg = theme.cash_budgetbar_bg or theme.bg_l1
 
 theme.hab_freq        = theme.hab_freq        or theme.main_accent
 theme.hab_uncheck_fg  = theme.hab_uncheck_fg  or theme.fg
@@ -76,12 +83,12 @@ theme.fetch_title     = theme.fetch_title     or theme.main_accent
 theme.fetch_value     = theme.fetch_value     or theme.fg
 
 theme.cal_fg = theme.cal_fg or theme.fg
-theme.cal_bg = theme.cal_bg or theme.bg
+theme.cal_bg = theme.cal_bg or theme.dash_widget_bg
 theme.cal_weekday_fg = theme.cal_weekday_fg or theme.fg
 theme.cal_header_fg = theme.cal_header_fg or theme.fg
-theme.cal_month_bg = theme.cal_month_bg or theme.bg
+theme.cal_month_bg = theme.cal_month_bg or theme.dash_widget_bg
 theme.cal_focus_fg = theme.cal_focus_fg or theme.main_accent
-theme.cal_focus_bg = theme.cal_focus_bg or theme.bg
+theme.cal_focus_bg = theme.cal_focus_bg or theme.dash_widget_bg
 theme.calendar_spacing = dpi(10)
 theme.calendar_long_weekdays = true
 
