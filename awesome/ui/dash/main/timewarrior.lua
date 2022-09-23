@@ -132,7 +132,7 @@ local function format_time(str)
 
   local txt = "--"
   local valid_hour = tonumber(hour_str) and tonumber(hour_str) > 0
-  if min_str  then txt = min_str .. "m" end
+  if min_str  then txt = tonumber(min_str) .. "m" end
   if hour_str and valid_hour then txt = hour_str .. "h " .. txt end
   return txt
 end
