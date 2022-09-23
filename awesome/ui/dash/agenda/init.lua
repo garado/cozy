@@ -10,16 +10,16 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 
 local calendar = require("ui.dash.agenda.calendar")
+local upcoming = require("ui.dash.agenda.upcoming")
 
 local widget = wibox.widget({
+  calendar,
   {
-    calendar,
-    layout = wibox.layout.fixed.horizontal,
+    upcoming,
+    layout = wibox.layout.fixed.vertical,
   },
-  bg = "bf616a",
-  forced_width = dpi(300),
-  forced_height = dpi(300),
-  widget = wibox.container.background,
-}) -- end widget
+  spacing = dpi(10),
+  layout = wibox.layout.fixed.horizontal,
+})
 
 return widget
