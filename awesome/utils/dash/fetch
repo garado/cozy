@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# os 
+os=$(hostnamectl | grep 'Operating System: ')
+os=$(echo $os | sed -e s/^"Operating System: "//)
+os=$(echo $os | sed -e s/" Linux"//)
+echo "os:$os"
+
+# kernel
+kernel=$(hostnamectl | grep 'Kernel: ')
+kernel=$(echo $kernel | sed -e s/^"Kernel: Linux "//)
+echo "kernel:$kernel"
+
+# wm
+wm=$(wmctrl -m | grep 'Name:')
+wm=$(echo $wm | sed -e s/^"Name: "//)
+echo "wm:$wm"
+
+# packages
+pkg=$(pacman -Q | wc -l)
+aur_pkgs=$(pacman -Qem | wc -l)
+com_pkgs=$(( $pkg - $aur_pkgs ))
+echo "pkg:$pkg"
+
+# uptime
+up=$(uptime -p)
+up=$(echo $up | sed -e s/^"up "//g)
+up=$(echo $up | sed -e s/" day"/"d"/g)
+up=$(echo $up | sed -e s/" hour"/"h"/g)
+up=$(echo $up | sed -e s/" minute"/"m"/g)
+up=$(echo $up | sed -e s/","//g)
+up=$(echo $up | sed -e s/"s"//g)
+echo "up:$up"
+
+#cpu
+cpu=$(cat /proc/cpuinfo | grep 'model name' -m 1)
+cpu=$(echo $cpu | sed -e s/^"model name : "//)
+echo "cpu:$cpu"
+
+# shell
+shell=$(echo $SHELL | sed -e s:/usr/bin/:: | sed -e s:/bin/::)
+echo "shell:$shell"
+
+#host
+host=$(hostname)
+echo "host:$host"

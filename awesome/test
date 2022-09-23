@@ -1,0 +1,4 @@
+#!/bin/bash
+
+#awmtt start --size 960x540
+awmtt start --size 1400x850

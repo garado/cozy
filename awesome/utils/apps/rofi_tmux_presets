@@ -1,0 +1,119 @@
+#!/bin/bash
+
+# ▀█▀ █▀▄▀█ █░█ ▀▄▀   █▀█ █▀█ █▀▀ █▀ █▀▀ ▀█▀ █▀
+# ░█░ █░▀░█ █▄█ █░█   █▀▀ █▀▄ ██▄ ▄█ ██▄ ░█░ ▄█
+# ----------------------------------------------
+# Easily open option tmux windows and panes with Rofi
+
+# if anyone can figure out why the text isn't vertically 
+# centered, i would greatly appreciate it. been driving me bonkers
+
+# Make rofi look nice
+rofi_dir="~/.config/rofi"
+rofi_cmd="rofi -dmenu -theme $rofi_dir/style.rasi"
+
+declare -a options
+options=(
+  "awesome"
+  "ledger"
+  "triple"
+  "home"
+  "crossword"
+  "eww"
+)
+
+# List all options
+create_option_list()
+{
+  for option in ${options[@]}
+  do
+    echo "${option}"
+  done
+}
+
+declare -i SELECTED
+
+select_option()
+{
+  local MORE_FLAGS=(-format i -no-custom)
+  while true
+  do
+    declare -i RTR
+    declare -i RES
+
+    RES=$( create_option_list | ${rofi_cmd} ${MORE_FLAGS[@]} -cycle -selected-row "${SELECTED}")
+    RTR=$?
+    if [ "${RTR}" = 10 ]
+    then
+      return 0;
+    elif [ "${RTR}" = 1 ]
+    then
+      return 1;
+    elif [ "${RTR}" = 65 ]
+    then
+      return 1;
+    fi
+    
+    # Set new option
+    SELECTED=${RES}
+    set_option $SELECTED
+    exit
+  done
+}
+
+set_option()
+{
+  option_NO=$1
+  option="${options[$option_NO]}"
+  echo $option 
+  case $option in
+  "single")
+    tmux new-window
+    ;;
+  "triple")
+    tmux new-window \; \
+    split-window -h \; \
+    split-window -v
+    ;;
+  "ledger")
+    tmux new-window -c $HOME/Documents/Ledger\; \
+    send-keys "vp *" Enter \; \
+    splitw -h -c "#{pane_current_path}"\; \
+    splitw -v -c "#{pane_current_path}"\; \
+    rename-window ledger
+    ;;
+  "awesome")
+    tmux new-window -c $HOME/.config/awesome \; \
+    splitw -h -c "#{pane_current_path}"\; \
+    splitw -v -c "#{pane_current_path}"\; \
+    rename-window dash
+    tmux new-window -c $HOME/.config/awesome \; \
+    splitw -h -c "#{pane_current_path}"\; \
+    splitw -v -c "#{pane_current_path}"\; \
+    rename-window bar
+    tmux new-window -c $HOME/.config/awesome\; \
+    rename-window xephyr
+    ;;
+  "eww")
+    tmux new-window -c $HOME/.config/eww/dash\; \
+    splitw -h -c "#{pane_current_path}"\; \
+    splitw -v -c "#{pane_current_path}"\; \
+    rename-window dash 
+    tmux new-window -c $HOME/.config/eww/bar\; \
+    splitw -h -c "#{pane_current_path}"\; \
+    splitw -v -c "#{pane_current_path}"\; \
+    rename-window bar 
+    ;;
+  "home")
+    tmux new-window 'vim ~/Documents/Vault/index.wiki' \; \
+    splitw -h 'taskwarrior-tui' \; \
+    splitw -v \; \
+    rename-window home
+    ;;
+  *)
+    ;;
+  esac
+}
+
+select_option
+

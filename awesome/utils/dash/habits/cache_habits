@@ -1,0 +1,79 @@
+#!/bin/bash
+
+# █▀▀ ▄▀█ █▀▀ █░█ █▀▀   █░█ ▄▀█ █▄▄ █ ▀█▀ █▀
+# █▄▄ █▀█ █▄▄ █▀█ ██▄   █▀█ █▀█ █▄█ █ ░█░ ▄█
+
+# Caches data from Pixela so I don't spam the pixela API every
+# time I restart awesome and end up with 8000 requests every day 
+# (sorry @a-know!)
+
+# Usage:
+#   ./cache_habits start_date end_date [-f file | graph_ids...]
+# Example usage:
+#   ./cache_habits 'today' '5 days ago' -f file_containing_ids
+#   ./cache_habits 'today' '5 days ago' id_1 id_2 id_3
+
+# start_date
+#     The beginning of the date range to start fetching habits from.
+#     Any format recognized by `date` will work, so
+#       ./cache_habits today ...
+#       ./cache_habits '5 days ago' ...
+#       ./cache_habits 'fortnight' ...
+#     are all valid inputs.
+#     **Be sure to quote multi-word inputs.**
+# end_date
+#     The end of the date range to start fetching habits from.
+#     See start_date above for formatting.
+# graph_id
+#     Graph_id(s) to get data for 
+# -f graph_id_file
+#     If this flag is set, cache_habits will retrieve graph ids from the 
+#     specified file.
+#     Each graph id in the file should be on its own line.
+
+# The intention is for you to run this script in a cron job every 
+# so often to keep it updated.
+
+# This script assumes that the necessary Pixela username/password env
+# variables are already set.
+
+# HOW IT WORKS
+# The pi command in this script will return a json array containing
+# dates for which the habit was completed.
+# When checking for habit completion, the source code simply scans the
+# file for a given date.
+# (It doesn't properly parse the json - it just performs a simple 
+# string.find() on the file contents.)
+
+# Ensure cache directory exists
+cache_dir=$HOME/.cache/awesome/pixela
+mkdir -p $cache_dir
+
+# Get variables
+start_date=$1
+end_date=$2
+
+if [[ "$3" == "-f" ]]; then
+  graph_id_file=$4
+  if test -f "$graph_id_file"; then
+    cmd="cat $graph_id_file"
+    cmd_out=$($cmd)
+    graph_ids=($cmd_out)
+  else
+    echo "cache_habits: error: graph id file does not exist"
+    exit
+  fi
+else
+  graph_ids=(${@:3})
+fi
+
+# Convert dates
+start_date=$(date -d "$start_date" +'%Y%m%d')
+end_date=$(date -d "$end_date" +'%Y%m%d')
+
+# Execute
+for graph in "${graph_ids[@]}"; do
+  cmd="pi graphs pixels --to=$start_date --from=$end_date --graph-id=$graph"
+  $cmd > $cache_dir/$graph
+done
+
