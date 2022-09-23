@@ -89,7 +89,7 @@ local widget = wibox.widget({
     widget = wibox.container.place
   },
   forced_height = dpi(300),
-  forced_width = dpi(350),
+  forced_width = dpi(220),
   bg = beautiful.dash_widget_bg,
   shape = gears.shape.rounded_rect,
   widget = wibox.container.background,

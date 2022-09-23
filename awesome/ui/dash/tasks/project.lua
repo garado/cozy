@@ -9,12 +9,6 @@
   -- completion percentage
   -- list of tasks associated with project
 
--- How it works:
-  -- this file returns a function
-  -- init.lua calls this file/function with a tag and a wibox as its argument
-  -- gets list of projects from output of `task tag:given_tag projects`
-  -- calls create_project_summary() for each of those projects
-
 local awful = require("awful")
 local beautiful = require("beautiful")
 local wibox = require("wibox")
@@ -25,6 +19,9 @@ local textbox = require("ui.widgets.text")
 local helpers = require("helpers")
 local ui = require("helpers.ui")
 local json = require("modules.json")
+
+local math = math
+local table = table
 
 local function format_due_date(due)
   if not due or due == "" then return "no due date" end
@@ -88,7 +85,6 @@ local function create_task(name, due_date)
     font = beautiful.font_name .. "11",
     halign = "right",
     align = "center",
-    forced_width = dpi(130),
     widget = wibox.widget.textbox,
   })
 
@@ -147,7 +143,7 @@ local function create_project_summary(tag, project_name, tasks)
 
   local tasklist = wibox.widget({
     spacing = dpi(8),
-    layout = wibox.layout.fixed.vertical,
+    layout = wibox.layout.flex.vertical,
   })
 
   local desc    = 1
