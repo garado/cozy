@@ -32,9 +32,9 @@ return function(s)
   local tasks, nav_tasks = require("ui.dash.tasks")()
   local agenda = require("ui.dash.agenda")
 
-  local tablist =   { main, cash, tasks,  agenda }
-  local tab_icons = { "",  "",      "",    ""    }
-  local navitems =  { nav_main, nav_cash,  nav_tasks,    nil    }
+  local tablist =   { main, tasks, cash,  agenda }
+  local tab_icons = { "",  "",   "",   ""    }
+  local navitems =  { nav_main, nav_tasks,  nav_cash,    nil    }
 
   local dash_content = wibox.widget({
     {

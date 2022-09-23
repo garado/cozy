@@ -9,12 +9,6 @@
   -- completion percentage
   -- list of tasks associated with project
 
--- How it works:
-  -- this file returns a function
-  -- init.lua calls this file/function with a tag and a wibox as its argument
-  -- gets list of projects from output of `task tag:given_tag projects`
-  -- calls create_project_summary() for each of those projects
-
 local awful = require("awful")
 local beautiful = require("beautiful")
 local wibox = require("wibox")
@@ -25,6 +19,9 @@ local textbox = require("ui.widgets.text")
 local helpers = require("helpers")
 local ui = require("helpers.ui")
 local json = require("modules.json")
+
+local math = math
+local table = table
 
 local function format_due_date(due)
   if not due or due == "" then return "no due date" end
@@ -88,7 +85,6 @@ local function create_task(name, due_date)
     font = beautiful.font_name .. "11",
     halign = "right",
     align = "center",
-    forced_width = dpi(130),
     widget = wibox.widget.textbox,
   })
 
@@ -100,28 +96,15 @@ local function create_task(name, due_date)
   })
 end
 
-local function create_all_tasks(tag, project, widget)
-  local cmd = "task tag:"..tag.." proj:'"..project.."' status:pending export rc.json.array=on"
-  awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    local empty_json = "[\n]\n"
-    if stdout ~= empty_json and stdout ~= "" then
-      local tasklist = json.decode(stdout)
-      for i, _ in ipairs(tasklist) do
-        local desc = tasklist[i]["description"]
-        local due  = format_due_date(tasklist[i]["due"])
-        print(desc .. due)
-        widget:add(create_task(desc, due))
-      end
-    end
-  end)
-end
-
 -- █▀█ █▀█ █▀█ ░░█ █▀▀ █▀▀ ▀█▀    █▀ █░█ █▀▄▀█ █▀▄▀█ ▄▀█ █▀█ █▄█ 
 -- █▀▀ █▀▄ █▄█ █▄█ ██▄ █▄▄ ░█░    ▄█ █▄█ █░▀░█ █░▀░█ █▀█ █▀▄ ░█░ 
-local function create_project_summary(project_name, tag)
-
+-- Create a summary listing all tasks as well as completion percentage
+local function create_project_summary(tag, project_name, tasks)
   local accent = beautiful.random_accent_color()
-  if project_name == "(none)" then project_name = "No project" end
+  if project_name == "(none)" or project_name == "noproj" then
+    project_name = "No project"
+  end
+
   local name_text = project_name:gsub("^%l", string.upper) -- capitalize 1st letter
   local name = wibox.widget({
     markup = helpers.ui.colorize_text(name_text, accent),
@@ -140,7 +123,7 @@ local function create_project_summary(project_name, tag)
   })
 
   local percent_completion = wibox.widget({
-    markup = helpers.ui.colorize_text("92%", beautiful.fg),
+    markup = helpers.ui.colorize_text("0%", beautiful.fg),
     font = beautiful.alt_font .. "Light 25",
     halign = "right",
     valign = "center",
@@ -158,11 +141,28 @@ local function create_project_summary(project_name, tag)
     widget = wibox.widget.progressbar,
   })
 
-  local tasks = wibox.widget({
+  local tasklist = wibox.widget({
     spacing = dpi(8),
-    layout = wibox.layout.fixed.vertical,
+    layout = wibox.layout.flex.vertical,
   })
-  create_all_tasks(tag, project_name, tasks)
+
+  local desc    = 1
+  local due     = 2
+  for i = 1, #tasks do
+    local task = create_task(tasks[i][desc], tasks[i][due])
+    tasklist:add(task)
+  end
+
+  -- update progress bar/completion percentage
+  local cmd = "task context none ; task project:"..project_name.. " status:completed count"
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    local completed = tonumber(stdout)
+    local total = #tasks
+    local percent = math.floor((completed * 100) / total)
+    progress_bar.value = percent
+    local markup = helpers.ui.colorize_text(percent.."%", beautiful.fg)
+    percent_completion:set_markup_silently(markup)
+  end)
 
   local project = wibox.widget({
     {
@@ -183,7 +183,7 @@ local function create_project_summary(project_name, tag)
           layout = wibox.layout.fixed.vertical
         },
         helpers.ui.vertical_pad(dpi(8)),
-        tasks,
+        tasklist,
         layout = wibox.layout.fixed.vertical
       },
       top = dpi(10),
@@ -201,45 +201,37 @@ local function create_project_summary(project_name, tag)
   return project
 end
 
--- █▀█ ▄▀█ █▀█ █▀ █▀▀ 
--- █▀▀ █▀█ █▀▄ ▄█ ██▄ 
--- Creates a list of projects given the output of `task tag:tagname projects`
-local function parse_taskw_projects(stdout)
-  local projects = {}
-  for line in string.gmatch(stdout, "[^\r\n]+") do
-    -- the task count is the string of numbers at end of line
-    -- so to get the task count, remove everything except for that
-    local count = string.gsub(line, "[^%d+$]", "")
-
-    -- to get project name, remove the task count
-    local name = string.gsub(line, "%s+%d+$", "")
-
-    local project = {
-      ["name"]  = name,
-      ["count"] = count,
-    }
-    table.insert(projects, project)
-  end
-
-  -- remove non-project lines
-  table.remove(projects, 1) -- header
-  table.remove(projects, 1) -- header
-  table.remove(projects) -- last line of output shows how many projects there are
-
-  return projects
-end
-
 return function(tag, widget)
-  local cmd = "task context none ; task tag:"..tag.." projects"
+  local cmd = "task context none ; task tag:"..tag.." status:pending export rc.json.array=on"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    local projects = parse_taskw_projects(stdout)
-    local fuck = {}
-    for i = 1, #projects do
-      table.insert(fuck, create_project_summary(projects[i]["name"], tag))
-    end
-    widget:reset()
-    for i = 1, #fuck do
-      widget:add(fuck[i])
+    local empty_json = "[\n]\n"
+    if stdout ~= empty_json and stdout ~= "" then
+      local json_arr = json.decode(stdout)
+      local projects = {}
+
+      -- separate tasks by project
+      for i, _ in ipairs(json_arr) do
+        local due  = format_due_date(json_arr[i]["due"])
+        local desc = json_arr[i]["description"]
+        local proj = json_arr[i]["project"]
+
+        if not proj then proj = "noproj" end
+        if not projects[proj] then projects[proj] = {} end
+
+        local task = { desc, due }
+        table.insert(projects[proj], task)
+      end
+
+      -- now create a project summary for each project
+      widget.children[1]:reset()
+      widget.children[2]:reset()
+      local test = true
+      for project_name, tasks in pairs(projects) do
+        local summary = create_project_summary(tag, project_name, tasks)
+        local idx = test and 1 or 2
+        widget.children[idx]:add(summary)
+        test = not test
+      end
     end
   end)
 end

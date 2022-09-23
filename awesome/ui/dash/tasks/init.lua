@@ -2,28 +2,26 @@
 -- ▀█▀ ▄▀█ █▀ █▄▀ █▀    █▀▄ ▄▀█ █▀ █░█ █▄▄ █▀█ ▄▀█ █▀█ █▀▄ 
 -- ░█░ █▀█ ▄█ █░█ ▄█    █▄▀ █▀█ ▄█ █▀█ █▄█ █▄█ █▀█ █▀▄ █▄▀ 
 
-local awful = require("awful")
-local beautiful = require("beautiful")
-local helpers = require("helpers")
 local wibox = require("wibox")
 local xresources = require("beautiful.xresources")
-local gears = require("gears")
-local gfs = require("gears.filesystem")
 local dpi = xresources.apply_dpi
-local naughty = require("naughty")
-local widgets = require("ui.widgets")
-local os = os
-
 local area = require("modules.keynav.area")
 local nav_tasks = area:new({ name = "tasks" })
 
 -- import
-local tag_list, nav_tags = require("ui.dash.tasks.tag_list")()
+local tag_list, nav_tags = require("ui.dash.tasks.taglist")()
+local currently_selected = "mech"
 local project_list = wibox.widget({
-  forced_num_cols = 2,
-  forced_num_rows = 2,
+  {
+    spacing = dpi(15),
+    layout = wibox.layout.fixed.vertical,
+  },
+  {
+    spacing = dpi(15),
+    layout = wibox.layout.fixed.vertical,
+  },
   spacing = dpi(15),
-  layout = wibox.layout.grid,
+  layout = wibox.layout.fixed.horizontal,
 })
 require("ui.dash.tasks.project")("mech", project_list)
 
@@ -32,11 +30,11 @@ nav_tasks:append(nav_tags)
 -- Assemble
 local tasks_dashboard = wibox.widget({
   {
-    project_list,
     {
       tag_list,
       layout = wibox.layout.fixed.vertical,
     },
+    project_list,
     spacing = dpi(15),
     layout = wibox.layout.fixed.horizontal,
   },
@@ -44,8 +42,16 @@ local tasks_dashboard = wibox.widget({
   widget = wibox.container.margin,
 })
 
+-- this signal is emitted in a taskwarrior hook
+-- instructions to configure this are in the install guide
+awesome.connect_signal("widget::update_tasks", function()
+  require("ui.dash.tasks.project")(currently_selected, project_list)
+  project_list:emit_signal("widget::redraw_needed")
+end)
+
 -- Change projects shown whenever the tag is changed
 awesome.connect_signal("tasks::tag_selected", function(tag)
+  currently_selected = tag
   require("ui.dash.tasks.project")(tag, project_list)
 end)
 
