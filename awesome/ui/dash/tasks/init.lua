@@ -5,55 +5,47 @@
 local wibox = require("wibox")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
+local gobject = require("gears.object")
 local area = require("modules.keynav.area")
+
+local task_obj = gobject{}
+task_obj.current_tag  = "Cozy"
+task_obj.current_proj = "General"
+
+-- Import modules
+local tag_list, nav_tags     = require("ui.dash.tasks.tags")(task_obj)
+local projects, nav_projects = require("ui.dash.tasks.projects")(task_obj)
+local overview = require("ui.dash.tasks.overview")(task_obj)
+require("ui.dash.tasks.parser")(task_obj)
+
+-- Keyboard navigation
 local nav_tasks = area:new({ name = "tasks" })
-
--- import
-local tag_list, nav_tags = require("ui.dash.tasks.taglist")()
-local currently_selected = "mech"
-local project_list = wibox.widget({
-  {
-    spacing = dpi(15),
-    layout = wibox.layout.fixed.vertical,
-  },
-  {
-    spacing = dpi(15),
-    layout = wibox.layout.fixed.vertical,
-  },
-  spacing = dpi(15),
-  layout = wibox.layout.fixed.horizontal,
-})
-require("ui.dash.tasks.project")("mech", project_list)
-
 nav_tasks:append(nav_tags)
+nav_tasks:append(nav_projects)
 
--- Assemble
+-- Assemble UI
 local tasks_dashboard = wibox.widget({
   {
     {
       tag_list,
       layout = wibox.layout.fixed.vertical,
     },
-    project_list,
+    {
+      overview,
+      left = dpi(15),
+      right = dpi(20),
+      widget = wibox.container.margin,
+    },
+    {
+      projects,
+      widget = wibox.container.margin,
+    },
     spacing = dpi(15),
-    layout = wibox.layout.fixed.horizontal,
+    layout = wibox.layout.align.horizontal,
   },
   margins = dpi(15),
   widget = wibox.container.margin,
 })
-
--- this signal is emitted in a taskwarrior hook
--- instructions to configure this are in the install guide
-awesome.connect_signal("widget::update_tasks", function()
-  require("ui.dash.tasks.project")(currently_selected, project_list)
-  project_list:emit_signal("widget::redraw_needed")
-end)
-
--- Change projects shown whenever the tag is changed
-awesome.connect_signal("tasks::tag_selected", function(tag)
-  currently_selected = tag
-  require("ui.dash.tasks.project")(tag, project_list)
-end)
 
 return function()
   return tasks_dashboard, nav_tasks

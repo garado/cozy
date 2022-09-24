@@ -1,6 +1,7 @@
 
 -- ▀█▀ ▄▀█ █▀▀ █▀ 
 -- ░█░ █▀█ █▄█ ▄█ 
+
 -- Get list of active Taskwarrior tags.
 
 local awful = require("awful")
@@ -14,6 +15,7 @@ local helpers = require("helpers")
 local elevated = require("modules.keynav.navitem").Elevated
 local Area = require("modules.keynav.area")
 
+-- Keyboard navigation
 local nav_tags = Area:new({
   name = "tags",
   circular = true,
@@ -47,54 +49,56 @@ local function parse_taskw_tags(stdout)
   return tags
 end
 
-local tag_list = wibox.widget({
-  spacing = dpi(10),
-  layout = wibox.layout.fixed.vertical,
-})
-
-local function create_tag_button(name)
-  return widgets.button.text.normal({
-    text = name,
-    text_normal_bg = beautiful.fg,
-    normal_bg = beautiful.switcher_opt_btn_bg,
-    animate_size = false,
-    size = 12,
-    on_release = function()
-      awesome.emit_signal("tasks::tag_selected", name)
-    end
+return function(task_obj)
+  local tag_list = wibox.widget({
+    spacing = dpi(10),
+    layout = wibox.layout.fixed.vertical,
   })
-end
 
-local cmd = "task context none ; task tags"
-awful.spawn.easy_async_with_shell(cmd, function(stdout)
-  local tags = parse_taskw_tags(stdout)
-  for i = 1, #tags do
-    local btn = create_tag_button(tags[i]["name"])
-    tag_list:add(btn)
-    nav_tags:append(elevated:new(btn))
+  local function create_tag_button(name)
+    return widgets.button.text.normal({
+      text = name,
+      text_normal_bg = beautiful.fg,
+      normal_bg = beautiful.switcher_opt_btn_bg,
+      animate_size = false,
+      size = 12,
+      on_release = function()
+        task_obj.current_tag = name
+        task_obj:emit_signal("tasks::tag_selected", name)
+      end
+    })
   end
-end)
 
+  local cmd = "task context none ; task tags"
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    local tags = parse_taskw_tags(stdout)
+    for i = 1, #tags do
+      local btn = create_tag_button(tags[i]["name"])
+      tag_list:add(btn)
+      nav_tags:append(elevated:new(btn))
+    end
+  end)
 
-local widget = wibox.widget({
-  {
+  local widget = wibox.widget({
     {
-      helpers.ui.create_dash_widget_header("Tags"),
-      tag_list,
-      spacing = dpi(10),
-      forced_width = dpi(150),
-      fill_space = false,
-      layout = wibox.layout.fixed.vertical,
+      {
+        {
+          helpers.ui.create_dash_widget_header("Tags"),
+          tag_list,
+          spacing = dpi(10),
+          forced_width = dpi(150),
+          fill_space = false,
+          layout = wibox.layout.fixed.vertical,
+        },
+        margins = dpi(20),
+        widget = wibox.container.margin,
+      },
+      widget = wibox.container.place
     },
-    widget = wibox.container.place
-  },
-  forced_height = dpi(300),
-  forced_width = dpi(220),
-  bg = beautiful.dash_widget_bg,
-  shape = gears.shape.rounded_rect,
-  widget = wibox.container.background,
-})
-
-return function()
+    forced_width = dpi(270),
+    bg = beautiful.dash_widget_bg,
+    shape = gears.shape.rounded_rect,
+    widget = wibox.container.background,
+  })
   return widget, nav_tags
 end
