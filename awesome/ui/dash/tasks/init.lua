@@ -8,19 +8,22 @@ local dpi = xresources.apply_dpi
 local gobject = require("gears.object")
 local area = require("modules.keynav.area")
 
+-- gears.object that modules use to communicate
+-- with each other
 local task_obj = gobject{}
 task_obj.current_tag  = "Cozy"
 task_obj.current_proj = "General"
 
 -- Import modules
 local tag_list, nav_tags     = require("ui.dash.tasks.tags")(task_obj)
+local overview, nav_overview = require("ui.dash.tasks.overview")(task_obj)
 local projects, nav_projects = require("ui.dash.tasks.projects")(task_obj)
-local overview = require("ui.dash.tasks.overview")(task_obj)
 require("ui.dash.tasks.parser")(task_obj)
 
 -- Keyboard navigation
 local nav_tasks = area:new({ name = "tasks" })
 nav_tasks:append(nav_tags)
+nav_tasks:append(nav_overview)
 nav_tasks:append(nav_projects)
 
 -- Assemble UI

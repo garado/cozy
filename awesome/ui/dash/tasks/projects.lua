@@ -51,7 +51,8 @@ return function(task_obj)
 
     local progress_bar = wibox.widget({
       color = accent,
-      background_color = beautiful.cash_budgetbar_bg,
+      background_color = beautiful.bg_l3,
+      --background_color = beautiful.cash_budgetbar_bg,
       value = 92,
       max_value = 100,
       border_width = dpi(0),

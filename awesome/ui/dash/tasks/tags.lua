@@ -77,6 +77,7 @@ return function(task_obj)
       tag_list:add(btn)
       nav_tags:append(elevated:new(btn))
     end
+    task_obj:emit_signal("tasks::tag_selected", tags[1]["name"])
   end)
 
   local widget = wibox.widget({

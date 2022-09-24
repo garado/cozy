@@ -13,10 +13,17 @@ local dpi = xresources.apply_dpi
 local textbox = require("ui.widgets.text")
 local helpers = require("helpers")
 local ui = require("helpers.ui")
-local json = require("modules.json")
-
 local math = math
-local table = table
+local navtask = require("modules.keynav.navitem").Task
+local taskbox = require("modules.keynav.navitem").Taskbox
+local area = require("modules.keynav.area")
+-- local animation = require("modules.animation")
+
+-- Keyboard navigation
+local nav_overview = area:new({
+  name = "overview",
+  circular = true,
+})
 
 local function format_due_date(due)
   if not due or due == "" then return "no due date" end
@@ -107,7 +114,7 @@ return function(task_obj)
     local name_text = project:gsub("^%l", string.upper) -- capitalize 1st letter
     local name = wibox.widget({
       markup = helpers.ui.colorize_text(name_text, accent),
-      font = beautiful.alt_font .. "15",
+      font = beautiful.alt_font .. "25",
       halign = "left",
       valign = "center",
       widget = wibox.widget.textbox,
@@ -123,7 +130,7 @@ return function(task_obj)
 
     local percent_completion = wibox.widget({
       markup = helpers.ui.colorize_text("0%", beautiful.fg),
-      font = beautiful.alt_font .. "Light 15",
+      font = beautiful.alt_font .. "Light 25",
       halign = "right",
       valign = "center",
       widget = wibox.widget.textbox,
@@ -131,7 +138,8 @@ return function(task_obj)
 
     local progress_bar = wibox.widget({
       color = accent,
-      background_color = beautiful.cash_budgetbar_bg,
+      background_color = beautiful.bg_l3,
+      --background_color = beautiful.cash_budgetbar_bg,
       value = 92,
       max_value = 100,
       border_width = dpi(0),
@@ -149,6 +157,7 @@ return function(task_obj)
     local due  = 2
     for i = 1, #tasks do
       local task = create_task(tasks[i][desc], tasks[i][due])
+      nav_overview:append(navtask:new(task))
       tasklist:add(task)
     end
 
@@ -195,6 +204,7 @@ return function(task_obj)
       local percent = math.floor((completed / total) * 100) or 0
 
       progress_bar.value = percent
+      --progress_bar.value = 0
       local markup = helpers.ui.colorize_text(percent.."%", beautiful.fg)
       percent_completion:set_markup_silently(markup)
 
@@ -204,8 +214,21 @@ return function(task_obj)
       markup = helpers.ui.colorize_text(rem, beautiful.fg)
       project_tag:set_markup_silently(markup)
 
+      -- fun animation!
+      --local anim = animation:new({
+      --  duration = 1.25,
+      --  target = percent,
+      --  easing = animation.easing.inOutExpo,
+      --  update = function(_, pos)
+      --    progress_bar.value = dpi(pos)
+      --    markup = helpers.ui.colorize_text(dpi(pos).."%", beautiful.fg)
+      --    percent_completion:set_markup_silently(markup)
+      --  end
+      --})
+
       -- prevent flicker by only drawing when ready
       task_obj:emit_signal("tasks::overview_ready", widget)
+      --anim:start()
     end)
   end -- end create proj summary
 
@@ -224,6 +247,8 @@ return function(task_obj)
 
     local tag     = task_obj.current_tag
     local tasks   = task_obj.projects[project]
+    nav_overview:remove_all_items()
+    nav_overview:reset()
     create_project_summary(tag, project, tasks)
   end)
 
@@ -233,16 +258,17 @@ return function(task_obj)
     local tag     = task_obj.current_tag
     local project = task_obj.current_project
     local tasks   = task_obj.projects[project]
+    nav_overview:remove_all_items()
+    nav_overview:reset()
     create_project_summary(tag, project, tasks)
-    --overview:add(summary)
   end)
 
   -- prevent flicker by only drawing when ready
   task_obj:connect_signal("tasks::overview_ready", function(_, widget)
     overview:reset()
     overview:add(widget)
-    --nav_projects:append(navproj:new(widget, task_obj, widget))
+    nav_overview.widget = taskbox:new(widget)
   end)
 
-  return overview
+  return overview, nav_overview
 end
