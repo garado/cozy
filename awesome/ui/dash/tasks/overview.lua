@@ -1,8 +1,10 @@
 
 -- █▀█ █▀█ █▀█ ░░█ █▀▀ █▀▀ ▀█▀    █▀█ █░█ █▀▀ █▀█ █░█ █ █▀▀ █░█░█ 
 -- █▀▀ █▀▄ █▄█ █▄█ ██▄ █▄▄ ░█░    █▄█ ▀▄▀ ██▄ █▀▄ ▀▄▀ █ ██▄ ▀▄▀▄▀ 
-
--- Create a fancy-looking list of projects.
+-- Project overview consists of:
+--    * project completion percentage
+--    * list of tasks and their due dates
+-- Also includes a keygrabber to enable modifying/adding/deleting tasks. :)
 
 local awful = require("awful")
 local beautiful = require("beautiful")
@@ -11,97 +13,54 @@ local gears = require("gears")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local textbox = require("ui.widgets.text")
-local helpers = require("helpers")
-local ui = require("helpers.ui")
-local math = math
-local navtask = require("modules.keynav.navitem").Task
-local taskbox = require("modules.keynav.navitem").Taskbox
 local area = require("modules.keynav.area")
+local navtask = require("modules.keynav.navitem").Task
+local overviewbox = require("modules.keynav.navitem").OverviewBox
 -- local animation = require("modules.animation")
-
--- Keyboard navigation
-local nav_overview = area:new({
-  name = "overview",
-  circular = true,
-})
-
-local function format_due_date(due)
-  if not due or due == "" then return "no due date" end
-
-  -- taskwarrior returns due date as string
-  -- convert that to a lua timestamp
-  local pattern = "(%d%d%d%d)(%d%d)(%d%d)T(%d%d)(%d%d)(%d%d)Z"
-  local xyear, xmon, xday, xhr, xmin, xsec = due:match(pattern)
-  local ts = os.time({
-    year = xyear, month = xmon, day = xday,
-    hour = xhr, min = xmin, sec = xsec })
-
-  -- turn timestamp into human-readable format
-  local now = os.time()
-  local time_difference = ts - now
-  local abs_time_difference = math.abs(time_difference)
-  local days_rem = math.floor(abs_time_difference / 86400)
-  local hours_rem = math.floor(abs_time_difference / 3600)
-
-  -- due date formatting
-  local due_date_text
-  if days_rem >= 1 then -- in x days / x days ago
-    due_date_text = days_rem .. " day"
-    if days_rem > 1 then
-      due_date_text = due_date_text .. "s"
-    end
-  else -- in x hours / in <1 hour / etc
-    if hours_rem == 1 then
-      due_date_text = hours_rem .. " hour"
-    elseif hours_rem < 1 then
-      due_date_text = "&lt;1 hour"
-    else
-      due_date_text = hours_rem .. " hours"
-    end
-  end
-
-  local due_date_color = beautiful.fg_sub
-  if time_difference < 0 then -- overdue
-    due_date_text = due_date_text .. " ago"
-    due_date_color = beautiful.red
-  else
-    due_date_text = "in " .. due_date_text
-  end
-
-  return due_date_text, due_date_color
-end
-
--- ▀█▀ ▄▀█ █▀ █▄▀ █▀ 
--- ░█░ █▀█ ▄█ █░█ ▄█ 
--- Returns tasks associated with a given project.
-local function create_task(name, due_date)
-  name = name:gsub("%^l", string.upper)
-  local taskname = wibox.widget({
-    markup = ui.colorize_text(name, beautiful.fg),
-    font = beautiful.font_name .. "12",
-    ellipsize = "end",
-    forced_width = dpi(410),
-    widget = wibox.widget.textbox,
-  })
-
-  local due_text, due_color = format_due_date(due_date)
-  local due = wibox.widget({
-    markup = ui.colorize_text(due_text, due_color or beautiful.fg_sub),
-    font = beautiful.font_name .. "12",
-    halign = "right",
-    align = "center",
-    widget = wibox.widget.textbox,
-  })
-
-  return wibox.widget({
-    taskname,
-    nil,
-    due,
-    layout = wibox.layout.align.horizontal,
-  })
-end
+local math = math
+local helpers = require("helpers")
+local colorize = require("helpers.ui").colorize_text
+local format_due_date = require("helpers.dash").format_due_date
 
 return function(task_obj)
+  -- Keyboard navigation
+  local keys = require("ui.dash.tasks.keygrabber")(task_obj)
+  local nav_overview = area:new({
+    name = "overview",
+    circular = true,
+    keys = keys,
+  })
+
+  -- ▀█▀ ▄▀█ █▀ █▄▀ █▀ 
+  -- ░█░ █▀█ ▄█ █░█ ▄█ 
+  -- Returns tasks associated with a given project.
+  local function create_task(name, due_date)
+    name = name:gsub("%^l", string.upper)
+    local taskname = wibox.widget({
+      markup = colorize(name, beautiful.fg),
+      font = beautiful.font_name .. "12",
+      ellipsize = "end",
+      --forced_width = dpi(450),
+      widget = wibox.widget.textbox,
+    })
+
+    local due_text, due_color = format_due_date(due_date)
+    local due = wibox.widget({
+      markup = colorize(due_text, due_color or beautiful.fg_sub),
+      font = beautiful.font_name .. "12",
+      halign = "right",
+      align = "center",
+      widget = wibox.widget.textbox,
+    })
+
+    return wibox.widget({
+      taskname,
+      nil,
+      due,
+      layout = wibox.layout.align.horizontal,
+    })
+  end
+
   -- █▀█ █▀█ █▀█ ░░█ █▀▀ █▀▀ ▀█▀    █▀ █░█ █▀▄▀█ █▀▄▀█ ▄▀█ █▀█ █▄█ 
   -- █▀▀ █▀▄ █▄█ █▄█ ██▄ █▄▄ ░█░    ▄█ █▄█ █░▀░█ █░▀░█ █▀█ █▀▄ ░█░ 
   -- Create a summary listing all tasks as well as completion percentage
@@ -113,7 +72,7 @@ return function(task_obj)
 
     local name_text = project:gsub("^%l", string.upper) -- capitalize 1st letter
     local name = wibox.widget({
-      markup = helpers.ui.colorize_text(name_text, accent),
+      markup = colorize(name_text, accent),
       font = beautiful.alt_font .. "25",
       halign = "left",
       valign = "center",
@@ -129,7 +88,7 @@ return function(task_obj)
     })
 
     local percent_completion = wibox.widget({
-      markup = helpers.ui.colorize_text("0%", beautiful.fg),
+      markup = colorize("0%", beautiful.fg),
       font = beautiful.alt_font .. "Light 25",
       halign = "right",
       valign = "center",
@@ -155,9 +114,11 @@ return function(task_obj)
 
     local desc = 1
     local due  = 2
+    local id   = 3
     for i = 1, #tasks do
+      local id_ = tasks[i][id]
       local task = create_task(tasks[i][desc], tasks[i][due])
-      nav_overview:append(navtask:new(task))
+      nav_overview:append(navtask:new(task, task_obj, id_))
       tasklist:add(task)
     end
 
@@ -189,7 +150,7 @@ return function(task_obj)
         right = dpi(25),
         widget = wibox.container.margin,
       },
-      forced_width = dpi(320),
+      forced_width = dpi(600),
       bg = beautiful.dash_widget_bg,
       shape = gears.shape.rounded_rect,
       widget = wibox.container.background,
@@ -198,6 +159,8 @@ return function(task_obj)
     -- update progress bar/completion percentage
     local cmd = "task context none ; task tag:"..tag.." project:'"..project.. "' count"
     awful.spawn.easy_async_with_shell(cmd, function(stdout)
+      print(cmd)
+      print(stdout)
       local pending = #tasks
       local total = tonumber(stdout) or 0
       local completed = total - pending
@@ -205,13 +168,13 @@ return function(task_obj)
 
       progress_bar.value = percent
       --progress_bar.value = 0
-      local markup = helpers.ui.colorize_text(percent.."%", beautiful.fg)
+      local markup = colorize(percent.."%", beautiful.fg)
       percent_completion:set_markup_silently(markup)
 
       -- tag
       local rem = pending.."/"..total.." REMAINING"
-      -- local text = string.upper(tag).." - "..rem
-      markup = helpers.ui.colorize_text(rem, beautiful.fg)
+      local text = string.upper(tag).." - "..rem
+      markup = colorize(text, beautiful.fg)
       project_tag:set_markup_silently(markup)
 
       -- fun animation!
@@ -221,7 +184,7 @@ return function(task_obj)
       --  easing = animation.easing.inOutExpo,
       --  update = function(_, pos)
       --    progress_bar.value = dpi(pos)
-      --    markup = helpers.ui.colorize_text(dpi(pos).."%", beautiful.fg)
+      --    markup = colorize(dpi(pos).."%", beautiful.fg)
       --    percent_completion:set_markup_silently(markup)
       --  end
       --})
@@ -244,6 +207,7 @@ return function(task_obj)
       project = k
       break
     end
+    task_obj.current_project = project
 
     local tag     = task_obj.current_tag
     local tasks   = task_obj.projects[project]
@@ -267,7 +231,7 @@ return function(task_obj)
   task_obj:connect_signal("tasks::overview_ready", function(_, widget)
     overview:reset()
     overview:add(widget)
-    nav_overview.widget = taskbox:new(widget)
+    nav_overview.widget = overviewbox:new(widget, task_obj)
   end)
 
   return overview, nav_overview

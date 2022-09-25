@@ -92,6 +92,9 @@ theme.cal_focus_bg = theme.cal_focus_bg or theme.dash_widget_bg
 theme.calendar_spacing = dpi(10)
 theme.calendar_long_weekdays = true
 
+theme.task_prompt_contbg = theme.bg_l0
+theme.task_prompt_textbg = theme.bg_l1
+
 -- Bar
 theme.wibar_bg        = theme.wibar_bg        or theme.bg
 theme.wibar_fg        = theme.wibar_fg        or theme.fg

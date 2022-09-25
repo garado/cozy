@@ -12,6 +12,7 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local textbox = require("ui.widgets.text")
 local helpers = require("helpers")
+local colorize = require("helpers.ui").colorize_text
 local area = require("modules.keynav.area")
 local navproj = require("modules.keynav.navitem").Project
 
@@ -26,7 +27,7 @@ return function(task_obj)
 
     local name_text = project:gsub("^%l", string.upper) -- capitalize 1st letter
     local name = wibox.widget({
-      markup = helpers.ui.colorize_text(name_text, accent),
+      markup = colorize(name_text, accent),
       font = beautiful.alt_font .. "15",
       halign = "left",
       valign = "center",
@@ -42,7 +43,7 @@ return function(task_obj)
     })
 
     local percent_completion = wibox.widget({
-      markup = helpers.ui.colorize_text("0%", beautiful.fg),
+      markup = colorize("0%", beautiful.fg),
       font = beautiful.alt_font .. "Light 15",
       halign = "right",
       valign = "center",
@@ -67,7 +68,7 @@ return function(task_obj)
           { -- header
             {
               name,
-              project_tag,
+              --project_tag,
               layout = wibox.layout.fixed.vertical
             },
             nil,
@@ -91,7 +92,7 @@ return function(task_obj)
       widget = wibox.container.background,
     })
 
-    -- update progress bar/completion percentage
+    -- Update progress bar/completion percentage
     local cmd = "task context none ; task tag:"..tag.." project:'"..project.. "' count"
     awful.spawn.easy_async_with_shell(cmd, function(stdout)
       local pending = #tasks
@@ -100,16 +101,16 @@ return function(task_obj)
       local percent = math.floor((completed / total) * 100) or 0
 
       progress_bar.value = percent
-      local markup = helpers.ui.colorize_text(percent.."%", beautiful.fg)
+      local markup = colorize(percent.."%", beautiful.fg)
       percent_completion:set_markup_silently(markup)
 
       -- tag
       local rem = pending.."/"..total.." REMAINING"
       -- local text = string.upper(tag).." - "..rem
-      markup = helpers.ui.colorize_text(rem, beautiful.fg)
+      markup = colorize(rem, beautiful.fg)
       project_tag:set_markup_silently(markup)
 
-      -- prevent flicker by only drawing when all ui-related async calls have
+      -- Prevent flicker by only drawing when all ui-related async calls have
       -- finished
       task_obj:emit_signal("tasks::projectlist_ready", widget, project)
     end)
@@ -130,11 +131,11 @@ return function(task_obj)
 
   -- json_parsed signal tells us that the data is ready to be
   -- processed
-  local fuck = true
+  local no_projects_added = true
   task_obj:connect_signal("tasks::json_parsed", function()
     nav_projects:remove_all_items()
     nav_projects:reset()
-    fuck = true
+    no_projects_added = true
 
     local tag = task_obj.current_tag
     for project, tasks in pairs(task_obj.projects) do
@@ -142,13 +143,22 @@ return function(task_obj)
     end
   end)
 
-  -- prevent flicker by only drawing when all ui-related async calls have
+  -- Prevent flicker by only drawing when all ui-related async calls have
   -- finished
   task_obj:connect_signal("tasks::projectlist_ready", function(_, widget, name)
-    if fuck then
+    -- When adding the first project to the project list,
+    -- clear all old projects, then move navigator to proj list
+    if no_projects_added then
+      no_projects_added = false
       project_list:reset()
-      fuck = false
+      project_list:add(widget)
+      nav_projects:append(navproj:new(widget, task_obj, name))
+
+      --local navigator = nav_projects.nav
+      --if navigator then navigator:set_area("projects") end
+      return
     end
+
     project_list:add(widget)
     nav_projects:append(navproj:new(widget, task_obj, name))
   end)

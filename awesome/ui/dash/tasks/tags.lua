@@ -10,9 +10,9 @@ local wibox = require("wibox")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local gears = require("gears")
-local widgets = require("ui.widgets")
 local helpers = require("helpers")
-local elevated = require("modules.keynav.navitem").Elevated
+local tasks_textbox = require("modules.keynav.navitem").Tasks_Textbox
+local taskbox = require("modules.keynav.navitem").Taskbox
 local Area = require("modules.keynav.area")
 
 -- Keyboard navigation
@@ -56,16 +56,12 @@ return function(task_obj)
   })
 
   local function create_tag_button(name)
-    return widgets.button.text.normal({
-      text = name,
-      text_normal_bg = beautiful.fg,
-      normal_bg = beautiful.switcher_opt_btn_bg,
-      animate_size = false,
-      size = 12,
-      on_release = function()
-        task_obj.current_tag = name
-        task_obj:emit_signal("tasks::tag_selected", name)
-      end
+    return wibox.widget({
+      markup = helpers.ui.colorize_text(name, beautiful.fg),
+      align = "center",
+      font = beautiful.font_name .. "11",
+      forced_height = dpi(20),
+      widget = wibox.widget.textbox,
     })
   end
 
@@ -73,9 +69,17 @@ return function(task_obj)
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local tags = parse_taskw_tags(stdout)
     for i = 1, #tags do
-      local btn = create_tag_button(tags[i]["name"])
+      local tagname = tags[i]["name"]
+      local btn = create_tag_button(tagname)
       tag_list:add(btn)
-      nav_tags:append(elevated:new(btn))
+
+      -- Keyboard navigation
+      local nav_tag = tasks_textbox:new(btn)
+      function nav_tag:release()
+        task_obj.current_tag = tagname
+        task_obj:emit_signal("tasks::tag_selected", tagname)
+      end
+      nav_tags:append(nav_tag)
     end
     task_obj:emit_signal("tasks::tag_selected", tags[1]["name"])
   end)
@@ -101,5 +105,7 @@ return function(task_obj)
     shape = gears.shape.rounded_rect,
     widget = wibox.container.background,
   })
+
+  nav_tags.widget = taskbox:new(widget)
   return widget, nav_tags
 end

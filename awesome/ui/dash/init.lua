@@ -78,6 +78,7 @@ return function(s)
           -- insert all areas for the new tab
           if navitems[i] and not nav_root:contains(navitems[i]) then
             nav_root:append(navitems[i])
+            nav_root:verify_nav_references()
           end
         end
       })

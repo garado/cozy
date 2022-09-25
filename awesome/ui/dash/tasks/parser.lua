@@ -22,8 +22,9 @@ return function(task_obj)
           local due   = json_arr[i]["due"]
           local desc  = json_arr[i]["description"]
           local proj  = json_arr[i]["project"]
+          local id    = json_arr[i]["id"]
 
-          local task = { desc, due }
+          local task = { desc, due, id }
           if not projects[proj] then projects[proj] = {} end
           table.insert(projects[proj], task)
         end

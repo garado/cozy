@@ -5,42 +5,52 @@
 local wibox = require("wibox")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
+local ui = require("helpers.ui")
 local gobject = require("gears.object")
 local area = require("modules.keynav.area")
 
--- gears.object that modules use to communicate
--- with each other
+-- gears.object that modules use to communicate with each other.
+-- emits/connects to signals and also holds state variables
 local task_obj = gobject{}
+task_obj.keygrabber_running = false
 task_obj.current_tag  = "Cozy"
-task_obj.current_proj = "General"
 
 -- Import modules
 local tag_list, nav_tags     = require("ui.dash.tasks.tags")(task_obj)
 local overview, nav_overview = require("ui.dash.tasks.overview")(task_obj)
-local projects, nav_projects = require("ui.dash.tasks.projects")(task_obj)
+local projects, nav_projects = require("ui.dash.tasks.new_projects")(task_obj)
+local stats   = require("ui.dash.tasks.stats")(task_obj)
+local prompt  = require("ui.dash.tasks.prompt")(task_obj)
 require("ui.dash.tasks.parser")(task_obj)
 
 -- Keyboard navigation
 local nav_tasks = area:new({ name = "tasks" })
 nav_tasks:append(nav_tags)
-nav_tasks:append(nav_overview)
 nav_tasks:append(nav_projects)
+nav_tasks:append(nav_overview)
 
 -- Assemble UI
+local sidebar = wibox.widget({
+  tag_list,
+  projects,
+  stats,
+  spacing = dpi(15),
+  forced_height = dpi(730),
+  layout = wibox.layout.ratio.vertical,
+})
+sidebar:adjust_ratio(2, unpack({0.3, 0.4, 0.3}))
+
 local tasks_dashboard = wibox.widget({
   {
+    sidebar,
     {
-      tag_list,
-      layout = wibox.layout.fixed.vertical,
-    },
-    {
-      overview,
+      {
+        overview,
+        prompt,
+        layout = wibox.layout.fixed.vertical,
+      },
       left = dpi(15),
       right = dpi(20),
-      widget = wibox.container.margin,
-    },
-    {
-      projects,
       widget = wibox.container.margin,
     },
     spacing = dpi(15),
