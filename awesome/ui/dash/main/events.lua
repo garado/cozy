@@ -121,7 +121,7 @@ local function widget()
       if stdout ~= nil and stdout ~= '' then
         parse_tsv(stdout)
       else
-        local gcalcli_cmd = "gcalcli agenda today '2 weeks' --tsv"
+        local gcalcli_cmd = "gcalcli agenda today '2 weeks' --tsv --details all"
         awful.spawn.easy_async_with_shell(gcalcli_cmd, function(stdout)
           parse_tsv(stdout)
           awful.spawn.with_shell("echo -e '" .. stdout .. "' > " .. file)

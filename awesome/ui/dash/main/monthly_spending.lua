@@ -13,9 +13,7 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local gears = require("gears")
 local helpers = require("helpers")
-local naughty = require("naughty")
 local animation = require("modules.animation")
 local user_vars = require("user_variables")
 
@@ -98,7 +96,7 @@ local function create_chart()
     local colors = { }
     local arc_text = chart:get_children_by_id("text")[1]
     local arc_chart = chart:get_children_by_id("arc")[1]
-    
+
     arc_chart.min_value = 0
     arc_chart.max_value = tonumber(total_spending)
 

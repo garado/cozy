@@ -13,7 +13,6 @@ local dpi = xresources.apply_dpi
 local helpers = require("helpers")
 local widgets = require("ui.widgets")
 local user_vars = require("user_variables")
-local naughty = require("naughty")
 local string = string
 
 local Elevated = require("modules.keynav.navitem").Elevated
@@ -127,13 +126,26 @@ local function format_time(str)
   str = string.gsub(str, "[%a+%s+\n\r]", "")
   str = string.gsub(str, ":%d+$", "")
 
-  local min_str = string.gsub(str, "^%d+:", "")
+  local min_str  = string.gsub(str, "^%d+:", "")
   local hour_str = string.gsub(str, ":%d+$", "")
+  local min  = tonumber(min_str)
+  local hour = tonumber(hour_str)
 
   local txt = "--"
-  local valid_hour = tonumber(hour_str) and tonumber(hour_str) > 0
-  if min_str  then txt = tonumber(min_str) .. "m" end
-  if hour_str and valid_hour then txt = hour_str .. "h " .. txt end
+  local valid_hour = hour and hour > 0
+  if min_str  then txt = min .. "m" end
+  if valid_hour then txt = hour .. "h " .. txt end
+
+  -- Send notif if I've been working for too long
+  if (hour ~= 0) and (min == 0 or min == 30) then
+    require("naughty").notification {
+      app_name = "Timewarrior",
+      title = "Is it time to take a break?",
+      message = "You've been working for "..txt..".",
+      timeout = 0,
+    }
+  end
+
   return txt
 end
 
