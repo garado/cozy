@@ -6,7 +6,6 @@
 --    * list of tasks and their due dates
 -- Also includes a keygrabber to enable modifying/adding/deleting tasks. :)
 
-local awful = require("awful")
 local beautiful = require("beautiful")
 local wibox = require("wibox")
 local gears = require("gears")
@@ -24,17 +23,36 @@ local format_due_date = require("helpers.dash").format_due_date
 
 return function(task_obj)
   -- Keyboard navigation
+  -- Setting up custom keys is... a little clunky
+  -- Need to update keynav to make this better
+  local nav_overview
   local keys = require("ui.dash.tasks.keygrabber")(task_obj)
-  local nav_overview = area:new({
+  nav_overview = area:new({
     name = "overview",
     circular = true,
-    keys = keys,
+  })
+
+  keys["h"] = function()
+    local navigator = nav_overview.nav
+    navigator:set_area("projects")
+  end
+  nav_overview.keys = keys
+
+  -- ui components
+  local overview = wibox.widget({
+    spacing = dpi(15),
+    layout = wibox.layout.fixed.vertical,
+  })
+
+  local tasklist = wibox.widget({
+    spacing = dpi(8),
+    layout = wibox.layout.flex.vertical,
   })
 
   -- ▀█▀ ▄▀█ █▀ █▄▀ █▀ 
   -- ░█░ █▀█ ▄█ █░█ ▄█ 
   -- Returns tasks associated with a given project.
-  local function create_task(name, due_date)
+  local function create_task(name, due_date, id)
     name = name:gsub("%^l", string.upper)
     local taskname = wibox.widget({
       markup = colorize(name, beautiful.fg),
@@ -53,19 +71,22 @@ return function(task_obj)
       widget = wibox.widget.textbox,
     })
 
-    return wibox.widget({
+    local task = wibox.widget({
       taskname,
       nil,
       due,
       layout = wibox.layout.align.horizontal,
     })
+
+    return task
   end
 
   -- █▀█ █▀█ █▀█ ░░█ █▀▀ █▀▀ ▀█▀    █▀ █░█ █▀▄▀█ █▀▄▀█ ▄▀█ █▀█ █▄█ 
   -- █▀▀ █▀▄ █▄█ █▄█ ██▄ █▄▄ ░█░    ▄█ █▄█ █░▀░█ █░▀░█ █▀█ █▀▄ ░█░ 
   -- Create a summary listing all tasks as well as completion percentage
-  local function create_project_summary(tag, project, tasks)
+  local function create_project_summary(tag, project)
     local accent = beautiful.random_accent_color()
+
     if project == "(none)" or project == "noproj" then
       project = "No project"
     end
@@ -98,7 +119,6 @@ return function(task_obj)
     local progress_bar = wibox.widget({
       color = accent,
       background_color = beautiful.bg_l3,
-      --background_color = beautiful.cash_budgetbar_bg,
       value = 92,
       max_value = 100,
       border_width = dpi(0),
@@ -107,20 +127,33 @@ return function(task_obj)
       widget = wibox.widget.progressbar,
     })
 
-    local tasklist = wibox.widget({
-      spacing = dpi(8),
-      layout = wibox.layout.flex.vertical,
-    })
-
-    local desc = 1
-    local due  = 2
-    local id   = 3
-    for i = 1, #tasks do
-      local id_ = tasks[i][id]
-      local task = create_task(tasks[i][desc], tasks[i][due])
-      nav_overview:append(navtask:new(task, task_obj, id_))
+    -- Add tasks
+    nav_overview:remove_all_items()
+    nav_overview:reset()
+    tasklist:reset()
+    local tasklist_ = task_obj.projects[project].tasks
+    for i = 1, #tasklist_ do
+      local desc = tasklist_[i]["description"]
+      local due  = tasklist_[i]["due"] or ""
+      local id   = tasklist_[i]["id"]
+      local task = create_task(desc, due, id)
+      nav_overview:append(navtask:new(task, task_obj, id))
       tasklist:add(task)
     end
+
+    local pending = #tasklist_
+    local total = task_obj.projects[project].total
+    local completed = total - pending
+    local percent = math.floor((completed / total) * 100) or 0
+
+    progress_bar.value = percent
+    local markup = colorize(percent.."%", beautiful.fg)
+    percent_completion:set_markup_silently(markup)
+
+    local rem = pending.."/"..total.." REMAINING"
+    local text = string.upper(tag).." - "..rem
+    markup = colorize(text, beautiful.fg)
+    project_tag:set_markup_silently(markup)
 
     local widget = wibox.widget({
       {
@@ -156,83 +189,38 @@ return function(task_obj)
       widget = wibox.container.background,
     })
 
-    -- update progress bar/completion percentage
-    local cmd = "task context none ; task tag:"..tag.." project:'"..project.. "' count"
-    awful.spawn.easy_async_with_shell(cmd, function(stdout)
-      print(cmd)
-      print(stdout)
-      local pending = #tasks
-      local total = tonumber(stdout) or 0
-      local completed = total - pending
-      local percent = math.floor((completed / total) * 100) or 0
-
-      progress_bar.value = percent
-      --progress_bar.value = 0
-      local markup = colorize(percent.."%", beautiful.fg)
-      percent_completion:set_markup_silently(markup)
-
-      -- tag
-      local rem = pending.."/"..total.." REMAINING"
-      local text = string.upper(tag).." - "..rem
-      markup = colorize(text, beautiful.fg)
-      project_tag:set_markup_silently(markup)
-
-      -- fun animation!
-      --local anim = animation:new({
-      --  duration = 1.25,
-      --  target = percent,
-      --  easing = animation.easing.inOutExpo,
-      --  update = function(_, pos)
-      --    progress_bar.value = dpi(pos)
-      --    markup = colorize(dpi(pos).."%", beautiful.fg)
-      --    percent_completion:set_markup_silently(markup)
-      --  end
-      --})
-
-      -- prevent flicker by only drawing when ready
-      task_obj:emit_signal("tasks::overview_ready", widget)
-      --anim:start()
-    end)
+    overview:reset()
+    overview:add(widget)
+    nav_overview.widget = overviewbox:new(widget, task_obj)
   end -- end create proj summary
 
-  local overview = wibox.widget({
-    spacing = dpi(15),
-    layout = wibox.layout.fixed.vertical,
-  })
 
-  task_obj:connect_signal("tasks::json_parsed", function()
-    -- ugh
-    local project
-    for k, _ in pairs(task_obj.projects) do
-      project = k
-      break
-    end
-    task_obj.current_project = project
-
-    local tag     = task_obj.current_tag
-    local tasks   = task_obj.projects[project]
-    nav_overview:remove_all_items()
-    nav_overview:reset()
-    create_project_summary(tag, project, tasks)
+  -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
+  -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
+  task_obj:connect_signal("tasks::draw_first_overview", function(_, project)
+    print("overview: connect draw_first_overview")
+    local tag = task_obj.current_tag
+    create_project_summary(tag, project)
   end)
 
   -- json_parsed signal tells us that the data is ready to be
   -- processed
   task_obj:connect_signal("tasks::project_selected", function()
+    print("overview: connect project_selected")
     local tag     = task_obj.current_tag
     local project = task_obj.current_project
-    local tasks   = task_obj.projects[project]
-    nav_overview:remove_all_items()
-    nav_overview:reset()
-    create_project_summary(tag, project, tasks)
+    create_project_summary(tag, project)
   end)
 
-  -- prevent flicker by only drawing when ready
-  task_obj:connect_signal("tasks::overview_ready", function(_, widget)
-    overview:reset()
-    overview:add(widget)
-    nav_overview.widget = overviewbox:new(widget, task_obj)
-  end)
+  --task_obj:connect_signal("tasks::project_json_parsed", function(_, tag, project)
+  --  print("overview: connect project_json_parsed; project is ")
+
+  --  --local curr_tag     = task_obj.current_tag
+  --  --local curr_project = task_obj.current_project
+  --  --if tag == curr_tag and project == curr_project then
+  --    create_project_summary(tag, project)
+  --  --end
+  --end)
 
   return overview, nav_overview
 end

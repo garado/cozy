@@ -52,6 +52,8 @@ return function(task_obj)
       local prompt = colorize("<b>Mark as done? (y/n) </b>", beautiful.fg)
       task_input(type, prompt)
     elseif  type == "start" then
+      --local cmd = "task start " .. task_obj.id
+      --awful.spawn.with_shell(cmd)
     end
   end)
 
@@ -61,23 +63,25 @@ return function(task_obj)
     local tag  = task_obj.current_tag
     local id   = task_obj.id
 
+    local cmd
     if      type == "add" then
-      local cmd = "task add proj:'"..proj.."' tag:'"..tag.."' '"..input.."'"
-      awful.spawn.with_shell(cmd)
+      cmd = "task add proj:'"..proj.."' tag:'"..tag.."' '"..input.."'"
     elseif  type == "modify" then
-      local cmd = "task "..id.." mod "..input
-      awful.spawn.with_shell(cmd)
+      cmd = "task "..id.." mod "..input
     elseif  type == "delete" then
       if input == "y" or input == "Y" then
-        local cmd = "echo 'y' | task delete " .. id
-        awful.spawn.with_shell(cmd)
+        cmd = "echo 'y' | task delete " .. id
       end
     elseif  type == "done" then
       if input == "y" or input == "Y" then
-        local cmd = "echo 'y' | task done " .. id
-        awful.spawn.with_shell(cmd)
+        cmd = "echo 'y' | task done " .. id
       end
     end
+
+    awful.spawn.easy_async_with_shell(cmd, function()
+      print("prompt: emit project_modified")
+      task_obj:emit_signal("tasks::project_modified", tag, proj, type)
+    end)
   end)
   --task_obj:connect_signal("tasks::task_add_input_received", function(_, input)
   --  local proj = task_obj.current_project

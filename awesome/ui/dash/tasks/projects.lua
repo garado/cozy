@@ -1,8 +1,7 @@
 
--- █▀█ █▀█ █▀█ ░░█ █▀▀ █▀▀ ▀█▀ █▀ 
--- █▀▀ █▀▄ █▄█ █▄█ ██▄ █▄▄ ░█░ ▄█ 
-
--- Create a fancy-looking list of projects.
+-- █▀█ █▀█ █▀█ ░░█ █▀▀ █▀▀ ▀█▀    █░░ █ █▀ ▀█▀ 
+-- █▀▀ █▀▄ █▄█ █▄█ ██▄ █▄▄ ░█░    █▄▄ █ ▄█ ░█░ 
+-- Create a list of projects and show completion percentage.
 
 local awful = require("awful")
 local beautiful = require("beautiful")
@@ -10,158 +9,148 @@ local wibox = require("wibox")
 local gears = require("gears")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local textbox = require("ui.widgets.text")
 local helpers = require("helpers")
 local colorize = require("helpers.ui").colorize_text
 local area = require("modules.keynav.area")
-local navproj = require("modules.keynav.navitem").Project
-
+local tasks_textbox = require("modules.keynav.navitem").Tasks_Textbox
+local taskbox = require("modules.keynav.navitem").Taskbox
 local math = math
 
+-- Keyboard navigation
+local nav_projects
+nav_projects = area:new({
+  name = "projects",
+  keys = {
+    ["l"] = function()
+      local navigator = nav_projects.nav
+      navigator:set_area("overview")
+    end,
+  }
+})
+
 return function(task_obj)
-  local function create_project_header(tag, project, tasks)
-    local accent = beautiful.random_accent_color()
+  local function create_project_button(project)
+    local tag = task_obj.current_tag
+
+    -- Handle tasks that don't have an associated project
     if project == "(none)" or project == "noproj" then
       project = "No project"
     end
 
-    local name_text = project:gsub("^%l", string.upper) -- capitalize 1st letter
-    local name = wibox.widget({
-      markup = colorize(name_text, accent),
-      font = beautiful.alt_font .. "15",
-      halign = "left",
-      valign = "center",
-      widget = wibox.widget.textbox,
-    })
-
-    local project_tag = textbox({
-      text = string.upper(tag),
-      color = beautiful.fg,
-      font = beautiful.font,
-      size = 10,
-      halign = "left",
-    })
-
-    local percent_completion = wibox.widget({
-      markup = colorize("0%", beautiful.fg),
-      font = beautiful.alt_font .. "Light 15",
-      halign = "right",
-      valign = "center",
-      widget = wibox.widget.textbox,
-    })
-
-    local progress_bar = wibox.widget({
-      color = accent,
-      background_color = beautiful.bg_l3,
-      --background_color = beautiful.cash_budgetbar_bg,
-      value = 92,
-      max_value = 100,
-      border_width = dpi(0),
-      forced_width = dpi(280),
-      forced_height = dpi(5),
-      widget = wibox.widget.progressbar,
-    })
-
-    local widget = wibox.widget({
-      {
-        {
-          { -- header
-            {
-              name,
-              --project_tag,
-              layout = wibox.layout.fixed.vertical
-            },
-            nil,
-            percent_completion,
-            layout = wibox.layout.align.horizontal,
-          },
-          progress_bar,
-          spacing = dpi(5),
-          layout = wibox.layout.fixed.vertical
-        },
-        top = dpi(15),
-        bottom = dpi(20),
-        left = dpi(25),
-        right = dpi(25),
-        widget = wibox.container.margin,
-      },
-      id = project,
-      forced_width = dpi(320),
-      bg = beautiful.dash_widget_bg,
-      shape = gears.shape.rounded_rect,
-      widget = wibox.container.background,
-    })
-
     -- Update progress bar/completion percentage
-    local cmd = "task context none ; task tag:"..tag.." project:'"..project.. "' count"
+    local unset_context = "task context none ; "
+    local filters = "task tag:'"..tag.."' project:'"..project.."' "
+    local status = " '(status:pending or status:completed)' "
+    local cmd = unset_context .. filters .. status .. "count"
     awful.spawn.easy_async_with_shell(cmd, function(stdout)
-      local pending = #tasks
+      local pending = #task_obj.projects[project].tasks
       local total = tonumber(stdout) or 0
       local completed = total - pending
       local percent = math.floor((completed / total) * 100) or 0
 
-      progress_bar.value = percent
-      local markup = colorize(percent.."%", beautiful.fg)
-      percent_completion:set_markup_silently(markup)
-
-      -- tag
-      local rem = pending.."/"..total.." REMAINING"
-      -- local text = string.upper(tag).." - "..rem
-      markup = colorize(rem, beautiful.fg)
-      project_tag:set_markup_silently(markup)
+      local text = project.." ("..percent .. "%)"
+      local markup = colorize(text, beautiful.fg)
+      local textbox = wibox.widget({
+        markup = markup,
+        align = "center",
+        forced_height = dpi(20),
+        font = beautiful.font_name .. "11",
+        widget = wibox.widget.textbox,
+      })
 
       -- Prevent flicker by only drawing when all ui-related async calls have
       -- finished
-      task_obj:emit_signal("tasks::projectlist_ready", widget, project)
+      task_obj.projects[project].total = total
+      task_obj:emit_signal("tasks::project_async_done", textbox, project)
     end)
-
-    return widget
-  end -- end create_project_header
-
-  -- Keyboard navigation
-  local nav_projects = area:new({
-    name = "projects",
-    circular = true,
-  })
+  end -- end create_project_button
 
   local project_list = wibox.widget({
-    spacing = dpi(15),
-    layout = wibox.layout.fixed.vertical,
+    spacing = dpi(5),
+    layout = wibox.layout.flex.vertical,
   })
 
-  -- json_parsed signal tells us that the data is ready to be
-  -- processed
+  local projects_widget = wibox.widget({
+    {
+      {
+        {
+          helpers.ui.create_dash_widget_header("Projects"),
+          project_list,
+          spacing = dpi(10),
+          --forced_width = dpi(150),
+          fill_space = true,
+          layout = wibox.layout.fixed.vertical,
+        },
+        top = dpi(15),
+        bottom = dpi(20),
+        widget = wibox.container.margin,
+      },
+      widget = wibox.container.place
+    },
+    forced_width = dpi(290),
+    bg = beautiful.dash_widget_bg,
+    shape = gears.shape.rounded_rect,
+    widget = wibox.container.background,
+  })
+  nav_projects.widget = taskbox:new(projects_widget)
+
   local no_projects_added = true
-  task_obj:connect_signal("tasks::json_parsed", function()
+  local function draw_project_list()
     nav_projects:remove_all_items()
     nav_projects:reset()
     no_projects_added = true
 
-    local tag = task_obj.current_tag
-    for project, tasks in pairs(task_obj.projects) do
-      create_project_header(tag, project, tasks)
+    for project, _ in pairs(task_obj.projects) do
+      create_project_button(project)
     end
+  end
+
+  -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
+  -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
+  -- json_parsed signal tells us that the data is ready to be
+  -- processed
+  -- need to rename and reuse this signal cause project_json_parsed is the exact same
+  task_obj:connect_signal("tasks::tag_json_parsed", function()
+    print("list: connect tag_json_parsed")
+    draw_project_list()
+  end)
+
+  task_obj:connect_signal("tasks::project_json_parsed", function()
+    print("list: connect project_json_parsed")
+    draw_project_list()
   end)
 
   -- Prevent flicker by only drawing when all ui-related async calls have
   -- finished
-  task_obj:connect_signal("tasks::projectlist_ready", function(_, widget, name)
-    -- When adding the first project to the project list,
-    -- clear all old projects, then move navigator to proj list
+  task_obj:connect_signal("tasks::project_async_done", function(_, widget, name)
+    -- When adding the first project to the project list, clear all old projects
     if no_projects_added then
       no_projects_added = false
       project_list:reset()
-      project_list:add(widget)
-      nav_projects:append(navproj:new(widget, task_obj, name))
+    end
 
-      --local navigator = nav_projects.nav
-      --if navigator then navigator:set_area("projects") end
-      return
+    if name == task_obj.current_project then
+      print("projectlist: emit draw_first_overview")
+      task_obj:emit_signal("tasks::draw_first_overview", name)
+    end
+
+    if not task_obj.current_project then
+      print("projectlist: emit draw_first_overview")
+      task_obj.current_project = name
+      task_obj:emit_signal("tasks::draw_first_overview", name)
     end
 
     project_list:add(widget)
-    nav_projects:append(navproj:new(widget, task_obj, name))
+
+    -- Keyboard navigation
+    local nav_project = tasks_textbox:new(widget)
+    function nav_project:release()
+      task_obj.current_project = name
+      print("listbutton: emit project_selected")
+      task_obj:emit_signal("tasks::project_selected")
+    end
+    nav_projects:append(nav_project)
   end)
 
-  return project_list, nav_projects
+  return projects_widget, nav_projects
 end

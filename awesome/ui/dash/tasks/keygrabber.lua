@@ -3,7 +3,7 @@
 -- █░█ ██▄ ░█░ █▄█ █▀▄ █▀█ █▄█ █▄█ ██▄ █▀▄ 
 -- Custom keys for managing tasks in the overview widget.
 
-return function(task_obj)
+return function(task_obj, nav_overview)
   local function request(type)
     task_obj:emit_signal("tasks::input_request", type)
   end

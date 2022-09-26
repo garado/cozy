@@ -14,11 +14,18 @@ local helpers = require("helpers")
 local tasks_textbox = require("modules.keynav.navitem").Tasks_Textbox
 local taskbox = require("modules.keynav.navitem").Taskbox
 local Area = require("modules.keynav.area")
+local user_vars = require("user_variables")
 
 -- Keyboard navigation
-local nav_tags = Area:new({
+local nav_tags
+nav_tags = Area:new({
   name = "tags",
-  circular = true,
+  keys = {
+    ["l"] = function()
+      local navigator = nav_tags.nav
+      navigator:set_area("overview")
+    end,
+  }
 })
 
 -- Given the output of `task tags`,
@@ -33,7 +40,7 @@ local function parse_taskw_tags(stdout)
     local count = string.gsub(line, "[^%d+$]", "")
 
     -- to get tag name, remove the task count
-    local name = string.gsub(line, "[%s+%d+$]", "")
+    local name = string.gsub(line, "%s+%d+$", "")
 
     local tag = {
       ["name"]  = name,
@@ -51,7 +58,7 @@ end
 
 return function(task_obj)
   local tag_list = wibox.widget({
-    spacing = dpi(10),
+    spacing = dpi(5),
     layout = wibox.layout.fixed.vertical,
   })
 
@@ -77,11 +84,15 @@ return function(task_obj)
       local nav_tag = tasks_textbox:new(btn)
       function nav_tag:release()
         task_obj.current_tag = tagname
+        task_obj.current_project = nil
         task_obj:emit_signal("tasks::tag_selected", tagname)
       end
       nav_tags:append(nav_tag)
     end
-    task_obj:emit_signal("tasks::tag_selected", tags[1]["name"])
+    local default_tag = user_vars.task.default_tag
+    task_obj.current_tag = default_tag or tags[1]["name"]
+    task_obj.current_project = nil
+    task_obj:emit_signal("tasks::tag_selected", default_tag)
   end)
 
   local widget = wibox.widget({
@@ -95,7 +106,7 @@ return function(task_obj)
           fill_space = false,
           layout = wibox.layout.fixed.vertical,
         },
-        margins = dpi(20),
+        margins = dpi(10),
         widget = wibox.container.margin,
       },
       widget = wibox.container.place
