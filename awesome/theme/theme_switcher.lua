@@ -25,12 +25,17 @@ end
 local function nvchad()
   local nvchad_theme = theme.nvchad
 
-  -- change nvchad config file
-  local nvchad_theme_cfg = "/home/alexis/.config/nvim/lua/custom/theme.lua"
+  -- Change nvchad config file.
+  -- In my setup, the theme is in a file called theme.lua,
+  -- and my chadrc contains the following:
+  -- M.ui = {
+  --  theme = require("custom.theme")
+  --}
+  local nvchad_theme_cfg = "~/.config/nvim/lua/custom/theme.lua"
   local change_cfg_cmd = "echo 'return \"" .. nvchad_theme .. "\"' > " .. nvchad_theme_cfg
   awful.spawn.with_shell(change_cfg_cmd)
 
-  -- reload theme for every running nvchad instance
+  -- Script to reload theme for every running nvchad instance
   local cfg = gfs.get_configuration_dir()
   local nvchad_reload = "python " .. cfg .. "utils/neovim_reload.py"
   local reload_theme_cmd = nvchad_reload .. " " .. nvchad_theme
@@ -46,8 +51,27 @@ local function gtk()
   awful.spawn.with_shell(cmd)
 end
 
+-- ▀█ ▄▀█ ▀█▀ █░█ █░█ █▀█ ▄▀█ 
+-- █▄ █▀█ ░█░ █▀█ █▄█ █▀▄ █▀█ 
+-- Change theme by symlinking zathurarc.
+local function zathura()
+  -- Create backup of user theme.
+  local backup = "~/.config/zathura/zathurarc.user.bak"
+  if not gfs.file_readable(backup) then
+    awful.spawn.with_shell("cp ~/.config/zathura/zathurarc " .. backup)
+  end
+
+  -- Different zathura themes should all be in ~/.config/zathura
+  local zathura_theme = theme.zathura
+  local cmd = "ln -sf ~/.config/zathura/" .. zathura_theme .. " ~/.config/zathura/zathurarc"
+  awful.spawn.with_shell(cmd)
+
+  -- To do: auto reload zathura theme
+end
+
 return function()
-  if theme.kitty  then kitty()  end
-  if theme.nvchad then nvchad() end
-  if theme.gtk    then gtk()    end
+  if theme.kitty   then kitty()   end
+  if theme.nvchad  then nvchad()  end
+  if theme.gtk     then gtk()     end
+  if theme.zathura then zathura() end
 end

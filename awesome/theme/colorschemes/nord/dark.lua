@@ -52,5 +52,6 @@ theme.wibar_occupied = "#d8dee9"
 theme.kitty   = "Nord"
 theme.nvchad  = "nord"
 theme.gtk     = "Nordic"
+theme.zathura = "nord_dark"
 
 return theme

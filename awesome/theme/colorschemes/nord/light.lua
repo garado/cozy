@@ -11,8 +11,7 @@ local math = math
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
 local awesome_cfg = gfs.get_configuration_dir()
-local wall_path = awesome_cfg .. "theme/assets/walls/murky_peaks.jpg"
---local wall_path = awesome_cfg .. "theme/assets/walls/nord_light.png"
+local wall_path = awesome_cfg .. "theme/assets/walls/nord_light.png"
 theme.wallpaper = gears.surface.load_uncached(wall_path)
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
@@ -51,9 +50,24 @@ theme.green       = "#75905e"
 theme.yellow      = "#ebcb8b"
 theme.transparent = "#ffffff00"
 
+-- custom
+theme.wibar_fg       = "#2e3440"
+theme.wibar_occupied = "#a1a7b2"
+-- theme.wibar_bg       = "#2e3440"
+-- theme.wibar_focused  = "#6181a1"
+-- theme.wibar_occupied = "#eceff4"
+-- theme.wibar_empty    = "#4c566a"
+
+-- theme.wibar_fg       = "#dee4ef"
+-- theme.wibar_bg       = "#2e3440"
+-- theme.wibar_focused  = "#6181a1"
+-- theme.wibar_occupied = "#eceff4"
+-- theme.wibar_empty    = "#4c566a"
+
 -- theme switcher settings
-theme.kitty = "Nord Light"
+theme.kitty   = "Nord Light"
 theme.nvchad  = "onenord_light"
-theme.gtk   = "Graphite-Light-nord"
+theme.gtk     = "Graphite-Light-nord"
+theme.zathura = "nord_light"
 
 return theme

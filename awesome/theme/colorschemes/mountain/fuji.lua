@@ -28,6 +28,15 @@ theme.accents = {
   "#9ec3c4",
   "#9ec49f",
   "#a5b4cb",
+  ----------
+  "#a39ec4",
+  "#c49ec4",
+  "#c4c19e",
+  "#c49ea0",
+  "#ceb188",
+  "#9ec3c4",
+  "#9ec49f",
+  "#a5b4cb",
 }
 
 function theme.random_accent_color()
@@ -57,5 +66,6 @@ theme.wibar_focused = "#5b6572"
 -- theme switcher settings
 theme.kitty   = "Mountain Fuji"
 theme.nvchad  = "mountain"
+theme.zathura = "mountain_fuji"
 
 return theme

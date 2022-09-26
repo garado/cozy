@@ -60,8 +60,9 @@ theme.notif_bg      = "#ebdbb2"
 theme._border_color_active = "#d79921"
 
 -- theme switcher
-theme.kitty = "Gruvbox Light Soft"
+theme.kitty   = "Gruvbox Light Soft"
 theme.nvchad  = "gruvbox_light"
-theme.gtk   = "Gruvbox-Light-B"
+theme.gtk     = "Gruvbox-Light-B"
+theme.zathura = "gruvbox_light"
 
 return theme
