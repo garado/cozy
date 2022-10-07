@@ -11,6 +11,7 @@ local user_vars = require("user_variables")
 local theme_name = user_vars.theme_name
 local theme_style = user_vars.theme_style
 local theme = require("theme.colorschemes." .. theme_name .. "." .. theme_style)
+theme = theme.switcher
 
 -- █▄▀ █ ▀█▀ ▀█▀ █▄█ 
 -- █░█ █ ░█░ ░█░ ░█░ 

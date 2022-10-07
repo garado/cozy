@@ -1,24 +1,22 @@
 
 -- █▀▀ █▀█ █░█ █░█ █▄▄ █▀█ ▀▄▀    █░░ █ █▀▀ █░█ ▀█▀ 
 -- █▄█ █▀▄ █▄█ ▀▄▀ █▄█ █▄█ █░█    █▄▄ █ █▄█ █▀█ ░█░ 
-
-local gears = require("gears")
 local gfs = require("gears.filesystem")
-local themes_path = gfs.get_themes_dir()
-local theme = dofile(themes_path .. "default/theme.lua")
-local math = math
+local colorscheme = {
+  colors = {},
+  override = {},
+  switcher = {},
+  wall_path = nil,
+}
 
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
 local awesome_cfg = gfs.get_configuration_dir()
-local wall_path = awesome_cfg .. "theme/assets/walls/gruvbox_light.png"
-theme.wallpaper = gears.surface.load_uncached(wall_path)
+colorscheme.wall_path = awesome_cfg .. "theme/assets/walls/gruvbox_light.png"
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
-theme.transparent = "#ffffff00"
-
-theme.accents = {
+colorscheme.colors.accents = {
   "#cc241d",
   "#98971a",
   "#d79921",
@@ -29,40 +27,37 @@ theme.accents = {
   "#d65d0e",
 }
 
-function theme.random_accent_color()
-  local i = math.random(1, #theme.accents)
-  return theme.accents[i]
-end
+colorscheme.colors.bg      = "#ebdbb2"
+colorscheme.colors.bg_l0   = "#d5c4a1"
+colorscheme.colors.bg_l1   = "#bdae93"
+colorscheme.colors.bg_l2   = "#a89984"
+colorscheme.colors.bg_l3   = "#7c6f64"
+colorscheme.colors.fg      = "#282828"
+colorscheme.colors.fg_alt  = "#998a75"
+colorscheme.colors.fg_sub  = "#7c6f64"
 
-theme.bg      = "#ebdbb2"
-theme.bg_l0   = "#d5c4a1"
-theme.bg_l1   = "#bdae93"
-theme.bg_l2   = "#a89984"
-theme.bg_l3   = "#7c6f64"
-theme.fg      = "#282828"
-theme.fg_alt  = "#998a75"
-theme.fg_sub  = "#7c6f64"
+colorscheme.colors.main_accent = "#504945"
+colorscheme.colors.red         = "#9d0006"
+colorscheme.colors.green       = "#79740e"
+colorscheme.colors.yellow      = "#d79921"
+colorscheme.colors.transparent = "#ffffff00"
 
-theme.main_accent = "#504945"
-theme.red         = "#9d0006"
-theme.green       = "#79740e"
-theme.yellow      = "#d79921"
-theme.transparent = "#ffffff00"
+-- █▀█ █░█ █▀▀ █▀█ █▀█ █ █▀▄ █▀▀ 
+-- █▄█ ▀▄▀ ██▄ █▀▄ █▀▄ █ █▄▀ ██▄ 
+colorscheme.override.hab_check_fg  = "#ebdbb2"
+colorscheme.override.wibar_empty   = "#d5c4a1"
+colorscheme.override.prof_pfp_bg   = "#bdae93"
+colorscheme.override.mus_filter_1  = "#bdae93"
+colorscheme.override.mus_filter_2  = "#d5c4a1"
+colorscheme.override.ctrl_uptime   = "#282828"
+colorscheme.override.notif_bg      = "#ebdbb2"
+colorscheme.override._border_color_active = "#d79921"
 
--- custom
-theme.hab_check_fg  = "#ebdbb2"
-theme.wibar_empty   = "#d5c4a1"
-theme.prof_pfp_bg   = "#bdae93"
-theme.mus_filter_1  = "#bdae93"
-theme.mus_filter_2  = "#d5c4a1"
-theme.ctrl_uptime   = "#282828"
-theme.notif_bg      = "#ebdbb2"
-theme._border_color_active = "#d79921"
+-- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ 
+-- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ 
+colorscheme.switcher.kitty   = "Gruvbox Light Soft"
+colorscheme.switcher.nvchad  = "gruvbox_light"
+colorscheme.switcher.gtk     = "Gruvbox-Light-B"
+colorscheme.switcher.zathura = "gruvbox_light"
 
--- theme switcher
-theme.kitty   = "Gruvbox Light Soft"
-theme.nvchad  = "gruvbox_light"
-theme.gtk     = "Gruvbox-Light-B"
-theme.zathura = "gruvbox_light"
-
-return theme
+return colorscheme
