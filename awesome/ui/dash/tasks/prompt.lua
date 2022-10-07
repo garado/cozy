@@ -13,21 +13,21 @@ local dpi = xresources.apply_dpi
 local gears = require("gears")
 
 return function(task_obj)
-  local textbox = wibox.widget({
+  local prompt_textbox = wibox.widget({
     font = beautiful.font,
     widget = wibox.widget.textbox,
   })
 
   local function task_input(type, prompt, text)
-    local _prompt = colorize("<b>"..type..": </b>", beautiful.fg)
+    local default_prompt = colorize("<b>"..type..": </b>", beautiful.fg)
     awful.prompt.run {
-      prompt       = prompt or _prompt,
+      prompt       = prompt or default_prompt,
       text         = text or "",
       fg           = beautiful.fg,
       bg           = beautiful.task_prompt_textbg,
       shape        = gears.shape.rounded_rect,
       bg_cursor    = beautiful.main_accent,
-      textbox      = textbox,
+      textbox      = prompt_textbox,
       exe_callback = function(input)
         if not input or #input == 0 then return end
         task_obj:emit_signal("tasks::input_completed", type, input)
@@ -52,7 +52,12 @@ return function(task_obj)
       local prompt = colorize("<b>Mark as done? (y/n) </b>", beautiful.fg)
       task_input(type, prompt)
     elseif  type == "start" then
-      --local cmd = "task start " .. task_obj.id
+      local cmd
+      if task_obj.start then
+        local cmd = "task start " .. task_obj.id
+      else
+        local cmd = "task stop" .. task_obj.id
+      end
       --awful.spawn.with_shell(cmd)
     end
   end)

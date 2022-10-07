@@ -52,13 +52,13 @@ return function(task_obj)
   -- ▀█▀ ▄▀█ █▀ █▄▀ █▀ 
   -- ░█░ █▀█ ▄█ █░█ ▄█ 
   -- Returns tasks associated with a given project.
-  local function create_task(name, due_date, id)
+  local function create_task(name, due_date, start, id)
     name = name:gsub("%^l", string.upper)
+    local taskname_color = start and beautiful.green or beautiful.fg
     local taskname = wibox.widget({
-      markup = colorize(name, beautiful.fg),
+      markup = colorize(name, taskname_color),
       font = beautiful.font_name .. "12",
       ellipsize = "end",
-      --forced_width = dpi(450),
       widget = wibox.widget.textbox,
     })
 
@@ -131,17 +131,24 @@ return function(task_obj)
     nav_overview:remove_all_items()
     nav_overview:reset()
     tasklist:reset()
-    local tasklist_ = task_obj.projects[project].tasks
-    for i = 1, #tasklist_ do
-      local desc = tasklist_[i]["description"]
-      local due  = tasklist_[i]["due"] or ""
-      local id   = tasklist_[i]["id"]
-      local task = create_task(desc, due, id)
+    local current_task_set = false
+    local json_tasklist = task_obj.projects[project].tasks
+    for i = 1, #json_tasklist do
+      local desc  = json_tasklist[i]["description"]
+      local due   = json_tasklist[i]["due"] or ""
+      local id    = json_tasklist[i]["id"]
+      local start = json_tasklist[i]["start"]
+      local task = create_task(desc, due, start, id)
       nav_overview:append(navtask:new(task, task_obj, id))
       tasklist:add(task)
+
+      if not current_task_set then
+        current_task_set = true
+        task_obj.current_task = json_tasklist[i]
+      end
     end
 
-    local pending = #tasklist_
+    local pending = #json_tasklist
     local total = task_obj.projects[project].total
     local completed = total - pending
     local percent = math.floor((completed / total) * 100) or 0

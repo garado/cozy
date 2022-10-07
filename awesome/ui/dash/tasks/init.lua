@@ -15,8 +15,8 @@ task_obj.current_tag  = "Cozy"
 
 -- Import modules
 local tag_list, nav_tags     = require("ui.dash.tasks.tags")(task_obj)
-local overview, nav_overview = require("ui.dash.tasks.overview")(task_obj)
-local projects, nav_projects = require("ui.dash.tasks.projects")(task_obj)
+local overview, nav_overview = require("ui.dash.tasks.project_overview")(task_obj)
+local projects, nav_projects = require("ui.dash.tasks.project_list")(task_obj)
 local stats   = require("ui.dash.tasks.stats")(task_obj)
 local prompt  = require("ui.dash.tasks.prompt")(task_obj)
 require("ui.dash.tasks.parser")(task_obj)
@@ -38,7 +38,7 @@ local sidebar = wibox.widget({
   forced_height = dpi(730),
   layout = wibox.layout.ratio.vertical,
 })
-sidebar:adjust_ratio(2, unpack({0.3, 0.4, 0.3}))
+sidebar:adjust_ratio(2, unpack({0.4, 0.4, 0.2}))
 
 local tasks_dashboard = wibox.widget({
   {

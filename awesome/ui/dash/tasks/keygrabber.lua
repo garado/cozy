@@ -3,7 +3,8 @@
 -- █░█ ██▄ ░█░ █▄█ █▀▄ █▀█ █▄█ █▄█ ██▄ █▀▄ 
 -- Custom keys for managing tasks in the overview widget.
 
-return function(task_obj, nav_overview)
+return function(task_obj)
+--return function(task_obj, nav_overview)
   local function request(type)
     task_obj:emit_signal("tasks::input_request", type)
   end
@@ -14,6 +15,14 @@ return function(task_obj, nav_overview)
   local function done()   request("done")   end
   local function start()  request("start")  end
   local function undo()   request("undo")   end
+
+  --local function new_project() request("new_project") end
+  local function new_project()
+    require("naughty").notification {
+      message = "Add task to a new project"
+    }
+    --request("new_project")
+  end
 
   return {
     ["a"] = add,

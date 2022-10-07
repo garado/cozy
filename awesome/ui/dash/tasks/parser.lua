@@ -20,7 +20,7 @@ return function(task_obj)
         -- separate tasks by project
         local projects = {}
         for i, v in ipairs(json_arr) do
-          local proj = json_arr[i]["project"]
+          local proj = json_arr[i]["project"] or "No project"
           if not projects[proj] then
             projects[proj] = {}
             projects[proj].total = 0
