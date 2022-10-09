@@ -27,9 +27,9 @@ return function(s)
   local dash
 
   -- import tab contents
-  local main, nav_main   = require("ui.dash.main")()
-  local cash, nav_cash   = require("ui.dash.finances")()
-  local tasks, nav_tasks = require("ui.dash.tasks")()
+  local main,   nav_main    = require("ui.dash.main")()
+  local cash,   nav_cash    = require("ui.dash.finances")()
+  local tasks,  nav_tasks   = require("ui.dash.tasks")()
   local agenda = require("ui.dash.agenda")
 
   local tablist =   { main, tasks, cash,  agenda }
@@ -78,6 +78,7 @@ return function(s)
           -- insert all areas for the new tab
           if navitems[i] and not nav_root:contains(navitems[i]) then
             nav_root:append(navitems[i])
+            nav_root:verify_nav_references()
           end
         end
       })

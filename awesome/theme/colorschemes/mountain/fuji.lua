@@ -1,25 +1,23 @@
 
--- █▀▄▀█ █▀█ █░█ █▄░█ ▀█▀ ▄▀█ █ █▄░█ 
--- █░▀░█ █▄█ █▄█ █░▀█ ░█░ █▀█ █ █░▀█ 
--- ====== Fuji (Dark) variant ======
--- Modified!
+-- █▀▄▀█ █▀█ █░█ █▄░█ ▀█▀ ▄▀█ █ █▄░█ ▀  █▀▀ █░█ ░░█ █ 
+-- █░▀░█ █▄█ █▄█ █░▀█ ░█░ █▀█ █ █░▀█ ▄  █▀░ █▄█ █▄█ █ 
 
-local gears = require("gears")
 local gfs = require("gears.filesystem")
-local themes_path = gfs.get_themes_dir()
-local theme = dofile(themes_path .. "default/theme.lua")
-local math = math
+local colorscheme = {
+  colors = {},
+  override = {},
+  switcher = {},
+  wall_path = nil,
+}
 
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
 local awesome_cfg = gfs.get_configuration_dir()
-local wall_path = awesome_cfg .. "theme/assets/walls/mountain_modified_fuji.png"
-theme.wallpaper = gears.surface.load_uncached(wall_path)
+colorscheme.wall_path = awesome_cfg .. "theme/assets/walls/mountain_modified_fuji.png"
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
-
-theme.accents = {
+colorscheme.colors.accents = {
   "#a39ec4",
   "#c49ec4",
   "#c4c19e",
@@ -30,32 +28,29 @@ theme.accents = {
   "#a5b4cb",
 }
 
-function theme.random_accent_color()
-  local i = math.random(1, #theme.accents)
-  return theme.accents[i]
-end
+colorscheme.colors.bg      = "#191919"
+colorscheme.colors.bg_l0   = "#222222"
+colorscheme.colors.bg_l1   = "#292929"
+colorscheme.colors.bg_l2   = "#303030"
+colorscheme.colors.bg_l3   = "#3d3d3d"
+colorscheme.colors.fg      = "#f0f0f0"
+colorscheme.colors.fg_alt  = "#4c4c4c"
+colorscheme.colors.fg_sub  = "#767676"
 
-theme.bg      = "#191919"
-theme.bg_l0   = "#222222"
-theme.bg_l1   = "#292929"
-theme.bg_l2   = "#303030"
-theme.bg_l3   = "#3d3d3d"
+colorscheme.colors.main_accent = "#8a98ac"
+colorscheme.colors.red         = "#c49ea0"
+colorscheme.colors.green       = "#89ab8a"
+colorscheme.colors.yellow      = "#c4c19e"
+colorscheme.colors.transparent = "#ffffff00"
 
-theme.fg      = "#f0f0f0"
-theme.fg_alt  = "#4c4c4c"
-theme.fg_sub  = "#767676"
+-- █▀█ █░█ █▀▀ █▀█ █▀█ █ █▀▄ █▀▀ 
+-- █▄█ ▀▄▀ ██▄ █▀▄ █▀▄ █ █▄▀ ██▄ 
+colorscheme.override.wibar_focused = "#5b6572"
 
-theme.main_accent = "#8a98ac"
-theme.red         = "#c49ea0"
-theme.green       = "#515646"
-theme.yellow      = "#c4c19e"
-theme.transparent = "#ffffff00"
+-- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ 
+-- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ 
+colorscheme.switcher.kitty   = "Mountain Fuji"
+colorscheme.switcher.nvchad  = "mountain"
+colorscheme.switcher.zathura = "mountain_fuji"
 
--- custom
-theme.wibar_focused = "#5b6572"
-
--- theme switcher settings
-theme.kitty   = "Mountain Fuji"
-theme.nvchad  = "mountain"
-
-return theme
+return colorscheme

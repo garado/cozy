@@ -1,24 +1,22 @@
 
 -- █▀▀ █▀█ █░█ █░█ █▄▄ █▀█ ▀▄▀    █▀▄ ▄▀█ █▀█ █▄▀ 
 -- █▄█ █▀▄ █▄█ ▀▄▀ █▄█ █▄█ █░█    █▄▀ █▀█ █▀▄ █░█ 
-
-local gears = require("gears")
 local gfs = require("gears.filesystem")
-local themes_path = gfs.get_themes_dir()
-local theme = dofile(themes_path .. "default/theme.lua")
-local math = math
+local colorscheme = {
+  colors = {},
+  override = {},
+  switcher = {},
+  wall_path = nil,
+}
 
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
 local awesome_cfg = gfs.get_configuration_dir()
-local wall_path = awesome_cfg .. "theme/assets/walls/gruvbox_dark.png"
-theme.wallpaper = gears.surface.load_uncached(wall_path)
+colorscheme.wall_path = awesome_cfg .. "theme/assets/walls/gruvbox_dark.png"
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
-theme.transparent = "#ffffff00"
-
-theme.accents = {
+colorscheme.colors.accents = {
   "#cc241d",
   "#98971a",
   "#d79921",
@@ -30,34 +28,31 @@ theme.accents = {
   "#f9f5d7",
 }
 
-function theme.random_accent_color()
-  local i = math.random(1, #theme.accents)
-  return theme.accents[i]
-end
+colorscheme.colors.bg      = "#1d2021"
+colorscheme.colors.bg_l0   = "#282828"
+colorscheme.colors.bg_l1   = "#383635"
+colorscheme.colors.bg_l2   = "#504945"
+colorscheme.colors.bg_l3   = "#7c6f64"
+colorscheme.colors.fg      = "#fbf1c7"
+colorscheme.colors.fg_alt  = "#d5c4a1"
+colorscheme.colors.fg_sub  = "#928374"
 
-theme.bg      = "#1d2021"
-theme.bg_l0   = "#282828"
-theme.bg_l1   = "#383635"
-theme.bg_l2   = "#504945"
-theme.bg_l3   = "#7c6f64"
-theme.fg      = "#fbf1c7"
-theme.fg_alt  = "#d5c4a1"
-theme.fg_sub  = "#928374"
+colorscheme.colors.main_accent = "#928374"
+colorscheme.colors.red         = "#fb4934"
+colorscheme.colors.green       = "#b8bb26"
+colorscheme.colors.yellow      = "#fabd2f"
+colorscheme.colors.transparent = "#ffffff00"
 
-theme.main_accent = "#928374"
-theme.red         = "#fb4934"
-theme.green       = "#b8bb26"
-theme.yellow      = "#fabd2f"
-theme.transparent = "#ffffff00"
+-- █▀█ █░█ █▀▀ █▀█ █▀█ █ █▀▄ █▀▀ 
+-- █▄█ ▀▄▀ ██▄ █▀▄ █▀▄ █ █▄▀ ██▄ 
+colorscheme.override.wibar_focused = "#504945"
+colorscheme.override.wibar_empty   = "#282828"
+colorscheme.override.prof_pfp_bg   = "#383635"
 
--- custom
-theme.wibar_focused = "#504945"
-theme.wibar_empty   = "#282828"
-theme.prof_pfp_bg   = "#383635"
+-- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ 
+-- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ 
+colorscheme.switcher.kitty = "Gruvbox Dark"
+colorscheme.switcher.nvchad  = "gruvbox"
+colorscheme.switcher.gtk   = "Gruvbox-Dark-B"
 
--- theme switcher
-theme.kitty = "Gruvbox Dark"
-theme.nvchad  = "gruvbox"
-theme.gtk   = "Gruvbox-Dark-B"
-
-return theme
+return colorscheme

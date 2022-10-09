@@ -7,7 +7,7 @@ local beautiful = require("beautiful")
 local helpers = require("helpers")
 
 local cmd = 'bash -c "uptime -p"'
-local w = awful.widget.watch(cmd, 5, function(widget, stdout)
+local w = awful.widget.watch(cmd, 60, function(widget, stdout)
   local text = helpers.ui.colorize_text(" " .. stdout, beautiful.ctrl_uptime)
   text = string.gsub(text, "up ", "")
   text = string.gsub(text, " day[s]?", "d")

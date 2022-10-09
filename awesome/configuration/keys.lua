@@ -49,7 +49,7 @@ local scratchpad = bling.module.scratchpad {
     floating = true,
     geometry = {x=360, y=90, height=900, width=1200},
     reapply = true,
-    dont_focus_before_close  = false,
+    dont_focus_before_close = true,
 }
 
 -- Global key bindings

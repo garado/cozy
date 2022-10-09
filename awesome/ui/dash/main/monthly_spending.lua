@@ -13,9 +13,7 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local gears = require("gears")
 local helpers = require("helpers")
-local naughty = require("naughty")
 local animation = require("modules.animation")
 local user_vars = require("user_variables")
 
@@ -47,7 +45,7 @@ local function create_chart()
     forced_width = dpi(120),
     widget = wibox.container.place,
   })
-  
+
   local function create_legend_entry(text, amount, color)
     local circle = wibox.widget({
       markup = helpers.ui.colorize_text("", color),
@@ -78,8 +76,8 @@ local function create_chart()
         layout = wibox.layout.fixed.horizontal,
         forced_width = dpi(300),
     })
-    
-    return legend_entry 
+
+    return legend_entry
   end -- end create_legend_entry()
 
   local legend = wibox.widget({
@@ -89,16 +87,16 @@ local function create_chart()
     },
     widget = wibox.container.place,
   })
- 
+
   local function create_chart_sections(entries, num_entries, total_spending)
     -- table of dummy values for animation
     local tmp_arc_values = { }
-    
+
     local arc_values = { }
     local colors = { }
     local arc_text = chart:get_children_by_id("text")[1]
     local arc_chart = chart:get_children_by_id("arc")[1]
-    
+
     arc_chart.min_value = 0
     arc_chart.max_value = tonumber(total_spending)
 
@@ -117,7 +115,7 @@ local function create_chart()
     arc_chart.values = tmp_arc_values
     local section_index = 1
     local max_index = #arc_chart.values
-    local relative_max = arc_values[1]
+    local relative_max = arc_values[1] or 0
     local sub = 0
     local arc_chart_animation = animation:new({
       duration = 1,
@@ -163,7 +161,7 @@ local function create_chart()
     for str in stdout:gmatch("[^\r\n]+") do
       table.insert(lines, str)
     end
-      
+
     -- ledger outputs look like this:
     --    Expenses:Personal:Food  $29.50
     --    Expenses:Fees           $0.10   

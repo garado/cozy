@@ -2,25 +2,25 @@
 -- █▀▀ ▄▀█ ▀█▀ █▀█ █▀█ █░█ █▀▀ █▀▀ █ █▄░█    █░░ ▄▀█ ▀█▀ ▀█▀ █▀▀ 
 -- █▄▄ █▀█ ░█░ █▀▀ █▀▀ █▄█ █▄▄ █▄▄ █ █░▀█    █▄▄ █▀█ ░█░ ░█░ ██▄ 
 
--- This theme sucks and I couldn't get it looking right
+-- This theme sucks and I couldn't get it to look right
+-- Pull requests from those more aesthetically inclined are very welcome
 
-local gears = require("gears")
 local gfs = require("gears.filesystem")
-local themes_path = gfs.get_themes_dir()
-local theme = dofile(themes_path .. "default/theme.lua")
-local math = math
+local colorscheme = {
+  colors = {},
+  override = {},
+  switcher = {},
+  wall_path = nil,
+}
 
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
 local awesome_cfg = gfs.get_configuration_dir()
-local wall_path = awesome_cfg .. "theme/assets/walls/catppuccin_latte.png"
-theme.wallpaper = gears.surface.load_uncached(wall_path)
+colorscheme.wall_path = awesome_cfg .. "theme/assets/walls/catppuccin_latte.png"
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
-theme.transparent = "#ffffff00"
-
-theme.accents = {
+colorscheme.colors.accents = {
   "#dc8a78",
   "#dd7878",
   "#ea76cb",
@@ -37,33 +37,31 @@ theme.accents = {
   "#7287fd",
 }
 
-function theme.random_accent_color()
-  local i = math.random(1, #theme.accents)
-  return theme.accents[i]
-end
+colorscheme.colors.bg_d0   = "#"
+colorscheme.colors.bg      = "#eff1f5"
+colorscheme.colors.bg_l0   = "#e6e9ef"
+colorscheme.colors.bg_l1   = "#dce0e8"
+colorscheme.colors.bg_l2   = "#ccd0da"
+colorscheme.colors.bg_l3   = "#bcc0cc"
+colorscheme.colors.fg      = "#4c4f69"
+colorscheme.colors.fg_alt  = "#6c6f85"
+colorscheme.colors.fg_sub  = "#6c6f85"
 
-theme.bg_d0   = "#"
-theme.bg      = "#eff1f5"
-theme.bg_l0   = "#e6e9ef"
-theme.bg_l1   = "#dce0e8"
-theme.bg_l2   = "#ccd0da"
-theme.bg_l3   = "#bcc0cc"
-theme.fg      = "#4c4f69"
-theme.fg_alt  = "#6c6f85"
-theme.fg_sub  = "#6c6f85"
+colorscheme.colors.main_accent = "#7287fd"
+colorscheme.colors.red         = "#e78284"
+colorscheme.colors.green       = "#40a02b"
+colorscheme.colors.yellow      = "#df8e1d"
+colorscheme.colors.transparent = "#ffffff00"
 
-theme.main_accent = "#7287fd"
-theme.red         = "#e78284"
-theme.green       = "#40a02b"
-theme.yellow      = "#df8e1d"
+-- █▀█ █░█ █▀▀ █▀█ █▀█ █ █▀▄ █▀▀ 
+-- █▄█ ▀▄▀ ██▄ █▀▄ █▀▄ █ █▄▀ ██▄ 
+colorscheme.override.wibar_focused = "#b0b4ed"
+colorscheme.override.prof_pfp_bg   = "#b0b4ed"
 
--- custom
-theme.wibar_focused = "#b0b4ed"
-theme.prof_pfp_bg   = "#b0b4ed"
+-- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ 
+-- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ 
+colorscheme.switcher.kitty = "Catppuccin-Latte"
+colorscheme.switcher.nvchad  = "catppuccin_latte"
+colorscheme.switcher.gtk   = "Catppuccin-Latte-Mauve"
 
--- settings for theme switcher
-theme.kitty = "Catppuccin-Latte"
-theme.nvchad  = "catppuccin_latte"
-theme.gtk   = "Catppuccin-Latte-Mauve"
-
-return theme
+return colorscheme
