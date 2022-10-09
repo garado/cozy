@@ -39,7 +39,7 @@ colorscheme.colors.fg_sub  = "#767676"
 
 colorscheme.colors.main_accent = "#8a98ac"
 colorscheme.colors.red         = "#c49ea0"
-colorscheme.colors.green       = "#515646"
+colorscheme.colors.green       = "#89ab8a"
 colorscheme.colors.yellow      = "#c4c19e"
 colorscheme.colors.transparent = "#ffffff00"
 

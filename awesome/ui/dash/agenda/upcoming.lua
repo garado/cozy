@@ -131,7 +131,7 @@ local function create_eventbox(entry)
     },
     forced_height = dpi(90),
     forced_width = dpi(300),
-    bg = beautiful.bg_l1,
+    bg = beautiful.bg_l0,
     shape = gears.shape.rounded_rect,
     widget = wibox.container.background,
   })

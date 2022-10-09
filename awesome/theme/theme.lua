@@ -44,7 +44,9 @@ function theme.random_accent_color()
   return colors.accents[i]
 end
 
--- Dashboard
+-- █▀▄ ▄▀█ █▀ █░█ 
+-- █▄▀ █▀█ ▄█ █▀█ 
+-- Basic dash settings
 theme.dash_bg         = colors.bg
 theme.dash_widget_bg  = colors.bg_l0
 theme.dash_widget_sel = colors.bg_l1
@@ -52,12 +54,15 @@ theme.dash_header_fg  = colors.main_accent
 theme.dash_tab_fg     = colors.fg
 theme.dash_tab_bg     = colors.bg_l0
 
+-- Profile picture
 theme.prof_name_fg    = colors.main_accent
 theme.prof_pfp_bg     = colors.main_accent
 theme.prof_title_fg   = colors.fg
 
+-- ... timedate
 theme.timedate        = colors.main_accent
 
+-- Music player
 theme.mus_filter_1    = colors.bg_l3
 theme.mus_filter_2    = colors.bg_l3
 theme.mus_playing_fg  = colors.fg
@@ -65,8 +70,7 @@ theme.mus_control_bg  = colors.main_accent.."00"
 theme.mus_control_fg  = colors.fg
 theme.mus_bg          = colors.bg_l2
 
-theme.task_due_fg     = colors.fg_sub
-
+-- Finances
 theme.cash_arccolors  = colors.accents
 theme.cash_income_fg  = colors.green
 theme.cash_expense_fg = colors.red
@@ -75,6 +79,7 @@ theme.cash_acct_name  = colors.fg_sub
 theme.cash_action_btn = colors.bg_l2
 theme.cash_budgetbar_bg = colors.bg_l1
 
+-- Habits
 theme.hab_freq        = colors.main_accent
 theme.hab_uncheck_fg  = colors.fg
 theme.hab_uncheck_bg  = colors.bg_l2
@@ -83,12 +88,15 @@ theme.hab_check_bg    = colors.main_accent
 theme.hab_selected_bg = colors.red
 theme.hab_selected_fg = colors.fg
 
+-- Timewarrior
 theme.timew_header_fg = colors.fg_sub
 theme.timew_btn_bg    = colors.bg_l2
 
+-- Fetch (unused)
 theme.fetch_title     = colors.main_accent
 theme.fetch_value     = colors.fg
 
+-- Calendar
 theme.cal_fg = colors.fg
 theme.cal_bg = theme.dash_widget_bg
 theme.cal_weekday_fg = colors.fg
@@ -99,10 +107,15 @@ theme.cal_focus_bg = theme.dash_widget_bg
 theme.calendar_spacing = dpi(10)
 theme.calendar_long_weekdays = true
 
+-- Tasks
 theme.task_prompt_contbg = theme.bg_l0
 theme.task_prompt_textbg = theme.bg_l1
+theme.task_due_fg        = colors.fg_sub
+theme.task_scrollbar_bg  = colors.bg_l3
+theme.task_scrollbar_fg  = colors.main_accent
 
--- Bar
+-- █▄▄ ▄▀█ █▀█ 
+-- █▄█ █▀█ █▀▄ 
 theme.wibar_bg        = colors.bg
 theme.wibar_fg        = colors.fg
 theme.wibar_accent    = colors.main_accent
@@ -123,7 +136,8 @@ theme.wibar_launch_ctrl   = theme.wibar_fg
 theme.wibar_launch_theme  = theme.wibar_fg
 theme.wibar_launch_hover  = colors.main_accent
 
--- Control center
+-- █▀▀ █▀█ █▄░█ ▀█▀ █▀█ █▀█ █░░ 
+-- █▄▄ █▄█ █░▀█ ░█░ █▀▄ █▄█ █▄▄ 
 theme.ctrl_fg       = colors.fg
 theme.ctrl_bg       = colors.bg_l0
 theme.ctrl_host     = colors.fg_alt
@@ -147,14 +161,16 @@ theme.ctrl_fetch_value  = colors.fg
 
 theme.ctrl_stats_bg   = colors.bg_l2
 
--- Theme switcher
+-- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ 
+-- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ 
 theme.switcher_bg          = colors.bg_l0
 theme.switcher_act_btn_bg  = colors.bg_l0
 theme.switcher_opt_btn_bg  = colors.bg_l2
 theme.switcher_lowbar_bg   = colors.bg
 theme.switcher_header_fg   = colors.main_accent
 
--- Notifications
+-- █▄░█ █▀█ ▀█▀ █ █▀▀ █ █▀▀ ▄▀█ ▀█▀ █ █▀█ █▄░█ █▀ 
+-- █░▀█ █▄█ ░█░ █ █▀░ █ █▄▄ █▀█ ░█░ █ █▄█ █░▀█ ▄█ 
 theme.notif_bg          = colors.bg_l0
 theme.notif_actions_bg  = colors.bg_l1
 theme.notif_timeout_bg  = colors.bg_l1
@@ -162,6 +178,8 @@ theme.notif_dismiss_bg  = colors.bg_l0
 theme.notification_spacing = dpi(10)
 theme.notification_border_color = theme.notif_bg
 
+-- █▀▄▀█ █ █▀ █▀▀ 
+-- █░▀░█ █ ▄█ █▄▄ 
 -- Gaps
 theme.useless_gap = dpi(7)
 
@@ -184,8 +202,8 @@ theme.hotkeys_group_margin = dpi(25)
 theme.hotkeys_font = theme.font .. "13"
 theme.hotkeys_description_font = theme.font .. "12"
 
--- Override default vars with vars defined in colorscheme.
-gears.table.crush(theme, colorscheme.colors)
+-- Override default vars with vars defined in colorscheme
+gears.table.crush(theme, colorscheme.colors) -- shouldn't be here
 gears.table.crush(theme, colorscheme.override)
 
 return theme

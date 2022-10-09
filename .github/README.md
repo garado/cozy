@@ -5,7 +5,7 @@
 </p>
 
 <p>
-Hi! This is <b>cozy</b>, my <a href="https://awesomewm.org" target="_blank">AwesomeWM</a> config. Thanks for checking it out!
+Hi! This is <b>cozy</b>, my Arch config with <a href="https://awesomewm.org" target="_blank">AwesomeWM</a>. Thanks for checking it out!
 </p>
 
 <p>

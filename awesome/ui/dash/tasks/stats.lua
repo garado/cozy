@@ -16,8 +16,8 @@ return function(task_obj)
   -- █░█ █ 
   -- █▄█ █ 
   local _ui_tag_time_header = wibox.widget({
-    markup = colorize("Time spent on tag", beautiful.dash_header_fg),
-    font = beautiful.font_name .. "10",
+    markup = colorize("All time", beautiful.dash_header_fg),
+    font = beautiful.font_name .. "11",
     align = "center",
     valign = "center",
     widget = wibox.widget.textbox,
@@ -34,7 +34,8 @@ return function(task_obj)
   local ui_tag_time = wibox.widget({
     _ui_tag_time_header,
     _ui_tag_time_content,
-    layout = wibox.layout.fixed.vertical,
+    spacing = dpi(10),
+    layout = wibox.layout.fixed.horizontal,
   })
 
   -- Assemble the stats widget
@@ -42,7 +43,7 @@ return function(task_obj)
     {
       {
         {
-          dash.widget_header("Stats"),
+          --dash.widget_header("Stats"),
           ui_tag_time,
           spacing = dpi(10),
           layout = wibox.layout.fixed.vertical,

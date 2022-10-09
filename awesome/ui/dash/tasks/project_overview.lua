@@ -15,11 +15,16 @@ local textbox = require("ui.widgets.text")
 local area = require("modules.keynav.area")
 local navtask = require("modules.keynav.navitem").Task
 local overviewbox = require("modules.keynav.navitem").OverviewBox
--- local animation = require("modules.animation")
 local math = math
 local helpers = require("helpers")
 local colorize = require("helpers.ui").colorize_text
 local format_due_date = require("helpers.dash").format_due_date
+
+local max_tasks_shown = 21
+local max_tasklist_height = dpi(580)
+local first_visible_task_index = 1
+
+local scrollbar
 
 return function(task_obj)
   -- Keyboard navigation
@@ -38,7 +43,7 @@ return function(task_obj)
   end
   nav_overview.keys = keys
 
-  -- ui components
+  -- Define core UI components
   local overview = wibox.widget({
     spacing = dpi(15),
     layout = wibox.layout.fixed.vertical,
@@ -48,6 +53,8 @@ return function(task_obj)
     spacing = dpi(8),
     layout = wibox.layout.flex.vertical,
   })
+
+  local tasklist_overflow = {}
 
   -- ▀█▀ ▄▀█ █▀ █▄▀ █▀ 
   -- ░█░ █▀█ ▄█ █░█ ▄█ 
@@ -75,6 +82,7 @@ return function(task_obj)
       taskname,
       nil,
       due,
+      forced_height = dpi(20),
       layout = wibox.layout.align.horizontal,
     })
 
@@ -127,11 +135,12 @@ return function(task_obj)
       widget = wibox.widget.progressbar,
     })
 
-    -- Add tasks
+    -- Add tasks to task list
     nav_overview:remove_all_items()
     nav_overview:reset()
     tasklist:reset()
     local current_task_set = false
+    tasklist_overflow = {}
     local json_tasklist = task_obj.projects[project].tasks
     for i = 1, #json_tasklist do
       local desc  = json_tasklist[i]["description"]
@@ -139,8 +148,16 @@ return function(task_obj)
       local id    = json_tasklist[i]["id"]
       local start = json_tasklist[i]["start"]
       local task = create_task(desc, due, start, id)
+
+      print(id .. ": " .. desc)
       nav_overview:append(navtask:new(task, task_obj, id))
-      tasklist:add(task)
+      if #tasklist.children < max_tasks_shown then
+        tasklist:add(task)
+      else
+        table.insert(tasklist_overflow, task)
+        --local tmp = navtask:new(task, task_obj, id)
+        --table.insert(navtasklist_overflow, tmp)
+      end
 
       if not current_task_set then
         current_task_set = true
@@ -148,40 +165,78 @@ return function(task_obj)
       end
     end
 
+    local scrollbar_height = (max_tasks_shown / #json_tasklist) * max_tasklist_height
+    scrollbar = wibox.widget({
+      {
+        id = "bar",
+        value = 0,
+        maximum = #tasklist_overflow - 1,
+        forced_height = dpi(5),
+        handle_width = dpi(scrollbar_height),
+        bar_color = beautiful.task_scrollbar_bg,
+        handle_color = beautiful.task_scrollbar_fg,
+        bar_shape = gears.shape.rounded_rect,
+        widget = wibox.widget.slider,
+      },
+      direction = "west",
+      widget = wibox.container.rotate,
+    })
+
+    -- Calculate completion percentage
     local pending = #json_tasklist
     local total = task_obj.projects[project].total
     local completed = total - pending
     local percent = math.floor((completed / total) * 100) or 0
 
+    -- Update bar with completion percentage
     progress_bar.value = percent
     local markup = colorize(percent.."%", beautiful.fg)
     percent_completion:set_markup_silently(markup)
 
+    -- Update completion percentage
     local rem = pending.."/"..total.." REMAINING"
     local text = string.upper(tag).." - "..rem
     markup = colorize(text, beautiful.fg)
     project_tag:set_markup_silently(markup)
 
+    local overview_header = wibox.widget({
+      {
+        {
+          name,
+          project_tag,
+          layout = wibox.layout.fixed.vertical
+        },
+        nil,
+        percent_completion,
+        layout = wibox.layout.align.horizontal,
+      },
+      progress_bar,
+      spacing = dpi(5),
+      layout = wibox.layout.fixed.vertical
+    })
+
+    local scrollbar_cont = wibox.widget({
+      scrollbar,
+      right = dpi(15),
+      visible = #tasklist_overflow > 0,
+      widget = wibox.container.margin,
+    })
+
+    -- Assemble final widget
     local widget = wibox.widget({
       {
         {
+          overview_header,
+          helpers.ui.vertical_pad(dpi(15)),
           {
-            { -- header
-              {
-                name,
-                project_tag,
-                layout = wibox.layout.fixed.vertical
-              },
-              nil,
-              percent_completion,
+            {
+              scrollbar_cont,
+              tasklist,
               layout = wibox.layout.align.horizontal,
             },
-            progress_bar,
-            spacing = dpi(5),
-            layout = wibox.layout.fixed.vertical
+            height = max_tasklist_height,
+            widget = wibox.container.constraint,
           },
-          helpers.ui.vertical_pad(dpi(15)),
-          tasklist,
           layout = wibox.layout.fixed.vertical,
         },
         top = dpi(15),
@@ -210,6 +265,51 @@ return function(task_obj)
     create_project_summary(tag, project)
   end)
 
+  -- Emitted by keygrabber when navigating to the previous or next task
+  -- Determines which items to show when scrolling
+  task_obj:connect_signal("tasks::task_selected", function(_)
+    if #tasklist_overflow == 0 then return end
+
+    print("task selected: fvti is "..first_visible_task_index)
+    --scrollbar.children[1].value = nav_overview.index - 1
+    --print("index " ..nav_overview.index)
+    local index = nav_overview.index - 1
+    local limit = first_visible_task_index + max_tasks_shown - 1
+    local bar = scrollbar.children[1]
+
+    -- Scroll up when the new index is less than the index of the first task 
+    -- currently shown
+    if index < first_visible_task_index then
+      print("scroll up")
+      first_visible_task_index = first_visible_task_index - 1
+      bar.value = bar.value - 1
+
+      -- For scroll up, the last task gets hidden
+      -- Add it to beginning of task overflow buffer
+      table.insert(tasklist_overflow, tasklist.children[#tasklist.children])
+      tasklist:remove(#tasklist.children)
+
+      -- Add the last task from overflow buffer
+      tasklist:add(tasklist_overflow[#tasklist_overflow])
+      table.remove(tasklist_overflow, #tasklist_overflow)
+    -- Scroll down to next task if index exceeds limit
+    elseif limit < nav_overview.index - 1 then
+      first_visible_task_index = first_visible_task_index + 1
+      bar.value = bar.value + 1
+
+      -- For scroll down, the 1st task gets hidden
+      -- Add it to end of task overflow buffer
+      table.insert(tasklist_overflow, tasklist.children[1])
+      tasklist:remove(1)
+
+      -- Add the first task from overflow buffer
+      tasklist:add(tasklist_overflow[1])
+      table.remove(tasklist_overflow, 1)
+
+      tasklist:emit_signal("widget::redraw_needed")
+    end
+  end)
+
   -- json_parsed signal tells us that the data is ready to be
   -- processed
   task_obj:connect_signal("tasks::project_selected", function()
@@ -231,3 +331,4 @@ return function(task_obj)
 
   return overview, nav_overview
 end
+

@@ -40,7 +40,7 @@ return function(task_obj)
   -- Change prompt depending on what action the user is performing,
   -- then call awful.prompt to get user input
   task_obj:connect_signal("tasks::input_request", function(_, type)
-    local prompt
+    local prompt, text
 
     -- Standard requests
     if type == "add" then
@@ -87,7 +87,7 @@ return function(task_obj)
       return
     end
 
-    task_input(type, prompt)
+    task_input(type, prompt, text)
   end)
 
   -- Emitted by awful.prompt when Enter/Return is pressed
