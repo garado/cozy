@@ -4,17 +4,17 @@
 
 local awful = require("awful")
 local gears = require("gears")
+local gobject = require("gears.object")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-
 local Navigator = require("modules.keynav.navigator")
 
-local navigator, nav_root = Navigator:new()
+local ctrl_obj = gobject{}
 
 -- Import widgets
-local uptime = require("ui.control_center.uptime")
+local uptime = require("ui.control_center.uptime")(ctrl_obj)
 local profile = require("ui.control_center.profile")
 local stats = require("ui.control_center.stats")
 local fetch = require("ui.control_center.fetch")
@@ -23,6 +23,7 @@ local nav_qactions, qactions = require("ui.control_center.quick_actions")()
 local power_opts, power_confirm, nav_power = require("ui.control_center.power")()
 -- local nav_links, links = require("ui.control_center.links")()
 
+local navigator, nav_root = Navigator:new()
 nav_root:append(nav_picom)
 nav_root:append(nav_qactions)
 nav_root:append(nav_power)
@@ -110,6 +111,7 @@ return function()
     control_center.visible = not control_center.visible
     if control_center.visible then
       require("ui.shared").close_other_popups("control_center")
+      ctrl_obj:emit_signal("ctrl::opened")
       navigator:start()
     else
       navigator:stop()
