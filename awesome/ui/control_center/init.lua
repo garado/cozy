@@ -16,7 +16,7 @@ local ctrl_obj = gobject{}
 -- Import widgets
 local uptime = require("ui.control_center.uptime")(ctrl_obj)
 local profile = require("ui.control_center.profile")
-local stats = require("ui.control_center.stats")
+local stats = require("ui.control_center.stats")(ctrl_obj)
 local fetch = require("ui.control_center.fetch")
 local nav_picom, picom = require("ui.control_center.picom")()
 local nav_qactions, qactions = require("ui.control_center.quick_actions")()
@@ -114,6 +114,8 @@ return function()
       ctrl_obj:emit_signal("ctrl::opened")
       navigator:start()
     else
+      ctrl_obj:emit_signal("ctrl::closed")
+  		collectgarbage("collect")
       navigator:stop()
       power_confirm.visible = false
     end
@@ -139,6 +141,7 @@ return function()
     power_confirm.visible = true
   end)
 
+  ctrl_obj:emit_signal("ctrl::closed")
   return control_center
 end
 
