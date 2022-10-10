@@ -13,72 +13,44 @@ return function(task_obj)
     end
   end
 
-  -- █▀▄▀█ █▀█ █▀▄ ▄▀█ █░░    █▀▄▀█ █▀█ █▀▄ █ █▀▀ █▄█ 
-  -- █░▀░█ █▄█ █▄▀ █▀█ █▄▄    █░▀░█ █▄█ █▄▀ █ █▀░ ░█░ 
   local function modal()
     request("modify")
     task_obj.wait_next_keypress = true
   end
 
-  local function d()
-    if not task_obj.wait_next_keypress then
-      request("done")
-    else
-      task_obj.wait_next_keypress = false
-      request("mod_due")
-    end
-  end
+  local function handle_modal(key)
+    local not_waiting = {
+      ["d"] = request("done"),
+      ["p"] = request("new_proj"),
+      ["t"] = request("new_tag"),
+    }
 
-  local function p()
-    if not task_obj.wait_next_keypress then
-      request("new_proj")
-    else
-      task_obj.wait_next_keypress = false
-      request("mod_proj")
-    end
-  end
+    local waiting = {
+      ["d"] = request("mod_due"),
+      ["p"] = request("mod_due"),
+      ["t"] = request("mod_due"),
+      ["n"] = request("mod_name"),
+      ["Escape"] = request("mod_clear"),
+    }
 
-  local function t()
-    if not task_obj.wait_next_keypress then
-      request("new_tag")
-    else
-      task_obj.wait_next_keypress = false
-      request("mod_tag")
-    end
-  end
-
-  local function n()
     if task_obj.wait_next_keypress then
-      task_obj.wait_next_keypress = false
-      request("mod_name")
+      waiting[key]()
+    else
+      not_waiting[key]()
     end
   end
-
-  local function esc()
-    request("mod_clear")
-  end
-
-  -- end modal modify
-  ------------------------------------------
-
-  local function a() request("add")      end
-  local function x() request("delete")   end
-  local function s() request("start")    end
-  local function u() request("undo")     end
-  local function m() modal()             end
-  local function h_cap() request("help") end
 
   return {
-    ["a"] = a, -- add new task
-    ["m"] = m, -- modify
-    ["d"] = d, -- done, (modify) due date
-    ["x"] = x, -- delete
-    ["s"] = s, -- toggle start
-    ["u"] = u, -- undo
-    ["p"] = p, -- add new project, (modify) project
-    ["t"] = t, -- add new tag, (modify) task
-    ["n"] = n, -- (modify) taskname
-    ["Escape"] = esc,
-    ["H"] = h_cap, -- help menu
+    ["a"] = {["function"] = request, ["args"] = "add"},     -- add new task
+    ["x"] = {["function"] = request, ["args"] = "delete"},  -- delete
+    ["s"] = {["function"] = request, ["args"] = "start"},   -- toggle start
+    ["u"] = {["function"] = request, ["args"] = "undo"},    -- undo
+    ["H"] = {["function"] = request, ["args"] = "help"},    -- help menu
+    ["m"] = modal, -- modify
+    ["d"] = {["function"] = handle_modal, ["args"] = "d"}, -- done, (modify) due date
+    ["p"] = {["function"] = handle_modal, ["args"] = "p"}, -- add new project, (modify) project
+    ["t"] = {["function"] = handle_modal, ["args"] = "t"}, -- add new tag, (modify) task
+    ["n"] = {["function"] = handle_modal, ["args"] = "n"}, -- (modify) taskname
+    ["Escape"] = {["function"] = handle_modal, ["args"] = "Escape"}, -- (modify) clear
   }
 end
