@@ -2,51 +2,63 @@
 -- █▄▀ █▀▀ █▄█ █▀▀ █▀█ ▄▀█ █▄▄ █▄▄ █▀▀ █▀█ 
 -- █░█ ██▄ ░█░ █▄█ █▀▄ █▀█ █▄█ █▄█ ██▄ █▀▄ 
 -- Custom keys for managing tasks in the overview widget.
--- super messy :/
 
 return function(task_obj)
   local function request(type)
-    if task_obj.wait_next_keypress then
-      task_obj.wait_next_keypress = false
+    if task_obj.in_modify_mode then
+      task_obj.in_modify_mode = false
     else
       task_obj:emit_signal("tasks::input_request", type)
     end
   end
 
+  -- Default mode is normal mode
+  -- Pressing 'm' puts you in modify mode
   local function modal()
     request("modify")
-    task_obj.wait_next_keypress = true
+    task_obj.in_modify_mode = true
   end
 
   local function handle_modal(key)
-    local not_waiting = {
-      ["d"] = request("done"),
-      ["p"] = request("new_proj"),
-      ["t"] = request("new_tag"),
+    local normal = {
+      ["d"] = "done",
+      ["p"] = "new_proj",
+      ["t"] = "new_tag",
+      ["H"] = "help",
+      ["a"] = "add",
+      ["x"] = "delete",
+      ["s"] = "start",
+      ["u"] = "undo",
     }
 
-    local waiting = {
-      ["d"] = request("mod_due"),
-      ["p"] = request("mod_due"),
-      ["t"] = request("mod_due"),
-      ["n"] = request("mod_name"),
-      ["Escape"] = request("mod_clear"),
+    local modify = {
+      ["d"] = "mod_due",
+      ["p"] = "mod_proj",
+      ["t"] = "mod_tag",
+      ["n"] = "mod_name",
+      ["Escape"] = "mod_clear",
     }
 
-    if task_obj.wait_next_keypress then
-      waiting[key]()
+    if task_obj.in_modify_mode then
+      if modify[key] then
+        request(modify[key])
+      else
+        request("mod_clear")
+        request("mod_clear")
+      end
+      task_obj.in_modify_mode = false
     else
-      not_waiting[key]()
+      request(normal[key])
     end
   end
 
   return {
-    ["a"] = {["function"] = request, ["args"] = "add"},     -- add new task
-    ["x"] = {["function"] = request, ["args"] = "delete"},  -- delete
-    ["s"] = {["function"] = request, ["args"] = "start"},   -- toggle start
-    ["u"] = {["function"] = request, ["args"] = "undo"},    -- undo
-    ["H"] = {["function"] = request, ["args"] = "help"},    -- help menu
-    ["m"] = modal, -- modify
+    ["m"] = modal, -- enter modify mode
+    ["H"] = {["function"] = handle_modal, ["args"] = "H"}, -- help menu
+    ["a"] = {["function"] = handle_modal, ["args"] = "a"}, -- add new task
+    ["x"] = {["function"] = handle_modal, ["args"] = "d"}, -- delete
+    ["s"] = {["function"] = handle_modal, ["args"] = "s"}, -- toggle start
+    ["u"] = {["function"] = handle_modal, ["args"] = "u"}, -- undo
     ["d"] = {["function"] = handle_modal, ["args"] = "d"}, -- done, (modify) due date
     ["p"] = {["function"] = handle_modal, ["args"] = "p"}, -- add new project, (modify) project
     ["t"] = {["function"] = handle_modal, ["args"] = "t"}, -- add new tag, (modify) task

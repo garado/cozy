@@ -29,6 +29,15 @@ nav_sidebar:append(nav_projects)
 nav_tasks:append(nav_sidebar)
 nav_tasks:append(nav_overview)
 
+local function request(type)
+    task_obj:emit_signal("tasks::input_request", type)
+end
+
+nav_sidebar.keys ={
+  ["H"] = {["function"] = request, ["args"] = "help"},    -- help menu
+  ["a"] = {["function"] = request, ["args"] = "add"},     -- add new task
+}
+
 -- Assemble UI
 local sidebar = wibox.widget({
   tag_list,
