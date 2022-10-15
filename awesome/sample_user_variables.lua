@@ -52,4 +52,11 @@ return {
     { "Coding",       "pomocode",     "daily"},
     { "Read",         "reading",      "daily"},
   },
+  git = {
+    {
+      name = "",
+      repo = "",
+      msg = "",
+    },
+  }
 }

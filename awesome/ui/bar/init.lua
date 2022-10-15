@@ -17,6 +17,7 @@ return function(s)
   local volume = require("ui.bar.volume")
   local brightness = require("ui.bar.brightness")
   local systray = require("ui.bar.systray")
+  local git = require("ui.bar.git_backup")
   local notif = require("ui.bar.notif")
   local app_launcher = require("ui.bar.app_launcher")
   local launchers = require("ui.bar.launchers")
@@ -133,6 +134,7 @@ return function(s)
               launchers[1],
               launchers[2],
               launchers[3],
+              git,
               spacing = dpi(15),
               layout = wibox.layout.fixed.vertical,
             },
