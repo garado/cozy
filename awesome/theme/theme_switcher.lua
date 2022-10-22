@@ -36,7 +36,7 @@ local function nvchad()
   local change_cfg_cmd = "echo 'return \"" .. nvchad_theme .. "\"' > " .. nvchad_theme_cfg
   awful.spawn.with_shell(change_cfg_cmd)
 
-  -- Script to reload theme for every running nvchad instance
+  -- Script to reload theme for every running nvim instance
   local cfg = gfs.get_configuration_dir()
   local nvchad_reload = "python " .. cfg .. "utils/neovim_reload.py"
   local reload_theme_cmd = nvchad_reload .. " " .. nvchad_theme
@@ -90,3 +90,4 @@ return function()
   if theme.zathura then zathura() end
   -- if theme.rofi    then rofi()    end
 end
+

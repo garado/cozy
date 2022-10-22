@@ -13,7 +13,7 @@ local colorscheme = {
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
 local awesome_cfg = gfs.get_configuration_dir()
-colorscheme.wall_path = "/home/alexis/Pictures/Wallpapers/misc/polyphia/polyphia_muse_2.jpg"
+colorscheme.wall_path = awesome_cfg .. "theme/assets/walls/polyphia_muse.jpg"
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
@@ -50,7 +50,7 @@ colorscheme.colors.transparent = "#ffffff00"
 -- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ 
 -- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ 
 colorscheme.switcher.kitty   = "Mountain Fuji"
-colorscheme.switcher.nvchad  = "mountain"
+colorscheme.switcher.nvchad  = "blossom"
 colorscheme.switcher.zathura = "mountain_fuji"
 
 return colorscheme
