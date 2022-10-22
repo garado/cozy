@@ -29,14 +29,26 @@ nav_sidebar:append(nav_projects)
 nav_tasks:append(nav_sidebar)
 nav_tasks:append(nav_overview)
 
+-- Having to define this twice (here and in keygrabber) seems clumsy,
+-- but currently the only way to get these commands to work everywhere in
+-- task manager (not just in project_overview)
+-- I'll refactor another day
 local function request(type)
-    task_obj:emit_signal("tasks::input_request", type)
+  task_obj:emit_signal("tasks::input_request", type)
 end
 
 nav_sidebar.keys ={
-  ["H"] = {["function"] = request, ["args"] = "help"},    -- help menu
+  ["H"] = {["function"] = request, ["args"] = "help"},    -- show help menu
   ["a"] = {["function"] = request, ["args"] = "add"},     -- add new task
+  ["/"] = {["function"] = request, ["args"] = "search"},  -- search
 }
+
+-- Switches to a specific index in the task overview list.
+-- Emitted after task search.
+task_obj:connect_signal("tasks::switch_to_task_index", function(_, index)
+  nav_overview:set_curr_item(index)
+  nav_tasks.nav:set_area("overview")
+end)
 
 -- Assemble UI
 local sidebar = wibox.widget({

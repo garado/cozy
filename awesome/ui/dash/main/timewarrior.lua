@@ -70,8 +70,8 @@ local function create_topic_button(topic)
     size = 12,
     on_release = function()
       awful.spawn("timew start " .. topic)
+      nav_timewarrior:remove_all_items()
       nav_timewarrior:append(nav_timew_actions)
-      nav_timewarrior:remove_item(nav_timew_topics)
       init_start_ui()
       update_ui(ui_started)
     end
@@ -147,8 +147,9 @@ local stop_button = widgets.button.text.normal({
   size = 12,
   on_release = function()
     awful.spawn.with_shell("timew stop")
+    nav_timewarrior:remove_all_items()
     nav_timewarrior:append(nav_timew_topics)
-    nav_timewarrior:remove_item(nav_timew_actions)
+    --nav_timewarrior:remove_item(nav_timew_actions)
     update_ui(ui_stopped)
   end
 })
@@ -227,11 +228,13 @@ local function read_timew_state()
     local content = timew_widget:get_children_by_id("content")[1]
     if stdout:find("no active time tracking") then
       content:set(1, ui_stopped)
+      nav_timewarrior:remove_all_items()
       nav_timewarrior:append(nav_timew_topics)
       nav_timewarrior.index = 1
     else
       content:set(1, ui_started)
       init_start_ui()
+      nav_timewarrior:remove_all_items()
       nav_timewarrior:append(nav_timew_actions)
     end
   end)

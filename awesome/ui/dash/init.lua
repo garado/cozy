@@ -15,7 +15,6 @@ local dashtab = require("modules.keynav.navitem").Dashtab
 local nav = require("modules.keynav").navigator
 
 local navigator, nav_root = nav:new()
-local startup = true
 
 local nav_tabs = area:new({
   name = "tabs",
@@ -35,15 +34,17 @@ return function(s)
   local tab_icons = { "",  "",   "",   ""    }
   local navitems =  { nav_main, nav_tasks, nav_cash, nil }
 
+  --- Display a specific tab on the dashboard
   -- @param i The tab number.
   local function switch_tab(i)
+    -- If trying to switch to the currently selected tab, 
+    -- do nothing
+    if navitems[i] and nav_root:contains(navitems[i]) then return end
+
     -- Turn off highlight for all other tabs
     nav_tabs:foreach(function(tab)
       tab.widget:nav_hl_off()
     end)
-
-    -- Deselect
-    nav_root:reset()
 
     -- Set the dash content to the proper tab
     local contents = dash_content:get_children_by_id("content")[1]
@@ -56,6 +57,9 @@ return function(s)
       nav_root:append(navitems[i])
       nav_root:verify_nav_references()
     end
+
+    nav_root:reset()
+    navigator.curr_area = navigator.root
   end
 
   nav_root.keys = {
@@ -121,7 +125,7 @@ return function(s)
   awesome.connect_signal("dash::toggle", function()
     if dash.visible then
       awesome.emit_signal("dash::closed")
-      nav_root:reset()
+      --nav_root:reset()
       navigator:stop()
     else
       require("ui.shared").close_other_popups("dash")
@@ -138,6 +142,7 @@ return function(s)
 
   awesome.connect_signal("dash::close", function()
     dash.visible = false
+    navigator:stop()
     awesome.emit_signal("dash::closed")
   end)
 

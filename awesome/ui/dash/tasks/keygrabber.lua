@@ -30,6 +30,7 @@ return function(task_obj)
       ["x"] = "delete",
       ["s"] = "start",
       ["u"] = "undo",
+      ["/"] = "search",
     }
 
     local modify = {
@@ -66,6 +67,7 @@ return function(task_obj)
     ["p"] = {["function"] = handle_modal, ["args"] = "p"}, -- add new project, (modify) project
     ["t"] = {["function"] = handle_modal, ["args"] = "t"}, -- add new tag, (modify) task
     ["n"] = {["function"] = handle_modal, ["args"] = "n"}, -- (modify) taskname
+    ["/"] = {["function"] = handle_modal, ["args"] = "/"}, -- search
     ["Escape"] = {["function"] = handle_modal, ["args"] = "Escape"}, -- (modify) clear
   }
 end
