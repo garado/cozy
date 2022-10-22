@@ -70,9 +70,23 @@ local function zathura()
   -- To do: auto reload zathura theme
 end
 
+-- █▀█ █▀█ █▀▀ █ 
+-- █▀▄ █▄█ █▀░ █ 
+local function rofi()
+  -- Different rofi themes should all be in ~/.config/rofi/cozy
+  local rofi_theme = theme.rofi
+  -- Todo: check for different image types
+  local img_path = "~/.config/rofi/cozy/" .. rofi_theme .. ".jpg"
+  local rasi_path = "~/.config/rofi/cozy/" .. rofi_theme .. ".rasi"
+
+  local symlink_rasi = "ln -sf " .. rasi_path .. "~/.config/rofi/colors.rasi"
+  local symlink_img = "ln -sf " .. img_path .. " ~/.config/rofi/image"
+end
+
 return function()
   if theme.kitty   then kitty()   end
   if theme.nvchad  then nvchad()  end
   if theme.gtk     then gtk()     end
   if theme.zathura then zathura() end
+  -- if theme.rofi    then rofi()    end
 end
