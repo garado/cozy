@@ -1,0 +1,13 @@
+* {
+    font:           "Roboto Mono Nerd Font 10";
+    background:     #191919;
+    background-alt: #292929;
+    foreground:     #f0f0f0;
+    selected:       #995c5c;
+    active:         #8aac8b;
+    urgent:         #8a98ac;
+}
+
+inputbar {
+  background-image: url("~/.config/rofi/image.jpg", width);
+}

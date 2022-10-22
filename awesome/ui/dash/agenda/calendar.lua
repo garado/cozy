@@ -2,13 +2,11 @@
 -- █▀▀ ▄▀█ █░░ █▀▀ █▄░█ █▀▄ ▄▀█ █▀█ 
 -- █▄▄ █▀█ █▄▄ ██▄ █░▀█ █▄▀ █▀█ █▀▄ 
 
-local awful = require("awful")
 local beautiful = require("beautiful")
 local helpers = require("helpers")
 local wibox = require("wibox")
 local xresources = require("beautiful.xresources")
 local gears = require("gears")
-local gfs = require("gears.filesystem")
 local dpi = xresources.apply_dpi
 
 -- The following is formatting for the calendar

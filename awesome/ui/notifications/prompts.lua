@@ -22,7 +22,7 @@ local user_vars = require("user_variables")
 -- Triggers 2x per hour between 4-11pm if I haven't written
 -- Note: this requires jrnl to be installed (pacman -S jrnl)
 local journal_yes = naughty.action { 
-  name = helpers.ui.colorize_text("Yes", beautiful.fg) 
+  name = helpers.ui.colorize_text("Yes", beautiful.fg)
 }
 journal_yes:connect_signal("invoked", function()
   awful.spawn.easy_async_with_shell("alacritty -e jrnl", function() end)
@@ -51,7 +51,7 @@ awesome.connect_signal("habit::journal_check", function()
         title = "You haven't journaled today.",
         message = "Open journal now?",
         timeout = 0,
-        actions = { journal_yes, journal_no }, 
+        actions = { journal_yes, journal_no },
       }
     else
       local cmd = "pi pixel increment -g journal"

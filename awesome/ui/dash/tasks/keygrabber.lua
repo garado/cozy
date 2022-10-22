@@ -1,84 +1,73 @@
 
 -- █▄▀ █▀▀ █▄█ █▀▀ █▀█ ▄▀█ █▄▄ █▄▄ █▀▀ █▀█ 
 -- █░█ ██▄ ░█░ █▄█ █▀▄ █▀█ █▄█ █▄█ ██▄ █▀▄ 
+
 -- Custom keys for managing tasks in the overview widget.
--- super messy :/
 
 return function(task_obj)
   local function request(type)
-    if task_obj.wait_next_keypress then
-      task_obj.wait_next_keypress = false
-    else
-      task_obj:emit_signal("tasks::input_request", type)
-    end
+    if not type then return end
+    print("request::"..type)
+    task_obj:emit_signal("tasks::input_request", type)
   end
 
-  -- █▀▄▀█ █▀█ █▀▄ ▄▀█ █░░    █▀▄▀█ █▀█ █▀▄ █ █▀▀ █▄█ 
-  -- █░▀░█ █▄█ █▄▀ █▀█ █▄▄    █░▀░█ █▄█ █▄▀ █ █▀░ ░█░ 
-  local function modal()
+  -- Default mode is normal mode
+  -- Pressing 'm' puts you in modify mode
+  local function modeswitch()
+    print("modeswitch")
     request("modify")
-    task_obj.wait_next_keypress = true
+    task_obj.in_modify_mode = true
   end
 
-  local function d()
-    if not task_obj.wait_next_keypress then
-      request("done")
+  local function handle_modal(key)
+    print("handle_modal::"..key)
+    local normal = {
+      ["d"] = "done",
+      ["p"] = "new_proj",
+      ["t"] = "new_tag",
+      ["H"] = "help",
+      ["a"] = "add",
+      ["x"] = "delete",
+      ["s"] = "start",
+      ["u"] = "undo",
+      ["/"] = "search",
+    }
+
+    local modify = {
+      ["d"] = "mod_due",
+      ["p"] = "mod_proj",
+      ["t"] = "mod_tag",
+      ["n"] = "mod_name",
+      ["Escape"] = "mod_clear",
+    }
+
+    if task_obj.in_modify_mode then
+      if modify[key] then
+        request(modify[key])
+      else
+        request("mod_clear")
+        request("mod_clear")
+      end
+      task_obj.in_modify_mode = false
     else
-      task_obj.wait_next_keypress = false
-      request("mod_due")
+      if normal[key] then
+        request(normal[key])
+      end
     end
   end
-
-  local function p()
-    if not task_obj.wait_next_keypress then
-      request("new_proj")
-    else
-      task_obj.wait_next_keypress = false
-      request("mod_proj")
-    end
-  end
-
-  local function t()
-    if not task_obj.wait_next_keypress then
-      request("new_tag")
-    else
-      task_obj.wait_next_keypress = false
-      request("mod_tag")
-    end
-  end
-
-  local function n()
-    if task_obj.wait_next_keypress then
-      task_obj.wait_next_keypress = false
-      request("mod_name")
-    end
-  end
-
-  local function esc()
-    request("mod_clear")
-  end
-
-  -- end modal modify
-  ------------------------------------------
-
-  local function a() request("add")      end
-  local function x() request("delete")   end
-  local function s() request("start")    end
-  local function u() request("undo")     end
-  local function m() modal()             end
-  local function h_cap() request("help") end
 
   return {
-    ["a"] = a, -- add new task
-    ["m"] = m, -- modify
-    ["d"] = d, -- done, (modify) due date
-    ["x"] = x, -- delete
-    ["s"] = s, -- toggle start
-    ["u"] = u, -- undo
-    ["p"] = p, -- add new project, (modify) project
-    ["t"] = t, -- add new tag, (modify) task
-    ["n"] = n, -- (modify) taskname
-    ["Escape"] = esc,
-    ["H"] = h_cap, -- help menu
+    ["m"] = modeswitch, -- enter modify mode
+    ["H"] = {["function"] = handle_modal, ["args"] = "H"}, -- help menu
+    ["a"] = {["function"] = handle_modal, ["args"] = "a"}, -- add new task
+    ["x"] = {["function"] = handle_modal, ["args"] = "x"}, -- delete
+    ["s"] = {["function"] = handle_modal, ["args"] = "s"}, -- toggle start
+    ["u"] = {["function"] = handle_modal, ["args"] = "u"}, -- undo
+    ["d"] = {["function"] = handle_modal, ["args"] = "d"}, -- done, (modify) due date
+    ["p"] = {["function"] = handle_modal, ["args"] = "p"}, -- add new project, (modify) project
+    ["t"] = {["function"] = handle_modal, ["args"] = "t"}, -- add new tag, (modify) task
+    ["n"] = {["function"] = handle_modal, ["args"] = "n"}, -- (modify) taskname
+    ["/"] = {["function"] = handle_modal, ["args"] = "/"}, -- search
+    ["Escape"] = {["function"] = handle_modal, ["args"] = "Escape"}, -- (modify) clear
   }
 end

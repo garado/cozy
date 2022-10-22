@@ -1,6 +1,17 @@
 #!/usr/bin/env python3
-# dwm-theme-switcher
+
+# █▄░█ █░█ █▀▀ █░█ ▄▀█ █▀▄    █▀█ █▀▀ █░░ █▀█ ▄▀█ █▀▄ 
+# █░▀█ ▀▄▀ █▄▄ █▀█ █▀█ █▄▀    █▀▄ ██▄ █▄▄ █▄█ █▀█ █▄▀ 
+
 # (c) 2017 Daniel Jankowski
+# Modified by Alexis Garado
+
+# tldr:
+# Every nvim instance has a socket located in /run/user/1000
+# (it used to be in /tmp but I don't know why or when that changed)
+# This script sets the nvchad theme to a specified theme,
+# checks /run/user/1000 for nvim sockets, and then sends the reload
+# command to every socket
 
 import os
 import sys
@@ -8,20 +19,15 @@ from neovim import attach
 
 def get_all_instances():
   instances = []
-  
-  # get the content of /tmp
-  directory_content = os.listdir('/tmp')
-  for directory in directory_content:
-    # check if it contains directories starting with nvim
-    if directory.startswith('nvim'):
-      # check if the nvim directories contains a socket
-      dc = os.listdir('/tmp/' + directory)
-      if '0' in dc:
-        instances.append('/tmp/' + directory + '/0') 
+  directory_content = os.listdir('/run/user/1000')
+  for dirent in directory_content:
+    if dirent.startswith('nvim'):
+      if '0' in dirent:
+        instances.append('/run/user/1000/' + dirent) 
   return instances
 
 def reload(instance, theme):
-  # connect over the socker
+  # connect over the socket
   nvim = attach('socket', path=instance)
 
   # execute the reload command
@@ -35,6 +41,7 @@ def main():
 
   # get cmd line args
   theme = str(sys.argv[1])
+  print("Changing nvchad theme to " + theme)
 
   # connect to instances and reload them
   for instance in instances:

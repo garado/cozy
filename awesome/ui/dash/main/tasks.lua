@@ -120,7 +120,7 @@ local function widget()
   -- use `task export` to get task json, 
   -- then convert that to a table
   local function update_tasks()
-    local cmd = "task limit:8 status:pending export next rc.json.array=on"
+    local cmd = "task limit:8 +MONTH status:pending export rc.json.array=on"
     awful.spawn.easy_async_with_shell(cmd, function(stdout)
       local empty_json = "[\n]\n"
       if stdout ~= empty_json and stdout ~= "" then

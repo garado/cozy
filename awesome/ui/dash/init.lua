@@ -21,12 +21,10 @@ local nav_tabs = area:new({
   circular = true,
 })
 
-nav_root:append(nav_tabs)
-
 return function(s)
-  local dash
+  local dash, dash_content
 
-  -- import tab contents
+  -- Import tab contents
   local main,   nav_main    = require("ui.dash.main")()
   local cash,   nav_cash    = require("ui.dash.finances")()
   local tasks,  nav_tasks   = require("ui.dash.tasks")()
@@ -34,9 +32,44 @@ return function(s)
 
   local tablist =   { main, tasks, cash,  agenda }
   local tab_icons = { "",  "",   "",   ""    }
-  local navitems =  { nav_main, nav_tasks,  nav_cash,    nil    }
+  local navitems =  { nav_main, nav_tasks, nav_cash, nil }
 
-  local dash_content = wibox.widget({
+  --- Display a specific tab on the dashboard
+  -- @param i The tab number.
+  local function switch_tab(i)
+    -- If trying to switch to the currently selected tab, 
+    -- do nothing
+    if navitems[i] and nav_root:contains(navitems[i]) then return end
+
+    -- Turn off highlight for all other tabs
+    nav_tabs:foreach(function(tab)
+      tab.widget:nav_hl_off()
+    end)
+
+    -- Set the dash content to the proper tab
+    local contents = dash_content:get_children_by_id("content")[1]
+    contents:set(1, tablist[i])
+    nav_root:remove_all_items()
+    nav_tabs.items[i].widget:nav_hl_on()
+
+    -- Insert all areas for the new tab
+    if navitems[i] and not nav_root:contains(navitems[i]) then
+      nav_root:append(navitems[i])
+      nav_root:verify_nav_references()
+    end
+
+    nav_root:reset()
+    navigator.curr_area = navigator.root
+  end
+
+  nav_root.keys = {
+    ["1"] = {["function"] = switch_tab, ["args"] = 1},
+    ["2"] = {["function"] = switch_tab, ["args"] = 2},
+    ["3"] = {["function"] = switch_tab, ["args"] = 3},
+    ["4"] = {["function"] = switch_tab, ["args"] = 4},
+  }
+
+  dash_content = wibox.widget({
     {
       {
         id = "content",
@@ -71,15 +104,7 @@ return function(s)
         animate_size = false,
         size = 15,
         on_release = function()
-          local contents = dash_content:get_children_by_id("content")[1]
-          contents:set(1, tablist[i])
-          nav_root:remove_all_except_item(nav_tabs)
-
-          -- insert all areas for the new tab
-          if navitems[i] and not nav_root:contains(navitems[i]) then
-            nav_root:append(navitems[i])
-            nav_root:verify_nav_references()
-          end
+          switch_tab(i)
         end
       })
       nav_tabs:append(dashtab:new(widget))
@@ -96,10 +121,11 @@ return function(s)
 
   -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
   -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
+  -- Emitted by keybind to open dash.
   awesome.connect_signal("dash::toggle", function()
     if dash.visible then
       awesome.emit_signal("dash::closed")
-      nav_root:reset()
+      --nav_root:reset()
       navigator:stop()
     else
       require("ui.shared").close_other_popups("dash")
@@ -116,13 +142,14 @@ return function(s)
 
   awesome.connect_signal("dash::close", function()
     dash.visible = false
+    navigator:stop()
     awesome.emit_signal("dash::closed")
   end)
 
   -- ▄▀█ █▀ █▀ █▀▀ █▀▄▀█ █▄▄ █░░ █▀▀ 
   -- █▀█ ▄█ ▄█ ██▄ █░▀░█ █▄█ █▄▄ ██▄ 
-  local swidth = s.geometry.width
-  local sheight = s.geometry.height
+  -- local swidth = s.geometry.width
+  -- local sheight = s.geometry.height
   dash = awful.popup({
     type = "splash",
     minimum_height = dpi(810),
@@ -140,7 +167,5 @@ return function(s)
     }),
   })
 
-  nav_root:append(nav_main)
-  --local main_tab_icon = tab_bar.children[1].children[1]
-  --main_tab_icon:set_color(beautiful.main_accent)
+  switch_tab(1)
 end

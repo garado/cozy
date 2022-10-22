@@ -8,7 +8,10 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local helpers = require("helpers")
+local colorize = require("helpers").ui.colorize_text
+local box = require("helpers").ui.create_boxed_widget
 local gfs = require("gears.filesystem")
+local naughty = require("naughty")
 
 local os = os
 local string = string
@@ -16,7 +19,7 @@ local table = table
 
 local function widget()
   local placeholder = wibox.widget({
-    markup = helpers.ui.colorize_text("No events found", beautiful.fg),
+    markup = colorize("No events found", beautiful.fg),
     align = "center",
     valign = "center",
     font = beautiful.font .. "12",
@@ -36,7 +39,7 @@ local function widget()
     widget = wibox.container.margin,
   })
 
-  local widget = wibox.widget({
+  local events_widget = wibox.widget({
     {
       header,
       {
@@ -53,14 +56,14 @@ local function widget()
   local function create_calendar_entry(date, time, desc)
     local datetime_text = date .. " " .. time
     local datetime = wibox.widget({
-      markup = helpers.ui.colorize_text(datetime_text, beautiful.fg),
+      markup = colorize(datetime_text, beautiful.fg),
       align = "left",
       valign = "center",
       widget = wibox.widget.textbox,
     })
 
     local desc_ = wibox.widget({
-      markup = helpers.ui.colorize_text("   " .. desc, beautiful.fg),
+      markup = colorize("   " .. desc, beautiful.fg),
       align = "left",
       valign = "center",
       widget = wibox.widget.textbox,
@@ -114,31 +117,52 @@ local function widget()
     end
   end
 
+  local function prompt_cache_update()
+    local prompt_no = naughty.action {
+      name = colorize("No", beautiful.fg)
+    }
+
+    local prompt_yes = naughty.action {
+      name = colorize("Yes", beautiful.fg)
+    }
+    prompt_yes:connect_signal("invoked", function()
+      local file = gfs.get_cache_dir() .. "calendar/agenda"
+      local gcalcli_cmd = "gcalcli agenda today '2 weeks' --tsv --details all"
+      awful.spawn.easy_async_with_shell(gcalcli_cmd, function(stdout)
+        parse_tsv(stdout)
+        awful.spawn.with_shell("echo -e '" .. stdout .. "' > " .. file)
+      end)
+    end)
+
+    naughty.notification {
+      app_name = "System notification",
+      title = "Calendar cache empty",
+      message = "Run gcalcli to fetch events?",
+      actions = { prompt_no, prompt_yes }
+    }
+  end
+
   local function update_calendar()
     local file = gfs.get_cache_dir() .. "calendar/agenda"
     local cmd = "cat " .. file .. " | head -n 5"
     awful.spawn.easy_async_with_shell(cmd, function(stdout)
+      -- try to read from cache
       if stdout ~= nil and stdout ~= '' then
         parse_tsv(stdout)
-      else
-        local gcalcli_cmd = "gcalcli agenda today '2 weeks' --tsv --details all"
-        awful.spawn.easy_async_with_shell(gcalcli_cmd, function(stdout)
-          parse_tsv(stdout)
-          awful.spawn.with_shell("echo -e '" .. stdout .. "' > " .. file)
-        end)
+      else -- if cache is empty, send notification
+        prompt_cache_update()
       end
     end)
   end
-  
+
+  update_calendar()
+
   awesome.connect_signal("widget::calendar_update", function()
     events:reset()
     update_calendar()
   end)
-  
-  update_calendar()
 
-  return widget
+  return events_widget
 end
 
-return helpers.ui.create_boxed_widget(widget(), dpi(0), dpi(190), beautiful.dash_widget_bg)
-
+return box(widget(), dpi(0), dpi(190), beautiful.dash_widget_bg)
