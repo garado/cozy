@@ -9,7 +9,7 @@ local gobject = require("gears.object")
 local area = require("modules.keynav.area")
 
 -- gears.object that modules use to communicate with each other.
--- emits/connects to signals and also holds state variables
+-- it emits/connects to signals and also holds state variables
 local task_obj = gobject{}
 task_obj.current_tag  = "Cozy"
 

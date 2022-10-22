@@ -127,7 +127,7 @@ local function format_time(str)
 
   local min_str  = string.gsub(str, "^%d+:", "")
   local hour_str = string.gsub(str, ":%d+$", "")
-  local min  = tonumber(min_str)
+  local min  = tonumber(min_str) or 0
   local hour = tonumber(hour_str)
 
   local txt = "--"
@@ -241,12 +241,14 @@ end
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
 -- Emitted by Timewarrior hook
 awesome.connect_signal("dash::update_timew", function()
+  print("Test")
   read_timew_state()
 end)
 
 -- Only update widget whenever dashboard is opened
 awesome.connect_signal("dash::opened", function()
-  update_timew_information()
+  read_timew_state()
+  --update_timew_information()
 end)
 
 -- set initial state

@@ -1,6 +1,7 @@
 
 -- █▀█ █▀█ █▀█ ░░█ █▀▀ █▀▀ ▀█▀    █▀█ █░█ █▀▀ █▀█ █░█ █ █▀▀ █░█░█ 
 -- █▀▀ █▀▄ █▄█ █▄█ ██▄ █▄▄ ░█░    █▄█ ▀▄▀ ██▄ █▀▄ ▀▄▀ █ ██▄ ▀▄▀▄▀ 
+
 -- Project overview consists of:
 --    * project completion percentage
 --    * list of tasks and their due dates
@@ -149,7 +150,7 @@ return function(task_obj)
       local start = json_tasklist[i]["start"]
       local task = create_task(desc, due, start, id)
 
-      print(id .. ": " .. desc)
+      --print(id .. ": " .. desc)
       nav_overview:append(navtask:new(task, task_obj, id))
       if #tasklist.children < max_tasks_shown then
         tasklist:add(task)
@@ -318,16 +319,6 @@ return function(task_obj)
     local project = task_obj.current_project
     create_project_summary(tag, project)
   end)
-
-  --task_obj:connect_signal("tasks::project_json_parsed", function(_, tag, project)
-  --  print("overview: connect project_json_parsed; project is ")
-
-  --  --local curr_tag     = task_obj.current_tag
-  --  --local curr_project = task_obj.current_project
-  --  --if tag == curr_tag and project == curr_project then
-  --    create_project_summary(tag, project)
-  --  --end
-  --end)
 
   return overview, nav_overview
 end

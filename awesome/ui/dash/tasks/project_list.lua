@@ -1,7 +1,9 @@
 
 -- █▀█ █▀█ █▀█ ░░█ █▀▀ █▀▀ ▀█▀    █░░ █ █▀ ▀█▀ 
 -- █▀▀ █▀▄ █▄█ █▄█ ██▄ █▄▄ ░█░    █▄▄ █ ▄█ ░█░ 
--- Create a list of projects and show completion percentage.
+
+-- Create a list of projects and show completion percentages.
+-- This is done every time a new tag is selected.
 
 local awful = require("awful")
 local beautiful = require("beautiful")
@@ -121,7 +123,9 @@ return function(task_obj)
   end)
 
   -- Prevent flicker by only drawing when all ui-related async calls have
-  -- finished
+  -- finished.
+  -- (Reminder: the async calls are for calculating the percentage
+  -- completion per project in the project list)
   task_obj:connect_signal("tasks::project_async_done", function(_, widget, name)
     -- When adding the first project to the project list, clear all old projects
     if no_projects_added then
@@ -129,15 +133,19 @@ return function(task_obj)
       project_list:reset()
     end
 
-    if name == task_obj.current_project then
-      print("projectlist: emit draw_first_overview")
-      task_obj:emit_signal("tasks::draw_first_overview", name)
+    -- If the current project is nil, then no project is selected.
+    -- This happens when you select a new tag.
+    -- Set the current project to this async call's project so that
+    -- an overview can be drawn.
+    if not task_obj.current_project then
+      task_obj.current_project = name
+      task_obj:emit_signal("tasks::project_selected", name)
     end
 
-    if not task_obj.current_project then
-      print("projectlist: emit draw_first_overview")
-      task_obj.current_project = name
-      task_obj:emit_signal("tasks::draw_first_overview", name)
+    -- If the async call is associated with the current project, then
+    -- draw the project overview
+    if name == task_obj.current_project then
+      task_obj:emit_signal("tasks::project_selected", name)
     end
 
     project_list:add(widget)

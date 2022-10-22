@@ -36,10 +36,11 @@ return function(task_obj)
     }
   end
 
-  -- Emitted by keygrabber when a valid keybind is triggered
+  -- Emitted by keygrabber when a valid keybind is triggered.
   -- Change prompt depending on what action the user is performing,
   -- then call awful.prompt to get user input
   task_obj:connect_signal("tasks::input_request", function(_, type)
+    print("prompt::caught input_request signal")
     local prompt, text
 
     -- Standard requests
@@ -82,6 +83,7 @@ return function(task_obj)
       prompt = colorize("<b>Modify project: </b>", beautiful.fg)
     elseif type == "mod_name" then
       prompt = colorize("<b>Modify task name: </b>", beautiful.fg)
+      text = remove_pango(task_obj.current_task)
     elseif type == "mod_clear" then
       prompt_textbox:set_markup_silently("")
       return
@@ -90,7 +92,7 @@ return function(task_obj)
     task_input(type, prompt, text)
   end)
 
-  -- Emitted by awful.prompt when Enter/Return is pressed
+  -- Emitted by awful.prompt when Enter/Return is pressed.
   -- Call taskwarrior command from user input
   task_obj:connect_signal("tasks::input_completed", function(_, type, input)
     local proj = task_obj.current_project

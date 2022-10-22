@@ -29,10 +29,23 @@ local function notify(msg)
   }
 end
 
-local function parse_push_stdout(stdout)
-end
+local function parse_stdout(stdout)
+  -- Split into lines
+  local lines = {}
+  for line in string.gmatch(stdout, "[^\r\n]+") do
+    table.insert(lines, line)
+  end
 
-local function parse_pull_stdout(stdout)
+  for i = 1, #lines do
+    -- Clear empty lines
+
+
+    -- Clear leading whitespace
+    lines[i] = string.gsub(lines[i], "^%s", "")
+    naughty.notification {
+      message = lines[i]
+    }
+  end
 end
 
 local function push()
@@ -42,10 +55,11 @@ local function push()
   local cmd = "cd " .. repo .. " ; git add * ; git commit -m '" .. msg .. "'; git push"
   notify("Backing up " .. name)
   awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
-    local parsed_stdout = parse_push_stdout(stdout)
+    --local parsed_stdout = parse_stdout(stdout)
     naughty.notification {
-      message = stdout,
+      app_name = "git push",
       title = stderr,
+      message = stdout,
       timeout = 0,
     }
   end)
@@ -53,22 +67,21 @@ end
 
 local function pull()
   local repo = user_vars.git[1].repo
-  local msg = user_vars.git[1].msg
-  local name = user_vars.git[1].name
   local cmd = "cd " .. repo .. " ; git pull"
   awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
-    local parsed_stdout = parse_pull_stdout(stdout)
+    --local parsed_stdout = parse_pull_stdout(stdout)
     naughty.notification {
-      message = stdout,
+      app_name = "git pull",
       title = stderr,
+      message = stdout,
       timeout = 0,
     }
+    push()
   end)
 end
 
 button:connect_signal("button::press", function()
-  --pull()
-  push()
+  pull()
 end)
 
 button:connect_signal("mouse::enter", function()

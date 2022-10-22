@@ -1,25 +1,26 @@
 
 -- █▄▀ █▀▀ █▄█ █▀▀ █▀█ ▄▀█ █▄▄ █▄▄ █▀▀ █▀█ 
 -- █░█ ██▄ ░█░ █▄█ █▀▄ █▀█ █▄█ █▄█ ██▄ █▀▄ 
+
 -- Custom keys for managing tasks in the overview widget.
 
 return function(task_obj)
   local function request(type)
-    if task_obj.in_modify_mode then
-      task_obj.in_modify_mode = false
-    else
-      task_obj:emit_signal("tasks::input_request", type)
-    end
+    if not type then return end
+    print("request::"..type)
+    task_obj:emit_signal("tasks::input_request", type)
   end
 
   -- Default mode is normal mode
   -- Pressing 'm' puts you in modify mode
-  local function modal()
+  local function modeswitch()
+    print("modeswitch")
     request("modify")
     task_obj.in_modify_mode = true
   end
 
   local function handle_modal(key)
+    print("handle_modal::"..key)
     local normal = {
       ["d"] = "done",
       ["p"] = "new_proj",
@@ -48,15 +49,17 @@ return function(task_obj)
       end
       task_obj.in_modify_mode = false
     else
-      request(normal[key])
+      if normal[key] then
+        request(normal[key])
+      end
     end
   end
 
   return {
-    ["m"] = modal, -- enter modify mode
+    ["m"] = modeswitch, -- enter modify mode
     ["H"] = {["function"] = handle_modal, ["args"] = "H"}, -- help menu
     ["a"] = {["function"] = handle_modal, ["args"] = "a"}, -- add new task
-    ["x"] = {["function"] = handle_modal, ["args"] = "d"}, -- delete
+    ["x"] = {["function"] = handle_modal, ["args"] = "x"}, -- delete
     ["s"] = {["function"] = handle_modal, ["args"] = "s"}, -- toggle start
     ["u"] = {["function"] = handle_modal, ["args"] = "u"}, -- undo
     ["d"] = {["function"] = handle_modal, ["args"] = "d"}, -- done, (modify) due date
