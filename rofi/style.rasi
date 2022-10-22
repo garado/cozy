@@ -25,6 +25,7 @@ configuration {
   kb-cancel: "Super_L,Super_R,Escape";
 }
 
+
 /*****----- Global Properties -----*****/
 * {
     font:                        "Roboto Mono Nerd Font 10";
@@ -35,6 +36,7 @@ configuration {
     active:                      #5e81ac;
     urgent:                      #b48ead;
 }
+
 
 /*****----- Main Window -----*****/
 window {
@@ -77,7 +79,7 @@ inputbar {
     spacing:                     0px;
     padding:                     100px 40px;
     background-color:            transparent;
-    background-image:            url("~/.config/rofi/image.png", width);
+    /*background-image:            url("~/.config/rofi/image.png", width);*/
     text-color:                  @foreground;
     orientation:                 horizontal;
     children:                    [ "textbox-prompt-colon", "entry" ];
@@ -211,3 +213,5 @@ error-message {
     background-color:            @background;
     text-color:                  @foreground;
 }
+
+@import "colors.rasi"
