@@ -22,14 +22,14 @@ return function(task_obj)
   local function handle_modal(key)
     print("handle_modal::"..key)
     local normal = {
+      ["a"] = "add",
+      ["s"] = "start",
+      ["u"] = "undo",
       ["d"] = "done",
+      ["x"] = "delete",
       ["p"] = "new_proj",
       ["t"] = "new_tag",
       ["H"] = "help",
-      ["a"] = "add",
-      ["x"] = "delete",
-      ["s"] = "start",
-      ["u"] = "undo",
       ["/"] = "search",
     }
 

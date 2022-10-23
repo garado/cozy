@@ -37,6 +37,7 @@ return function(task_obj)
   end)
 
   -- Parse all tasks associated with project on project update 
+  -- Emitted by Taskwarrior hook and after receiving input from prompt
   task_obj:connect_signal("tasks::project_modified", function(_, tag, project)
     print("parser: connect project_modified")
     local cmd = "task context none ; task tag:"..tag.." proj:'"..project.."' status:pending export rc.json.array=on"
