@@ -16,27 +16,48 @@ return function(task_obj)
 
   -- █░█ █▀▀ █░░ █▀█ █▀▀ █▀█ █▀ 
   -- █▀█ ██▄ █▄▄ █▀▀ ██▄ █▀▄ ▄█ 
-  --- Get current task index by comparing the current task description stored in task_obj
-  -- with all of the task descriptions stored in task_obj.projects[proj].tasks
-  -- this is such a shitty way to do this but i am lazy
-  -- alternative: make nav_tasks available to this module, then get current area index from that?
-  local function get_current_task_index()
-    local proj = task_obj.current_project
-    local tasks = task_obj.projects[proj].tasks
-    local current_task = remove_pango(task_obj.current_task)
-    for i = 1, #tasks do
-      if tasks[i]["description"] == current_task then
-        return i
-      end
-    end
-    return 1
-  end
-
   --- Adds pango formatting to prompt text.
   -- @param text The text to promptify.
   local function promptify(text)
     text = "<b>" .. text .. "</b>"
     return colorize(text, beautiful.fg)
+  end
+
+  --- Reload components only when necessary.
+  -- @param type The type of action being performed.
+  -- @param input The user input.
+  local function send_reload_signal(type, input)
+    -- Reload tag list
+    if type == "mod_tag" then
+      task_obj:emit_signal("tasks::reload_tag_list")
+    end
+
+    -- Reload entire project list
+    local project_added
+    local project_removed
+    if type == "mod_proj" then
+      task_obj:emit_signal("tasks::reload_project_list_all")
+    end
+
+    -- Reload specific projects in project list
+    -- if type == "mod_proj" then
+    --   task_obj:emit_signal("tasks::reload_project_list_entry")
+    -- end
+
+    -- Reload overview task list
+    if type == "" then
+      task_obj:emit_signal("tasks::reload_task_list")
+    end
+
+    -- Reload overview header
+    if type == "add" then
+      task_obj:emit_signal("tasks::reload_overview_header")
+    end
+
+    -- Reload stats
+    if type == "mod_proj" or type == "mod_tag" then
+      task_obj:emit_signal("tasks::reload_stats")
+    end
   end
 
   --- When the user modifies the tasklist, sometimes the currently selected task should
@@ -48,8 +69,8 @@ return function(task_obj)
     local tasks = task_obj.projects[proj].tasks
 
     local newest = #tasks + 1
-    local current = get_current_task_index()
-    local prev = (current ~= 0 and current - 1) or 1
+    local current = task_obj.current_task_index
+    local prev = (current > 1 and current - 1) or 1
 
     local indices = {
       ["add"]       = newest,
@@ -93,18 +114,10 @@ return function(task_obj)
   -- when modifying tag, have a completion table full of the tag names. This skeleton is a reminder 
   -- to myself to implement that later.
   local function set_completion()
-  end
-
-  --- Checks if the task has been started by checking existence of "start" field.
-  -- @param id
-  local function task_started(id)
-    local proj = task_obj.current_project
-    local tasks = task_obj.projects[proj].tasks
-    for i = 1, #tasks do
-      if tasks[i]["id"] == task_obj.current_id then
-        return tasks[i]["start"] and true or false
-      end
-    end
+    -- local projects = {}
+    --for k, _ in ipairs(task_obj.projects) do
+    --  table.insert(projects, k)
+    --end
   end
 
   -- ▀█▀ █░█ █▀▀    █▀▀ █▀█ █▀█ █▀▄    █▀ ▀█▀ █░█ █▀▀ █▀▀ 
@@ -183,6 +196,8 @@ return function(task_obj)
     local proj = task_obj.current_project
     local tag  = task_obj.current_tag
     local id   = task_obj.current_id
+    local idx  = task_obj.current_task_index
+    local task = task_obj.projects[proj].tasks[idx]
     local cmd
 
     if      type == "add" then
@@ -204,8 +219,7 @@ return function(task_obj)
         end
       end
     elseif type == "start" then
-      local id = task_obj.current_id
-      if task_started(id) then
+      if task["start"] then
         cmd = "task " .. id .. " stop"
       else
         cmd = "task " .. id .. " start"

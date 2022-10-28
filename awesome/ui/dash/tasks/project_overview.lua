@@ -275,6 +275,9 @@ return function(task_obj)
   -- Emitted by keygrabber when navigating to the previous or next task
   -- Determines which items to show when scrolling
   task_obj:connect_signal("tasks::task_selected", function(_)
+    task_obj.current_task_index = nav_overview.index
+    print(task_obj.current_task_index)
+
     if #tasklist_overflow == 0 then return end
 
     print("task selected: fvti is "..first_visible_task_index)

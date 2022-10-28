@@ -19,8 +19,8 @@ return function(task_obj)
     task_obj.in_modify_mode = true
   end
 
-  local function handle_modal(key)
-    print("handle_modal::"..key)
+  local function handle_key(key)
+    print("handle_key::"..key)
     local normal = {
       ["a"] = "add",
       ["s"] = "start",
@@ -29,6 +29,7 @@ return function(task_obj)
       ["x"] = "delete",
       ["p"] = "new_proj",
       ["t"] = "new_tag",
+      ["n"] = "next",
       ["H"] = "help",
       ["/"] = "search",
     }
@@ -58,16 +59,16 @@ return function(task_obj)
 
   return {
     ["m"] = modeswitch, -- enter modify mode
-    ["H"] = {["function"] = handle_modal, ["args"] = "H"}, -- help menu
-    ["a"] = {["function"] = handle_modal, ["args"] = "a"}, -- add new task
-    ["x"] = {["function"] = handle_modal, ["args"] = "x"}, -- delete
-    ["s"] = {["function"] = handle_modal, ["args"] = "s"}, -- toggle start
-    ["u"] = {["function"] = handle_modal, ["args"] = "u"}, -- undo
-    ["d"] = {["function"] = handle_modal, ["args"] = "d"}, -- done, (modify) due date
-    ["p"] = {["function"] = handle_modal, ["args"] = "p"}, -- add new project, (modify) project
-    ["t"] = {["function"] = handle_modal, ["args"] = "t"}, -- add new tag, (modify) task
-    ["n"] = {["function"] = handle_modal, ["args"] = "n"}, -- (modify) taskname
-    ["/"] = {["function"] = handle_modal, ["args"] = "/"}, -- search
-    ["Escape"] = {["function"] = handle_modal, ["args"] = "Escape"}, -- (modify) clear
+    ["H"] = {["function"] = handle_key, ["args"] = "H"}, -- help menu
+    ["a"] = {["function"] = handle_key, ["args"] = "a"}, -- add new task
+    ["x"] = {["function"] = handle_key, ["args"] = "x"}, -- delete
+    ["s"] = {["function"] = handle_key, ["args"] = "s"}, -- toggle start
+    ["u"] = {["function"] = handle_key, ["args"] = "u"}, -- undo
+    ["d"] = {["function"] = handle_key, ["args"] = "d"}, -- done, (modify) due date
+    ["p"] = {["function"] = handle_key, ["args"] = "p"}, -- add new project, (modify) project
+    ["t"] = {["function"] = handle_key, ["args"] = "t"}, -- add new tag, (modify) task
+    ["n"] = {["function"] = handle_key, ["args"] = "n"}, -- next, (modify) taskname
+    ["/"] = {["function"] = handle_key, ["args"] = "/"}, -- search
+    ["Escape"] = {["function"] = handle_key, ["args"] = "Escape"}, -- (modify) clear
   }
 end
