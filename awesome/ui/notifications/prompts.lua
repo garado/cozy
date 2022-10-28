@@ -13,7 +13,7 @@ local naughty = require("naughty")
 local helpers = require("helpers")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local user_vars = require("user_variables")
+local config = require("config")
 
 
 -- ░░█ █▀█ █▄░█ █░░
@@ -110,7 +110,7 @@ local ledger_yes = naughty.action {
 }
 
 ledger_yes:connect_signal("invoked", function()
-  local ledger_dir = user_vars.ledger.ledger_dir
+  local ledger_dir = config.ledger.ledger_dir
   awful.spawn.with_shell(
     [[
       tmux new-window -c ]] .. ledger_dir .. [[\; \

@@ -10,7 +10,7 @@ local dpi = xresources.apply_dpi
 local gears = require("gears")
 local gfs = require("gears.filesystem")
 local helpers = require("helpers")
-local user_vars = require("user_variables")
+local config = require("config")
 
 local math = math
 
@@ -32,7 +32,7 @@ local function create_profile()
     widget = wibox.container.background,
   })
 
-  local display_name = user_vars.display_name
+  local display_name = config.display_name
   local name = wibox.widget({
     widget = wibox.widget.textbox,
     markup = helpers.ui.colorize_text(display_name, beautiful.prof_name_fg),
@@ -59,7 +59,7 @@ local function create_profile()
  
   -- new title every time you open dash
   awesome.connect_signal("dash::closed", function()
-    local titles_list = user_vars.titles
+    local titles_list = config.titles
     local random_title = titles_list[math.random(#titles_list)]
     title:set_markup(helpers.ui.colorize_text(random_title, beautiful.fg))
   end)

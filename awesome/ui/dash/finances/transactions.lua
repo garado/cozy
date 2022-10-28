@@ -8,9 +8,9 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local helpers = require("helpers")
-local user_vars = require("user_variables")
+local config = require("config")
 
-local ledger_file = user_vars.ledger.ledger_file
+local ledger_file = config.ledger.ledger_file
 
 -- create_transaction_entry() will populate this widget with entries
 local transaction_history = wibox.widget({

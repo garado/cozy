@@ -13,7 +13,7 @@ local colorize = require("helpers").ui.colorize_text
 local box = require("helpers").ui.create_boxed_widget
 local dash_header = require("helpers").ui.create_dash_widget_header
 local widgets = require("ui.widgets")
-local user_vars = require("user_variables")
+local config = require("config")
 local string = string
 
 local Elevated = require("modules.keynav.navitem").Elevated
@@ -26,7 +26,7 @@ local nav_timew_actions = Area:new({ name = "timew_actions" })
 
 local update_ui, init_start_ui
 local ui_started, ui_stopped
-local topic_list = user_vars.pomo.topics
+local topic_list = config.pomo.topics
 
 -- Creates a subsection.
 -- Subsections: current session, working on, total today
@@ -80,7 +80,7 @@ local function create_topic_button(topic)
   return topic_btn
 end
 
--- Loops through all topics set in user_vars and creates a button
+-- Loops through all topics set in config and creates a button
 -- for each.
 local function create_topic_buttons()
   local topic_buttons = wibox.widget({

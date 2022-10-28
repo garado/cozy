@@ -15,13 +15,13 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local helpers = require("helpers")
 local animation = require("modules.animation")
-local user_vars = require("user_variables")
+local config = require("config")
 
 local os = os
 local string = string
 local tonumber = tonumber
 local table = table
-local ledger_file = user_vars.ledger.ledger_file
+local ledger_file = config.ledger.ledger_file
 
 -- arc chart colors
 local color_palette = beautiful.cash_arccolors

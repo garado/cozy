@@ -10,10 +10,10 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local helpers = require("helpers")
-local user_vars = require("user_variables")
+local config = require("config")
 local widgets = require("ui.widgets")
 local string = string
-local ledger_file = user_vars.ledger.ledger_file
+local ledger_file = config.ledger.ledger_file
 
 local function get_account_value(header_text, account)
   local header = widgets.text({

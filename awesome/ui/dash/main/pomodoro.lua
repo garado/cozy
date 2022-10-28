@@ -13,7 +13,7 @@ local gears = require("gears")
 local gfs = require("gears.filesystem")
 local helpers = require("helpers")
 local widgets = require("ui.widgets")
-local user_vars = require("user_variables")
+local config = require("config")
 local naughty = require("naughty")
 local json = require("modules.json")
 
@@ -37,11 +37,11 @@ local pomodoro = {
   timer_states = {
     "stopped", "ticking", "paused",
   },
-  topics = user_vars.pomo.topics,
-  times = user_vars.pomo.times,
-  short_break_duration = user_vars.pomo.short_break,
-  long_break_duration = user_vars.pomo.long_break,
-  target = user_vars.pomo.target,
+  topics = config.pomo.topics,
+  times = config.pomo.times,
+  short_break_duration = config.pomo.short_break,
+  long_break_duration = config.pomo.long_break,
+  target = config.pomo.target,
   completed = 0,
   min_focused = 0,
 }

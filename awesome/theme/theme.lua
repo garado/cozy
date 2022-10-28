@@ -6,19 +6,19 @@ local gears = require("gears")
 local gfs = require("gears.filesystem")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local user_vars = require("user_variables")
+local config = require("config")
 local themes_path = gfs.get_themes_dir()
 local theme = dofile(themes_path .. "default/theme.lua")
 
 -- Get user's color scheme
-local theme_name = user_vars.theme_name
-local theme_style = user_vars.theme_style
+local theme_name = config.theme_name
+local theme_style = config.theme_style
 local colorscheme = require("theme.colorschemes." .. theme_name .. "." .. theme_style)
 local colors = colorscheme.colors
 
 -- Automagically match system color schemes with awesome
 -- color scheme
-local do_theme_integration = user_vars.theme_switch_integration
+local do_theme_integration = config.theme_switch_integration
 if do_theme_integration then
   require("theme/theme_switcher")()
 end

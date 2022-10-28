@@ -9,7 +9,7 @@
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local helpers = require("helpers")
-local user_vars = require("user_variables")
+local config = require("config")
 local awful = require("awful")
 local naughty = require("naughty")
 
@@ -49,9 +49,9 @@ local function parse_stdout(stdout)
 end
 
 local function push()
-  local name = user_vars.git[1].name
-  local repo = user_vars.git[1].repo
-  local msg = user_vars.git[1].msg
+  local name = config.git[1].name
+  local repo = config.git[1].repo
+  local msg = config.git[1].msg
   local cmd = "cd " .. repo .. " ; git add * ; git commit -m '" .. msg .. "'; git push"
   notify("Backing up " .. name)
   awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
@@ -66,7 +66,7 @@ local function push()
 end
 
 local function pull()
-  local repo = user_vars.git[1].repo
+  local repo = config.git[1].repo
   local cmd = "cd " .. repo .. " ; git pull"
   awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
     --local parsed_stdout = parse_pull_stdout(stdout)

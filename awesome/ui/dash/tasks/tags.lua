@@ -14,7 +14,7 @@ local helpers = require("helpers")
 local tasks_textbox = require("modules.keynav.navitem").Tasks_Textbox
 local taskbox = require("modules.keynav.navitem").Taskbox
 local Area = require("modules.keynav.area")
-local user_vars = require("user_variables")
+local config = require("config")
 
 -- Keyboard navigation
 local nav_tags
@@ -89,7 +89,7 @@ return function(task_obj)
       end
       nav_tags:append(nav_tag)
     end
-    local default_tag = user_vars.task.default_tag
+    local default_tag = config.task.default_tag
     task_obj.current_tag = default_tag or tags[1]["name"]
     task_obj.current_project = nil
     task_obj:emit_signal("tasks::tag_selected", default_tag)

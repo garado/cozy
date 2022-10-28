@@ -7,9 +7,9 @@
 
 local awful = require("awful")
 local gfs = require("gears.filesystem")
-local user_vars = require("user_variables")
-local theme_name = user_vars.theme_name
-local theme_style = user_vars.theme_style
+local config = require("config")
+local theme_name = config.theme_name
+local theme_style = config.theme_style
 local theme = require("theme.colorschemes." .. theme_name .. "." .. theme_style)
 theme = theme.switcher
 

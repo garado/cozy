@@ -9,7 +9,7 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local widgets = require("ui.widgets")
 local helpers = require("helpers")
-local user_vars = require("user_variables")
+local config = require("config")
 
 local area = require("modules.keynav.area")
 local elevated = require("modules.keynav.navitem").Elevated
@@ -20,7 +20,7 @@ local nav_actions = area:new({
   circular = true,
 })
 
-local ledger_dir = user_vars.ledger.ledger_dir
+local ledger_dir = config.ledger.ledger_dir
 local open_button = widgets.button.text.normal({
   text = "Open ledger",
   text_normal_bg = beautiful.fg,

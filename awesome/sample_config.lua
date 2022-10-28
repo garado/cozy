@@ -1,7 +1,7 @@
 -- █▀ ▄▀█ █▀▄▀█ █▀█ █░░ █▀▀    █░█ █▀ █▀▀ █▀█    █░█ ▄▀█ █▀█ █▀ 
 -- ▄█ █▀█ █░▀░█ █▀▀ █▄▄ ██▄    █▄█ ▄█ ██▄ █▀▄    ▀▄▀ █▀█ █▀▄ ▄█ 
 
--- Copy this to user_variables.lua!
+-- Copy this to config.lua!
 
 return {
   theme_name  = "mountain",
@@ -17,7 +17,7 @@ return {
   ---
   display_name = "Display Name",
   goals = {
-    "Update user_vars",
+    "Update config",
     "Post to r/unixporn",
     "Be kind to myself",
   },

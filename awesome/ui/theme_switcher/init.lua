@@ -12,8 +12,8 @@ local dpi = xresources.apply_dpi
 local helpers = require("helpers")
 local widgets = require("ui.widgets")
 local naughty = require("naughty")
-local user_vars = require("user_variables")
-local displayed_themes = user_vars.displayed_themes
+local config = require("config")
+local displayed_themes = config.displayed_themes
 
 local keynav = require("modules.keynav")
 local Area = keynav.area
@@ -159,10 +159,10 @@ function reset_theme_switcher()
   get_current_theme()
 end
 
--- Returns currently selected theme and style in user_variables.lua
+-- Returns currently selected theme and style in config.lua
 function get_current_theme()
-  local user_vars_path = gfs.get_configuration_dir() .. "user_variables.lua"
-  local cmd = "egrep 'theme_name.*|theme_style.*' " .. user_vars_path
+  local config_path = gfs.get_configuration_dir() .. "config.lua"
+  local cmd = "egrep 'theme_name.*|theme_style.*' " .. config_path
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local fields = { }
     for field in stdout:gmatch('"(.-)"') do
@@ -178,7 +178,7 @@ function get_current_theme()
   end)
 end
 
--- Edits user_vars with selected theme and style
+-- Edits config with selected theme and style
 function apply_new_theme(theme, style)
   local cfg = gfs.get_configuration_dir()
   local path = cfg .. "theme/colorschemes/" .. theme .. "/" .. style .. ".lua"
@@ -191,11 +191,11 @@ function apply_new_theme(theme, style)
     }
     return
   end
-  local user_vars_path = gfs.get_configuration_dir() .. "user_variables.lua"
+  local config_path = gfs.get_configuration_dir() .. "config.lua"
   local replace_theme = "sed -i 's/theme_name.*/theme_name = \"" .. theme .. "\",/' "
   local replace_style = "sed -i 's/theme_style.*/theme_style = \"" .. style .. "\",/' "
-  awful.spawn.with_shell(replace_theme .. user_vars_path)
-  awful.spawn.with_shell(replace_style .. user_vars_path)
+  awful.spawn.with_shell(replace_theme .. config_path)
+  awful.spawn.with_shell(replace_style .. config_path)
   awesome.restart()
 end
 

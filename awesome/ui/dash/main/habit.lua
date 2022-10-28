@@ -9,7 +9,7 @@ local wibox = require("wibox")
 local xresources = require("beautiful.xresources")
 local gears = require("gears")
 local gfs = require("gears.filesystem")
-local user_vars = require("user_variables")
+local config = require("config")
 local dpi = xresources.apply_dpi
 local naughty = require("naughty")
 local Area = require("modules.keynav.area")
@@ -26,7 +26,7 @@ local os = os
 local string = string
 
 -- habits get appended here later
-local habit_list = user_vars.habit
+local habit_list = config.habit
 local habit_widget = wibox.widget({
   {
     --helpers.ui.create_dash_widget_header("Habits"),
@@ -48,14 +48,14 @@ local function update_pixela_err_handling(stderr)
     naughty.notification {
       app_name = "System Notification",
       title = "Pixela API",
-      message = "Pixela username not found - set this in user_vars",
+      message = "Pixela username not found - set this in config",
       timeout = 0,
     }
   elseif string.find(stderr, "Please specify password") then
     naughty.notification {
       app_name = "System Notification",
       title = "Pixela API",
-      message = "Pixela password not found - set this in user_vars",
+      message = "Pixela password not found - set this in config",
       timeout = 0,
     }
   end
@@ -63,9 +63,9 @@ end
 
 local function update_pixela(graph_id, date, qty)
   local set_pixela_user, set_pixela_token
-  if user_vars.pixela then
-    set_pixela_user = "export PIXELA_USER_NAME=" .. user_vars.pixela.user
-    set_pixela_token = "export PIXELA_USER_TOKEN=" .. user_vars.pixela.token
+  if config.pixela then
+    set_pixela_user = "export PIXELA_USER_NAME=" .. config.pixela.user
+    set_pixela_token = "export PIXELA_USER_TOKEN=" .. config.pixela.token
   end
 
   local graph_id_cmd = " -g " .. graph_id

@@ -8,7 +8,7 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local helpers = require("helpers")
-local user_vars = require("user_variables")
+local config = require("config")
 
 local function widget()
 
@@ -36,7 +36,7 @@ local function widget()
     widget = wibox.container.place,
   })
   
-  local goals_list = user_vars.goals
+  local goals_list = config.goals
   local w = widget:get_children_by_id("goals")[1]
   for _,v in ipairs(goals_list) do
     w:add(create_goal(v))

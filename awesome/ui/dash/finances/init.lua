@@ -10,7 +10,7 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local helpers = require("helpers")
-local user_vars = require("user_variables")
+local config = require("config")
 local area = require("modules.keynav.area")
 
 local nav_finances = area:new({ name = "finances" })
