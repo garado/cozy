@@ -42,14 +42,14 @@ local function resize_vertical(factor)
 end
 
 local scratchpad = bling.module.scratchpad {
-    command = "kitty --class spad --session sessions/scratchpad",
-    rule = { instance = "spad" },
-    sticky = true,
-    autoclose = true,
-    floating = true,
-    geometry = {x=360, y=90, height=900, width=1200},
-    reapply = true,
-    dont_focus_before_close = true,
+  command = "kitty --class spad --session sessions/scratchpad",
+  rule = { instance = "spad" },
+  sticky = true,
+  autoclose = true,
+  floating = true,
+  geometry = {x=360, y=90, height=900, width=1200},
+  reapply = true,
+  dont_focus_before_close = true,
 }
 
 -- Global key bindings
@@ -83,6 +83,11 @@ awful.keyboard.append_global_keybindings({
     scratchpad:turn_off()
     awesome.emit_signal("theme_switcher::toggle")
   end, { description = "dash", group = "Awesome" }),
+
+  awful.key({ mod }, "l", function()
+    scratchpad:turn_off()
+    awesome.emit_signal("layoutlist::toggle")
+  end, { description = "layout list", group = "Awesome"}),
 
 
   -- █░█ █▀█ ▀█▀ █▄▀ █▀▀ █▄█ █▀
@@ -149,6 +154,7 @@ awful.keyboard.append_global_keybindings({
     awful.spawn(apps.default.terminal)
   end, { description = "terminal", group = "Launchers" }),
 
+  -- Scratchpad
   awful.key({ mod }, "p", function()
     awesome.emit_signal("dash::close")
     awesome.emit_signal("control_center::close")
@@ -297,4 +303,6 @@ client.connect_signal("request::default_mousebindings", function()
     end),
   })
 end)
+
+
 
