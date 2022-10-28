@@ -5,6 +5,7 @@
 -- Background info: if my task group is 'Class' and I have a project for
 -- that group called 'Assignment1', then in Timew I track the tags 'Class'
 -- and 'Class:Assignment1'
+-- This way I can easily track time per tag as well as time per project
 
 local awful = require("awful")
 local wibox = require("wibox")
@@ -59,6 +60,7 @@ return function(task_obj)
 
   local ui_proj_time = wibox.widget({
     _ui_proj_time_header,
+    nil,
     _ui_proj_time_content,
     spacing = dpi(10),
     layout = wibox.layout.fixed.horizontal,
@@ -70,8 +72,14 @@ return function(task_obj)
       {
         {
           --dash.widget_header("Stats"),
-          ui_tag_time,
-          ui_proj_time,
+          {
+            ui_tag_time,
+            widget = wibox.container.place,
+          },
+          {
+            ui_proj_time,
+            widget = wibox.container.place,
+          },
           spacing = dpi(10),
           layout = wibox.layout.fixed.vertical,
         },
@@ -90,6 +98,11 @@ return function(task_obj)
   -- █▀▀ █░█ █▄░█ █▀▀ ▀█▀ █ █▀█ █▄░█ █▀ 
   -- █▀░ █▄█ █░▀█ █▄▄ ░█░ █ █▄█ █░▀█ ▄█ 
   --- Get total time spent working on a project
+  -- The output of the Timewarrior command looks like:
+  --                                  65:00:23
+  -- (The important part is that it starts with a ton of spaces)
+  -- If there is no Timewarrior data then the output looks like:
+  -- No filtered data found tagged with Tag:Project.
   local function get_proj_time()
     local curr_tag = task_obj.current_tag
     local curr_proj = task_obj.current_project
@@ -97,7 +110,15 @@ return function(task_obj)
     local tag = curr_tag .. ":" .. curr_proj
     local cmd = "timew sum :all " .. tag .. " | tail -n 2 | head -n 1"
     awful.spawn.easy_async_with_shell(cmd, function(stdout)
-      local proj_time = string.gsub(stdout, "[^0-9:]", "")
+      -- If first char is a space, then there was (probably?) a valid
+      -- Timewarrior output
+      local first_char = string.sub(stdout, 1, 1)
+      local proj_time
+      if first_char ~= " " and first_char ~= "\t" then
+        proj_time = ""
+      else
+        proj_time = string.gsub(stdout, "[^0-9:]", "")
+      end
       task_obj.current_proj_total_time = proj_time
       task_obj:emit_signal("tasks::stats_tag_finished", "total_proj")
     end)
@@ -108,13 +129,20 @@ return function(task_obj)
     local tag = task_obj.current_tag
     local tag_cmd = "timew sum :all " .. tag .. " | tail -n 2 | head -n 1"
     awful.spawn.easy_async_with_shell(tag_cmd, function(stdout)
-      local tag_time = string.gsub(stdout, "[^0-9:]", "")
+      -- If first char is a space, then there was (probably?) a valid
+      -- Timewarrior output
+      local first_char = string.sub(stdout, 1, 1)
+      local tag_time
+      if first_char ~= " " and first_char ~= "\t" then
+        tag_time = ""
+      else
+        tag_time = string.gsub(stdout, "[^0-9:]", "")
+      end
       task_obj.current_tag_total_time = tag_time
       task_obj:emit_signal("tasks::stats_tag_finished", "total_tag")
       get_proj_time()
     end)
   end
-
 
   -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
   -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
@@ -138,7 +166,7 @@ return function(task_obj)
 
     if type == "total_proj" then
       local time = task_obj.current_proj_total_time
-      if not time or time == ":" then time = "00:00:00" end
+      if not time or time == ":" or time == "" then time = "00:00:00" end
       local markup = colorize(time, beautiful.fg)
       _ui_proj_time_content:set_markup_silently(markup)
     end
