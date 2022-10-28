@@ -111,6 +111,9 @@ theme.calendar_long_weekdays = true
 theme.task_prompt_contbg = theme.bg_l0
 theme.task_prompt_textbg = theme.bg_l1
 theme.task_due_fg        = colors.fg_sub
+theme.task_overdue_fg    = colors.red
+theme.task_next_fg       = colors.yellow
+theme.task_selected_fg   = colors.main_accent
 theme.task_scrollbar_bg  = colors.bg_l3
 theme.task_scrollbar_fg  = colors.main_accent
 
@@ -180,6 +183,20 @@ theme.notification_border_color = theme.notif_bg
 
 -- █▀▄▀█ █ █▀ █▀▀ 
 -- █░▀░█ █ ▄█ █▄▄ 
+-- Layout list
+theme.layout_bg = colors.bg_l0
+
+-- Bling mstab
+theme.mstab_bar_disable = false
+theme.mstab_bar_ontop = false
+theme.mstab_border_radius = 0
+theme.mstab_tabbar_position = "top"
+theme.mstab_tabbar_style = "default"
+theme.tabbed_bg_focus = colors.main_accent
+theme.tabbed_fg_focus = colors.fg
+theme.tabbar_bg_normal = colors.bg_l0
+theme.tabbar_fg_normal = colors.bg_l3
+
 -- Gaps
 theme.useless_gap = dpi(7)
 
