@@ -255,6 +255,12 @@ return function(task_obj)
     overview:reset()
     overview:add(widget)
     nav_overview.widget = overviewbox:new(widget, task_obj)
+
+    if task_obj.switch_index then
+      print("overview: proj summary created; switch index flag is set. index "..task_obj.index_to_switch)
+      task_obj:emit_signal("tasks::switch_to_task_index", task_obj.index_to_switch)
+      task_obj.switch_index = false
+    end
   end -- end create proj summary
 
 
@@ -269,6 +275,9 @@ return function(task_obj)
   -- Emitted by keygrabber when navigating to the previous or next task
   -- Determines which items to show when scrolling
   task_obj:connect_signal("tasks::task_selected", function(_)
+    task_obj.current_task_index = nav_overview.index
+    print(task_obj.current_task_index)
+
     if #tasklist_overflow == 0 then return end
 
     print("task selected: fvti is "..first_visible_task_index)

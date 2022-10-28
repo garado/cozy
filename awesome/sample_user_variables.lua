@@ -4,15 +4,16 @@
 -- Copy this to user_variables.lua!
 
 return {
-  -- Default themes:
-  -- gruvbox: dark, light
-  -- catppuccin: mocha, latte
-  -- nord: dark
-  -- dracula: dark
-  -- tokyonight: dark
-  theme_name  = "tokyonight",
-  theme_style = "dark",
+  theme_name  = "mountain",
+  theme_style = "fuji",
   theme_switch_integration = false,
+  -- Define displayed_themes if you want to only show specific themes
+  -- in the theme switcher
+  -- displayed_themes = {
+  --   ["mountain"] = true,
+  --   ["kanagawa"] = true,
+  --   ["nord"] = true,
+  -- },
   ---
   display_name = "Display Name",
   goals = {

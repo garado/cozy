@@ -1,7 +1,7 @@
 
 -- █▀█ █▀█ █▀█ █▀▄▀█ █▀█ ▀█▀ 
 -- █▀▀ █▀▄ █▄█ █░▀░█ █▀▀ ░█░ 
--- A textbox used for adding and modifying tasks
+-- A textbox used for adding and modifying tasks.
 
 local awful = require("awful")
 local beautiful = require("beautiful")
@@ -11,34 +11,97 @@ local colorize = require("helpers.ui").colorize_text
 local remove_pango = require("helpers.dash").remove_pango
 local dpi = xresources.apply_dpi
 local gears = require("gears")
-local gfs = require("gears.filesystem")
-
---- Adds formatting to prompt text.
--- @param text The text to promptify.
-local function create_prompt(text)
-  text = "<b>" .. text .. "</b>"
-  return colorize(text, beautiful.fg)
-end
-
--- Module-level variables
-local searching = true
 
 return function(task_obj)
-  local prompt_textbox = wibox.widget({
-    font = beautiful.font,
-    widget = wibox.widget.textbox,
-  })
 
-  task_obj.dash_closed_during_input = false
+  -- █░█ █▀▀ █░░ █▀█ █▀▀ █▀█ █▀ 
+  -- █▀█ ██▄ █▄▄ █▀▀ ██▄ █▀▄ ▄█ 
+  --- Adds pango formatting to prompt text.
+  -- @param text The text to promptify.
+  local function promptify(text)
+    text = "<b>" .. text .. "</b>"
+    return colorize(text, beautiful.fg)
+  end
 
-  -- Support tab completion when searching through tabs
+  --- Reload components only when necessary.
+  -- @param type The type of action being performed.
+  -- @param input The user input.
+  local function send_reload_signal(type, input)
+    -- Reload tag list
+    if type == "mod_tag" then
+      task_obj:emit_signal("tasks::reload_tag_list")
+    end
+
+    -- Reload entire project list
+    local project_added
+    local project_removed
+    if type == "mod_proj" then
+      task_obj:emit_signal("tasks::reload_project_list_all")
+    end
+
+    -- Reload specific projects in project list
+    -- if type == "mod_proj" then
+    --   task_obj:emit_signal("tasks::reload_project_list_entry")
+    -- end
+
+    -- Reload overview task list
+    if type == "" then
+      task_obj:emit_signal("tasks::reload_task_list")
+    end
+
+    -- Reload overview header
+    if type == "add" then
+      task_obj:emit_signal("tasks::reload_overview_header")
+    end
+
+    -- Reload stats
+    if type == "mod_proj" or type == "mod_tag" then
+      task_obj:emit_signal("tasks::reload_stats")
+    end
+  end
+
+  --- When the user modifies the tasklist, sometimes the currently selected task should
+  -- change. For example, when adding a task, the selection should move to the newly-
+  -- added task. This function handles these cases.
+  -- @param type The action type.
+  local function set_selected_task(type)
+    local proj = task_obj.current_project
+    local tasks = task_obj.projects[proj].tasks
+
+    local newest = #tasks + 1
+    local current = task_obj.current_task_index
+    local prev = (current > 1 and current - 1) or 1
+
+    local indices = {
+      ["add"]       = newest,
+      ["start"]     = current,
+      ["mod_due"]   = current,
+      ["mod_name"]	= current,
+      ["done"]      = prev,
+      ["delete"]    = prev,
+      ["undo"]      = 1,
+      ["mod_proj"]  = 1,
+      ["mod_tag"]   = 1,
+    }
+
+    -- Default to first task
+    task_obj.switch_index = true
+    task_obj.index_to_switch = 1
+
+    if indices[type] then
+      task_obj.index_to_switch = indices[type]
+    end
+  end
+
+  --- Support tab completion when searching through tabs.
+  -- @params I don't really understand them tbh.
   local function search_callback(command_before_comp, cur_pos_before_comp, ncomp)
     local proj = task_obj.current_project
     local tasks = task_obj.projects[proj].tasks
     local searchtasks = {}
 
     -- Need to put all of the task descriptions into their own separate table
-    -- Not the most optimal way to do this probably, but it is a way
+    -- Not the most optimal way to do this probably, but it is... a way
     for i = 1, #tasks do
       table.insert(searchtasks, tasks[i]["description"])
     end
@@ -46,9 +109,30 @@ return function(task_obj)
     return awful.completion.generic(command_before_comp, cur_pos_before_comp, ncomp, searchtasks)
   end
 
-  -- Starts prompt to get user input
+  --- In the future I will have different completion options based on what exactly the
+  -- user is trying to do, e.g. when searching through tasks, have a completion table full of tasks;
+  -- when modifying tag, have a completion table full of the tag names. This skeleton is a reminder 
+  -- to myself to implement that later.
+  local function set_completion()
+    -- local projects = {}
+    --for k, _ in ipairs(task_obj.projects) do
+    --  table.insert(projects, k)
+    --end
+  end
+
+  -- ▀█▀ █░█ █▀▀    █▀▀ █▀█ █▀█ █▀▄    █▀ ▀█▀ █░█ █▀▀ █▀▀ 
+  -- ░█░ █▀█ ██▄    █▄█ █▄█ █▄█ █▄▀    ▄█ ░█░ █▄█ █▀░ █▀░ 
+  local prompt_textbox = wibox.widget({
+    font = beautiful.font,
+    widget = wibox.widget.textbox,
+  })
+
+  --- Starts prompt to get user input.
+  -- @param type The action type.
+  -- @param prompt The prompt to display.
+  -- @param text The initial textbox text.
   local function task_input(type, prompt, text)
-    local default_prompt = colorize("<b>"..type..": </b>", beautiful.fg)
+    local default_prompt = promptify(type..": ")
     awful.prompt.run {
       prompt       = prompt or default_prompt,
       text         = text or "",
@@ -65,76 +149,57 @@ return function(task_obj)
     }
   end
 
+  --- Change prompt depending on what action the user is performing,
+  -- then call awful.prompt to get user input.
   -- Emitted by keygrabber when a valid keybind is triggered.
-  -- Change prompt depending on what action the user is performing,
-  -- then call awful.prompt to get user input
   task_obj:connect_signal("tasks::input_request", function(_, type)
     print("prompt::caught input_request signal")
-    local prompt, text
 
-    -- Standard requests
-    if type == "add" then
-      prompt = colorize("<b>Add task: </b>", beautiful.fg)
-    elseif type == "modify" then
-      prompt = colorize("<b>Modify: </b>", beautiful.fg)
-      prompt = prompt .. " (d) due date, (n) task name, (p) project, (t) tag"
+    local prompt_options = {
+      ["add"]       = promptify("Add task: "),
+      ["modify"]    = promptify("Modify: ") .. " (d) due date, (n) task name, (p) project, (t) tag",
+      ["done"]      = promptify("Mark as done? (y/n) "),
+      ["delete"]    = promptify("Delete task? (y/n) "),
+      ["undo"]      = "",
+      ["search"]    = promptify("/"),
+      ["mod_proj"]  = promptify("Modify project: "),
+      ["mod_tag"]   = promptify("Modify tag: "),
+      ["mod_due"]   = promptify("Modify due date: "),
+      ["mod_name"]	= promptify("Modify task name: "),
+    }
+
+    local text_options = {
+      ["mod_name"]  = remove_pango(task_obj.current_task),
+    }
+
+    local prompt  = prompt_options[type] or ""
+    local text    = text_options[type] or ""
+
+    -- Modify and Start take no textbox input - they just execute
+    if type == "modify" then
       prompt_textbox:set_markup_silently(prompt)
       return
-    elseif type == "delete" then
-      prompt = create_prompt("Delete task? (y/n) ")
-    elseif type == "done" then
-      prompt = create_prompt("Mark as done? (y/n) ")
-    elseif type == "start" then
-      -- toggling start/stop is disabled for now
-      require("naughty").notification {
-        message = "Starting/stopping tasks not implemented yet :("
-      }
-      --local cmd
-      --if task_obj.start then
-      --  local cmd = "task start " .. task_obj.id
-      --else
-      --  local cmd = "task stop" .. task_obj.id
-      --end
-      --awful.spawn.with_shell(cmd)
-    elseif type == "new_proj" then
-      prompt = colorize("<b>Add project: </b>", beautiful.fg)
-    elseif type == "new_tag" then
-      prompt = colorize("<b>Add tag: </b>", beautiful.fg)
-    elseif type == "help" then
-      require("naughty").notification {
-        message = "Help not implemented yet :("
-      }
-      return
-    elseif type == "search" then
-      prompt = colorize("<b>/</b>", beautiful.fg)
+    end
 
-    -- Modal modify requests
-    elseif type == "mod_due" then
-      prompt = colorize("<b>Modify due date: </b>", beautiful.fg)
-    elseif type == "mod_tag" then
-      prompt = colorize("<b>Modify tag: </b>", beautiful.fg)
-    elseif type == "mod_proj" then
-      prompt = colorize("<b>Modify project: </b>", beautiful.fg)
-    elseif type == "mod_name" then
-      prompt = colorize("<b>Modify task name: </b>", beautiful.fg)
-      text = remove_pango(task_obj.current_task)
-    elseif type == "mod_clear" then
-      prompt_textbox:set_markup_silently("")
+    if type == "start" then
+      prompt_textbox:set_markup_silently(prompt)
+      task_obj:emit_signal("tasks::input_completed", "start", "")
       return
     end
 
     task_input(type, prompt, text)
   end)
 
-  -- Emitted by awful.prompt when Enter/Return is pressed.
-  -- Call taskwarrior command from user input
+  --- Call Taskwarrior command based on user input.
+  -- Emitted by the awful.prompt above when Enter/Return is pressed.
   task_obj:connect_signal("tasks::input_completed", function(_, type, input)
     local proj = task_obj.current_project
     local tag  = task_obj.current_tag
-    local id   = task_obj.id
+    local id   = task_obj.current_id
+    local idx  = task_obj.current_task_index
+    local task = task_obj.projects[proj].tasks[idx]
     local cmd
 
-    -- Standard requests
     if      type == "add" then
       cmd = "task add proj:'"..proj.."' tag:'"..tag.."' '"..input.."'"
     elseif  type == "delete" then
@@ -146,13 +211,18 @@ return function(task_obj)
         cmd = "echo 'y' | task done " .. id
       end
     elseif  type == "search" then
-      local proj = task_obj.current_project
       local tasks = task_obj.projects[proj].tasks
       for i = 1, #tasks do
         if tasks[i]["description"] == input then
           task_obj:emit_signal("tasks::switch_to_task_index", i)
           return
         end
+      end
+    elseif type == "start" then
+      if task["start"] then
+        cmd = "task " .. id .. " stop"
+      else
+        cmd = "task " .. id .. " start"
       end
     end
 
@@ -167,9 +237,11 @@ return function(task_obj)
       cmd = "task "..id.." mod desc:'"..input.."'"
     end
 
+    -- Execute command
     awful.spawn.easy_async_with_shell(cmd, function()
       print("prompt: emit project_modified")
       task_obj:emit_signal("tasks::project_modified", tag, proj, type)
+      set_selected_task(type)
     end)
   end)
 

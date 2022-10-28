@@ -168,15 +168,19 @@ ui_started = wibox.widget({
     layout = wibox.layout.fixed.vertical,
   },
   stop_button,
+  spacing = dpi(20),
   layout = wibox.layout.fixed.vertical,
 })
 
 -- The function to run whenever 
 local function update_timew_information()
   -- current tag
+  -- with the way I use taskwarrior, I always have multiple tasks,
+  -- but I only need to use the 1st tag. so only take the 1st word
   local cmd = "timew | head -n 1"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local tag = string.gsub(stdout, "Tracking ", "")
+    tag = string.gsub(tag, "%s+.+$", "")
     local markup = colorize(tag, beautiful.fg)
     current_tag.children[2]:set_markup_silently(markup)
   end)

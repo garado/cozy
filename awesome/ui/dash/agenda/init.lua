@@ -21,7 +21,7 @@ local header = wibox.widget({
 
 local widget = wibox.widget({
   {
-    header,
+    -- header,
     calendar,
     deadlines,
     layout = wibox.layout.fixed.vertical,

@@ -12,6 +12,8 @@ local dpi = xresources.apply_dpi
 local helpers = require("helpers")
 local widgets = require("ui.widgets")
 local naughty = require("naughty")
+local user_vars = require("user_variables")
+local displayed_themes = user_vars.displayed_themes
 
 local keynav = require("modules.keynav")
 local Area = keynav.area
@@ -159,8 +161,8 @@ end
 
 -- Returns currently selected theme and style in user_variables.lua
 function get_current_theme()
-  local user_vars = gfs.get_configuration_dir() .. "user_variables.lua"
-  local cmd = "egrep 'theme_name.*|theme_style.*' " .. user_vars
+  local user_vars_path = gfs.get_configuration_dir() .. "user_variables.lua"
+  local cmd = "egrep 'theme_name.*|theme_style.*' " .. user_vars_path
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local fields = { }
     for field in stdout:gmatch('"(.-)"') do
@@ -189,11 +191,11 @@ function apply_new_theme(theme, style)
     }
     return
   end
-  local user_vars = gfs.get_configuration_dir() .. "user_variables.lua"
+  local user_vars_path = gfs.get_configuration_dir() .. "user_variables.lua"
   local replace_theme = "sed -i 's/theme_name.*/theme_name = \"" .. theme .. "\",/' "
   local replace_style = "sed -i 's/theme_style.*/theme_style = \"" .. style .. "\",/' "
-  awful.spawn.with_shell(replace_theme .. user_vars)
-  awful.spawn.with_shell(replace_style .. user_vars)
+  awful.spawn.with_shell(replace_theme .. user_vars_path)
+  awful.spawn.with_shell(replace_style .. user_vars_path)
   awesome.restart()
 end
 
@@ -290,12 +292,15 @@ local function create_theme_button(name)
 end
 
 local function create_theme_buttons()
+  -- Check if should load only selected themes
+  local restrict_themes = gears.table.count_keys(displayed_themes) ~= 0
+
   local themes_dir = gfs.get_configuration_dir() .. "theme/colorschemes/"
   local cmd = "ls " .. themes_dir
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     for theme in string.gmatch(stdout, "[^\n\r]+") do
-      if theme ~= "init.lua" then
-        theme = string.gsub(theme, ".lua", "")
+      theme = string.gsub(theme, ".lua", "")
+      if restrict_themes and displayed_themes[theme] and theme ~= "init" then
         local theme_button = create_theme_button(theme)
         theme_buttons:add(theme_button)
       end

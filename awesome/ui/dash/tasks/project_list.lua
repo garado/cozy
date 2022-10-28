@@ -31,6 +31,15 @@ nav_projects = area:new({
 })
 
 return function(task_obj)
+  local total_projects_in_tag = 0
+
+  local function count_projects_in_tag()
+    total_projects_in_tag = 0
+    for _, _ in pairs(task_obj.projects) do
+      total_projects_in_tag = total_projects_in_tag + 1
+    end
+  end
+
   local function create_project_button(project)
     local tag = task_obj.current_tag
 
@@ -68,6 +77,11 @@ return function(task_obj)
   end -- end create_project_button
 
   local project_list = wibox.widget({
+    spacing = dpi(5),
+    layout = wibox.layout.flex.vertical,
+  })
+
+  local project_list_buffer = wibox.widget({
     spacing = dpi(5),
     layout = wibox.layout.flex.vertical,
   })
@@ -114,11 +128,19 @@ return function(task_obj)
   -- need to rename and reuse this signal cause project_json_parsed is the exact same
   task_obj:connect_signal("tasks::tag_json_parsed", function()
     print("list: connect tag_json_parsed")
+    count_projects_in_tag()
     draw_project_list()
   end)
 
   task_obj:connect_signal("tasks::project_json_parsed", function()
     print("list: connect project_json_parsed")
+    count_projects_in_tag()
+    draw_project_list()
+  end)
+
+  task_obj:connect_signal("tasks::reload_project_list_all", function()
+    print("list: connect reload_proj_list")
+    count_projects_in_tag()
     draw_project_list()
   end)
 
@@ -126,11 +148,13 @@ return function(task_obj)
   -- finished.
   -- (Reminder: the async calls are for calculating the percentage
   -- completion per project in the project list)
+  local async_calls_completed = 0
   task_obj:connect_signal("tasks::project_async_done", function(_, widget, name)
     -- When adding the first project to the project list, clear all old projects
     if no_projects_added then
+      async_calls_completed = 0
       no_projects_added = false
-      project_list:reset()
+      project_list_buffer:reset()
     end
 
     -- If the current project is nil, then no project is selected.
@@ -148,7 +172,7 @@ return function(task_obj)
       task_obj:emit_signal("tasks::project_selected", name)
     end
 
-    project_list:add(widget)
+    project_list_buffer:add(widget)
 
     -- Keyboard navigation
     local nav_project = tasks_textbox:new(widget)
@@ -158,6 +182,14 @@ return function(task_obj)
       task_obj:emit_signal("tasks::project_selected")
     end
     nav_projects:append(nav_project)
+
+    async_calls_completed = async_calls_completed + 1
+    if async_calls_completed == total_projects_in_tag then
+      project_list:reset()
+      for i = 1, #project_list_buffer.children do
+        project_list:add(project_list_buffer.children[i])
+      end
+    end
   end)
 
   return projects_widget, nav_projects

@@ -9,7 +9,9 @@ local xresources = require("beautiful.xresources")
 local gears = require("gears")
 local dpi = xresources.apply_dpi
 
--- The following is formatting for the calendar
+
+-- █░█ █ 
+-- █▄█ █ 
 local styles = {}
 local function rounded_shape(size, partial)
   if partial then
@@ -85,10 +87,11 @@ end
 
 local cal = wibox.widget({
   {
-    date = os.date("*t"),
-    widget   = wibox.widget.calendar.month,
-    font = beautiful.font .. "15",
-    fn_embed = decorate_cell,
+    date      = os.date("*t"),
+    widget    = wibox.widget.calendar.month,
+    font      = beautiful.font .. "15",
+    fn_embed  = decorate_cell,
+    start_sunday = true,
   },
   widget = wibox.container.place,
 })
