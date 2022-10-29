@@ -15,7 +15,7 @@ task_obj.current_tag  = "ECE118"
 
 -- Import modules
 local tag_list, nav_tags     = require("ui.dash.tasks.tags")(task_obj)
-local overview, nav_overview = require("ui.dash.tasks.project_overview")(task_obj)
+local overview, nav_tasklist = require("ui.dash.tasks.tasklist")(task_obj)
 local projects, nav_projects = require("ui.dash.tasks.project_list")(task_obj)
 local stats   = require("ui.dash.tasks.stats")(task_obj)
 local prompt  = require("ui.dash.tasks.prompt")(task_obj)
@@ -27,7 +27,7 @@ local nav_sidebar = area:new({ name = "sidebar", circular = true })
 nav_sidebar:append(nav_tags)
 nav_sidebar:append(nav_projects)
 nav_tasks:append(nav_sidebar)
-nav_tasks:append(nav_overview)
+nav_tasks:append(nav_tasklist)
 
 -- Having to define this twice (here and in keygrabber) seems clumsy,
 -- but currently the only way to get these commands to work everywhere in
@@ -46,8 +46,8 @@ nav_sidebar.keys ={
 -- Switches to a specific index in the task overview list.
 -- Emitted after task search.
 task_obj:connect_signal("tasks::switch_to_task_index", function(_, index)
-  nav_overview:set_curr_item(index)
-  nav_tasks.nav:set_area("overview")
+  nav_tasklist:set_curr_item(index)
+  nav_tasks.nav:set_area("tasklist")
 end)
 
 -- Assemble UI

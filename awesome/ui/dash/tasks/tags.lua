@@ -23,9 +23,10 @@ nav_tags = Area:new({
   keys = {
     ["l"] = function()
       local navigator = nav_tags.nav
-      navigator:set_area("overview")
+      navigator:set_area("tasklist")
     end,
-  }
+  },
+  hl_persist_on_area_switch = true,
 })
 
 -- Given the output of `task tags`,

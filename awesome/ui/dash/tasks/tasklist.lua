@@ -1,11 +1,6 @@
 
--- █▀█ █▀█ █▀█ ░░█ █▀▀ █▀▀ ▀█▀    █▀█ █░█ █▀▀ █▀█ █░█ █ █▀▀ █░█░█ 
--- █▀▀ █▀▄ █▄█ █▄█ ██▄ █▄▄ ░█░    █▄█ ▀▄▀ ██▄ █▀▄ ▀▄▀ █ ██▄ ▀▄▀▄▀ 
-
--- Project overview consists of:
---    * project completion percentage
---    * list of tasks and their due dates
--- Also includes a keygrabber to enable modifying/adding/deleting tasks. :)
+-- ▀█▀ ▄▀█ █▀ █▄▀ █░░ █ █▀ ▀█▀ 
+-- ░█░ █▀█ ▄█ █░█ █▄▄ █ ▄█ ░█░ 
 
 local beautiful = require("beautiful")
 local wibox = require("wibox")
@@ -21,31 +16,38 @@ local helpers = require("helpers")
 local colorize = require("helpers.ui").colorize_text
 local format_due_date = require("helpers.dash").format_due_date
 
-local max_tasks_shown = 21
 local max_tasklist_height = dpi(580)
 local first_visible_task_index = 1
 
 local scrollbar
 
 return function(task_obj)
+  -- idk where to put this
+  task_obj.max_tasks_shown = 21
+
+  local function num_tasks()
+    local project = task_obj.current_project
+    return #task_obj.projects[project].tasks
+  end
+
   -- Keyboard navigation
   -- Setting up custom keys is... a little clunky
   -- Need to update keynav to make this better
-  local nav_overview
+  local nav_tasklist
   local keys = require("ui.dash.tasks.keygrabber")(task_obj)
-  nav_overview = area:new({
-    name = "overview",
+  nav_tasklist = area:new({
+    name = "tasklist",
     circular = true,
   })
 
   keys["h"] = function()
-    local navigator = nav_overview.nav
+    local navigator = nav_tasklist.nav
     navigator:set_area("projects")
   end
-  nav_overview.keys = keys
+  nav_tasklist.keys = keys
 
   -- Define core UI components
-  local overview = wibox.widget({
+  local tasklist_wrapper = wibox.widget({
     spacing = dpi(15),
     layout = wibox.layout.fixed.vertical,
   })
@@ -55,7 +57,12 @@ return function(task_obj)
     layout = wibox.layout.flex.vertical,
   })
 
-  local tasklist_overflow = {}
+  local overflow_top = {}
+  local overflow_bottom = {}
+
+  local function total_overflow()
+    return #overflow_top + #overflow_bottom
+  end
 
   -- ▀█▀ ▄▀█ █▀ █▄▀ █▀ 
   -- ░█░ █▀█ ▄█ █░█ ▄█ 
@@ -93,7 +100,7 @@ return function(task_obj)
   -- █▀█ █▀█ █▀█ ░░█ █▀▀ █▀▀ ▀█▀    █▀ █░█ █▀▄▀█ █▀▄▀█ ▄▀█ █▀█ █▄█ 
   -- █▀▀ █▀▄ █▄█ █▄█ ██▄ █▄▄ ░█░    ▄█ █▄█ █░▀░█ █░▀░█ █▀█ █▀▄ ░█░ 
   -- Create a summary listing all tasks as well as completion percentage
-  local function create_project_summary(tag, project)
+  local function create_tasklist(tag, project)
     local accent = beautiful.random_accent_color()
 
     if project == "(none)" or project == "noproj" then
@@ -137,11 +144,12 @@ return function(task_obj)
     })
 
     -- Add tasks to task list
-    nav_overview:remove_all_items()
-    nav_overview:reset()
+    nav_tasklist:remove_all_items()
+    nav_tasklist:reset()
     tasklist:reset()
     local current_task_set = false
-    tasklist_overflow = {}
+    overflow_top = {}
+    overflow_bottom = {}
     local json_tasklist = task_obj.projects[project].tasks
     for i = 1, #json_tasklist do
       local desc  = json_tasklist[i]["description"]
@@ -150,14 +158,11 @@ return function(task_obj)
       local start = json_tasklist[i]["start"]
       local task = create_task(desc, due, start, id)
 
-      --print(id .. ": " .. desc)
-      nav_overview:append(navtask:new(task, task_obj, id))
-      if #tasklist.children < max_tasks_shown then
+      nav_tasklist:append(navtask:new(task, task_obj, id))
+      if #tasklist.children < task_obj.max_tasks_shown then
         tasklist:add(task)
       else
-        table.insert(tasklist_overflow, task)
-        --local tmp = navtask:new(task, task_obj, id)
-        --table.insert(navtasklist_overflow, tmp)
+        table.insert(overflow_bottom, task)
       end
 
       if not current_task_set then
@@ -166,21 +171,23 @@ return function(task_obj)
       end
     end
 
-    local scrollbar_height = (max_tasks_shown / #json_tasklist) * max_tasklist_height
+    local max_tasks_shown = task_obj.max_tasks_shown
+    local scrollbar_height = ((max_tasks_shown / #json_tasklist) * max_tasklist_height) or 0
+    local maximum = (total_overflow() > 1 and total_overflow()) or 1
     scrollbar = wibox.widget({
       {
-        id = "bar",
-        value = 0,
-        maximum = #tasklist_overflow - 1,
+        id            = "bar",
+        value         = 0,
+        maximum       = maximum,
         forced_height = dpi(5),
-        handle_width = dpi(scrollbar_height),
-        bar_color = beautiful.task_scrollbar_bg,
-        handle_color = beautiful.task_scrollbar_fg,
-        bar_shape = gears.shape.rounded_rect,
-        widget = wibox.widget.slider,
+        handle_width  = dpi(scrollbar_height),
+        bar_color     = beautiful.task_scrollbar_bg,
+        handle_color  = beautiful.task_scrollbar_fg,
+        bar_shape     = gears.shape.rounded_rect,
+        widget        = wibox.widget.slider,
       },
       direction = "west",
-      widget = wibox.container.rotate,
+      widget    = wibox.container.rotate,
     })
 
     -- Calculate completion percentage
@@ -200,7 +207,7 @@ return function(task_obj)
     markup = colorize(text, beautiful.fg)
     project_tag:set_markup_silently(markup)
 
-    local overview_header = wibox.widget({
+    local tasklist_header = wibox.widget({
       {
         {
           name,
@@ -219,7 +226,7 @@ return function(task_obj)
     local scrollbar_cont = wibox.widget({
       scrollbar,
       right = dpi(15),
-      visible = #tasklist_overflow > 0,
+      visible = total_overflow() > 0,
       widget = wibox.container.margin,
     })
 
@@ -227,7 +234,7 @@ return function(task_obj)
     local widget = wibox.widget({
       {
         {
-          overview_header,
+          tasklist_header,
           helpers.ui.vertical_pad(dpi(15)),
           {
             {
@@ -252,12 +259,12 @@ return function(task_obj)
       widget = wibox.container.background,
     })
 
-    overview:reset()
-    overview:add(widget)
-    nav_overview.widget = overviewbox:new(widget, task_obj)
+    tasklist_wrapper:reset()
+    tasklist_wrapper:add(widget)
+    nav_tasklist.widget = overviewbox:new(widget, task_obj)
 
     if task_obj.switch_index then
-      print("overview: proj summary created; switch index flag is set. index "..task_obj.index_to_switch)
+      print("tasklist: proj summary created; switch index flag is set. index "..task_obj.index_to_switch)
       task_obj:emit_signal("tasks::switch_to_task_index", task_obj.index_to_switch)
       task_obj.switch_index = false
     end
@@ -267,68 +274,103 @@ return function(task_obj)
   -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
   -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
   task_obj:connect_signal("tasks::draw_first_overview", function(_, project)
-    print("overview: connect draw_first_overview")
+    print("tasklist: connect draw_first_overview")
     local tag = task_obj.current_tag
-    create_project_summary(tag, project)
+    create_tasklist(tag, project)
   end)
 
-  -- Emitted by keygrabber when navigating to the previous or next task
-  -- Determines which items to show when scrolling
-  task_obj:connect_signal("tasks::task_selected", function(_)
-    task_obj.current_task_index = nav_overview.index
-    print(task_obj.current_task_index)
-
-    if #tasklist_overflow == 0 then return end
-
-    print("task selected: fvti is "..first_visible_task_index)
-    --scrollbar.children[1].value = nav_overview.index - 1
-    --print("index " ..nav_overview.index)
-    local index = nav_overview.index - 1
-    local limit = first_visible_task_index + max_tasks_shown - 1
+  -- █▀ █▀▀ █▀█ █▀█ █░░ █░░ █ █▄░█ █▀▀ 
+  -- ▄█ █▄▄ █▀▄ █▄█ █▄▄ █▄▄ █ █░▀█ █▄█ 
+  local function scroll_up()
     local bar = scrollbar.children[1]
+    bar.value = bar.value - 1
+    first_visible_task_index = first_visible_task_index - 1
 
-    -- Scroll up when the new index is less than the index of the first task 
-    -- currently shown
-    if index < first_visible_task_index then
-      print("scroll up")
-      first_visible_task_index = first_visible_task_index - 1
-      bar.value = bar.value - 1
+    -- For scroll up, the last task gets hidden
+    -- Prepend to overflow_bottom buffer
+    local last_task_shown
+    if #tasklist.children > (first_visible_task_index + 20) then
+      last_task_shown = first_visible_task_index + task_obj.max_tasks_shown - 1
+    else
+      last_task_shown = #tasklist.children
+    end
+    table.insert(overflow_bottom, 1, tasklist.children[last_task_shown])
+    tasklist:remove(#tasklist.children)
 
-      -- For scroll up, the last task gets hidden
-      -- Add it to beginning of task overflow buffer
-      table.insert(tasklist_overflow, tasklist.children[#tasklist.children])
-      tasklist:remove(#tasklist.children)
+    -- Prepend last task from overflow_top to tasklist 
+    tasklist:insert(1, overflow_top[#overflow_top])
+    table.remove(overflow_top, #overflow_top)
+  end
 
-      -- Add the last task from overflow buffer
-      tasklist:add(tasklist_overflow[#tasklist_overflow])
-      table.remove(tasklist_overflow, #tasklist_overflow)
-    -- Scroll down to next task if index exceeds limit
-    elseif limit < nav_overview.index - 1 then
-      first_visible_task_index = first_visible_task_index + 1
-      bar.value = bar.value + 1
+  local function scroll_down()
+    local bar = scrollbar.children[1]
+    bar.value = bar.value + 1
+    first_visible_task_index = first_visible_task_index + 1
 
-      -- For scroll down, the 1st task gets hidden
-      -- Add it to end of task overflow buffer
-      table.insert(tasklist_overflow, tasklist.children[1])
-      tasklist:remove(1)
+    -- When scrolling down, the 1st visible task gets hidden
+    -- Append to overflow_top buffer
+    table.insert(overflow_top, tasklist.children[1])
+    tasklist:remove(1)
 
-      -- Add the first task from overflow buffer
-      tasklist:add(tasklist_overflow[1])
-      table.remove(tasklist_overflow, 1)
+    -- Append the first task from overflow_bottom 
+    tasklist:add(overflow_bottom[1])
+    table.remove(overflow_bottom, 1)
+  end
 
-      tasklist:emit_signal("widget::redraw_needed")
+  local function jump_top()
+    while #overflow_top > 0 do
+      scroll_up()
+    end
+
+    nav_tasklist:set_curr_item(#overflow_top + 1)
+  end
+
+  local function jump_end()
+    -- is this necessary? idk
+    nav_tasklist:set_curr_item(num_tasks() - #overflow_bottom)
+
+    while #overflow_bottom > 0 do
+      scroll_down()
+    end
+    nav_tasklist:set_curr_item(num_tasks())
+  end
+
+  -- Emitted by keygrabber when navigating to the previous or next task
+  -- Determines which items to show when scrolling and also sets current
+  -- task index
+  task_obj:connect_signal("tasks::task_selected", function(_)
+    local old_index = task_obj.current_task_index or 1
+    task_obj.current_task_index = nav_tasklist.index
+
+    -- Everything below here is relevant to scrolling only
+    if total_overflow() == 0 then return end
+
+    local max_tasks_shown = task_obj.max_tasks_shown
+    local index = nav_tasklist.index
+    local last_visible_task_index = first_visible_task_index + max_tasks_shown - 1
+    local gap = math.abs(old_index - index)
+
+    if index == 1 and gap > 1 then
+      if first_visible_task_index == 1 then return end
+      jump_top()
+    elseif index == num_tasks() and gap > 1 then
+      if first_visible_task_index == num_tasks() then return end
+      jump_end()
+    elseif index < first_visible_task_index then
+      scroll_up()
+    elseif index > last_visible_task_index then
+      scroll_down()
     end
   end)
 
   -- json_parsed signal tells us that the data is ready to be
   -- processed
   task_obj:connect_signal("tasks::project_selected", function()
-    print("overview: connect project_selected")
+    print("tasklist: connect project_selected")
     local tag     = task_obj.current_tag
     local project = task_obj.current_project
-    create_project_summary(tag, project)
+    create_tasklist(tag, project)
   end)
 
-  return overview, nav_overview
+  return tasklist_wrapper, nav_tasklist
 end
-

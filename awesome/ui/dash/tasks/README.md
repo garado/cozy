@@ -104,3 +104,19 @@ user modifies a         fetch and parse          draw new project
 ```
 
 ## Reload signals
+
+# How scrollbar works
+The tasklist displays max_tasks_shown tasks at a time (default 21)
+- overflow buffers
+  - top and bottom
+  - these hold excess tasks (eg if you have more than max_tasks_shown tasks)
+- scroll down
+  - append 1st visible task to overflow_top; remove it from tasklist ui
+  - append 1st task from overflow_bottom to tasklist ui; remove it from overflow_bottom
+- scroll up
+  - prepend last visible task to overflow_bottom; remove from tasklist ui
+  - append 1st task from overflow_bottom to tasklist ui; remove it from overflow_bottom
+- jump top
+  - loop over scroll_up
+- jump end
+  - loop over scroll_down

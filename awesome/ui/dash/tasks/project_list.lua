@@ -25,9 +25,10 @@ nav_projects = area:new({
   keys = {
     ["l"] = function()
       local navigator = nav_projects.nav
-      navigator:set_area("overview")
+      navigator:set_area("tasklist")
     end,
-  }
+  },
+  hl_persist_on_area_switch = true,
 })
 
 return function(task_obj)
