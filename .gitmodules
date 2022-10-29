@@ -1,3 +1,6 @@
 [submodule "awesome/modules/keynav"]
 	path = awesome/modules/keynav
 	url = https://github.com/garado/awesome-keynav.git
+[submodule "awesome/modules/bling"]
+	path = awesome/modules/bling
+	url = https://github.com/garado/bling.git
