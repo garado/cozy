@@ -4,3 +4,6 @@
 [submodule "awesome/modules/bling"]
 	path = awesome/modules/bling
 	url = https://github.com/garado/bling.git
+[submodule "awesome/modules/fzy-lua"]
+	path = awesome/modules/fzy-lua
+	url = git@github.com:swarn/fzy-lua.git
