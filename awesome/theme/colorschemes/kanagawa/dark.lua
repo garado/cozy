@@ -47,8 +47,9 @@ colorscheme.colors.transparent = "#ffffff00"
 
 -- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ 
 -- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ 
-colorscheme.switcher.kitty = "kanagawabones"
-colorscheme.switcher.nvchad  = "kanagawa"
-colorscheme.switcher.gtk   = "Nordic"
+colorscheme.switcher.kitty    = "kanagawabones"
+colorscheme.switcher.nvchad   = "kanagawa"
+colorscheme.switcher.gtk      = "Nordic"
+colorscheme.switcher.zathura  = "kanagawa"
 
 return colorscheme
