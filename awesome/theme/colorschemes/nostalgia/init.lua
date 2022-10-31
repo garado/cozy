@@ -1,0 +1,3 @@
+return {
+  light = require(... .. ".light"),
+}

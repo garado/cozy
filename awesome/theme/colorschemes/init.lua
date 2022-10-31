@@ -7,4 +7,5 @@ return {
   dracula = require(... .. ".dracula"),
   kanagawa = require(... .. ".kanagawa"),
   polyphia = require(... .. ".polyphia"),
+  nostalgia = require(... .. ".nostalgia"),
 }
