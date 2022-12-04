@@ -28,10 +28,12 @@ return function(s)
   local main,   nav_main    = require("ui.dash.main")()
   local cash,   nav_cash    = require("ui.dash.finances")()
   local tasks,  nav_tasks   = require("ui.dash.tasks")()
+  local time                = require("ui.dash.time")()
+--  local time,   nav_time    = require("ui.dash.time")()
   local agenda = require("ui.dash.agenda")
 
-  local tablist =   { main, tasks, cash,  agenda }
-  local tab_icons = { "",  "",   "",   ""    }
+  local tablist =   { main, tasks, time, cash,  agenda }
+  local tab_icons = { "",  "",   "",  "",   ""    }
   local navitems =  { nav_main, nav_tasks, nav_cash, nil }
 
   --- Display a specific tab on the dashboard
@@ -67,6 +69,7 @@ return function(s)
     ["2"] = {["function"] = switch_tab, ["args"] = 2},
     ["3"] = {["function"] = switch_tab, ["args"] = 3},
     ["4"] = {["function"] = switch_tab, ["args"] = 4},
+    ["5"] = {["function"] = switch_tab, ["args"] = 5},
   }
 
   dash_content = wibox.widget({
