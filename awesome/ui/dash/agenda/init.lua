@@ -14,7 +14,8 @@ local deadlines = require("ui.dash.agenda.deadlines")
 
 local header = wibox.widget({
   markup = colorize("This week", beautiful.main_accent),
-  font = beautiful.alt_font_name .. "Light 30",
+  font    = beautiful.font_name .. "17",
+  --font = beautiful.alt_font_name .. "Light 30",
   align = "center",
   widget = wibox.widget.textbox,
 })

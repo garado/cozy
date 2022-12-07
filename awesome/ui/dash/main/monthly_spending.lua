@@ -23,6 +23,8 @@ local tonumber = tonumber
 local table = table
 local ledger_file = config.ledger.ledger_file
 
+local no_spending_this_month = false
+
 -- arc chart colors
 local color_palette = beautiful.cash_arccolors
 
@@ -213,6 +215,7 @@ local function create_chart()
     for i, v in ipairs(entries) do
       total_spending = total_spending + v[2]
     end
+
     create_chart_sections(entries, num_entries, total_spending)
   end) -- end awful.spawn
 
@@ -231,7 +234,7 @@ local function get_account_value(header_text, ledger_cmd)
   })
 
   local balance_ = wibox.widget({
-    markup = helpers.ui.colorize_text("$--.--", beautiful.fg),
+    markup = helpers.ui.colorize_text("$0.00", beautiful.fg),
     widget = wibox.widget.textbox,
     font = beautiful.alt_font_name .. "15",
     align = "center",
@@ -241,8 +244,14 @@ local function get_account_value(header_text, ledger_cmd)
   awful.spawn.easy_async_with_shell(ledger_cmd, function(stdout)
     balance = string.gsub(stdout, "[^0-9.]", "")
     balance = string.gsub(balance, "%s+", "")
-    local markup = helpers.ui.colorize_text("$" .. balance, beautiful.fg)
-    balance_:set_markup_silently(markup)
+    if balance ~= "" then
+      local markup = helpers.ui.colorize_text("$" .. balance, beautiful.fg)
+      balance_:set_markup_silently(markup)
+    else
+      if (header_text == "Spent") then
+        no_spending_this_month = true
+      end
+    end
   end)
 
   local balance = wibox.widget({
@@ -283,15 +292,25 @@ local top = wibox.widget({
   widget = wibox.container.place,
 })
 
-local bottom = wibox.widget({
-  {
-    breakdown_chart,
-    breakdown_legend,
-    spacing = dpi(30),
-    layout = wibox.layout.fixed.horizontal,
-  },
-  widget = wibox.container.place,
-})
+local bottom
+
+if not no_spending_this_month then
+  bottom = wibox.widget({
+    {
+      breakdown_chart,
+      breakdown_legend,
+      spacing = dpi(30),
+      layout = wibox.layout.fixed.horizontal,
+    },
+    widget = wibox.container.place,
+  })
+else -- doesn't work rn
+  print("no spend")
+  bottom = wibox.widget({
+    text = "no spending",
+    widget = wibox.widget.text,
+  })
+end
 
 local widget = wibox.widget({
   helpers.ui.create_dash_widget_header("Monthly Spending"),

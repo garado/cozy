@@ -47,12 +47,12 @@ colorscheme.colors.transparent = "#ffffff00"
 
 -- █▀█ █░█ █▀▀ █▀█ █▀█ █ █▀▄ █▀▀ 
 -- █▄█ ▀▄▀ ██▄ █▀▄ █▀▄ █ █▄▀ ██▄ 
-colorscheme.override.wibar_fg       = "#2e3440"
-colorscheme.override.wibar_occupied = "#a1a7b2"
--- theme.wibar_bg       = "#2e3440"
--- theme.wibar_focused  = "#6181a1"
--- theme.wibar_occupied = "#eceff4"
--- theme.wibar_empty    = "#4c566a"
+-- colorscheme.override.wibar_occupied = "#a1a7b2"
+colorscheme.override.wibar_bg       = "#2e3440"
+colorscheme.override.wibar_focused  = "#6181a1"
+colorscheme.override.wibar_occupied = "#eceff4"
+colorscheme.override.wibar_empty    = "#4c566a"
+colorscheme.override.wibar_fg       = "#eceff4"
 
 -- theme.wibar_fg       = "#dee4ef"
 -- theme.wibar_bg       = "#2e3440"

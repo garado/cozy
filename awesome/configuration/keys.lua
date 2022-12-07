@@ -9,14 +9,13 @@ local bling = require("modules.bling")
 local naughty = require("naughty")
 local os = os
 
-local mod = "Mod4"
-local alt = "Mod1"
-local ctrl = "Control"
+local mod   = "Mod4"
+local alt   = "Mod1"
+local ctrl  = "Control"
 local shift = "Shift"
 
--- Helper functions for sane(er) keyboard resizing in layout.suit.tile.* modes
-local function resize_horizontal(factor)
-  local layout = awful.layout.get(awful.screen.focused())
+-- Sane(er) keyboard resizing
+local function resize_horizontal(factor) local layout = awful.layout.get(awful.screen.focused())
   if layout == awful.layout.suit.tile then
     awful.tag.incmwfact(-factor)
   elseif layout == awful.layout.suit.tile.left then
@@ -25,6 +24,8 @@ local function resize_horizontal(factor)
     awful.client.incwfact(-factor)
   elseif layout == awful.layout.suit.tile.bottom then
     awful.client.incwfact(-factor)
+  elseif layout == bling.layout.mstab then
+    awful.tag.incmwfact(factor)
   end
 end
 
@@ -41,6 +42,16 @@ local function resize_vertical(factor)
   end
 end
 
+-- check if currently focused client is master
+local function focused_is_master()
+  local master = awful.client.getmaster()
+  local focused = awful.client.focus
+  local nmaster = math.min(t.master_count, #p.clients)
+  for i = 1, nmaster do
+    require("naughty").notification { message = "master selected" }
+  end
+end
+
 local scratchpad = bling.module.scratchpad {
   command = "kitty --class spad --session sessions/scratchpad",
   rule = { instance = "spad" },
@@ -52,7 +63,14 @@ local scratchpad = bling.module.scratchpad {
   dont_focus_before_close = true,
 }
 
--- Global key bindings
+awesome.connect_signal("startup", function()
+  scratchpad:turn_off()
+end)
+
+
+-- ░█▀▀░█░░░█▀█░█▀▄░█▀█░█░░░░░█░█░█▀▀░█░█░█▀▄░▀█▀░█▀█░█▀▄░█▀▀
+-- ░█░█░█░░░█░█░█▀▄░█▀█░█░░░░░█▀▄░█▀▀░░█░░█▀▄░░█░░█░█░█░█░▀▀█
+-- ░▀▀▀░▀▀▀░▀▀▀░▀▀░░▀░▀░▀▀▀░░░▀░▀░▀▀▀░░▀░░▀▀░░▀▀▀░▀░▀░▀▀░░▀▀▀
 awful.keyboard.append_global_keybindings({
 
   -- ▄▀█ █░█░█ █▀▀ █▀ █▀█ █▀▄▀█ █▀▀
@@ -69,22 +87,32 @@ awful.keyboard.append_global_keybindings({
   awful.key({ mod }, "s", hotkeys_popup.show_help,
     { description = "help", group = "Awesome"}),
 
+  -- Daily briefing
+  awful.key({ mod }, "d", function()
+    scratchpad:turn_off()
+    awesome.emit_signal("daily_briefing::toggle", s)
+  end, { description = "daily briefing", group = "Awesome" }),
+
+  -- Toggle dash
   awful.key({ mod }, "j", function()
     scratchpad:turn_off()
     awesome.emit_signal("dash::toggle", s)
   end, { description = "dash", group = "Awesome" }),
 
+  -- Toggle control center
   awful.key({ mod }, "k", function()
     scratchpad:turn_off()
     awesome.emit_signal("control_center::toggle")
   end, { description = "control center", group = "Awesome" }),
 
+  -- Toggle theme switcher
   awful.key({ mod }, "l", function()
     scratchpad:turn_off()
     awesome.emit_signal("theme_switcher::toggle")
   end, { description = "dash", group = "Awesome" }),
 
-  awful.key({ mod }, "l", function()
+  -- Toggle layout list switcher
+  awful.key({ mod }, "u", function()
     scratchpad:turn_off()
     awesome.emit_signal("layoutlist::toggle")
   end, { description = "layout list", group = "Awesome"}),
@@ -92,11 +120,12 @@ awful.keyboard.append_global_keybindings({
 
   -- █░█ █▀█ ▀█▀ █▄▀ █▀▀ █▄█ █▀
   -- █▀█ █▄█ ░█░ █░█ ██▄ ░█░ ▄█
-  -- Brightness
+  -- Adjust brightness
 	awful.key({}, "XF86MonBrightnessUp", function()
 		awful.spawn("brightnessctl set 5%+ -q", false)
 		awesome.emit_signal("module::brightness")
 	end),
+
 	awful.key({}, "XF86MonBrightnessDown", function()
 		awful.spawn("brightnessctl set 5%- -q", false)
 		awesome.emit_signal("module::brightness")
@@ -118,6 +147,7 @@ awful.keyboard.append_global_keybindings({
 		awesome.emit_signal("module::volume")
 	end),
 
+  -- Playerctl
   awful.key({ mod }, "XF86AudioLowerVolume", function()
     awful.spawn("playerctl play-pause", false)
   end, { description = "play/pause track", group = "Hotkeys" }),
@@ -130,19 +160,21 @@ awful.keyboard.append_global_keybindings({
     awful.spawn("playerctl next", false)
   end, { description = "next track", group = "Hotkeys" }),
 
-  -- Screenshots
+  -- Screenshot of entire screen
   awful.key({ mod, shift }, "s", function()
     local home = os.getenv("HOME")
     local cmd = "scrot " .. home  .. "/Pictures/Screenshots/%b%d::%H%M%S.png --silent -s -e 'xclip -selection clipboard -t image/png -i $f'"
     awful.spawn.easy_async(cmd, function() end)
   end, { description = "screenshot (select)", group = "Hotkeys" }),
 
+  -- Screenshot and select region
   awful.key({ mod, alt }, "s", function()
     local home = os.getenv("HOME")
     local cmd = "scrot " .. home  .. "/Pictures/Screenshots/%b%d::%H%M%S.png --silent 'xclip -selection clipboard -t image/png -i $f'"
     awful.spawn.easy_async(cmd, function() end)
   end, { description = "screenshot (whole screen)", group = "Hotkeys" }),
 
+  -- Dismiss notifications
   awful.key({ mod }, "n", function()
     naughty.destroy_all_notifications()
   end, { description = "dismiss notifications", group = "Hotkeys" }),
@@ -154,7 +186,7 @@ awful.keyboard.append_global_keybindings({
     awful.spawn(apps.default.terminal)
   end, { description = "terminal", group = "Launchers" }),
 
-  -- Scratchpad
+  -- Toggle scratchpad
   awful.key({ mod }, "p", function()
     awesome.emit_signal("dash::close")
     awesome.emit_signal("control_center::close")
@@ -162,26 +194,21 @@ awful.keyboard.append_global_keybindings({
     scratchpad:toggle()
   end, { description = "scratchpad", group = "Launchers"}),
 
-  -- Rofi --
-  -- App launcher
+  -- Rofi app launcher
   awful.key({ alt }, "r", function()
     awful.spawn(apps.utils.app_launcher)
   end, { description = "app launcher", group = "Launchers" }),
 
-  -- Tmux presets
-  awful.key({ alt }, "e", function()
-    awful.spawn(apps.utils.tmux_presets)
-  end, { description = "tmux presets", group = "Launchers" }),
-
-  -- Bluetooth
+  -- Bluetooth menu
   awful.key({ alt }, "b", function()
     awful.spawn(apps.utils.bluetooth)
   end, { description = "bluetooth", group = "Launchers" }),
-
 })
 
--- █▀▀ █░░ █ █▀▀ █▄░█ ▀█▀
--- █▄▄ █▄▄ █ ██▄ █░▀█ ░█░
+
+-- ░█▀▀░█░░░▀█▀░█▀▀░█▀█░▀█▀░░░█░█░█▀▀░█░█░█▀▄░▀█▀░█▀█░█▀▄░█▀▀
+-- ░█░░░█░░░░█░░█▀▀░█░█░░█░░░░█▀▄░█▀▀░░█░░█▀▄░░█░░█░█░█░█░▀▀█
+-- ░▀▀▀░▀▀▀░▀▀▀░▀▀▀░▀░▀░░▀░░░░▀░▀░▀▀▀░░▀░░▀▀░░▀▀▀░▀░▀░▀▀░░▀▀▀
 client.connect_signal("request::default_keybindings", function()
   awful.keyboard.append_client_keybindings({
 
@@ -201,7 +228,7 @@ client.connect_signal("request::default_keybindings", function()
     awful.key({ ctrl, shift }, "d", function()
       client.focus.sticky = not client.focus.sticky
     end, { description = "sticky", group = "Client" }),
- 
+
     -- Maximize
     awful.key({ ctrl, shift }, "m", function(c)
       c.maximized = not c.maximized
@@ -221,13 +248,25 @@ client.connect_signal("request::default_keybindings", function()
     awful.key({ alt, shift   }, "j", function () resize_vertical(0.05) end),
 
   -- Changing focus
+  -- Special case: mstab layout (TODO)
   awful.key({ alt }, "Tab", function()
-    awful.client.focus.byidx(1)
+    local layout = awful.layout.get(awful.screen.focused())
+    if layout.name == "mstab" then
+      -- if a slave is selected, alt tab switches between master and slave
+      awful.client.focus.byidx(1)
+    else
+      awful.client.focus.byidx(1)
+    end
   end),
 
   awful.key({ alt , shift }, "Tab", function()
     awful.client.focus.byidx(-1)
   end),
+
+  -- When in mstab, ctrl tab cycles between only slaves
+  -- If master selected and ctrl tab is pressed, go to slave
+  -- awful.key({ ctrl }, "Tab", function()
+  -- end),
 
   -- Swapping clients
   awful.key({ mod, shift }, "h", function()
@@ -249,8 +288,10 @@ client.connect_signal("request::default_keybindings", function()
   })
 end)
 
--- █░█░█ █▀█ █▀█ █▄▀ █▀ █▀█ ▄▀█ █▀▀ █▀▀ █▀
--- ▀▄▀▄▀ █▄█ █▀▄ █░█ ▄█ █▀▀ █▀█ █▄▄ ██▄ ▄█
+
+-- ░█░█░█▀█░█▀▄░█░█░█▀▀░█▀█░█▀█░█▀▀░█▀▀░░░█░█░█▀▀░█░█░█▀▄░▀█▀░█▀█░█▀▄░█▀▀
+-- ░█▄█░█░█░█▀▄░█▀▄░▀▀█░█▀▀░█▀█░█░░░█▀▀░░░█▀▄░█▀▀░░█░░█▀▄░░█░░█░█░█░█░▀▀█
+-- ░▀░▀░▀▀▀░▀░▀░▀░▀░▀▀▀░▀░░░▀░▀░▀▀▀░▀▀▀░░░▀░▀░▀▀▀░░▀░░▀▀░░▀▀▀░▀░▀░▀▀░░▀▀▀
 awful.keyboard.append_global_keybindings({
   -- Switch to prev/next workspaces 
   awful.key({ mod }, "Tab", awful.tag.viewnext,

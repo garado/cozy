@@ -3,7 +3,7 @@
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄   █▀█ ██▄ █▄▄ █▀▀ ██▄ █▀▄ ▄█ --
 ------------------- Credit: @rxhyn -------------------
 
-local color_libary = require("modules.color")
+local color_library = require("modules.color")
 local tonumber = tonumber
 local string = string
 local math = math
@@ -76,14 +76,14 @@ end
 
 --- Try to guess if a color is dark or light.
 function _color.is_dark(color)
-	color = color_libary.color({ hex = color })
+	color = color_library.color({ hex = color })
 
 	return color.l <= 0.4
 end
 
 --- Check if a color is opaque.
 function _color.is_opaque(color)
-	color = color_libary.color({ hex = color })
+	color = color_library.color({ hex = color })
 
 	return color.a == 0
 end
@@ -94,7 +94,7 @@ function _color.relative_luminance(color)
 		return u <= 0.0031308 and 25 * u / 323 or pow(((200 * u + 11) / 211), 12 / 5)
 	end
 
-	color = color_libary.color({ hex = color })
+	color = color_library.color({ hex = color })
 
 	return 0.2126 * from_sRGB(color.r) + 0.7152 * from_sRGB(color.g) + 0.0722 * from_sRGB(color.b)
 end
@@ -111,7 +111,7 @@ end
 
 -- Returns a bright-ish, saturated-ish, color of random hue
 function _color.rand_hex(lb_angle, ub_angle)
-	return color_libary.color({
+	return color_library.color({
 		h = random(lb_angle or 0, ub_angle or 360),
 		s = 70,
 		v = 90,
@@ -120,7 +120,7 @@ end
 
 -- Rotates the hue of the given hex color by the specified angle (in degrees)
 function _color.rotate_hue(color, angle)
-	color = color_libary.color({ hex = color })
+	color = color_library.color({ hex = color })
 
 	angle = clip(angle or 0, 0, 360)
 	color.h = (color.h + angle) % 360
@@ -129,7 +129,7 @@ function _color.rotate_hue(color, angle)
 end
 
 function _color.button_color(color, amount)
-	color = color_libary.color({ hex = color })
+	color = color_library.color({ hex = color })
 
 	if _color.is_dark(color.hex) then
 		color = color + string.format("%fl", amount)
@@ -143,7 +143,7 @@ end
 function _color.lighten(color, amount)
 	amount = amount or 0
 
-	color = color_libary.color({ hex = color })
+	color = color_library.color({ hex = color })
 	color.l = color.l + amount
 
 	return color.hex
@@ -152,7 +152,7 @@ end
 function _color.darken(color, amount)
 	amount = amount or 0
 
-	color = color_libary.color({ hex = color })
+	color = color_library.color({ hex = color })
 	color.l = color.l - amount
 
 	return color.hex
@@ -160,10 +160,10 @@ end
 
 -- Pywal like functions
 function _color.pywal_blend(color1, color2)
-	color1 = color_libary.color({ hex = color1 })
-	color2 = color_libary.color({ hex = color2 })
+	color1 = color_library.color({ hex = color1 })
+	color2 = color_library.color({ hex = color2 })
 
-	return color_libary.color({
+	return color_library.color({
 		r = round(0.5 * color1.r + 0.5 * color2.r),
 		g = round(0.5 * color1.g + 0.5 * color2.g),
 		b = round(0.5 * color1.b + 0.5 * color2.b),
@@ -171,7 +171,7 @@ function _color.pywal_blend(color1, color2)
 end
 
 function _color.pywal_saturate_color(color, amount)
-	color = color_libary.color({ hex = color })
+	color = color_library.color({ hex = color })
 
 	color.s = clip(amount, 0, 1)
 
@@ -181,7 +181,7 @@ end
 function _color.pywal_alter_brightness(color, amount, sat)
 	sat = sat or 0
 
-	color = color_libary.color({ hex = color })
+	color = color_library.color({ hex = color })
 
 	color.l = clip(color.l + amount, 0, 1)
 	color.s = clip(color.s + sat, 0, 1)
@@ -190,7 +190,7 @@ function _color.pywal_alter_brightness(color, amount, sat)
 end
 
 function _color.pywal_lighten(color, amount)
-	color = color_libary.color({ hex = color })
+	color = color_library.color({ hex = color })
 
 	color.r = round(color.r + (255 - color.r) * amount)
 	color.g = round(color.g + (255 - color.g) * amount)
@@ -200,7 +200,7 @@ function _color.pywal_lighten(color, amount)
 end
 
 function _color.pywal_darken(color, amount)
-	color = color_libary.color({ hex = color })
+	color = color_library.color({ hex = color })
 
 	color.r = round(color.r * (1 - amount))
 	color.g = round(color.g * (1 - amount))

@@ -17,7 +17,6 @@ local box = require("helpers.ui").create_boxed_widget
 local colorize = require("helpers.ui").colorize_text
 local color = require("helpers.color")
 local datestr_to_ts = require("helpers.dash").datestr_to_ts
-local round = require("helpers.dash").round
 
 -----------------------------------------------------------
 
@@ -220,7 +219,8 @@ return function(data)
         local this_heat = heat(beautiful.timew_cal_heatmap_accent, hours_this_date)
         grid_item.bg = this_heat
 
-        print("worked "..hours_this_date.. "h on dec "..last_date)
+        -- for other modules to keep track of hours by date 
+        data.days[last_date] = hours_this_date
 
         -- Add tooltip showing hours
         -- BUG: hours always show as 0 in tooltip despite printing fine above
@@ -238,6 +238,8 @@ return function(data)
       -- Update hours this date
       hours_this_date = hours_this_date + (data.entry[i]["duration"] or 0)
     end
+
+    data:emit_signal("timew::hours_by_day_processed")
   end)
 
   return calendar

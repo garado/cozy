@@ -3,17 +3,12 @@
 -- █▄▄ █▀█ █▄█ █░▀█ █▄▄ █▀█ ██▄ █▀▄ ▄█ 
 
 local beautiful = require("beautiful")
-local widgets = require("ui.widgets")
-local helpers = require("helpers")
-local wibox = require("wibox")
-
-local function markup(icon, color)
-  return helpers.ui.colorize_text(icon, color)
-end
+local wibox     = require("wibox")
+local colorize  = require("helpers").ui.colorize_text
 
 local function create_launcher(icon, signal, color)
   local button = wibox.widget({
-    markup = markup(icon, color),
+    markup = colorize(icon, color),
     widget = wibox.widget.textbox,
     font = beautiful.font .. "12",
     align = "center",
@@ -23,10 +18,10 @@ local function create_launcher(icon, signal, color)
     awesome.emit_signal(signal)
   end)
   button:connect_signal("mouse::enter", function()
-    button:set_markup_silently(markup(icon, beautiful.wibar_launch_hover))
+    button:set_markup_silently(colorize(icon, beautiful.wibar_launch_hover))
   end)
   button:connect_signal("mouse::leave", function()
-    button:set_markup_silently(markup(icon, color))
+    button:set_markup_silently(colorize(icon, color))
   end)
   return button
 end

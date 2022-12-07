@@ -19,20 +19,6 @@ local client_cache = cache_dir .. "restore/client"
 local tag_cache = cache_dir .. "restore/tag"
 local focus_cache = cache_dir .. "restore/focus"
 
-local function dump(o)
-   if type(o) == 'table' then
-      local s = '{ '
-      for k,v in pairs(o) do
-         if type(k) ~= 'number' then k = '"'..k..'"' end
-         s = s .. '['..k..'] = ' .. dump(v) .. ','
-      end
-      return s .. '} '
-   else
-      return tostring(o)
-   end
-end
-
-
 -- █▀█ █▀█ █▀▀ █▀ █▀▀ █▀█ █░█ █▀▀ 
 -- █▀▀ █▀▄ ██▄ ▄█ ██▄ █▀▄ ▀▄▀ ██▄ 
 local function preserve_client_state(s)

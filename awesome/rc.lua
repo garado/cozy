@@ -24,6 +24,10 @@ require("configuration")
 require("modules")
 
 
+-- █▀▀ █▀█ █▀█ █▀▀ 
+-- █▄▄ █▄█ █▀▄ ██▄ 
+require("core")
+
 -- █░█ █
 -- █▄█ █
 require("ui")

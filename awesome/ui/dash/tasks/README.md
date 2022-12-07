@@ -38,7 +38,7 @@ but i just got a new ascii art diagram plugin and i am very excited to use it :-
  ┌───────────────────────────────────────────────────────────────────────────────────┐
  │┌──────────────────┐ ┌────────────────────────────────────────────────────────────┐│
  ││                  │ │┌──────────────────────────────────────────────────────────┐││
- ││       TAGS       │ ││                  PROJECT HEADER                          │││
+ ││       TAGS       │ ││                  TASKLIST HEADER                         │││
  ││                  │ ││                                                          │││
  │└──────────────────┘ │└──────────────────────────────────────────────────────────┘││
  │┌──────────────────┐ │┌──────────────────────────────────────────────────────────┐││
@@ -47,9 +47,9 @@ but i just got a new ascii art diagram plugin and i am very excited to use it :-
  ││                  │ ││                                                          │││
  ││     PROJECT      │ ││                                                          │││
  ││       LIST       │ ││                                                          │││
- ││                  │ ││                     OVERVIEW                             │││
- ││                  │ ││                 will be renamed to tasklist              │││
- ││                  │ ││                  in the future                           │││
+ ││                  │ ││                       TASKLIST                           │││
+ ││                  │ ││                                                          │││
+ ││                  │ ││                                                          │││
  │└──────────────────┘ ││                                                          │││
  │┌──────────────────┐ ││                                                          │││
  ││                  │ ││                                                          │││
@@ -59,6 +59,7 @@ but i just got a new ascii art diagram plugin and i am very excited to use it :-
  │└──────────────────┘ └────────────────────────────────────────────────────────────┘│
  └───────────────────────────────────────────────────────────────────────────────────┘
 ```
+
 ## How project_list draws new projects
 ```
 ┌────────────────────────┐     ┌───────────────┐    ┌──────────────┐
@@ -83,7 +84,6 @@ but i just got a new ascii art diagram plugin and i am very excited to use it :-
 ```
 ## After modifying tasklist (eg adding a new task, changing the due date, etc)
 ```
-
   ┌───────┐ project_              project_json_   ┌───────┐
   │prompt │ modified     ┌──────┐  parsed         │project│
   │handler│────────────► │parser│ ──────────────► │ list  │
@@ -95,7 +95,6 @@ user modifies a         fetch and parse          draw new project
 
 ## When a new task is selected
 ```
-
   ┌────────┐  task_selected    ┌────────┐
   │navitems│ ───────────────►  │overview│
   └────────┘                   └────────┘

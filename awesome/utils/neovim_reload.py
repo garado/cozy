@@ -34,7 +34,6 @@ def reload(instance, theme):
   nvim.command("let g:nvchad_theme = '" + theme + "'")
   nvim.command("lua require('nvchad').reload_theme()")
 
-
 def main():
   # search for neovim instances
   instances = get_all_instances()

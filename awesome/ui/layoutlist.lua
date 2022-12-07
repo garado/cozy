@@ -76,11 +76,11 @@ return function()
     title:set_markup_silently(colorize(lname, beautiful.fg))
   end
 
-  local function set_focused_icon_color(index)
+  local function set_icon_color(index, color)
     -- find the icon and recolor it
     local lname = awful.layout.get()["name"]
     local icon = beautiful["layout_"..lname]
-    local icon_recolored = gears.color.recolor_image(icon, beautiful.main_accent)
+    local icon_recolored = gears.color.recolor_image(icon, color)
 
     -- find the currently selected icon in the layout list and replace icon
     local ll_icons = ll._private.layout:get_children()
@@ -88,27 +88,37 @@ return function()
     if icon_recolored and img then img.image = icon_recolored end
   end
 
+  local function update_layoutlist_ui(first_keypress, iter)
+    -- stop first keypress from cycling layout
+    if first_keypress then iter = 0 end
+
+    local layout, index = gears.table.cycle_value(ll.layouts, ll.current_layout, iter)
+    awful.layout.set(layout)
+    set_title()
+    set_icon_color(index, beautiful.main_accent)
+  end
+
   -- █▄▀ █▀▀ █▄█ █▀▀ █▀█ ▄▀█ █▄▄ █▄▄ █▀▀ █▀█ 
   -- █░█ ██▄ ░█░ █▄█ █▀▄ █▀█ █▄█ █▄█ ██▄ █▀▄ 
   local mod = "Mod4"
+  local first_keypress = true
   awful.keygrabber {
-    start_callback = function() layout_popup.visible = true  end,
+    start_callback = function()
+      layout_popup.visible = true
+      first_keypress = true
+    end,
     stop_callback  = function() layout_popup.visible = false end,
     export_keybindings = true,
     stop_event = "release",
     stop_key = {"Escape", "Super_L", "Super_R"},
     keybindings = {
       {{ mod } , " " , function()
-        local layout, index = gears.table.cycle_value(ll.layouts, ll.current_layout, 1)
-        awful.layout.set(layout)
-        set_title()
-        set_focused_icon_color(index)
+        update_layoutlist_ui(first_keypress, 1)
+        first_keypress = false
       end},
       {{ mod, "Shift" } , " " , function()
-        local layout, index = gears.table.cycle_value(ll.layouts, ll.current_layout, -1)
-        awful.layout.set(layout)
-        set_title()
-        set_focused_icon_color(index)
+        update_layoutlist_ui(first_keypress, -1)
+        first_keypress = false
       end},
     }
   }

@@ -1,3 +1,6 @@
+-- █░░ ▄▀█ █▄█ █▀█ █░█ ▀█▀ 
+-- █▄▄ █▀█ ░█░ █▄█ █▄█ ░█░ 
+
 local awful = require("awful")
 local bling = require("modules.bling")
 

@@ -1,3 +1,6 @@
+-- █▀▄ █▀▀ █▀ █▄▀ ▀█▀ █▀█ █▀█ 
+-- █▄▀ ██▄ ▄█ █░█ ░█░ █▄█ █▀▀ 
+
 local awful = require("awful")
 local gears = require("gears")
 local beautiful = require("beautiful")
@@ -20,7 +23,7 @@ client.connect_signal("request::manage", function(c)
 	end
 end)
 
--- Enable sloppy focus, so that focus follows mouse.
+-- Enable sloppy focus so that focus follows mouse.
 client.connect_signal("mouse::enter", function(c)
 	c:emit_signal("request::activate", "mouse_enter", { raise = false })
 end)

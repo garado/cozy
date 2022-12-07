@@ -1,9 +1,13 @@
+
+-- █▀█ █░█ █░░ █▀▀ █▀▄ 
+-- █▀▄ █▄█ █▄▄ ██▄ █▄▀ 
+
 local awful = require("awful")
 local ruled = require("ruled")
 local helpers = require("helpers")
 
 ruled.client.connect_signal("request::rules", function()
-  -- GLOBAL --
+  -- Rules applied to every window
   ruled.client.append_rule({
     id = "global",
     rule = { },
@@ -19,7 +23,7 @@ ruled.client.connect_signal("request::rules", function()
     },
   })
 
-  -- Float
+  -- Set certain applications as floating
   ruled.client.append_rule({
     id = "floating",
     rule_any = {
@@ -50,6 +54,7 @@ ruled.client.connect_signal("request::rules", function()
     },
   })
 
+  -- Force window height for certain applications
   ruled.client.append_rule({
     rule_any = {
       instance = {
@@ -64,7 +69,7 @@ ruled.client.connect_signal("request::rules", function()
     },
   })
 
-  -- On-screen keyboard
+  -- Rules for onscreen keyboard
   ruled.client.append_rule({
     rule_any = {
       instance = { "onboard" },

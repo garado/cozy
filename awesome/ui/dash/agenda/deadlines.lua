@@ -66,7 +66,13 @@ end
 generate_tasklist()
 
 local widget = wibox.widget({
-  header("Due this week"),
+  wibox.widget({
+    markup  = colorize("Due this week", beautiful.fg),
+    font    = beautiful.font_name .. "17",
+    align   = "center",
+    valign  = "center",
+    widget  = wibox.widget.textbox,
+  }),
   tasklist,
   layout = wibox.layout.fixed.vertical,
 })

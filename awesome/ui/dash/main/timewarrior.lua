@@ -147,9 +147,9 @@ local stop_button = widgets.button.text.normal({
   size = 12,
   on_release = function()
     awful.spawn.with_shell("timew stop")
+    awful.spawn.with_shell("echo 'all' | task status:pending stop")
     nav_timewarrior:remove_all_items()
     nav_timewarrior:append(nav_timew_topics)
-    --nav_timewarrior:remove_item(nav_timew_actions)
     update_ui(ui_stopped)
   end
 })

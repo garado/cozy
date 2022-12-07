@@ -71,4 +71,19 @@ function _dash.widget_header(text)
   })
 end
 
+function _dash.round(num, numDecimalPlaces)
+  local mult = 10^(numDecimalPlaces or 0)
+  return math.floor(num * mult + 0.5) / mult
+end
+
+function _dash.datestr_to_ts(datestring)
+  local pattern = "(%d%d%d%d)(%d%d)(%d%d)T(%d%d)(%d%d)(%d%d)Z"
+  local xyear, xmon, xday, xhr, xmin, xsec = datestring:match(pattern)
+  local ts = os.time({
+    year = xyear, month = xmon, day = xday,
+    hour = xhr, min = xmin, sec = xsec })
+  ts = ts - (8 * 60 * 60) -- pacific time is 8 hours behind utc
+  return ts
+end
+
 return _dash

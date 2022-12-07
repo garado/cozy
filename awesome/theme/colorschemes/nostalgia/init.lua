@@ -1,3 +1,4 @@
 return {
-  light = require(... .. ".light"),
+  treefrog = require(... .. ".treefrog"),
+  toad = require(... .. ".toad")
 }

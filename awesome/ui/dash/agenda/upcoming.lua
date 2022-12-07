@@ -12,6 +12,8 @@ local gears = require("gears")
 local helpers = require("helpers")
 local gfs = require("gears.filesystem")
 
+local colorize = require("helpers.ui").colorize_text
+
 local os = os
 local string = string
 local table = table
@@ -163,10 +165,21 @@ end
 create_all_eventboxes()
 
 local widget = wibox.widget({
-  helpers.ui.create_dash_widget_header("Upcoming Events"),
-  event_list,
-  spacing = dpi(10),
-  layout = wibox.layout.fixed.vertical,
+  {
+    wibox.widget({
+      markup  = colorize("Upcoming", beautiful.fg),
+      font    = beautiful.font_name .. "17",
+      align   = "center",
+      valign  = "center",
+      widget  = wibox.widget.textbox,
+    }),
+    event_list,
+    spacing = dpi(10),
+    layout = wibox.layout.fixed.vertical,
+  },
+  top = dpi(20),
+  bottom = dpi(20),
+  widget = wibox.container.margin,
 })
 
 return widget

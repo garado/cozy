@@ -25,6 +25,7 @@ local round = require("helpers.dash").round
 local data = gobject{}
 data.entry        = {}
 data.num_entries  = 0
+data.days         = {}
 
 local monthname = string.lower(tostring(os.date("%B")))
 local cmd = "timew export " .. monthname

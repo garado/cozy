@@ -16,7 +16,6 @@ local gears = require("gears")
 local colorize = require("helpers.ui").colorize_text
 local box = require("helpers.ui").create_boxed_widget
 local datestr_to_ts = require("helpers.dash").datestr_to_ts
-local round = require("helpers.dash").round
 
 -------------------
 
@@ -125,14 +124,6 @@ return function(data)
     list_cont:add(ui_create_all_entries())
   end)
 
-  -- local list_cont = wibox.widget({
-  --   {
-  --     text = "list",
-  --     widget = wibox.widget.textbox,
-  --   },
-  --   widget = wibox.container.place,
-  -- })
-
   local widget = wibox.widget({
     list_cont,
     margins = dpi(5),
@@ -141,3 +132,4 @@ return function(data)
 
   return box(widget, dpi(1000), dpi(800), beautiful.dash_widget_bg)
 end
+

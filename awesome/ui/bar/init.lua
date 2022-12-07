@@ -21,6 +21,7 @@ return function(s)
   local notif = require("ui.bar.notif")
   local app_launcher = require("ui.bar.app_launcher")
   local launchers = require("ui.bar.launchers")
+  local timew = require("ui.bar.timew")
 
   -- Assemble bar
   s.bar = awful.popup({
@@ -54,10 +55,11 @@ return function(s)
           taglist(s),
           {
             {
+              timew,
               brightness,
               volume,
               notif,
-              layout,
+              -- layout,
               battery,
               clock,
               --systray,

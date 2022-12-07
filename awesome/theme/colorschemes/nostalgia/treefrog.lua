@@ -46,9 +46,9 @@ colorscheme.colors.fg      = "#444444"
 colorscheme.colors.fg_sub  = "#808080"
 colorscheme.colors.fg_alt  = "#949494"
 
-colorscheme.colors.main_accent = "#5b6982"
+colorscheme.colors.main_accent = "#5b8275"
 colorscheme.colors.red         = "#825b69"
-colorscheme.colors.green       = "#aabda0"
+colorscheme.colors.green       = "#8a9d89"
 colorscheme.colors.yellow      = "#d9d5ba"
 colorscheme.colors.transparent = "#ffffff00"
 
@@ -59,7 +59,7 @@ colorscheme.colors.transparent = "#ffffff00"
 -- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ 
 -- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ 
 colorscheme.switcher.kitty   = "Nostalgia Light"
--- colorscheme.switcher.nvchad  = "nord"
+colorscheme.switcher.nvchad  = "nostalgia_light"
 -- colorscheme.switcher.gtk     = "Nordic"
 -- colorscheme.switcher.zathura = "nord_dark"
 

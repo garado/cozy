@@ -5,15 +5,14 @@ local utils_dir = config_dir .. "utils/"
 return {
 	--- Default Applications
 	default = {
-		terminal = "kitty",
-		web_browser = "firefox",
-		file_manager = "thunar",
+		terminal      = "kitty",
+		web_browser   = "firefox",
+		file_manager  = "thunar",
 	},
 
 	--- List of binaries/shell scripts that will execute for a certain task
 	utils = {
-    bluetooth = utils_dir .. "apps/rofi_bluetooth",
-    tmux_presets = utils_dir .. "apps/rofi_tmux_presets",
-    app_launcher = utils_dir .. "apps/rofi_app_launcher",
+    bluetooth     = utils_dir .. "apps/rofi_bluetooth",
+    app_launcher  = utils_dir .. "apps/rofi_app_launcher",
 	},
 }
