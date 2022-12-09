@@ -2,34 +2,39 @@
 -- █░░ █▀▀ █▀▄ █▀▀ █▀▀ █▀█ 
 -- █▄▄ ██▄ █▄▀ █▄█ ██▄ █▀▄ 
 
--- Object for interfacing with Ledger and interacting with Ledger files.
+-- For interfacing with Ledger and interacting with Ledger files.
 
 local gobject = require("gears.object")
 local gtable = require("gears.table")
 local awful = require("awful")
 local config = require("config")
+local core = require("helpers.core")
+local ledger_dir  = config.ledger.ledger_dir
 local ledger_file = config.ledger.ledger_file
+local budget_file = config.ledger.budget_file
 
 local ledger = { }
 local instance = nil
+
+---------------------------------------------------------------------
 
 -- TODO: add error checking for improperly formatted ledger entries
 
 --- Call Ledger command to get account balances.
 function ledger:parse_account_balances()
-  local cmd = "ledger -f " .. ledger_file .. " balance checking savings"
+  local cmd = "ledger -f " .. ledger_file .. " balance checking savings --no-total"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
 
-    -- Split output into lines
-    for str in string.gmatch(stdout, "([^\n]+)") do
+    local lines = core.split("\r\n", stdout)
+    for i = 1, #lines do
 
       -- Look for lines containing "Assets" "Checking" and "Savings"
-      local str_assets = string.find(str, "Assets")
-      local str_checking  = string.find(str, "Checking")
-      local str_savings = string.find(str, "Savings")
+      local str_assets = string.find(lines[i], "Assets")
+      local str_checking  = string.find(lines[i], "Checking")
+      local str_savings = string.find(lines[i], "Savings")
 
       -- Remove everything except # $ . from string
-      local str_stripped = string.gsub(str, "[^0-9$.]", "")
+      local str_stripped = string.gsub(lines[i], "[^0-9$.]", "")
       if str_assets ~= nil then
         self._private.total = str_stripped
       elseif str_checking ~= nil then
@@ -37,8 +42,7 @@ function ledger:parse_account_balances()
       elseif str_savings ~= nil then
         self._private.savings = str_stripped
       end
-
-    end -- end iter lines
+    end
 
     self:emit_signal("update::balances")
 
@@ -128,20 +132,15 @@ function ledger:parse_transactions_this_month()
 
       -- Get category
       local cat = raw_entries[i][1]
-
-      -- tmp is tokenized string (split on colons)
-      local tmp = {}
-      for j in string.gmatch(cat, "[^:]+") do
-        tmp[#tmp + 1] = j
-      end
+      local tmp = core.split(cat, ":")
 
       -- Keep only the top-level category
       if #tmp >= 2 then
         local top_category = tmp[2]
         if not month[top_category] then
-          -- Need to remove dollar sign from the amount
+          -- Remove dollar sign from the amount
           local amt = string.gsub(raw_entries[i][2], "[^0-9.]", "")
-          month[top_category] = amt
+          month[top_category] = tonumber(amt)
           self._private.total_spent_this_month = self._private.total_spent_this_month + amt
         end
       end
@@ -153,7 +152,86 @@ function ledger:parse_transactions_this_month()
   end)
 end
 
+--- Call Ledger command to extract information on monthly budget.
+function ledger:parse_budget(month)
+  local files = " -f " .. ledger_file .. " -f " .. budget_file
+  local format = " budget --budget-format '%A,%T\n'"
+  local begin = " --begin " .. (month or os.date("%Y/%m/01"))
+  local cmd = "ledger " .. files .. begin .. format .. " --no-total"
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+
+    local budget_entries  = {}
+    local total_spent     = 0
+    local total_budgeted  = 0
+    self._private.budget  = {}
+
+    -- Iterate over lines to extract information
+    local lines = core.split("\r\n", stdout)
+    for i = 1, #lines do
+      local fields = core.split(",", lines[i])
+
+      -- First bit is the category
+      local category
+      if fields[1] ~= "Assets:Checking" and fields[1] ~= "Expenses" then
+        category = string.gsub(fields[1], "Expenses:", "")
+        category = string.gsub(category, ":.*", "")
+      end
+
+      -- Second bit is the amount spent 
+      local amt_spent_str = fields[2] and string.gsub(fields[2], "[^0-9.]", "") or "0"
+      local amt_spent = tonumber(amt_spent_str) or 0
+
+      -- Third bit is the amount budgeted
+      local amt_budgeted_str = fields[3] and string.gsub(fields[3], "[^0-9.]", "") or "0"
+      local amt_budgeted = tonumber(amt_budgeted_str) or 0
+
+
+      if category and amt_spent and amt_budgeted then
+        if not budget_entries[category] then
+          budget_entries[category] = {}
+          budget_entries[category][1] = amt_spent
+          budget_entries[category][2] = amt_budgeted
+          total_spent = total_spent + amt_spent
+          total_budgeted = total_budgeted + total_budgeted
+        end
+      end
+    end
+
+    self._private.budget = budget_entries
+    self._private.budget_total_spent    = total_spent
+    self._private.budget_total_budgeted = total_budgeted
+    self:emit_signal("update::budget")
+  end)
+end
+
+--- Open Ledger files in new popup window.
+function ledger:open_ledger()
+  local cmd = "kitty sh -c 'nvim -p " .. ledger_dir .. "*'"
+  -- awesome.emit_signal("dash::toggle")
+  awful.spawn(cmd, {
+    floating = true,
+    geometry = {x=360, y=90, height=900, width=1200},
+    placement = awful.placement.centered,
+  })
+end
+
 ---------------------------------------------------------------------
+
+--- Return budget information.
+-- @return A table containing budget information. Index into it with category name.
+-- budget[cat][1] is the amount spent.
+-- budget[cat][2] is the amount budgeted.
+function ledger:get_budget()
+  return self._private.budget
+end
+
+function ledger:get_budget_total_spent()
+  return self._private.budget_total_spent
+end
+
+function ledger:get_budget_total_budgeted()
+  return self._private.budget_total_budgeted
+end
 
 --- Return a given account balance.
 -- @param account A string "checking" "savings" or "total"
@@ -190,6 +268,14 @@ function ledger:new()
   self:parse_account_balances()
   self:parse_recent_transactions()
   self:parse_transactions_this_month()
+  self:parse_budget()
+end
+
+function ledger:reload()
+  self:parse_account_balances()
+  self:parse_recent_transactions()
+  self:parse_transactions_this_month()
+  self:parse_budget()
 end
 
 local function new()

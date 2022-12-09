@@ -34,7 +34,7 @@ return function(s)
 
   local tablist =   { main, tasks, time, cash,  agenda }
   local tab_icons = { "",  "",   "",  "",   ""    }
-  local navitems =  { nav_main, nav_tasks, nav_cash, nil }
+  local navitems =  { nav_main, nav_tasks, nil, nav_cash, nil }
 
   --- Display a specific tab on the dashboard
   -- @param i The tab number.

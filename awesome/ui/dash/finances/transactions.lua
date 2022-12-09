@@ -2,26 +2,20 @@
 -- ▀█▀ █▀█ ▄▀█ █▄░█ █▀ ▄▀█ █▀▀ ▀█▀ █ █▀█ █▄░█ █▀
 -- ░█░ █▀▄ █▀█ █░▀█ ▄█ █▀█ █▄▄ ░█░ █ █▄█ █░▀█ ▄█
 
-local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local helpers = require("helpers")
-local config = require("config")
+local colorize = require("helpers.ui").colorize_text
+local wheader = require("helpers.ui").create_dash_widget_header
+local box = require("helpers.ui").create_boxed_widget
+local ledger = require("core.system.ledger")
 
-local ledger_file = config.ledger.ledger_file
-
--- create_transaction_entry() will populate this widget with entries
-local transaction_history = wibox.widget({
-  spacing = dpi(4),
-  layout = wibox.layout.flex.vertical,
-})
+local transaction_history
 
 local function create_transaction_entry(date, title, category, amount)
-
-  -- determine color of amount
-  -- green for income, red for expense
+  -- Determine color of amount text
+  -- Green for income, red for expense
   local i, _ = string.find(category, "Expenses:")
   local amount_color, prefix
   if i == nil then
@@ -33,37 +27,45 @@ local function create_transaction_entry(date, title, category, amount)
   end
 
   local date_text = wibox.widget({
-    markup = helpers.ui.colorize_text(date, beautiful.fg),
+    markup = colorize(date, beautiful.fg),
     font = beautiful.font_name .. "12",
     widget = wibox.widget.textbox,
   })
 
   local title_text = wibox.widget({
-    markup = helpers.ui.colorize_text(title, beautiful.fg),
+    markup = colorize(title, beautiful.fg),
     font = beautiful.font_name .. "12",
     widget = wibox.widget.textbox,
     ellipsize = "end",
-    forced_width = dpi(250),
   })
 
   local amount_ = "$" .. amount
   amount_ = string.gsub(amount_, "-", "")
   local amount_text = wibox.widget({
-    markup = helpers.ui.colorize_text(prefix .. amount_, amount_color),
+    markup = colorize(prefix .. amount_, amount_color),
     font = beautiful.font_name .. "12",
     widget = wibox.widget.textbox,
-    forced_width = dpi(90),
+    forced_width = dpi(100),
   })
 
+  category = category:gsub("Expenses:", "")
+  category = category:gsub("Income:", "")
   local category_text = wibox.widget({
-    markup = helpers.ui.colorize_text(category, beautiful.fg),
-    widget = wibox.widget.textbox,
+    {
+      markup = colorize(category, beautiful.fg),
+      widget = wibox.widget.textbox,
+      ellipsize = "end",
+      forced_width = dpi(200),
+    },
+    right = dpi(5),
+    widget = wibox.container.margin,
   })
 
   local widget = wibox.widget({
     {
       date_text,
       amount_text,
+      category_text,
       title_text,
       forced_height = dpi(20),
       spacing = dpi(10),
@@ -76,35 +78,15 @@ local function create_transaction_entry(date, title, category, amount)
   transaction_history:add(widget)
 end
 
--- grab last 10 transactions
-local file = " -f " .. ledger_file
-local cmd = "ledger" .. file .. " csv expenses reimbursements income | head -10"
-awful.spawn.easy_async_with_shell(cmd, function(stdout)
-  for str in string.gmatch(stdout, "([^\n]+)") do
-    local t = { }
-    for field in string.gmatch(str, "([^,]+)") do
-      field = string.gsub(field, "\"", "")
-      if field ~= "" and field ~= "$" then
-        table.insert(t, field)
-      end
-    end
+--------------------------------------------
 
-    local date = t[1]
-    local pattern = "(%d%d%d%d)/(%d%d)/(%d%d)"
-    local xyear, xmon, xday = date:match(pattern)
-    local ts = os.time({ year = xyear, month = xmon, day = xday })
-    local format_date = os.date("%a %m/%d", ts) .. " "
-    local title = t[2]
-    local category = t[3]
-    local amount = t[4]
-    amount = string.format("%.2f", tonumber(amount))
-    create_transaction_entry(format_date, title, category, amount)
-  end
-end)
+transaction_history = wibox.widget({
+  spacing = dpi(4),
+  layout = wibox.layout.flex.vertical,
+})
 
--- assemble final widget
 local widget = wibox.widget({
-  helpers.ui.create_dash_widget_header("Transaction History"),
+  wheader("Transaction History"),
   {
     transaction_history,
     margins = dpi(10),
@@ -114,4 +96,12 @@ local widget = wibox.widget({
   widget = wibox.container.place,
 })
 
-return helpers.ui.create_boxed_widget(widget, dpi(0), dpi(900), beautiful.dash_widget_bg)
+ledger:connect_signal("update::transactions", function(_)
+  local t = ledger:get_transactions()
+  transaction_history:reset()
+  for i = 1, #t do
+    create_transaction_entry(t[i][1], t[i][2], t[i][3], t[i][4])
+  end
+end)
+
+return box(widget, dpi(0), dpi(900), beautiful.dash_widget_bg)
