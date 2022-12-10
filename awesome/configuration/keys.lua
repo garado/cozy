@@ -9,6 +9,10 @@ local bling = require("modules.bling")
 local naughty = require("naughty")
 local os = os
 
+local dash = require("core.cozy.dash")
+local control = require("core.cozy.control")
+local themeswitcher = require("core.cozy.themeswitcher")
+
 local mod   = "Mod4"
 local alt   = "Mod1"
 local ctrl  = "Control"
@@ -96,19 +100,19 @@ awful.keyboard.append_global_keybindings({
   -- Toggle dash
   awful.key({ mod }, "j", function()
     scratchpad:turn_off()
-    awesome.emit_signal("dash::toggle", s)
+    dash:toggle()
   end, { description = "dash", group = "Awesome" }),
 
   -- Toggle control center
   awful.key({ mod }, "k", function()
     scratchpad:turn_off()
-    awesome.emit_signal("control_center::toggle")
+    control:toggle()
   end, { description = "control center", group = "Awesome" }),
 
   -- Toggle theme switcher
   awful.key({ mod }, "l", function()
     scratchpad:turn_off()
-    awesome.emit_signal("theme_switcher::toggle")
+    themeswitcher:toggle()
   end, { description = "dash", group = "Awesome" }),
 
   -- Toggle layout list switcher
@@ -188,9 +192,9 @@ awful.keyboard.append_global_keybindings({
 
   -- Toggle scratchpad
   awful.key({ mod }, "p", function()
-    awesome.emit_signal("dash::close")
-    awesome.emit_signal("control_center::close")
-    awesome.emit_signal("theme_switcher::close")
+    dash:close()
+    control:close()
+    themeswitcher:close()
     scratchpad:toggle()
   end, { description = "scratchpad", group = "Launchers"}),
 

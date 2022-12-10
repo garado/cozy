@@ -13,6 +13,7 @@ local widgets = require("ui.widgets")
 local gfs = require("gears.filesystem")
 local apps = require("configuration.apps")
 local Area = require("modules.keynav.area")
+local control = require("core.cozy.control")
 local Qaction = require("modules.keynav.navitem").Qaction
 
 local nav_qactions = Area:new({
@@ -78,7 +79,7 @@ end
 
 local function onboard_func()
   awful.spawn.once("onboard")
-  awesome.emit_signal("control_center::toggle")
+  control:toggle()
 end
 
 -- spawn floating term window
@@ -93,7 +94,7 @@ local function calculator_func()
     width = 600,
     height = 400,
   })
-  awesome.emit_signal("control_center::toggle")
+  control:toggle()
 end
 
 -- Toggle redshift

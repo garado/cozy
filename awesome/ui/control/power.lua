@@ -10,6 +10,7 @@ local dpi = xresources.apply_dpi
 local helpers = require("helpers")
 local widgets = require("ui.widgets")
 local elevated = require("modules.keynav.navitem").Elevated
+local control = require("core.cozy.control")
 local Area = require("modules.keynav.area")
 
 local nav_power = Area:new({ name = "nav_power" })
@@ -44,7 +45,7 @@ local yes = widgets.button.text.normal({
       func()
     end
     nav_power:remove_item(nav_power_confirm)
-    awesome.emit_signal("ctrl::power_confirm_toggle")
+    control:emit_signal("power::confirm_toggle")
   end
 })
 nav_power_confirm:append(elevated:new(yes))
@@ -58,7 +59,7 @@ local no = widgets.button.text.normal({
   on_release = function()
     state = "idle"
     nav_power:remove_item(nav_power_confirm)
-    awesome.emit_signal("ctrl::power_confirm_toggle")
+    control:emit_signal("power::confirm_toggle")
   end
 })
 nav_power_confirm:append(elevated:new(no))
@@ -109,7 +110,7 @@ local function create_power_btn(icon, confirm_text, cmd)
         nav_power:append(nav_power_confirm)
       end
       set_confirmation_text(confirm_text)
-      awesome.emit_signal("ctrl::power_confirm_on")
+      control:emit_signal("power::confirm_on")
       func = function()
         if state == "confirming" then
           state = "idle"

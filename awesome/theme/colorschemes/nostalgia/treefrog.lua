@@ -27,12 +27,12 @@ colorscheme.colors.accents = {
   "#5b8275",
   "#494949",
   "#333333",
-  "#bda0aa",
-  "#aabda0",
+  "#9f838d",
+  "#9aad90",
   "#bdb3a0",
   "#7484a2",
-  "#b3a0bd",
-  "#a0bdb3",
+  "#a390ad",
+  "#90ada3",
   "#494847",
 }
 

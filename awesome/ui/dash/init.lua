@@ -9,7 +9,7 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local widgets = require("ui.widgets")
-
+local dashcore = require("core.cozy.dash")
 local area = require("modules.keynav.area")
 local dashtab = require("modules.keynav.navitem").Dashtab
 local nav = require("modules.keynav").navigator
@@ -21,7 +21,7 @@ local nav_tabs = area:new({
   circular = true,
 })
 
-return function(s)
+return function(_) -- s
   local dash, dash_content
 
   -- Import tab contents
@@ -125,28 +125,27 @@ return function(s)
   -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
   -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
   -- Emitted by keybind to open dash.
-  awesome.connect_signal("dash::toggle", function()
-    if dash.visible then
-      awesome.emit_signal("dash::closed")
-      --nav_root:reset()
-      navigator:stop()
-    else
-      require("ui.shared").close_other_popups("dash")
-      awesome.emit_signal("dash::opened")
-      navigator:start()
-    end
-    dash.visible = not dash.visible
-  end)
+  -- dashcore:connect_signal("updatestate::toggle", function()
+  --   if dash.visible then
+  --     navigator:stop()
+  --   else
+  --     require("ui.shared").close_other_popups("dash")
+  --     dashcore:emit_signal("newstate::opened")
+  --     navigator:start()
+  --   end
+  --   dash.visible = not dash.visible
+  -- end)
 
-  awesome.connect_signal("dash::open", function()
+  dashcore:connect_signal("updatestate::open", function()
     dash.visible = true
-    awesome.emit_signal("dash::opened")
+    navigator:start()
+    dashcore:emit_signal("newstate::opened")
   end)
 
-  awesome.connect_signal("dash::close", function()
+  dashcore:connect_signal("updatestate::close", function()
     dash.visible = false
     navigator:stop()
-    awesome.emit_signal("dash::closed")
+    dashcore:emit_signal("newstate::closed")
   end)
 
   -- ▄▀█ █▀ █▀ █▀▀ █▀▄▀█ █▄▄ █░░ █▀▀ 
