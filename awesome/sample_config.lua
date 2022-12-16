@@ -45,13 +45,13 @@ return {
     "Uses Arch, btw",
   },
   habit = {
-    -- { name,        graph_id,       frequency},
-    { "Make bed",     "make-bed",     "daily" },
-    { "Journal",      "journal",      "daily"},
-    { "Touch grass",  "go-outside",   "daily"},
-    { "Ledger",       "ledger",       "daily"},
-    { "Coding",       "pomocode",     "daily"},
-    { "Read",         "reading",      "daily"},
+    -- graph id         display name    frequency
+    ["make-bed"]    = { "Make bed",     "daily" },
+    ["journal"]     = { "Journal",      "daily"},
+    ["go-outside"]  = { "Touch grass",  "daily"},
+    ["ledger"]      = { "Ledger",       "daily"},
+    ["pomocode"]    = { "Coding",       "daily"},
+    ["reading"]     = { "Read",         "daily"},
   },
   git = {
     {
