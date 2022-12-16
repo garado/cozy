@@ -32,7 +32,7 @@ local icon = wibox.widget({
   {
     markup = helpers.ui.colorize_text("", beautiful.wibar_vol_fg),
     widget = wibox.widget.textbox,
-    font = beautiful.font .. "13",
+    font = beautiful.font_name .. "13",
     align = "center",
     valign = "center",
   },

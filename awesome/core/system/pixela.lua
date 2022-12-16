@@ -121,8 +121,7 @@ function pixela:update_cache(graph_id, date, set_as_complete)
     -- Remove date from file
     cmd = "sed -e s/" .. date .. "//g -i " .. file
   end
-  print(cmd)
-  awful.spawn(cmd)
+  awful.spawn.with_shell(cmd)
 end
 
 ---------------------------------------------------------------------

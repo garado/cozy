@@ -54,7 +54,7 @@ end)
 
 naughty.connect_signal("request::display", function(n)
   local accent_color = beautiful.random_accent_color()
-  n.font = beautiful.font .. "10"
+  n.font = beautiful.font_name .. "10"
   n.fg = beautiful.fg
 
 	--- table of icons
@@ -152,7 +152,7 @@ naughty.connect_signal("request::display", function(n)
 				{
 					{
 						id = "text_role",
-						font = beautiful.font .. "10",
+						font = beautiful.font_name .. "10",
 						widget = wibox.widget.textbox,
 					},
 					left = dpi(6),

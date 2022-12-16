@@ -8,6 +8,8 @@
 Hi! This is <b>cozy</b>, my Arch config with <a href="https://awesomewm.org" target="_blank">AwesomeWM</a>. Thanks for checking it out!
 </p>
 
+<h2>⚠️ This project is undergoing heavy refactoring. It probably won't work on your machine. It's best used as just a reference for now.</h2>
+
 <p>
   The primary goals of this setup are to create an environment that:
 </p>
@@ -19,7 +21,7 @@ Hi! This is <b>cozy</b>, my Arch config with <a href="https://awesomewm.org" tar
 </ol>
 
 <h2>🚀 Features</h2>
-<h4>Dashboard</h4>
+<h3>Dashboard</h3>
 <p align="center">
   <img title="" src="assets/dash_main.png" alt="" width="800">
 </p>
@@ -35,15 +37,44 @@ Hi! This is <b>cozy</b>, my Arch config with <a href="https://awesomewm.org" tar
 <li>(WIP) Different tabs to show even more information!</li>
 </ul>
 
+<b>Like the dashboard but don't want to use AwesomeWM? There's a work-in-progress <a href="https://github.com/garado/dashboard" target="_blank">rewrite of the dashboard in Flutter</a>.</b>
 
-<h4>Control center</h4>
+<h4>To do list applet (Taskwarrior)</h4>
+<p align="center">
+  <img title="" src="assets/task_demo.gif" alt="" width="800">
+</p>
+<ul>
+  <li>View tags, projects, and project stats</li>
+  <li>Easily add and modify tasks</li>
+  <li>Supports starting and stopping tasks for easy time-tracking</li>
+</ul>
+
+<h4>Finances at a glance</h4>
+<p align="center">
+  <img title="" src="assets/ledger.png" alt="" width="800">
+</p>
+<ul>
+  <li>Uses Ledger as a backend - have the convenience of a banking app without relying on a shady 3rd party</li>
+  <li>Quickly access ledger files to add or update ledger entries</li>
+</ul>
+
+<h4>Time tracking</h4>
+<p align="center">
+  <img title="" src="assets/timewarrior.png" alt="" width="800">
+</p>
+<ul>
+  <li>Heatmap showing which days you've worked the hardest</li>
+  <li>View time tracking statistics and recent sessions</li>
+</ul>
+
+<h3>Control center</h3>
 <p align="center">
   <img title="" src="assets/control_center.gif" alt="" width="400">
 </p>
 Also fully keyboard navigable!
 
 
-<h4>Theme switcher</h4>
+<h3>Theme switcher</h3>
 
 <p align="center">
   <img title="" src="assets/theme_switcher.gif" alt="" width="800">

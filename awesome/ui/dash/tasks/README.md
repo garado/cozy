@@ -118,4 +118,3 @@ The tasklist displays max_tasks_shown tasks at a time (default 21)
 - jump top
   - loop over scroll_up
 - jump end
-  - loop over scroll_down

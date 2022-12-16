@@ -15,7 +15,7 @@ local notif_icon_color = beautiful.wibar_notif_fg
 local notif_button = wibox.widget({
   align = "center",
   valign = "center",
-  font = beautiful.font .. "15",
+  font = beautiful.font_name .. "15",
   widget = wibox.widget.textbox,
 })
 

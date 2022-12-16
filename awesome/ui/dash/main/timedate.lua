@@ -25,7 +25,7 @@ time_color:set_fg(beautiful.fg)
 
 local date = wibox.widget({
   format = "%A %B %d", 
-  font = beautiful.font .. "12",
+  font = beautiful.font_name .. "12",
   align = "center",
   valign = "center",
   widget = wibox.widget.textclock

@@ -30,7 +30,6 @@ return function(task_obj)
         end
 
         task_obj.projects = projects
-        print("parser: emit tag_json_parsed")
         task_obj:emit_signal("tasks::tag_json_parsed")
       end
     end)
@@ -39,7 +38,6 @@ return function(task_obj)
   -- Parse all tasks associated with project on project update 
   -- Emitted by Taskwarrior hook and after receiving input from prompt
   task_obj:connect_signal("tasks::project_modified", function(_, tag, project)
-    print("parser: connect project_modified")
     local cmd = "task context none ; task tag:"..tag.." proj:'"..project.."' status:pending export rc.json.array=on"
     awful.spawn.easy_async_with_shell(cmd, function(stdout)
       local empty_json = "[\n]\n"
@@ -56,7 +54,6 @@ return function(task_obj)
         end
 
         task_obj.projects[project] = new_project
-        print("parser: emit project_json_parsed")
         task_obj:emit_signal("tasks::project_json_parsed", tag, project)
       end
     end)

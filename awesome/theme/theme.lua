@@ -32,6 +32,11 @@ theme.wallpaper = gears.surface.load_uncached(colorscheme.wall_path)
 
 -- █▀▀ █▀█ █▄░█ ▀█▀ █▀
 -- █▀░ █▄█ █░▀█ ░█░ ▄█
+-- theme.font_name = "DisposableDroid BB "
+-- theme.font = theme.font_name .. "Regular "
+-- theme.alt_font_name = theme.font_name
+-- theme.alt_font = theme.alt_font_name .. "Regular "
+
 theme.font_name = "RobotoMono Nerd Font Mono "
 theme.font = theme.font_name .. "Regular "
 theme.alt_font_name = "Roboto "
@@ -205,7 +210,8 @@ theme.tabbar_fg_normal = colors.bg_l3
 theme.useless_gap = dpi(7)
 
 -- Borders
-theme.border_width = dpi(3)
+-- theme.border_width = dpi(3)
+theme.border_width = dpi(0)
 theme.border_color_active = colors.main_accent
 theme.border_color_normal = colors.bg_l1
 

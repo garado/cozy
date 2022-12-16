@@ -16,7 +16,7 @@ local naughty = require("naughty")
 local button = wibox.widget({
   markup = helpers.ui.colorize_text("", beautiful.wibar_launch_app),
   widget = wibox.widget.textbox,
-  font = beautiful.font .. "12",
+  font = beautiful.font_name .. "12",
   align = "center",
   valign = "center",
 })

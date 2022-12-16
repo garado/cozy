@@ -264,7 +264,6 @@ return function(task_obj)
     nav_tasklist.widget = overviewbox:new(widget, task_obj)
 
     if task_obj.switch_index then
-      print("tasklist: proj summary created; switch index flag is set. index "..task_obj.index_to_switch)
       task_obj:emit_signal("tasks::switch_to_task_index", task_obj.index_to_switch)
       task_obj.switch_index = false
     end
@@ -274,7 +273,6 @@ return function(task_obj)
   -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
   -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
   task_obj:connect_signal("tasks::draw_first_overview", function(_, project)
-    print("tasklist: connect draw_first_overview")
     local tag = task_obj.current_tag
     create_tasklist(tag, project)
   end)
@@ -366,7 +364,6 @@ return function(task_obj)
   -- json_parsed signal tells us that the data is ready to be
   -- processed
   task_obj:connect_signal("tasks::project_selected", function()
-    print("tasklist: connect project_selected")
     local tag     = task_obj.current_tag
     local project = task_obj.current_project
     create_tasklist(tag, project)

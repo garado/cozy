@@ -11,7 +11,7 @@ local area = require("modules.keynav.area")
 -- gears.object that modules use to communicate with each other.
 -- it emits/connects to signals and also holds state variables
 local task_obj = gobject{}
-task_obj.current_tag  = "ECE118"
+task_obj.current_tag  = "Cozy"
 
 -- Import modules
 local tag_list, nav_tags     = require("ui.dash.tasks.tags")(task_obj)

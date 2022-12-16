@@ -13,7 +13,7 @@ local colorscheme = {
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
 local awesome_cfg = gfs.get_configuration_dir()
-colorscheme.wall_path = awesome_cfg .. "theme/assets/walls/wall45.png"
+colorscheme.wall_path = awesome_cfg .. "theme/assets/walls/hotaka.jpeg"
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█

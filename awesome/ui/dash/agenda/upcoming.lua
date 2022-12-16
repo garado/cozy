@@ -2,68 +2,22 @@
 -- █░█ █▀█ █▀▀ █▀█ █▀▄▀█ █ █▄░█ █▀▀ 
 -- █▄█ █▀▀ █▄▄ █▄█ █░▀░█ █ █░▀█ █▄█ 
 
-local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local textbox = require("ui.widgets.text")
 local gears = require("gears")
-local helpers = require("helpers")
-local gfs = require("gears.filesystem")
+local cal = require("core.system.cal")
 
 local colorize = require("helpers.ui").colorize_text
 
-local os = os
-local string = string
-local table = table
-
-local events = {}
-
--- split tsv into lines (events) + their fields
-local function parse_tsv(tsv)
-  -- insert each event into a table
-  local event_list = {}
-  local num_events = 0
-  for event in string.gmatch(tsv, "[^\r\n]+") do
-    num_events = num_events + 1
-    table.insert(event_list, event)
-  end
-
-  -- parse tsv
-  for i = 1, #event_list do
-    -- split on tabs
-    local fields = {}
-    for field in string.gmatch(event_list[i], "[^\t]+") do
-      table.insert(fields, field)
-    end
-
-    -- date comes in 2022-08-23 format
-    -- change to Tue Aug 23
-    local date = fields[1]
-    local pattern = "(%d%d%d%d)-(%d%d)-(%d%d)"
-    local xyear, xmon, xday = date:match(pattern)
-    local ts = os.time({ year = xyear, month = xmon, day = xday })
-    local format_date = os.date("%a %b %d", ts)
-
-    local event = {
-      ["name"]  = fields[6],
-      ["start"] = fields[2],
-      ["end_"]  = fields[4],
-      ["date"]  = format_date,
-      ["desc"]  = fields[8],
-      ["place"] = fields[7],
-    }
-    table.insert(events, event)
-  end
-end
-
 -- Assemble a single event box
-local function create_eventbox(entry)
+local function create_eventbox(startdate, starttime, endtime, title, place)
   local accent = beautiful.random_accent_color()
 
   local name = textbox({
-    text = entry["name"],
+    text = title,
     color = accent,
     bold = true,
     size = 14,
@@ -72,7 +26,7 @@ local function create_eventbox(entry)
   })
 
   local date = textbox({
-    text = entry["date"],
+    text = startdate,
     size = 12,
     bold = true,
     halign = "left",
@@ -80,14 +34,14 @@ local function create_eventbox(entry)
   })
 
   local times = textbox({
-    text = entry["start"] .. " - " .. entry["end_"],
+    text = starttime .. " - " .. endtime,
     size = 12,
     halign = "left",
     valign = "center",
   })
 
-  local place = textbox({
-    text = entry["place"],
+  local _place = textbox({
+    text = place,
     size = 12,
     halign = "left",
     valign = "center",
@@ -101,7 +55,7 @@ local function create_eventbox(entry)
       spacing = dpi(10),
       layout = wibox.layout.fixed.horizontal,
     },
-    place,
+    _place,
     spacing = dpi(2),
     forced_width = dpi(400),
     layout = wibox.layout.fixed.vertical,
@@ -115,7 +69,7 @@ local function create_eventbox(entry)
   })
 
   local eventbox = wibox.widget({
-    {
+    -- {
       {
         {
           accent_bar,
@@ -130,12 +84,12 @@ local function create_eventbox(entry)
         widget = wibox.container.margin,
       },
       widget = wibox.container.place,
-    },
-    forced_height = dpi(90),
-    forced_width = dpi(300),
-    bg = beautiful.bg_l0,
-    shape = gears.shape.rounded_rect,
-    widget = wibox.container.background,
+    -- },
+    -- forced_height = dpi(90),
+    -- forced_width = dpi(300),
+    -- bg = beautiful.bg_l0,
+    -- shape = gears.shape.rounded_rect,
+    -- widget = wibox.container.background,
   })
 
   return eventbox
@@ -146,23 +100,26 @@ local event_list = wibox.widget({
   layout = wibox.layout.fixed.vertical,
 })
 
-local function create_all_eventboxes()
-  local file = gfs.get_cache_dir() .. "calendar/agenda"
-  local cmd = "cat " .. file
-  awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
-    print(stderr)
-    parse_tsv(stdout)
-    for i = 1, #events do
-      local eventbox = create_eventbox(events[i])
-      event_list:add(eventbox)
-      if #event_list.children >= 7 then
-        break
-      end
-    end
-  end)
-end
+cal:connect_signal("ready::upcoming", function()
+  local upcoming = cal:get_upcoming_events()
+  -- TODO: add placeholder
+  -- if #upcoming > 0 then
+  --   events:reset()
+  -- end
 
-create_all_eventboxes()
+  local max = 5
+  for i = 1, #upcoming do
+    if i > max then break end
+    local date = cal:get_start_date(upcoming[i])
+    date = cal:format_date(date)
+    local stime = cal:get_start_time(upcoming[i])
+    local etime = cal:get_end_time(upcoming[i])
+    local desc = cal:get_title(upcoming[i])
+    local loc = cal:get_location(upcoming[i])
+    local entry = create_eventbox(date, stime, etime, desc, loc)
+    event_list:add(entry)
+  end
+end)
 
 local widget = wibox.widget({
   {

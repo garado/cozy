@@ -25,7 +25,6 @@ return function()
   -- Recolor layout icon when set
   local tag = awful.screen.focused().selected_tag
   tag:connect_signal("property::selected", function()
-    print("asdfasdf")
     if not layout or #layout.children == 0 then return end
     gears.color.recolor_image(layout.children[1].image, beautiful.main_accent)
   end)

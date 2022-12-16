@@ -11,6 +11,7 @@ local dpi = xresources.apply_dpi
 local widgets = require("ui.widgets")
 local box = require("helpers.ui").create_boxed_widget
 local ledger = require("core.system.ledger")
+local dash = require("core.cozy.dash")
 
 local area = require("modules.keynav.area")
 local elevated = require("modules.keynav.navitem").Elevated
@@ -30,6 +31,7 @@ local open_button = widgets.button.text.normal({
   size = 12,
   on_release = function()
     ledger:open_ledger()
+    dash:close()
   end,
 })
 

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# █▀▀ █▀▀ ▀█▀ █▀▀ █░█    █░█ █▀█ █▀▀ █▀█ █▀▄▀█ █ █▄░█ █▀▀ 
+# █▀░ ██▄ ░█░ █▄▄ █▀█    █▄█ █▀▀ █▄▄ █▄█ █░▀░█ █ █░▀█ █▄█ 
+
+# tiny helper script to parse cal cache file for upcoming events because
+# escaping the double quotes was a bitch
+# the cal cache file contains events from 3 month ago to 3 months from now
+
+# to do: limit to 2 weeks from now
+
+awk -F, ' BEGIN { "date +%Y-%m-%d" | getline a } { if ( $0>a ) { print $0 }} ' $1 | head -14

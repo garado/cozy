@@ -128,19 +128,16 @@ return function(task_obj)
   -- processed
   -- need to rename and reuse this signal cause project_json_parsed is the exact same
   task_obj:connect_signal("tasks::tag_json_parsed", function()
-    print("list: connect tag_json_parsed")
     count_projects_in_tag()
     draw_project_list()
   end)
 
   task_obj:connect_signal("tasks::project_json_parsed", function()
-    print("list: connect project_json_parsed")
     count_projects_in_tag()
     draw_project_list()
   end)
 
   task_obj:connect_signal("tasks::reload_project_list_all", function()
-    print("list: connect reload_proj_list")
     count_projects_in_tag()
     draw_project_list()
   end)

@@ -24,9 +24,6 @@ local focus_cache = cache_dir .. "restore/focus"
 local function preserve_client_state(s)
   local clients = {}
 
-  -- I do existence checks bc according to xephyr, sometimes
-  -- accessing these fields would just... fail? and brick the rest
-  -- of the function
   for i, c in ipairs(s.all_clients) do
     clients[i] = {}
     if c.width  then clients[i].width = c.width   end
@@ -133,7 +130,7 @@ end
 -- Save states on restart
 awesome.connect_signal("exit", function(reason_restart)
   if reason_restart then
-    -- Then clear the caches
+    -- Clear the caches
     local cmd
     cmd = "echo '' > " .. tag_cache
     awful.spawn.with_shell(cmd)
@@ -144,6 +141,7 @@ awesome.connect_signal("exit", function(reason_restart)
     cmd = "echo '' > " .. focus_cache
     awful.spawn.with_shell(cmd)
 
+    -- Then write state
     for s in screen do
       preserve_focus(s)
       preserve_client_state(s)

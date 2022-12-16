@@ -62,8 +62,25 @@ local debrief = wibox.widget({
 -- Weather ------------------------
 local weather = wibox.widget({
   {
-    markup = colorize("It's going to be cloudy today with a high of 68*.", beautiful.fg),
-    font = beautiful.alt_font_name .. "12",
+    {
+      markup = colorize("It's going to be cloudy today with a high of 68*.", beautiful.fg),
+      font = beautiful.alt_font_name .. "12",
+      align = "left",
+      valign = "center",
+      widget = wibox.widget.textbox,
+    },
+    spacing = dpi(10),
+    layout = wibox.layout.fixed.vertical,
+  },
+  bottom = dpi(20),
+  widget = wibox.container.margin,
+})
+
+-- Events ------------------------
+local _events_overview_header = wibox.widget({
+  {
+    markup = colorize("EVENTS", beautiful.fg),
+    font = beautiful.font_name .. "Bold 12",
     align = "left",
     valign = "center",
     widget = wibox.widget.textbox,
@@ -72,14 +89,38 @@ local weather = wibox.widget({
   layout = wibox.layout.fixed.vertical,
 })
 
--- Events ------------------------
+local events_overview = wibox.widget({
+  _events_overview_header,
+  spacing = dpi(10),
+  layout = wibox.layout.fixed.vertical,
+})
 
+-- Tasks ----------------------------
+local _tasks_overview_header = wibox.widget({
+  {
+    markup = colorize("TASKS", beautiful.fg),
+    font = beautiful.font_name .. "Bold 12",
+    align = "left",
+    valign = "center",
+    widget = wibox.widget.textbox,
+  },
+  spacing = dpi(10),
+  layout = wibox.layout.fixed.vertical,
+})
+
+local tasks_overview = wibox.widget({
+  _tasks_overview_header,
+  spacing = dpi(10),
+  layout = wibox.layout.fixed.vertical,
+})
 
 -- Assemble contents ---------------------------
 local _daily_briefing = wibox.widget({
   greeting,
   debrief,
   weather,
+  events_overview,
+  tasks_overview,
   layout = wibox.layout.fixed.vertical,
 })
 

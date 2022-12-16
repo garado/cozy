@@ -7,7 +7,9 @@ local beautiful = require("beautiful")
 local colorize = require("helpers").ui.colorize_text
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
+local gobject = require("gears.object")
 
+local keygrabber = require("ui.dash.agenda.keygrabber")
 local calendar  = require("ui.dash.agenda.calendar")
 local upcoming  = require("ui.dash.agenda.upcoming")
 local deadlines = require("ui.dash.agenda.deadlines")

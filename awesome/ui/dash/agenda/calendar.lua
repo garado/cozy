@@ -11,6 +11,7 @@ local beautiful = require("beautiful")
 local dpi = xresources.apply_dpi
 local area = require("modules.keynav.area")
 local gears = require("gears")
+local cal = require("core.system.cal")
 
 local box = require("helpers.ui").create_boxed_widget
 local colorize = require("helpers.ui").colorize_text
@@ -28,24 +29,24 @@ local calgrid
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄ ▀    █░█ █▀▀ █░░ █▀█ █▀▀ █▀█ █▀ 
 -- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀ ▄    █▀█ ██▄ █▄▄ █▀▀ ██▄ █▀▄ ▄█ 
 
---- Determines the heatmap color based on a number of hours.
+--- Determines the heatmap color based on a number of events.
 -- @param base    The color when heatmap is at its maximum (hottest?). This color
 --                will be darkened for days that aren't as "hot".
 -- @param hours   Number of hours.
-local function heat(base, hours)
+local function heat(base, events)
   -- To get the right heat color, we modify the base color's lightness.
   -- The range of valid lightness values is 0 - 1.
 
-  local max_hours = 20
-  if (hours > 20) then
-    hours = max_hours
-  end
+  -- local max_events = 5
+  -- if (hours > 20) then
+  --   hours = max_hours
+  -- end
 
-  if hours > 6 then
-    local lmod = (max_hours - hours) * 0.015
+  if events > 2 then
+    local lmod = events * 0.015
     return color.pywal_lighten(base, lmod)
   else
-    local lmod = (max_hours - hours) * 0.04
+    local lmod = events * 0.04
     return color.pywal_darken(base, lmod)
   end
 end
@@ -86,12 +87,10 @@ end
 
 --- Create wibox for a single day of the calendar.
 -- @param date    The date (1-31)
--- @param valid   The number of hours worked on this day
+-- @param valid   Whether it's a day within this month or not
 local function _create_day(date, valid)
-  -- local heat_color
-  -- if hours > 0 then
-  --   heat_color = heat(accent, hours)
-  -- end
+  local cnt = cal:get_num_events(os.date("%m"), date)
+  local heat_color = (valid and cnt > 0) and heat(accent, cnt) or nil
 
   local fg = valid > 0 and beautiful.fg or beautiful.fg_sub
 
@@ -105,7 +104,7 @@ local function _create_day(date, valid)
       widget  = wibox.widget.textbox,
     },
     -- Heatmap background color
-    -- bg = heat_color,
+    bg = heat_color,
     forced_width  = dpi(35),
     forced_height = dpi(35),
     shape = gears.shape.circle,
@@ -169,7 +168,6 @@ end
 -- Get this month and year
 local _thismonth = os.date("%m")
 local _thisyear = os.date("%Y")
-local month = create_month_widget(_thismonth, _thisyear)
 
 local month_label = wibox.widget({
   markup  = colorize(os.date("%B %Y"), beautiful.fg),
@@ -184,7 +182,6 @@ local calendar = wibox.widget({
     {
       month_label,
       create_week_label(),
-      month,
       spacing = dpi(20),
       layout = wibox.layout.fixed.vertical,
     },
@@ -194,7 +191,12 @@ local calendar = wibox.widget({
   widget = wibox.container.constraint,
 })
 
-calendar = box(calendar, dpi(450), dpi(420), beautiful.dash_widget_bg)
+local _calendar = box(calendar, dpi(450), dpi(420), beautiful.dash_widget_bg)
 
-return calendar
+cal:connect_signal("ready::month_events", function()
+  local month = create_month_widget(_thismonth, _thisyear)
+  local ugh = calendar.children[1].children[1]
+  ugh:add(month)
+end)
 
+return _calendar

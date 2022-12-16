@@ -31,7 +31,7 @@ local slider = wibox.widget({
 local icon = wibox.widget({
   markup = helpers.ui.colorize_text("滛", beautiful.wibar_bright_fg),
   widget = wibox.widget.textbox,
-  font = beautiful.font .. "15",
+  font = beautiful.font_name .. "15",
   align = "center",
   valign = "center",
 })

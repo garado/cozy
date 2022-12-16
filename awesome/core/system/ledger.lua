@@ -53,7 +53,7 @@ end -- end get_account_balances
 -- The Ledger command returns CSV.
 -- @param amt The number of transactions to grab (default 10)
 function ledger:parse_recent_transactions(amt)
-  if not amt then amt = 10 end
+  if not amt then amt = 20 end
 
   local cmd = "ledger -f " .. ledger_file .. " csv expenses reimbursements income | head -" .. amt
   awful.spawn.easy_async_with_shell(cmd, function(stdout)

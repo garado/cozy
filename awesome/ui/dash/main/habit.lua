@@ -107,7 +107,7 @@ local function create_habit_ui_entry(name, graph_id, frequency)
       },
       { -- Overlay text (date)
         markup = colorize(checkbox_text, text_color),
-        font = beautiful.font .. "11",
+        font = beautiful.font_name .. "11",
         align = "center",
         valign = "center",
         widget = wibox.widget.textbox,
@@ -126,8 +126,10 @@ local function create_habit_ui_entry(name, graph_id, frequency)
       text.markup = colorize(checkbox_text, text_color)
 
       -- Update data in cache and in Pixela
-      pixela:update_pixela(graph_id, os.date("%Y%m%d"), qty)
-      pixela:update_cache(graph_id, os.date("%Y%m%d"), qty)
+      local cboxdate = os.date("%Y%m") .. os.date("%d", i_days_ago)
+      print("updating for day " .. date)
+      pixela:update_pixela(graph_id, cboxdate, qty)
+      pixela:update_cache(graph_id, cboxdate, qty)
 
       qty = not qty
     end) -- end checkbox connect signal

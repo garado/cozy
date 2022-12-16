@@ -2,167 +2,98 @@
 -- █▀▀ █░█ █▀▀ █▄░█ ▀█▀ █▀
 -- ██▄ ▀▄▀ ██▄ █░▀█ ░█░ ▄█
 
-local awful = require("awful")
+-- Show upcoming events.
+
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local helpers = require("helpers")
 local colorize = require("helpers").ui.colorize_text
+local wheader = require("helpers.ui").create_dash_widget_header
 local box = require("helpers").ui.create_boxed_widget
-local gfs = require("gears.filesystem")
-local naughty = require("naughty")
+local cal = require("core.system.cal")
 
-local os = os
-local string = string
-local table = table
+------------------------------------
 
-local function widget()
-  local placeholder = wibox.widget({
-    markup = colorize("No events found", beautiful.fg),
-    align = "center",
+--- Inserts entry into events wibox.
+-- @param date Event start date
+-- @param time Event start time
+-- @param desc Event title
+local function create_calendar_entry(date, time, desc)
+  local datetime_text = date .. " " .. time
+
+  local datetime = wibox.widget({
+    markup = colorize(datetime_text, beautiful.fg),
+    align = "left",
     valign = "center",
-    font = beautiful.font .. "12",
     widget = wibox.widget.textbox,
   })
 
-  -- actual events get appended here later
-  local events = wibox.widget({
-    placeholder,
-    spacing = dpi(3),
-    layout = wibox.layout.flex.vertical,
+  local _desc = wibox.widget({
+    markup = colorize("   " .. desc, beautiful.fg),
+    align = "left",
+    valign = "center",
+    widget = wibox.widget.textbox,
   })
 
-  local header = wibox.widget({
-    helpers.ui.create_dash_widget_header("Events"),
-    margins = dpi(5),
-    widget = wibox.container.margin,
+  return wibox.widget({
+    datetime,
+    _desc,
+    layout = wibox.layout.fixed.horizontal,
   })
-
-  local events_widget = wibox.widget({
-    {
-      header,
-      {
-        events,
-        widget = wibox.container.place,
-      },
-      layout = wibox.layout.fixed.vertical,
-    },
-    widget = wibox.container.margin,
-    margins = dpi(5),
-  })
-
-  -- inserts entry into events wibox
-  local function create_calendar_entry(date, time, desc)
-    local datetime_text = date .. " " .. time
-    local datetime = wibox.widget({
-      markup = colorize(datetime_text, beautiful.fg),
-      align = "left",
-      valign = "center",
-      widget = wibox.widget.textbox,
-    })
-
-    local desc_ = wibox.widget({
-      markup = colorize("   " .. desc, beautiful.fg),
-      align = "left",
-      valign = "center",
-      widget = wibox.widget.textbox,
-    })
-
-    local event = wibox.widget({
-      datetime,
-      desc_,
-      layout = wibox.layout.fixed.horizontal,
-    })
-
-    events:add(event)
-  end
-
-  -- split tsv into lines (events) + their fields
-  local function parse_tsv(tsv)
-    -- insert each event into a table
-    local event_list = {}
-    local num_events = 0
-    for event in string.gmatch(tsv, "[^\r\n]+") do
-      num_events = num_events + 1
-      table.insert(event_list, event)
-    end
-
-    -- remove placeholder if events were found
-    if num_events > 0 then
-      events:remove(1)
-    else
-      return
-    end
-
-    -- parse tsv
-    for i = 1, #event_list do
-      -- split on tabs
-      local fields = { }
-      for field in string.gmatch(event_list[i], "[^\t]+") do
-        table.insert(fields, field)
-      end
-
-      -- date comes in 2022-08-23 format
-      -- change to Tue Aug 23
-      local date = fields[1]
-      local pattern = "(%d%d%d%d)-(%d%d)-(%d%d)"
-      local xyear, xmon, xday = date:match(pattern)
-      local ts = os.time({ year = xyear, month = xmon, day = xday })
-      local format_date = os.date("%a %b %d", ts)
-
-      local time = fields[2]
-      local desc = fields[6]
-      create_calendar_entry(format_date, time, desc)
-    end
-  end
-
-  local function prompt_cache_update()
-    local prompt_no = naughty.action {
-      name = colorize("No", beautiful.fg)
-    }
-
-    local prompt_yes = naughty.action {
-      name = colorize("Yes", beautiful.fg)
-    }
-    prompt_yes:connect_signal("invoked", function()
-      local file = gfs.get_cache_dir() .. "calendar/agenda"
-      local gcalcli_cmd = "gcalcli agenda today '2 weeks' --tsv --details all"
-      awful.spawn.easy_async_with_shell(gcalcli_cmd, function(stdout)
-        parse_tsv(stdout)
-        awful.spawn.with_shell("echo -e '" .. stdout .. "' > " .. file)
-      end)
-    end)
-
-    naughty.notification {
-      app_name = "System notification",
-      title = "Calendar cache empty",
-      message = "Run gcalcli to fetch events?",
-      actions = { prompt_no, prompt_yes }
-    }
-  end
-
-  local function update_calendar()
-    local file = gfs.get_cache_dir() .. "calendar/agenda"
-    local cmd = "cat " .. file .. " | head -n 5"
-    awful.spawn.easy_async_with_shell(cmd, function(stdout)
-      -- try to read from cache
-      if stdout ~= nil and stdout ~= '' then
-        parse_tsv(stdout)
-      else -- if cache is empty, send notification
-        prompt_cache_update()
-      end
-    end)
-  end
-
-  update_calendar()
-
-  awesome.connect_signal("widget::calendar_update", function()
-    events:reset()
-    update_calendar()
-  end)
-
-  return events_widget
 end
 
-return box(widget(), dpi(0), dpi(190), beautiful.dash_widget_bg)
+-- Uhows when there are no events to display
+local placeholder = wibox.widget({
+  markup = colorize("No events found", beautiful.fg),
+  align = "center",
+  valign = "center",
+  font = beautiful.font_name .. "12",
+  widget = wibox.widget.textbox,
+})
+
+local header = wibox.widget({
+  wheader("Events"),
+  margins = dpi(5),
+  widget = wibox.container.margin,
+})
+
+local events = wibox.widget({
+  placeholder,
+  spacing = dpi(3),
+  layout = wibox.layout.flex.vertical,
+})
+
+-- Assemble final widget.
+local events_widget = wibox.widget({
+  {
+    header,
+    {
+      events,
+      widget = wibox.container.place,
+    },
+    layout = wibox.layout.fixed.vertical,
+  },
+  widget = wibox.container.margin,
+  margins = dpi(5),
+})
+
+cal:connect_signal("ready::upcoming", function()
+  local upcoming = cal:get_upcoming_events()
+  if #upcoming > 0 then
+    events:reset()
+  end
+
+  local max = 5
+  for i = 1, #upcoming do
+    if i > max then break end
+    local date = cal:get_start_date(upcoming[i])
+    date = cal:format_date(date)
+    local time = cal:get_start_time(upcoming[i])
+    local desc = cal:get_title(upcoming[i])
+    local entry = create_calendar_entry(date, time, desc)
+    events:add(entry)
+  end
+end)
+
+return box(events_widget, dpi(0), dpi(190), beautiful.dash_widget_bg)
