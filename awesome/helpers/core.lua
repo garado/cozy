@@ -27,4 +27,28 @@ end
 --   return string.gsub(text, "[^]", "")
 -- end
 
+--- Pretty print array
+function core.print_arr(arr, indentLevel)
+  local str = ""
+  local indentStr = "#"
+
+  if (indentLevel == nil) then
+    print(core.print_arr(arr, 0))
+    return
+  end
+
+  for _ = 0, indentLevel do
+    indentStr = indentStr.."  "
+  end
+
+  for index,value in pairs(arr) do
+    if type(value) == "table" then
+      str = str..indentStr..index..": \n"..core.print_arr(value, (indentLevel + 1))
+    else
+      str = str..indentStr..index..": "..value.."\n"
+    end
+  end
+  return str
+end
+
 return core
