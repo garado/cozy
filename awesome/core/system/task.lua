@@ -116,11 +116,19 @@ function task:get_focused_proj()  return self._private.focused_proj end
 function task:set_focused_tag(tag)    self._private.focused_tag   = tag end
 function task:set_focused_proj(proj)  self._private.focused_proj  = proj end
 
-function task:get_total_tasks_for_proj(tag, proj)
+function task:get_pending_tasks(tag, proj)
+  tag = tag or self._private.focused_tag
+  return self._private.tags[tag].projects[proj].tasks
+end
+
+function task:get_total_tasks(tag, proj)
+  tag = tag or self._private.focused_tag
   return self._private.tags[tag].projects[proj].total
 end
 
 function task:get_proj_completion_percentage(tag, proj)
+  tag = tag or self._private.focused_tag
+
   local pending = #self._private.tags[tag].projects[proj].tasks
   local total = self._private.tags[tag].projects[proj].total
   local completed = total - pending
@@ -136,6 +144,10 @@ function task:new()
   self._private.focused_task  = nil
   self:get_taglist()
   self:get_tasks_for_tag('Cozy')
+
+  self:connect_signal("selected::tag", function(_, tag)
+    self:get_tasks_for_tag(tag)
+  end)
 end
 
 local function new()

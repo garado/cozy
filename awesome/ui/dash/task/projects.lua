@@ -86,6 +86,8 @@ end -- end create_project_button
 task:connect_signal("ready::projects", function(_, tag)
   if tag == task:get_focused_tag() then
     project_list:reset()
+    nav_projects:remove_all_items()
+    nav_projects:reset()
     for project, _ in pairs(task:get_projects(tag)) do
       local btn, nav = create_project_button(project)
       project_list:add(btn)

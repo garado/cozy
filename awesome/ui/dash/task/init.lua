@@ -7,8 +7,10 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local area = require("modules.keynav.area")
 
-local tag_list, nav_tags     = require("ui.dash.tasks.tag_list")()
-local projects, nav_projects = require("ui.dash.tasks.project_list")()
+local tag_list, nav_tags      = require(... .. ".tags")()
+local projects, nav_projects  = require(... .. ".projects")()
+local tasks, nav_tasklist     = require(... .. ".tasks")()
+local header                  = require(... .. ".header")
 
 --------
 
@@ -18,7 +20,7 @@ local nav_sidebar = area:new({ name = "sidebar", circular = true })
 nav_sidebar:append(nav_tags)
 nav_sidebar:append(nav_projects)
 nav_tasks:append(nav_sidebar)
--- nav_tasks:append(nav_tasklist)
+--nav_tasks:append(nav_tasklist)
 
 --------
 
@@ -38,7 +40,7 @@ local tasks_dashboard = wibox.widget({
     sidebar,
     {
       {
-        --overview,
+        header, --overview,
         --prompt,
         layout = wibox.layout.fixed.vertical,
       },

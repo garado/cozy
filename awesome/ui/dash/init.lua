@@ -27,7 +27,7 @@ return function(_) -- s
   -- Import tab contents
   local main,   nav_main    = require("ui.dash.main")()
   local cash,   nav_cash    = require("ui.dash.finances")()
-  local tasks,  nav_tasks   = require("ui.dash.tasks")()
+  local tasks,  nav_tasks   = require("ui.dash.task")()
   local time                = require("ui.dash.time")()
 --  local time,   nav_time    = require("ui.dash.time")()
   local agenda = require("ui.dash.agenda")
