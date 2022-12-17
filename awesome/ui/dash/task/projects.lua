@@ -76,14 +76,13 @@ local function create_project_button(project)
 
   local nav_project = tasks_textbox:new(textbox)
   function nav_project:release()
-    task:set_focused_proj(project)
     task:emit_signal("selected::project", project)
   end
 
   return textbox, nav_project
 end -- end create_project_button
 
-task:connect_signal("ready::projects", function(_, tag)
+task:connect_signal("update::project_list", function(_, tag)
   if tag == task:get_focused_tag() then
     project_list:reset()
     nav_projects:remove_all_items()

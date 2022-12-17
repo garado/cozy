@@ -70,15 +70,17 @@ local function create_tag_button(tag)
 
   local nav_tag = tasks_textbox:new(tag_wibox)
   function nav_tag:release()
-    task:set_focused_tag(tag)
-    task:set_focused_proj(nil)
     task:emit_signal("selected::tag", tag)
   end
 
   return tag_wibox, nav_tag
 end
 
-task:connect_signal("ready::tags", function()
+task:connect_signal("update::tag_list", function()
+  tag_list:reset()
+  nav_tags:remove_all_items()
+  nav_tags:reset()
+
   local tags = task:get_tags()
   for i = 1, #tags do
     local tag_wibox, nav_tag = create_tag_button(tags[i])

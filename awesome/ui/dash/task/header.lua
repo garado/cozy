@@ -95,13 +95,8 @@ local tasklist_header = wibox.widget({
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄ 
 -- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀ 
 
-task:connect_signal("selected::project", function(_, project)
-  local tag = task:get_focused_tag()
+local function update_header(tag, project)
   accent = beautiful.random_accent_color()
-
-  -- print('HEADER')
-  -- print(tag)
-  -- print(project)
 
   if project == "(none)" or project == "noproj" then
     project = "No project"
@@ -110,10 +105,10 @@ task:connect_signal("selected::project", function(_, project)
   local name_text = project:gsub("^%l", string.upper)
   name:set_markup_silently(colorize(name_text, accent))
 
-  local pending = #task:get_pending_tasks(tag, project)
+  local pending = #task:get_pending_tasks(nil, project)
   local total = task:get_total_tasks(tag, project)
-  local rem = pending.."/"..total.." REMAINING"
-  local text = string.upper(tag).." - "..rem
+  local rem   = pending.."/"..total.." REMAINING"
+  local text  = string.upper(tag).." - "..rem
   local markup = colorize(text, beautiful.fg)
   subheader:set_markup_silently(markup)
 
@@ -123,6 +118,10 @@ task:connect_signal("selected::project", function(_, project)
 
   markup = colorize(percent.."%", beautiful.fg)
   percent_completion:set_markup_silently(markup)
+end
+
+task:connect_signal("update::header", function(_, tag, project)
+  update_header(tag, project)
 end)
 
 return tasklist_header

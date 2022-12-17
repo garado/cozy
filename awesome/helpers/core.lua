@@ -51,4 +51,9 @@ function core.print_arr(arr, indentLevel)
   return str
 end
 
+--- Makes text bold
+function core.pango_bold(text)
+  return "<b>" .. text .. "</b>"
+end
+
 return core

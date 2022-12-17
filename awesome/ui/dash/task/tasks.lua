@@ -4,17 +4,12 @@
 
 local beautiful = require("beautiful")
 local wibox = require("wibox")
-local gears = require("gears")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local textbox = require("ui.widgets.text")
 local area = require("modules.keynav.area")
 local navtask = require("modules.keynav.navitem").Task
 local overviewbox = require("modules.keynav.navitem").OverviewBox
-local animation = require("modules.animation")
-local math = math
-local dash = require("core.cozy.dash")
-local helpers = require("helpers")
 local colorize = require("helpers.ui").colorize_text
 local format_due_date = require("helpers.dash").format_due_date
 
@@ -29,14 +24,8 @@ local nav_tasklist
 nav_tasklist = area:new({
   name = "tasklist",
   circular = true,
+  keys = require("ui.dash.task.keys.tasklist")
 })
-
--- local keys = require("ui.dash.tasks.keygrabber")(task_obj)
--- keys["h"] = function()
---   local navigator = nav_tasklist.nav
---   navigator:set_area("projects")
--- end
--- nav_tasklist.keys = keys
 
 -- █░█ █
 -- █▄█ █
@@ -84,6 +73,64 @@ local function create_task_wibox(name, due_date, start, id)
   return task_wibox
 end
 
+local function update_tasklist()
+  -- Add tasks to task list
+  nav_tasklist:remove_all_items()
+  nav_tasklist:reset()
+  tasklist:reset()
+  local current_task_set = false -- forgot why this is needed?
+  -- overflow_top = {}
+  -- overflow_bottom = {}
+  local json_tasklist = task:get_pending_tasks()
+  for i = 1, #json_tasklist do
+    local desc  = json_tasklist[i]["description"]
+    local due   = json_tasklist[i]["due"] or ""
+    local id    = json_tasklist[i]["id"]
+    local start = json_tasklist[i]["start"]
+
+    local task_wibox = create_task_wibox(desc, due, start, id)
+
+    -- Keyboard navigation setup
+    local ntask = navtask:new(task_wibox, nil, id)
+    function ntask:select_on()
+      self.selected = true
+      local text = self.widget.children[1]
+      text.font = beautiful.font_name .. "Bold 12"
+      task:set_focused_task(json_tasklist[i], i)
+    end
+
+    function ntask:select_off()
+      self.selected = false
+      local text = self.widget.children[1]
+      text.font = beautiful.font_name .. "12"
+    end
+
+    nav_tasklist:append(ntask)
+    tasklist:add(task_wibox)
+
+    -- if #tasklist.children < task_obj.max_tasks_shown then
+    --   tasklist:add(task)
+    -- else
+    --   table.insert(overflow_bottom, task)
+    -- end
+
+    if not current_task_set then
+      current_task_set = true
+    end
+  end -- end for
+
+  -- Handles switching to the correct index after redrawing because a task
+  -- was added/deleted/completed
+  if task.need_switch_index then
+    task:emit_signal("ui::switch_tasklist_index", task.switch_index)
+    task.need_switch_index = false
+  end
+end
+
+task:connect_signal("update::tasks", function(_, tag, project)
+  update_tasklist()
+end)
+
 return function()
-  return nav_tasklist
+  return tasklist, nav_tasklist
 end

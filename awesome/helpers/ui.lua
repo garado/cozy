@@ -44,6 +44,7 @@ function _ui.create_boxed_widget(widget_to_be_boxed, width, height, bg_color)
 end
 
 function _ui.colorize_text(text, color)
+  color = color or "#FF000000"
 	return "<span foreground='" .. color .. "'>" .. text .. "</span>"
 end
 

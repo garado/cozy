@@ -39,7 +39,7 @@ local filter_color = {
 	type = "linear",
 	from = { 0, 0 },
 	to = { 0, 200 },
-	stops = { { 0, beautiful.mus_filter_1}, { 1, beautiful.mus_filter_2 .. "cc" } },
+	stops = { { 0, beautiful.mus_filter_1}, { 1, beautiful.mus_filter_2 .. "99" } },
 }
 
 local music_art_filter = wibox.widget({

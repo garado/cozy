@@ -7,3 +7,6 @@
 [submodule "awesome/modules/fzy-lua"]
 	path = awesome/modules/fzy-lua
 	url = git@github.com:swarn/fzy-lua.git
+[submodule "awesome/modules/awesome-widgets"]
+	path = awesome/modules/awesome-widgets
+	url = git@github.com:garado/awesome-widgets.git
