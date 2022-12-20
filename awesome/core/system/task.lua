@@ -14,8 +14,7 @@
 -- self._private.focused_project
 --      - string containing name of focused project
 -- self._private.focused_task
---      - a reference to focused task array
---      - actually idk if it's a reference to it or a copy of it
+--      - reference to focused task json table
 -- self._private.tags[]
 --      - array of all active tags
 -- self._private.tags[tag].projects_ready
@@ -26,7 +25,7 @@
 -- self._private.tags[tag].projects[]
 --      - array of all active projects for a given tag
 -- self._private.tags[tag].projects[proj].tasks
---      - array of all tasks for a given project
+--      - array of all tasks for a given project (numerically indexed)
 
 -- Signals      Description
 -- ---------    ------------------
@@ -83,7 +82,7 @@ function task:parse_tags()
 end
 
 --- Parse all pending tasks for a given tag and then sort them by project
--- (As far as I'm aware this is the only way to obtain the list of projects for a tag)
+-- (As far as I'm aware this is the only way to obtain the list of projects for a tag initially) 
 function task:parse_tasks_for_tag(tag)
   local cmd = "task context none; task tag:"..tag.. " status:pending export rc.json.array=on"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
@@ -137,12 +136,11 @@ function task:parse_total_tasks_for_proj(tag, proj)
     local total = tonumber(stdout) or 0
     self._private.tags[tag].projects[proj].total = total
 
-    -- i curse that there is no ++ or -- operator in lua
-    self._private.tags[tag].projects_ready = self._private.tags[tag].projects_ready + 1
-    local ready = self._private.tags[tag].projects_ready
+    local ready = self._private.tags[tag].projects_ready + 1
     if ready == self:num_projects_in_tag(tag) then
       self:emit_signal("ready::projects", tag)
     end
+    self._private.tags[tag].projects_ready = ready
   end)
 end
 
@@ -157,6 +155,7 @@ function task:num_projects_in_tag(tag)
   return gears.table.count_keys(tbl)
 end
 
+--- For debugging purposes.
 function task:report_focused()
   local curtag = self._private.focused_tag or "NIL"
   local curproj = self._private.focused_project or "NIL"
@@ -212,9 +211,14 @@ function task:set_focused_project(tag, project)
 end
 
 function task:set_focused_task(_task, index)
+  debug:print('core::setfocusedtask to index '..index..', desc '.._task["description"])
   self._private.focused_task = _task
   self._private.task_index   = index
-  debug:print('core::task: setting focused task to "'.._task["description"]..'"')
+end
+
+function task:increment_total(tag, project)
+  local total = self._private.tags[tag].projects[project].total
+  self._private.tags[tag].projects[project].total = total + 1
 end
 
 ---------------------------------------------------------------------
@@ -259,6 +263,20 @@ function task:get_proj_completion_percentage(tag, proj)
   return math.floor((completed / total) * 100) or 0
 end
 
+-- BUG: every accent is turning bright red for some reason
+function task:set_accent(tag, project, color)
+  self._private.tags[tag].projects[project].accent = color
+end
+
+function task:get_accent(tag, project)
+  if self._private.tags[tag] == nil then
+    print('tags nil')
+  elseif self._private.tags[tag].projects == nil then
+    print('proj nil')
+  end
+  return self._private.tags[tag].projects[project].accent
+end
+
 ---------------------------------------------------------------------
 
 -- This is where everything gets tied together
@@ -287,15 +305,15 @@ function task:signal_setup()
     self:set_focused_project(tag)
     self:parse_total_tasks_for_proj(tag, self:get_focused_project())
     self:report_focused()
-    -- self:emit_signal("update::project_list", tag)
+    -- self:emit_signal("project_list::update_all", tag)
     self:emit_signal("update::tasks", tag, self:get_focused_project())
   end)
 
   -- All project information is ready
   self:connect_signal("ready::projects", function(_, tag)
     debug:print('core::task: caught signal ready::projects for '..tag)
-    self:emit_signal("update::project_list", tag)
-    self:emit_signal("update::header", tag, self:get_focused_project())
+    self:emit_signal("project_list::update_all", tag)
+    self:emit_signal("header::update", tag, self:get_focused_project())
   end)
 
   -- █▀ █▀▀ █░░ █▀▀ █▀▀ ▀█▀ █▀▀ █▀▄ 
@@ -315,9 +333,9 @@ function task:signal_setup()
     else
       self:set_focused_project(tag, nil)
       debug:print('\ttasks for selected tag have already been fetched! updating ui')
-      self:emit_signal("update::project_list", tag)
+      self:emit_signal("project_list::update_all", tag)
       self:emit_signal("update::tasks", tag, self:get_focused_project())
-      self:emit_signal("update::header", tag, self:get_focused_project())
+      self:emit_signal("header::update", tag, self:get_focused_project())
       self:report_focused()
     end
   end)
@@ -326,6 +344,7 @@ function task:signal_setup()
     debug:print('core::task: caught selected::project for '..project)
     self:set_focused_project(nil, project)
     self:emit_signal("update::tasks", self:get_focused_tag(), project)
+    self:emit_signal("header::update", self:get_focused_tag(), project)
     self:report_focused()
   end)
 
@@ -351,27 +370,62 @@ function task:signal_setup()
     end
   end)
 
-  -- TODO: selectively reload ui components based on what was modified
-  self:connect_signal("modified::add", function(_, tag, project)
+  -- TODO: selectively reload UI components based on what was modified
+  self:connect_signal("modified::add", function(_, tag, project, input, id)
+    debug:print('core::task: caught mod add signal with input '..input)
+    if not id then
+      debug:print('id is nil!')
+    end
+    debug:print('\tcreating task...')
+
+    local new_task = {}
+    new_task["description"] = input
+    new_task["tag"] = tag
+    new_task["project"] = project
+    new_task["id"] = id
+
+    table.insert(self._private.tags[tag].projects[project].tasks, new_task)
+    self:increment_total(tag, project)
+
+    self:emit_signal("tasklist::add", new_task)
+    self:emit_signal("header::update", tag, project)
   end)
 
-  self:connect_signal("modified::done", function(_, tag, project)
+  -- Done: remove task entry (these need WORK)
+  -- navitem indices are not kept up to date with data table & wibox indices which leads to
+  -- very unexpected behavior
+  self:connect_signal("modified::done", function(_, tag, project, _, _)
+    local index = self:get_focused_task_index()
+    debug:print('core::task: caught mod done signal for task at ui index '..index)
+    table.remove(self._private.tags[tag].projects[project].tasks, index)
+    self:emit_signal("tasklist::remove")
+    self:emit_signal("header::update", tag, project)
   end)
 
+  -- Delete: also remove task entry
   self:connect_signal("modified::delete", function(_, tag, project)
+    local index = self:get_focused_task_index()
+    debug:print('core::task: caught mod delete signal for task at ui index '..index)
+    table.remove(self._private.tags[tag].projects[project].tasks, index)
+    self:emit_signal("tasklist::remove")
+    self:emit_signal("header::update", tag, project)
   end)
 
-  self:connect_signal("modified::mod_due", function(_, tag, project)
-  end)
+  -- self:connect_signal("modified::mod_due", function(_, tag, project)
+  --   debug:print('core::task: caught mod due signal')
+  -- end)
 
-  self:connect_signal("modified::mod_name", function(_, tag, project)
-  end)
+  -- self:connect_signal("modified::mod_name", function(_, tag, project)
+  --   debug:print('core::task: caught mod name signal')
+  -- end)
 
-  self:connect_signal("modified::mod_tag", function(_, tag, project)
-  end)
+  -- self:connect_signal("modified::mod_tag", function(_, tag, project)
+  --   debug:print('core::task: caught mod tag signal')
+  -- end)
 
-  self:connect_signal("modified::mod_proj", function(_, tag, project)
-  end)
+  -- self:connect_signal("modified::mod_proj", function(_, tag, project)
+  --   debug:print('core::task: caught mod proj signal')
+  -- end)
 end
 
 function task:reset()

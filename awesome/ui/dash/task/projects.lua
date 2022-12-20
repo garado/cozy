@@ -82,7 +82,7 @@ local function create_project_button(project)
   return textbox, nav_project
 end -- end create_project_button
 
-task:connect_signal("update::project_list", function(_, tag)
+task:connect_signal("project_list::update_all", function(_, tag)
   if tag == task:get_focused_tag() then
     project_list:reset()
     nav_projects:remove_all_items()
@@ -93,6 +93,9 @@ task:connect_signal("update::project_list", function(_, tag)
       nav_projects:append(nav)
     end
   end
+end)
+
+task:connect_signal("project_list::update", function(_, tag, project)
 end)
 
 return function()

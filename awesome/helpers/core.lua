@@ -4,6 +4,8 @@
 
 -- Some helper functions that I found useful for data wrangling.
 
+local colorize = require("helpers.ui").colorize_text
+
 local core = {}
 
 --- Split text input on a given character(s).
@@ -51,9 +53,9 @@ function core.print_arr(arr, indentLevel)
   return str
 end
 
---- Makes text bold
-function core.pango_bold(text)
-  return "<b>" .. text .. "</b>"
+function core.pango_bold(text, color)
+  text = "<b>" .. text .. "</b>"
+  return colorize(text, color)
 end
 
 return core

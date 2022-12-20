@@ -10,20 +10,11 @@ local gears = require("gears")
 local wibox = require("wibox")
 local awful = require("awful")
 local dpi   = xresources.apply_dpi
-
-local colorize      = require("helpers.ui").colorize_text
-local remove_pango  = require("helpers.dash").remove_pango
+local pango_bold  = require("helpers.core").pango_bold
 
 local task = require("core.system.task")
 
 -------------------------
-
---- Adds pango formatting to prompt text.
--- @param text The text to promptify.
-local function promptify(text)
-  text = "<b>" .. text .. "</b>"
-  return colorize(text, beautiful.fg)
-end
 
 local function desc_search_callback(command_before_comp, cur_pos_before_comp, ncomp)
   local tasks = task:get_pending_tasks()
@@ -50,7 +41,7 @@ local prompt_textbox = wibox.widget({
 -- @param prompt The prompt to display.
 -- @param text The initial textbox text.
 local function task_input(type, prompt, text)
-  local default_prompt = promptify(type..": ")
+  local default_prompt = pango_bold(type..": ", beautiful.fg)
   awful.prompt.run {
     prompt       = prompt or default_prompt,
     text         = text or "",
@@ -84,10 +75,10 @@ task:connect_signal("key::input_request", function(_, type)
   }
 
   local text_options = {
-    ["mod_name"]  = remove_pango(task:get_focused_task_desc()),
+    ["mod_name"]  = task:get_focused_task_desc(),
   }
 
-  local prompt  = promptify(prompt_options[type]) or ""
+  local prompt  = pango_bold(prompt_options[type], beautiful.fg) or ""
   local text    = text_options[type] or ""
 
   -- Modify and Start take no textbox input - they just execute

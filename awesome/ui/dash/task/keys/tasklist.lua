@@ -54,32 +54,6 @@ local function handle_key(key)
   end
 end
 
-local function set_selected_task(type)
-  local tasks   = task:get_pending_tasks()
-  local newest  = #tasks + 1
-  local current = task:get_focused_task_index()
-  local prev = (current > 1 and current - 1) or 1
-
-  local indices = {
-    ["add"]       = newest,
-    ["start"]     = current,
-    ["mod_due"]   = current,
-    ["mod_name"]	= current,
-    ["done"]      = prev,
-    ["delete"]    = prev,
-    ["undo"]      = 1,
-    ["mod_proj"]  = 1,
-    ["mod_tag"]   = 1,
-  }
-
-  -- Default to first task
-  task.need_switch_index = true
-  task.switch_index = 1
-  if indices[type] then
-    task.switch_index = indices[type]
-  end
-end
-
 task:connect_signal("key::input_completed", function(_, type, input)
   local tag     = task:get_focused_tag()
   local project = task:get_focused_project()
@@ -87,9 +61,9 @@ task:connect_signal("key::input_completed", function(_, type, input)
   local id = _task["id"]
   local cmd
 
-  if      type == "add" then
+  if type == "add" then
     cmd = "task add proj:'"..project.."' tag:'"..tag.."' '"..input.."'"
-  elseif  type == "delete" then
+  elseif type == "delete" then
     if input == "y" or input == "Y" then
       cmd = "echo 'y' | task delete " .. id
     end
@@ -98,13 +72,10 @@ task:connect_signal("key::input_completed", function(_, type, input)
       cmd = "echo 'y' | task done " .. id
     end
   elseif  type == "search" then
-    -- TODO fix this disgusting mess lol
-    local tasks = task._private.tags[task:get_focused_tag()].projects[task:get_focused_project()].tasks
+    local tasks = task._private.tags[tag].projects[project].tasks
     for i = 1, #tasks do
       if tasks[i]["description"] == input then
-        print('TODO: switch to task index')
         task:emit_signal("ui::switch_tasklist_index", i)
-        -- task_obj:emit_signal("tasks::switch_to_task_index", i)
         return
       end
     end
@@ -128,15 +99,22 @@ task:connect_signal("key::input_completed", function(_, type, input)
   end
 
   -- Execute command
-  awful.spawn.easy_async_with_shell(cmd, function()
-    set_selected_task(type)
-    task:emit_signal("modified", tag, project, type)
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    -- stdout gives you the task ID
+    print(stdout)
+    local new_id = string.gsub(stdout, "[^0-9]", "")
+
+    -- task:emit_signal("modified", tag, project, type, new_id)
+
+    -- set_new_task_index(type)
+    local signal = "modified::" .. type
+    task:emit_signal(signal, tag, project, input, new_id)
   end)
 end)
 
 return {
   ["m"] = modeswitch, -- enter modify mode
-  ["H"] = {["function"] = handle_key, ["args"] = "H"}, -- help menu
+  -- ["H"] = {["function"] = handle_key, ["args"] = "H"}, -- help menu
   ["a"] = {["function"] = handle_key, ["args"] = "a"}, -- add new task
   ["x"] = {["function"] = handle_key, ["args"] = "x"}, -- delete
   ["s"] = {["function"] = handle_key, ["args"] = "s"}, -- toggle start
