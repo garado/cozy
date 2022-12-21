@@ -59,8 +59,10 @@ local taglist_widget = wibox.widget({
 
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄ 
 -- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀ 
+
 local function create_tag_button(tag)
   local tag_wibox = wibox.widget({
+    id      = tag,
     markup  = colorize(tag, beautiful.fg),
     align   = "center",
     font    = beautiful.font_name .. "11",
@@ -76,7 +78,7 @@ local function create_tag_button(tag)
   return tag_wibox, nav_tag
 end
 
-task:connect_signal("update::tag_list", function()
+task:connect_signal("taglist::update_all", function()
   tag_list:reset()
   nav_tags:remove_all_items()
   nav_tags:reset()
@@ -89,6 +91,17 @@ task:connect_signal("update::tag_list", function()
   end
 
   nav_tags.widget = taskbox:new(taglist_widget)
+end)
+
+task:connect_signal("taglist::add", function(_, tag)
+  local tag_wibox, tag_nav = create_tag_button(tag)
+  tag_list:add(tag_wibox)
+  nav_tags:append(tag_nav)
+end)
+
+-- TODO fix this
+task:connect_signal("taglist::remove", function(_, tag)
+  -- local tag_wibox = tag_list.children[1]:get_children_by_id(tag)[1]
 end)
 
 return function()

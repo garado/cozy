@@ -45,6 +45,7 @@ local function create_task_wibox(task_table)
   desc = desc:gsub("%^l", string.upper)
   local taskname_color = start and beautiful.green or beautiful.fg
   local taskname = wibox.widget({
+    id = "description",
     markup = colorize(desc, taskname_color),
     font = beautiful.font_name .. "12",
     ellipsize = "end",
@@ -53,6 +54,7 @@ local function create_task_wibox(task_table)
 
   local due_text, due_color = format_due_date(due)
   local due_ = wibox.widget({
+    id = "due",
     markup = colorize(due_text, due_color or beautiful.fg_sub),
     font = beautiful.font_name .. "12",
     halign = "right",
@@ -115,7 +117,7 @@ end
 ----
 
 --- Draw all tasks for a project
-task:connect_signal("update::tasks", function(_, tag, project)
+task:connect_signal("update::tasks", function(_, _, _)
   nav_tasklist:remove_all_items()
   nav_tasklist:reset()
   tasklist:reset()
@@ -148,20 +150,59 @@ end)
 --- Remove a task from the task list and task keynav hierarchy
 -- Note: this is called *after* task has been removed from data table
 task:connect_signal("tasklist::remove", function()
-  local index_to_remove = task:get_focused_task_index()
+  local index_to_remove = task:focused_task_index()
   remove_task_wibox(index_to_remove)
   nav_tasklist:remove_index(index_to_remove)
   update_wibox_index()
 
+  if #nav_tasklist.items == 0 then return end
+
   -- Cursor will stay in the same position post removal
-  nav_tasklist:set_curr_item(index_to_remove)
+  -- Unless there are no more tasks
+  -- (Unless you're removing the last one in the list, or there are no more tasks)
+  local new_nav_index = index_to_remove
+  local last_task_index = #task:get_pending_tasks()
+  print('last task index is '..last_task_index)
+  if index_to_remove == last_task_index + 1 then
+    new_nav_index = new_nav_index - 1
+  end
+  print('new nav index is '..new_nav_index)
 
   -- The self.index field is used to set task.focused_task_index
   -- whenever a new task navitem is selected
   -- Must update these indices when you alter the order
-  for i = index_to_remove, #nav_tasklist.items do
+  for i = new_nav_index, #nav_tasklist.items do
     nav_tasklist.items[i].index = i
   end
+
+  nav_tasklist:set_curr_item(new_nav_index)
+end)
+
+task:connect_signal("tasklist::update_task_name", function(_, index, new_desc)
+  local modtask = tasklist.children[1].children[index]
+  local desc_wibox = modtask:get_children_by_id("description")[1]
+  new_desc = new_desc:gsub("%^l", string.upper)
+  desc_wibox:set_markup_silently(colorize(new_desc, beautiful.fg))
+end)
+
+task:connect_signal("tasklist::update_task_due", function(_, index, due)
+  local modtask = tasklist.children[1].children[index]
+  local due_wibox = modtask:get_children_by_id("due")[1]
+  local due_text, due_color = format_due_date(due)
+  due_wibox:set_markup_silently(colorize(due_text, due_color))
+end)
+
+--- Toggle start/stop: change text color between white (stopped) and green (started)
+task:connect_signal("tasklist::update_start", function(_, index, desc, is_started)
+  local modtask = tasklist.children[1].children[index]
+  local desc_wibox = modtask:get_children_by_id("description")[1]
+  local markup
+  if is_started then
+    markup = colorize(desc, beautiful.fg)
+  else
+    markup = colorize(desc, beautiful.green)
+  end
+  desc_wibox:set_markup_silently(markup)
 end)
 
 return function()

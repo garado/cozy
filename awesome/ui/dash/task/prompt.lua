@@ -78,7 +78,7 @@ task:connect_signal("key::input_request", function(_, type)
     ["mod_name"]  = task:get_focused_task_desc(),
   }
 
-  local prompt  = pango_bold(prompt_options[type], beautiful.fg) or ""
+  local prompt  = (prompt_options[type] and pango_bold(prompt_options[type], beautiful.fg)) or ""
   local text    = text_options[type] or ""
 
   -- Modify and Start take no textbox input - they just execute

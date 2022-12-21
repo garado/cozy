@@ -80,9 +80,11 @@ task:connect_signal("key::input_completed", function(_, type, input)
       end
     end
   elseif type == "start" then
-    if task["start"] then
+    if _task["start"] then
+      print('stopping task')
       cmd = "task " .. id .. " stop"
     else
+      print('starting task')
       cmd = "task " .. id .. " start"
     end
   end
@@ -99,6 +101,7 @@ task:connect_signal("key::input_completed", function(_, type, input)
   end
 
   -- Execute command
+  if type == "start" then cmd = "echo 'hi'" end -- TEMPORARY
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     -- stdout gives you the task ID
     print(stdout)
@@ -106,7 +109,6 @@ task:connect_signal("key::input_completed", function(_, type, input)
 
     -- task:emit_signal("modified", tag, project, type, new_id)
 
-    -- set_new_task_index(type)
     local signal = "modified::" .. type
     task:emit_signal(signal, tag, project, input, new_id)
   end)

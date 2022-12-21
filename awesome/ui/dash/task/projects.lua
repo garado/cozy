@@ -61,12 +61,18 @@ nav_projects.widget = taskbox:new(projects_widget)
 
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄ 
 -- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀ 
-local function create_project_button(project)
-  local tag = task:get_focused_tag()
+
+local function create_project_button_markup(tag, project)
   local per = task:get_proj_completion_percentage(tag, project)
   local text = project.." ("..per.. "%)"
-  local markup = colorize(text, beautiful.fg)
+  return colorize(text, beautiful.fg)
+end
+
+local function create_project_button(tag, project)
+  print(project)
+  local markup = create_project_button_markup(tag, project)
   local textbox = wibox.widget({
+    id = project,
     markup = markup,
     align = "center",
     forced_height = dpi(20),
@@ -80,22 +86,32 @@ local function create_project_button(project)
   end
 
   return textbox, nav_project
-end -- end create_project_button
+end
 
 task:connect_signal("project_list::update_all", function(_, tag)
-  if tag == task:get_focused_tag() then
-    project_list:reset()
-    nav_projects:remove_all_items()
-    nav_projects:reset()
-    for project, _ in pairs(task:get_projects(tag)) do
-      local btn, nav = create_project_button(project)
-      project_list:add(btn)
-      nav_projects:append(nav)
-    end
+  project_list:reset()
+  nav_projects:remove_all_items()
+  nav_projects:reset()
+  for project, _ in pairs(task:get_projects(tag)) do
+    local textbox, nav = create_project_button(tag, project)
+    project_list:add(textbox)
+    nav_projects:append(nav)
   end
 end)
 
 task:connect_signal("project_list::update", function(_, tag, project)
+  print('projectlist update')
+  print(project)
+  print(project_list)
+  local textbox = project_list.children[1]:get_children_by_id(project)[1]
+
+  if not textbox then
+    print('error: textbox wibox is nil for '..tag..', '..project)
+    return
+  end
+
+  local markup = create_project_button_markup(tag, project)
+  textbox:set_markup_silently(markup)
 end)
 
 return function()
