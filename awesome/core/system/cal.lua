@@ -5,10 +5,10 @@
 -- For interfacing with Google Calendar through gcalcli
 
 local gobject = require("gears.object")
-local gtable = require("gears.table")
-local gfs = require("gears.filesystem")
-local awful = require("awful")
-local core = require("helpers.core")
+local gtable  = require("gears.table")
+local gfs     = require("gears.filesystem")
+local awful   = require("awful")
+local core    = require("helpers.core")
 
 local cal = { }
 local instance = nil

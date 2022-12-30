@@ -65,7 +65,7 @@ local function create_tag_button(tag)
     id      = tag,
     markup  = colorize(tag, beautiful.fg),
     align   = "center",
-    font    = beautiful.font_name .. "11",
+    font    = beautiful.base_small_font,
     widget  = wibox.widget.textbox,
     forced_height = dpi(20),
   })

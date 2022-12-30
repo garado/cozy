@@ -32,15 +32,35 @@ theme.wallpaper = gears.surface.load_uncached(colorscheme.wall_path)
 
 -- █▀▀ █▀█ █▄░█ ▀█▀ █▀
 -- █▀░ █▄█ █░▀█ ░█░ ▄█
--- theme.font_name = "DisposableDroid BB "
--- theme.font = theme.font_name .. "Regular "
--- theme.alt_font_name = theme.font_name
--- theme.alt_font = theme.alt_font_name .. "Regular "
 
-theme.font_name = "RobotoMono Nerd Font Mono "
-theme.font = theme.font_name .. "Regular "
-theme.alt_font_name = "Roboto "
-theme.alt_font = theme.alt_font_name .. "Regular "
+-- ROBOTO/ROBOTOMONO
+-- theme.font_name = "RobotoMono Nerd Font Mono "
+-- theme.alt_font_name = "Roboto "
+-- theme.font      = theme.font_name .. "Regular "
+-- theme.alt_font  = theme.alt_font_name .. "Regular "
+-- theme.base_xsmall_font = theme.font .. " 10"
+-- theme.base_small_font  = theme.font .. " 12"
+-- theme.base_med_font    = theme.font .. " 20"
+-- theme.base_large_font  = theme.font .. " 25"
+-- theme.alt_small_font  = theme.alt_font .. " 12"
+-- theme.alt_med_font    = theme.alt_font .. " 20"
+-- theme.alt_large_font  = theme.alt_font .. " 25"
+
+-- BEDSTEAD/DISPOSABLEDROID
+theme.font_name     = "Bedstead "
+theme.alt_font_name = "DisposableDroid BB "
+theme.font      = theme.font_name .. "Regular "
+theme.alt_font  = theme.alt_font_name .. "Regular "
+
+theme.base_xsmall_font = theme.font .. " 10"
+theme.base_small_font  = theme.font .. " 12"
+theme.base_med_font    = theme.font .. " 15"
+theme.base_large_font  = theme.font .. " 20"
+
+theme.alt_small_font  = theme.alt_font .. " 12"
+theme.alt_med_font    = theme.alt_font .. " 20"
+theme.alt_large_font  = theme.alt_font .. " 25"
+theme.alt_xlarge_font = theme.alt_font .. " 32"
 
 -- █░█ █   █▀▀ █░░ █▀▀ █▀▄▀█ █▀▀ █▄░█ ▀█▀ █▀
 -- █▄█ █   ██▄ █▄▄ ██▄ █░▀░█ ██▄ █░▀█ ░█░ ▄█
@@ -210,8 +230,7 @@ theme.tabbar_fg_normal = colors.bg_l3
 theme.useless_gap = dpi(7)
 
 -- Borders
--- theme.border_width = dpi(3)
-theme.border_width = dpi(0)
+theme.border_width = dpi(3)
 theme.border_color_active = colors.main_accent
 theme.border_color_normal = colors.bg_l1
 

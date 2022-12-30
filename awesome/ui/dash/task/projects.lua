@@ -9,6 +9,7 @@ local dpi       = require("beautiful.xresources").apply_dpi
 local colorize  = require("helpers.ui").colorize_text
 local wheader   = require("helpers.ui").create_dash_widget_header
 local task      = require("core.system.task")
+local remove_pango = require("helpers.dash").remove_pango
 
 local area = require("modules.keynav.area")
 local taskbox = require("modules.keynav.navitem").Taskbox
@@ -68,19 +69,34 @@ local function create_project_button_markup(tag, project)
   return colorize(text, beautiful.fg)
 end
 
-local function create_project_button(tag, project)
-  print(project)
+local function create_project_button(tag, project, index)
   local markup = create_project_button_markup(tag, project)
   local textbox = wibox.widget({
-    id = project,
-    markup = markup,
-    align = "center",
+    id      = project,
+    markup  = markup,
+    align   = "center",
+    font    = beautiful.base_small_font,
     forced_height = dpi(20),
-    font = beautiful.font_name .. "11",
-    widget = wibox.widget.textbox,
+    widget  = wibox.widget.textbox,
   })
 
   local nav_project = tasks_textbox:new(textbox)
+  nav_project.index = index
+
+  function nav_project:select_on()
+    self.selected = true
+    local text    = remove_pango(self.widget.text)
+    local mkup    = colorize(text, beautiful.main_accent)
+    self.widget:set_markup_silently(mkup)
+  end
+
+  function nav_project:select_off()
+    self.selected = false
+    local text    = remove_pango(self.widget.text)
+    local mkup    = colorize(text, beautiful.fg)
+    self.widget:set_markup_silently(mkup)
+  end
+
   function nav_project:release()
     task:emit_signal("selected::project", project)
   end
@@ -92,15 +108,16 @@ task:connect_signal("project_list::update_all", function(_, tag)
   project_list:reset()
   nav_projects:remove_all_items()
   nav_projects:reset()
+  local index = 1
   for project, _ in pairs(task:get_projects(tag)) do
-    local textbox, nav = create_project_button(tag, project)
+    local textbox, nav = create_project_button(tag, project, index)
     project_list:add(textbox)
     nav_projects:append(nav)
+    index = index + 1
   end
 end)
 
 task:connect_signal("project_list::update", function(_, tag, project)
-  print('projectlist update')
   print(project)
   print(project_list)
   local textbox = project_list.children[1]:get_children_by_id(project)[1]
@@ -112,6 +129,9 @@ task:connect_signal("project_list::update", function(_, tag, project)
 
   local markup = create_project_button_markup(tag, project)
   textbox:set_markup_silently(markup)
+end)
+
+task:connect_signal("project_list::add", function(_, project)
 end)
 
 return function()

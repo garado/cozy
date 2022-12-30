@@ -4,9 +4,9 @@
 
 -- Handles backend for dashboard.
 
-local cozy = require("core.cozy.cozy")
+local cozy    = require("core.cozy.cozy")
 local gobject = require("gears.object")
-local gtable = require("gears.table")
+local gtable  = require("gears.table")
 
 local dash = { }
 local instance = nil

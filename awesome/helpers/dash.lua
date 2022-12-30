@@ -64,7 +64,7 @@ end
 function _dash.widget_header(text)
   return wibox.widget({
     markup = ui.colorize_text(text, beautiful.dash_header_fg),
-    font = beautiful.alt_font_name .. "Light 20",
+    font = beautiful.alt_large_font,
     align = "center",
     valign = "center",
     widget = wibox.widget.textbox,

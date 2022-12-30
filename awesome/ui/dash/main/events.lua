@@ -23,17 +23,19 @@ local function create_calendar_entry(date, time, desc)
   local datetime_text = date .. " " .. time
 
   local datetime = wibox.widget({
-    markup = colorize(datetime_text, beautiful.fg),
-    align = "left",
-    valign = "center",
-    widget = wibox.widget.textbox,
+    markup  = colorize(datetime_text, beautiful.fg),
+    align   = "left",
+    valign  = "center",
+    font    = beautiful.base_small_font,
+    widget  = wibox.widget.textbox,
   })
 
   local _desc = wibox.widget({
-    markup = colorize("   " .. desc, beautiful.fg),
-    align = "left",
-    valign = "center",
-    widget = wibox.widget.textbox,
+    markup  = colorize("   " .. desc, beautiful.fg),
+    align   = "left",
+    valign  = "center",
+    font    = beautiful.base_small_font,
+    widget  = wibox.widget.textbox,
   })
 
   return wibox.widget({
@@ -45,11 +47,11 @@ end
 
 -- Uhows when there are no events to display
 local placeholder = wibox.widget({
-  markup = colorize("No events found", beautiful.fg),
-  align = "center",
-  valign = "center",
-  font = beautiful.font_name .. "12",
-  widget = wibox.widget.textbox,
+  markup  = colorize("No events found", beautiful.fg),
+  align   = "center",
+  valign  = "center",
+  font    = beautiful.base_small_font,
+  widget  = wibox.widget.textbox,
 })
 
 local header = wibox.widget({

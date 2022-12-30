@@ -15,6 +15,7 @@ local dash_header = require("helpers").ui.create_dash_widget_header
 local widgets = require("ui.widgets")
 local config = require("config")
 local string = string
+local dash = require("core.cozy.dash")
 
 local Elevated = require("modules.keynav.navitem").Elevated
 local Dashwidget = require("modules.keynav.navitem").Dashwidget
@@ -253,7 +254,7 @@ awesome.connect_signal("dash::update_timew", function()
 end)
 
 -- Only update widget whenever dashboard is opened
-awesome.connect_signal("dash::opened", function()
+dash:connect_signal("updatestate::open", function()
   read_timew_state()
   --update_timew_information()
 end)

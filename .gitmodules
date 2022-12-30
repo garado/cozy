@@ -10,3 +10,6 @@
 [submodule "awesome/modules/awesome-widgets"]
 	path = awesome/modules/awesome-widgets
 	url = git@github.com:garado/awesome-widgets.git
+[submodule "awesome/modules/awesome-keyboard-nav"]
+	path = awesome/modules/awesome-keyboard-nav
+	url = git@github.com:garado/awesome-keyboard-nav.git

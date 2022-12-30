@@ -3,9 +3,11 @@
 -- █░█ ██▄ ░█░ ▄█ 
 
 -- Custom keys for managing tasks in the tasklist widget.
+-- Handles executing Taskwarrior commands.
 
-local awful = require("awful")
-local task  = require("core.system.task")
+local awful   = require("awful")
+local task    = require("core.system.task")
+local core    = require("helpers.core")
 
 local function request(type)
   if not type then return end
@@ -28,6 +30,7 @@ local function handle_key(key)
     ["t"] = "new_tag",
     ["n"] = "next",
     ["H"] = "help",
+    ["R"] = "reload",
     ["/"] = "search",
   }
 
@@ -43,7 +46,6 @@ local function handle_key(key)
     if modify[key] then
       request(modify[key])
     else
-      request("mod_clear")
       request("mod_clear")
     end
     task.in_modify_mode = false
@@ -63,15 +65,17 @@ task:connect_signal("key::input_completed", function(_, type, input)
 
   if type == "add" then
     cmd = "task add proj:'"..project.."' tag:'"..tag.."' '"..input.."'"
-  elseif type == "delete" then
+  end
+
+  if type == "delete" then
     if input == "y" or input == "Y" then
       cmd = "echo 'y' | task delete " .. id
-    end
-  elseif  type == "done" then
+    else return end
+  elseif type == "done" then
     if input == "y" or input == "Y" then
       cmd = "echo 'y' | task done " .. id
-    end
-  elseif  type == "search" then
+    else return end
+  elseif type == "search" then
     local tasks = task._private.tags[tag].projects[project].tasks
     for i = 1, #tasks do
       if tasks[i]["description"] == input then
@@ -81,12 +85,15 @@ task:connect_signal("key::input_completed", function(_, type, input)
     end
   elseif type == "start" then
     if _task["start"] then
-      print('stopping task')
       cmd = "task " .. id .. " stop"
     else
-      print('starting task')
       cmd = "task " .. id .. " start"
     end
+  elseif type == "reload" then
+    if input == "y" or input == "Y" then
+      task:reset()
+    end
+    return
   end
 
   -- Modal modify requests
@@ -101,13 +108,17 @@ task:connect_signal("key::input_completed", function(_, type, input)
   end
 
   -- Execute command
-  if type == "start" then cmd = "echo 'hi'" end -- TEMPORARY
-  awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    -- stdout gives you the task ID
-    print(stdout)
-    local new_id = string.gsub(stdout, "[^0-9]", "")
+  awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
+    -- Check for invalid date
+    if string.find(stderr, "is not a valid date") then return end
 
-    -- task:emit_signal("modified", tag, project, type, new_id)
+    -- Stdout gives you new task id; need to store in local database
+    -- Stdout looks like: Modifying task ### 'Task name'.
+    local words = core.split(' ', stdout)
+    local new_id = words[3]
+
+    -- If nothing was modified, stdout looks like: Modified 0 tasks.
+    if words[2] == "0" then return end
 
     local signal = "modified::" .. type
     task:emit_signal(signal, tag, project, input, new_id)
@@ -121,10 +132,11 @@ return {
   ["x"] = {["function"] = handle_key, ["args"] = "x"}, -- delete
   ["s"] = {["function"] = handle_key, ["args"] = "s"}, -- toggle start
   ["u"] = {["function"] = handle_key, ["args"] = "u"}, -- undo
-  ["d"] = {["function"] = handle_key, ["args"] = "d"}, -- done, (modify) due date
-  ["p"] = {["function"] = handle_key, ["args"] = "p"}, -- add new project, (modify) project
-  ["t"] = {["function"] = handle_key, ["args"] = "t"}, -- add new tag, (modify) task
-  ["n"] = {["function"] = handle_key, ["args"] = "n"}, -- next, (modify) taskname
+  ["d"] = {["function"] = handle_key, ["args"] = "d"}, -- done; (modify) due date
+  ["p"] = {["function"] = handle_key, ["args"] = "p"}, -- add new project; (modify) project
+  ["t"] = {["function"] = handle_key, ["args"] = "t"}, -- add new tag; (modify) task
+  ["n"] = {["function"] = handle_key, ["args"] = "n"}, -- next; (modify) taskname
+  ["R"] = {["function"] = handle_key, ["args"] = "R"}, -- restart + reload all tasks
   ["/"] = {["function"] = handle_key, ["args"] = "/"}, -- search
   ["Escape"] = {["function"] = handle_key, ["args"] = "Escape"}, -- (modify) clear
 }

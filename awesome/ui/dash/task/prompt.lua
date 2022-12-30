@@ -3,6 +3,7 @@
 -- █▀▀ █▀▄ █▄█ █░▀░█ █▀▀ ░█░ 
 
 -- A text field to get user input for adding and modifying tasks.
+-- This only handles the prompt, not any commands.
 
 local beautiful   = require("beautiful")
 local xresources  = require("beautiful.xresources")
@@ -15,6 +16,9 @@ local pango_bold  = require("helpers.core").pango_bold
 local task = require("core.system.task")
 
 -------------------------
+
+-- █▀▀ █▀█ █▀▄▀█ █▀█ █░░ █▀▀ ▀█▀ █ █▀█ █▄░█ █▀ 
+-- █▄▄ █▄█ █░▀░█ █▀▀ █▄▄ ██▄ ░█░ █ █▄█ █░▀█ ▄█ 
 
 local function desc_search_callback(command_before_comp, cur_pos_before_comp, ncomp)
   local tasks = task:get_pending_tasks()
@@ -29,10 +33,34 @@ local function desc_search_callback(command_before_comp, cur_pos_before_comp, nc
   return awful.completion.generic(command_before_comp, cur_pos_before_comp, ncomp, searchtasks)
 end
 
+--- BUG this errors on tab completion when you have text written
+local function project_search_callback(command_before_comp, cur_pos_before_comp, ncomp)
+  local projects = task:project_names(task:focused_tag())
+  return awful.completion.generic(command_before_comp, cur_pos_before_comp, ncomp, projects)
+end
+
+--- BUG this errors on tab completion when you have text written
+local function tag_search_callback(command_before_comp, cur_pos_before_comp, ncomp)
+  local tags = task:tag_names()
+  return awful.completion.generic(command_before_comp, cur_pos_before_comp, ncomp, tags)
+end
+
+local function get_completion_callback(type)
+  local ret = nil
+  if type == "search" then
+    ret = desc_search_callback
+  elseif type == "mod_proj" then
+    ret = project_search_callback
+  elseif type == "mod_tag"  then
+    ret = tag_search_callback
+  end
+  return ret
+end
+
 -------------------------
 
 local prompt_textbox = wibox.widget({
-  font = beautiful.font,
+  font = beautiful.base_small_font,
   widget = wibox.widget.textbox,
 })
 
@@ -41,8 +69,11 @@ local prompt_textbox = wibox.widget({
 -- @param prompt The prompt to display.
 -- @param text The initial textbox text.
 local function task_input(type, prompt, text)
-  local default_prompt = pango_bold(type..": ", beautiful.fg)
+  local comp_callback   = get_completion_callback(type)
+  local default_prompt  = pango_bold(type..": ", beautiful.fg)
+
   awful.prompt.run {
+    font         = beautiful.base_small_font,
     prompt       = prompt or default_prompt,
     text         = text or "",
     fg           = beautiful.fg,
@@ -54,24 +85,27 @@ local function task_input(type, prompt, text)
       if not input or #input == 0 then return end
       task:emit_signal("key::input_completed", type, input)
     end,
-    completion_callback = desc_search_callback,
+    completion_callback = comp_callback,
   }
 end
 
+--- Generates the prompt to display based on type of input requested,
+-- then calls function to actually start the prompt
 task:connect_signal("key::input_request", function(_, type)
   print("prompt::caught input_request signal")
 
   local prompt_options = {
-    ["add"]       = "Add task: ",
-    ["modify"]    = "Modify: " .. " (d) due date, (n) task name, (p) project, (t) tag",
-    ["done"]      = "Mark as done? (y/n) ",
-    ["delete"]    = "Delete task? (y/n) ",
+    ["add"]       = "Add quest: ",
+    ["modify"]    = "Modify: " .. "(d) due date, (n) quest name, (p) project, (t) tag",
+    ["done"]      = "Complete quest? (y/n) ",
+    ["delete"]    = "Abandon quest? (y/n) ",
+    ["reload"]    = "Reload quests? (y/n) ",
     ["undo"]      = "",
     ["search"]    = "/",
     ["mod_proj"]  = "Modify project: ",
     ["mod_tag"]   = "Modify tag: ",
     ["mod_due"]   = "Modify due date: ",
-    ["mod_name"]	= "Modify task name: ",
+    ["mod_name"]	= "Modify quest name: ",
   }
 
   local text_options = {

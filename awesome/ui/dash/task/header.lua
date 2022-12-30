@@ -9,7 +9,6 @@ local wibox       = require("wibox")
 local xresources  = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local animation   = require("modules.animation")
-local textbox     = require("ui.widgets.text")
 local colorize    = require("helpers.ui").colorize_text
 local task        = require("core.system.task")
 
@@ -18,23 +17,23 @@ local task        = require("core.system.task")
 
 local name = wibox.widget({
   markup = colorize("Project name", beautiful.fg),
-  font = beautiful.alt_font .. "25",
+  font   = beautiful.alt_large_font,
   halign = "left",
   valign = "center",
   widget = wibox.widget.textbox,
 })
 
-local subheader = textbox({
-  text = "Tag",
-  color = beautiful.fg,
-  font = beautiful.font,
-  size = 10,
-  halign = "left",
+local subheader = wibox.widget({
+  markup  = colorize("Tag", beautiful.fg),
+  color   = beautiful.fg,
+  font    = beautiful.base_xsmall_font,
+  halign  = "left",
+  widget = wibox.widget.textbox,
 })
 
 local percent_completion = wibox.widget({
   markup = colorize("0%", beautiful.fg),
-  font = beautiful.alt_font .. "Light 25",
+  font   = beautiful.alt_large_font,
   halign = "right",
   valign = "center",
   widget = wibox.widget.textbox,

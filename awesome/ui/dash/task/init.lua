@@ -12,7 +12,7 @@ local task = require("core.system.task")
 
 local tag_list, nav_tags      = require(... .. ".tags")()
 local projects, nav_projects  = require(... .. ".projects")()
-local tasklist, nav_tasklist  = require(... .. ".tasks")()
+local tasklist, nav_tasklist  = require(... .. ".tasklist.tasks")()
 local header  = require(... .. ".header")
 local prompt  = require(... .. ".prompt")
 
@@ -33,7 +33,16 @@ end)
 
 --------
 
+local colorize = require("helpers.ui").colorize_text
+
 local sidebar = wibox.widget({
+  wibox.widget({
+    markup = colorize("Questlog", beautiful.fg),
+    font   = beautiful.alt_xlarge_font,
+    align  = "center",
+    valign = "center",
+    widget = wibox.widget.textbox,
+  }),
   tag_list,
   projects,
   -- stats,
@@ -41,33 +50,24 @@ local sidebar = wibox.widget({
   forced_height = dpi(730),
   layout = wibox.layout.ratio.vertical,
 })
-sidebar:adjust_ratio(2, unpack({0.4, 0.4, 0.2}))
+-- sidebar:adjust_ratio(2, unpack({0.4, 0.4, 0.2}))
+sidebar:adjust_ratio(2, unpack({0.075, 0.425, 0.5}))
 
 local rightside = wibox.widget({
   {
     {
       header,
       vpad(dpi(15)),
-      {
-        -- {
-        --   scrollbar_cont,
-        --   tasklist,
-        --   layout = wibox.layout.align.horizontal,
-        -- },
-        tasklist,
-        height = dpi(800),
-        --height = max_tasklist_height,
-        widget = wibox.container.constraint,
-      },
+      tasklist,
       layout = wibox.layout.fixed.vertical,
     },
-    top = dpi(15),
-    bottom = dpi(20),
-    left = dpi(25),
-    right = dpi(25),
-    widget = wibox.container.margin,
+    top     = dpi(15),
+    bottom  = dpi(20),
+    left    = dpi(25),
+    right   = dpi(25),
+    widget  = wibox.container.margin,
   },
-  forced_width = dpi(600),
+  forced_width = dpi(800),
   bg = beautiful.dash_widget_bg,
   shape = gears.shape.rounded_rect,
   widget = wibox.container.background,

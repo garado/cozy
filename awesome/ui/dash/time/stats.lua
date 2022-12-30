@@ -37,7 +37,7 @@ local function get_stats(data)
   for day = 1, #data.days do
     total_hours = total_hours + day
 
-    if data.days[day] > highest_hours then
+    if (data.days[day]) and (data.days[day] > highest_hours) then
       highest_hours = data.days[day]
       highest_day = day
     end
