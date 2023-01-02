@@ -29,7 +29,7 @@ colorscheme.colors.accents = {
   "#333333",
   "#9f838d",
   "#9aad90",
-  "#bdb3a0",
+  "#ada390",
   "#7484a2",
   "#a390ad",
   "#90ada3",
@@ -101,8 +101,8 @@ return colorscheme
 -- *color9:  #bda0aa
 -- *.color10: #aabda0
 -- *color10:  #aabda0
--- *.color11: #bdb3a0
--- *color11:  #bdb3a0
+-- *.color11: #bcb29f
+-- *color11:  #bcb29f
 -- *.color12: #7484a2
 -- *color12:  #7484a2
 -- *.color13: #b3a0bd

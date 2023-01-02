@@ -13,7 +13,8 @@ local colorscheme = {
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
 local awesome_cfg = gfs.get_configuration_dir()
-colorscheme.wall_path = awesome_cfg .. "theme/assets/walls/mountain_modified_fuji.png"
+-- colorscheme.wall_path = awesome_cfg .. "theme/assets/walls/mountain_modified_fuji.png"
+colorscheme.wall_path = "/home/alexis/Pictures/Wallpapers/mountain/dark/shore.png"
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
