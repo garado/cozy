@@ -5,8 +5,8 @@
 -- For interfacing with Timewarrior.
 
 local gobject = require("gears.object")
-local gtable = require("gears.table")
-local awful = require("awful")
+local gtable  = require("gears.table")
+local awful   = require("awful")
 
 local time = { }
 local instance = nil
@@ -41,6 +41,18 @@ function time:get_time_per_project(tag, project)
   end)
 end
 
+function time:determine_if_active()
+  local cmd = "timew"
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    if string.gmatch(stdout, "There is no active time tracking.") then
+      self.tracking_active = false
+      self:emit_signal("tracking_inactive")
+    else
+      self.tracking_active = true
+      self:emit_signal("tracking_active")
+    end
+  end)
+end
 
 ---------------------------------------------------------------------
 
@@ -49,6 +61,17 @@ end
 ---------------------------------------------------------------------
 
 function time:new()
+  self:determine_if_active()
+
+  self:connect_signal("set_tracking_inactive", function()
+    self.tracking_active = false
+    self:emit_signal("tracking_inactive")
+  end)
+
+  self:connect_signal("set_tracking_active", function()
+    self.tracking_active = true
+    self:emit_signal("tracking_active")
+  end)
 end
 
 local function new()

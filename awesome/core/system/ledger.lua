@@ -95,7 +95,7 @@ end
 function ledger:parse_transactions_this_month()
   local begin = " --begin " .. os.date("%Y/%m/01") .. " "
   local format = " --balance-format '%A,%T\n'"
-  local cmd = "ledger -f " .. ledger_file .. " bal" .. begin .. "--no-total" .. format
+  local cmd = "ledger -f " .. ledger_file .. " bal" .. begin .. "--no-total" .. format .. " | grep Expenses"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     self._private.total_spent_this_month = 0
 
@@ -116,27 +116,25 @@ function ledger:parse_transactions_this_month()
         end
       end
 
-      -- Needs to have both the category and the amount
+      -- Ensure it has both the category and the amount
       if #t > 1 then
         raw_entries[#raw_entries + 1] = t
       end
     end
 
-    -- The raw output from the loop above is flawed
-    -- It includes the totals for top-level categories and subcategories, but
-    -- I only want top-level
-    -- (try the command yourself for this code to make more sense)
-    -- this is kind of ugly but idk how to get what i want directly from ledger
+    -- The raw output from the loop above totals for top-level category and then a 
+    -- breakdown into subcategories
+    -- I only want want top-level categories
     local month = {}
     for i = 1, #raw_entries do
 
       -- Get category
       local cat = raw_entries[i][1]
-      local tmp = core.split(cat, ":")
+      local tokens = core.split(":", cat)
 
       -- Keep only the top-level category
-      if #tmp >= 2 then
-        local top_category = tmp[2]
+      if #tokens >= 2 then
+        local top_category = tokens[2]
         if not month[top_category] then
           -- Remove dollar sign from the amount
           local amt = string.gsub(raw_entries[i][2], "[^0-9.]", "")

@@ -29,12 +29,13 @@ local cash,   nav_cash    = require("ui.dash.finances")()
 local tasks,  nav_tasks   = require("ui.dash.task")()
 local time                = require("ui.dash.time")()
 --   local time,   nav_time    = require("ui.dash.time")()
-local journal = require(... .. ".journal")
+local journal, nav_journal = require(... .. ".journal")()
 local agenda  = require("ui.dash.agenda")
 
-local tablist =   { main,     tasks,      time,   cash,     journal,  agenda }
-local tab_icons = { "",      "",        "",    "",      "",      ""    }
-local navitems =  { nav_main, nav_tasks,  nil,    nav_cash, nil,      nil }
+local tablist   = { main,     tasks,      time,   cash,     agenda,   journal,      }
+local tabnames  = { "main",   "tasks",    "time", "cash",   "agenda", "journal",    }
+local tab_icons = { "",      "",        "",    "",      "",      "",          }
+local navitems  = { nav_main, nav_tasks,  nil,    nav_cash, nil,      nav_journal,  }
 
 --- Display a specific tab on the dashboard
 -- @param i The tab number.
@@ -62,6 +63,8 @@ local function switch_tab(i)
 
   nav_root:reset()
   navigator.curr_area = navigator.root
+
+  dashcore:emit_signal("tabswitch", tabnames[i])
 end
 
 nav_root.keys = {

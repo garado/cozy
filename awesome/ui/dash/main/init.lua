@@ -14,13 +14,13 @@ local nav_main = Area:new({ name = "main" })
 local nav_habit, habit = require("ui.dash.main.habit")()
 local nav_timewarrior, timewarrior = require("ui.dash.main.timewarrior")()
 
-local profile = require(... .. ".profile")
-local events  = require(... .. ".events")
-local tasks   = require(... .. ".tasks")
-local music   = require(... .. ".music_player")
-local goals   = require(... .. ".goals")
-local monthly_spending = require("ui.dash.main.monthly_spending")
-local timedate = require("ui.dash.main.timedate")
+local profile   = require(... .. ".profile")
+local events    = require(... .. ".events")
+local tasks     = require(... .. ".tasks")
+local music     = require(... .. ".music")
+local goals     = require(... .. ".goals")
+local ledger    = require(... .. ".ledger")
+local timedate  = require(... .. ".timedate")
 
 nav_main:append(nav_timewarrior)
 nav_main:append(nav_habit)
@@ -46,7 +46,7 @@ local widget = wibox.widget({
     {
       events,
       tasks,
-      monthly_spending,
+      ledger,
       forced_width = dpi(550),
       layout = wibox.layout.fixed.vertical,
     },
