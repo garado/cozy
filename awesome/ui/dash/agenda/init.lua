@@ -7,12 +7,18 @@ local beautiful = require("beautiful")
 local colorize = require("helpers").ui.colorize_text
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local gobject = require("gears.object")
+local area = require("modules.keynav.area")
 
-local keygrabber = require("ui.dash.agenda.keygrabber")
-local calendar  = require("ui.dash.agenda.calendar")
-local upcoming  = require("ui.dash.agenda.upcoming")
-local deadlines = require("ui.dash.agenda.deadlines")
+local calendar    = require(... .. ".calendar")
+local deadlines   = require(... .. ".deadlines")
+local prompt      = require(... .. ".prompt")
+local events, nav_events = require(... .. ".eventlist")()
+
+-- Keynav
+local nav_agenda = area:new({
+  name = "agenda"
+})
+nav_agenda:append(nav_events)
 
 local header = wibox.widget({
   markup = colorize("This week", beautiful.main_accent),
@@ -30,11 +36,15 @@ local widget = wibox.widget({
     layout = wibox.layout.fixed.vertical,
   },
   {
-    upcoming,
+    events,
+    prompt,
+    spacing = dpi(5),
     layout = wibox.layout.fixed.vertical,
   },
   spacing = dpi(10),
   layout = wibox.layout.fixed.horizontal,
 })
 
-return widget
+return function()
+  return widget, nav_agenda
+end

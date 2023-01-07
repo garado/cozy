@@ -72,7 +72,7 @@ local function create_week_label()
 
   for i = 1, 7, 1 do
     local label = wibox.widget({
-      markup    = colorize(labels[i], beautiful.fg),
+      markup    = colorize(labels[i], beautiful.fg_sub),
       font      = beautiful.font_name .. "11",
       forced_width = dpi(35),
       align     = "center",
@@ -152,6 +152,12 @@ local function create_month_widget(month, year)
     calgrid:add(day)
   end
 
+  -- Change today's color
+  -- TODO new theme variable for today color
+  local today = tonumber(os.date("%d"))
+  local today_wibox = calgrid.children[today].children[1]
+  today_wibox:set_markup_silently(colorize(today, beautiful.red))
+
   return wibox.widget({
     calgrid,
     widget = wibox.container.constraint,
@@ -171,7 +177,7 @@ local _thisyear = os.date("%Y")
 
 local month_label = wibox.widget({
   markup  = colorize(os.date("%B %Y"), beautiful.fg),
-  font    = beautiful.font_name .. "17",
+  font    = beautiful.alt_large_font,
   align   = "center",
   valign  = "center",
   widget  = wibox.widget.textbox,
@@ -192,6 +198,9 @@ local calendar = wibox.widget({
 })
 
 local _calendar = box(calendar, dpi(450), dpi(420), beautiful.dash_widget_bg)
+
+-- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
+-- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
 
 cal:connect_signal("ready::month_events", function()
   local month = create_month_widget(_thismonth, _thisyear)

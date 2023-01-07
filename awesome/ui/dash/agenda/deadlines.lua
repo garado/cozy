@@ -2,6 +2,8 @@
 -- █▀▄ █▀▀ ▄▀█ █▀▄ █░░ █ █▄░█ █▀▀ █▀ 
 -- █▄▀ ██▄ █▀█ █▄▀ █▄▄ █ █░▀█ ██▄ ▄█ 
 
+-- TODO refactor using core
+
 local beautiful = require("beautiful")
 local colorize = require("helpers").ui.colorize_text
 local box = require("helpers").ui.create_boxed_widget
@@ -68,13 +70,14 @@ generate_tasklist()
 local widget = wibox.widget({
   wibox.widget({
     markup  = colorize("Due this week", beautiful.fg),
-    font    = beautiful.font_name .. "17",
+    font    = beautiful.alt_large_font,
     align   = "center",
     valign  = "center",
     widget  = wibox.widget.textbox,
   }),
   tasklist,
-  layout = wibox.layout.fixed.vertical,
+  spacing = dpi(8),
+  layout  = wibox.layout.fixed.vertical,
 })
 
 return box(widget, dpi(0), dpi(400), beautiful.dash_widget_bg)
