@@ -3,7 +3,7 @@
 -- █▀▀ █▀▄ █▄█ █░▀░█ █▀▀ ░█░ 
 
 -- A text field to get user input for adding and modifying tasks.
--- This only handles the prompt, not any commands.
+-- This only handles the prompt, not generating or executing any commands.
 
 local beautiful   = require("beautiful")
 local xresources  = require("beautiful.xresources")
@@ -27,11 +27,9 @@ local prompt_textbox = wibox.widget({
 -- @param prompt The prompt to display.
 -- @param text The initial textbox text.
 local function agenda_input(type, prompt, text)
-  local default_prompt  = pango_bold(type..": ", beautiful.fg)
-
   awful.prompt.run {
     font         = beautiful.base_small_font,
-    prompt       = prompt or default_prompt,
+    prompt       = prompt,
     text         = text or "",
     fg           = beautiful.fg,
     bg           = beautiful.task_prompt_textbg,
@@ -40,7 +38,6 @@ local function agenda_input(type, prompt, text)
     textbox      = prompt_textbox,
     exe_callback = function(input)
       if not input or #input == 0 then return end
-
       agenda:emit_signal("input::complete", type, input)
     end,
     }
@@ -49,10 +46,16 @@ end
 --- Generates the prompt to display based on type of input requested,
 -- then calls function to actually start the prompt
 agenda:connect_signal("input::request", function(_, type)
-  print("prompt::caught input_request signal")
-
   local prompt_options = {
-    ["add"]       = "Add event (title ; location ; when ; duration): ",
+    ["add_title"] = "Adding new event...\nTitle: ",
+    ["add_when"]  = "Adding new event...\nWhen: ",
+    ["add_dur"]   = "Adding new event...\nDuration: ",
+    ["add_loc"]   = "Adding new event...\nLocation: ",
+    ["add_confirm"] = "(s)ave or edit: (t)itle, (w)hen, (d)uration, (l)ocation\n" ..
+      (agenda.add_title or "") ..
+      " at "     .. (agenda.add_loc or "-") ..
+      ", starting at " .. (agenda.add_when or "-") ..
+      " for " .. (agenda.add_dur or "-") .. " ",
     ["modify"]    = "Modify: (t)itle (l)ocation (w)hen (d)uration ",
     ["delete"]    = "Delete event? (y/n) ",
     ["refresh"]   = "Refresh events? (y/n) ",

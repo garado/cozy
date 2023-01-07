@@ -17,13 +17,6 @@ local cache_path = gfs.get_cache_dir() .. "cal"
 local curmonth  = os.date("%m")
 local curdate   = os.date("%d")
 
-local addtypes = {
-  TITLE = 1,
-  LOCATION = 2,
-  WHEN = 3,
-  DURATION = 4,
-}
-
 ---------------------------------------------------------------------
 
 --- Checks if the cache is empty. If empty then gcalcli probably needs to be reauthenticated.
@@ -63,7 +56,7 @@ function agenda:fetch_month(year, month)
   year  = year or os.date("%Y")
   month = month or curmonth
 
-  -- cat cache_path | grep 2022-07
+  -- Command looks like: cat cache_path | grep 2022-07
   local date = year .. "-" .. string.format("%02d", month)
   local grep = "grep " .. date
   local cmd = "cat " .. cache_path .. " | "  .. grep
@@ -126,10 +119,37 @@ end
 -- █▀▀ █▀█ █▀▄▀█ █▀▄▀█ ▄▀█ █▄░█ █▀▄ █▀ 
 -- █▄▄ █▄█ █░▀░█ █░▀░█ █▀█ █░▀█ █▄▀ ▄█ 
 
--- Editing events in gcalcli is done interactively with stdin,
--- so we have to jump through a few odd hoops to execute the edit command through dashboard
--- Example: to edit the title of an event, the command would look like
+--- For some reason some gcalcli add only take durations in minutes, so this is
+-- converts more human-readable inputs like 2h 15m, 3d, 20m, etc into minutes.
+-- @param dur A duration or string of space-separated durations in the form #H, #D, #M, etc.
+local function convert_duration(dur)
+  local thingies = core.split(' ', dur)
+
+  local factor = {
+    ["m"] = 1,
+    ["h"] = 60,
+    ["d"] = 24 * 60,
+  }
+
+  local minutes = 0
+  for i = 1, #thingies do
+    local type = string.sub(thingies[i], -1) -- isolate H, M, or D
+    type = string.lower(type)
+
+    local numstr = string.sub(thingies[i], 1, -2) -- isolate number
+    local num = tonumber(numstr)
+
+    minutes = minutes + (factor[type] * num)
+  end
+
+  return minutes
+end
+
+-- Editing events in gcalcli is done interactively with stdin, so we have
+-- to jump through a few odd hoops to execute the edit command through dashboard
+-- Example: to edit the title of an event, the command would look like:
 -- ( echo "t" & echo "newtitle" & echo "s"  & cat ) | gcalcli edit Eventtitle 2023-01-06
+-- @param arr Array of inputs to pipe to gcalcli. In the example above, arr == { "t", "newtitle", "s" }
 local function genpipecmd(arr)
   local function _echo(input)
     return ' echo \"' .. input .. '\" '
@@ -145,32 +165,80 @@ local function genpipecmd(arr)
   return pipecmd .. ' cat )'
 end
 
---- Build gcalcli command based on input and input type, then execute.
+--- Build command based on input and input type, then execute.
+-- @param type The input type
+-- @param input The user input
 function agenda:execute_request(_, type, input)
-  local title = self.cur_title or ""
-  local date  = self.cur_date or ""
-  print('CORE: caught input::request:' .. type .. ' for event ' .. title .. ' on ' .. date)
+  if type == "refresh" then
+    self:update_cache()
+    return
+  end
 
   local cmd = ""
 
-  if type == "add" then
-    -- Split on semicolons
-    local fields = core.split(';', input)
-    local title = " --title " .. fields[addtypes.TITLE]
-    local loc   = " --where " .. fields[addtypes.LOCATION]
-    local dur   = " --duration " .. fields[addtypes.DURATION]
-    local when  = " --when " .. fields[addtypes.WHEN]
-    cmd = "gcalcli add" .. title .. loc .. dur .. when .. " --noprompt"
+  --- Add command requires multiple consecutive inputs
+  if type == "add_title" then
+    self.add_title = input
+    local signal = self.return_to_confirm and "add_confirm" or "add_when"
+    self:emit_signal("input::request", signal)
+    return
   end
+
+  if type == "add_when" then
+    self.add_when = input
+    local signal = self.return_to_confirm and "add_confirm" or "add_dur"
+    self:emit_signal("input::request", signal)
+    return
+  end
+
+  if type == "add_dur" then
+    self.add_dur = convert_duration(input)
+    local signal = self.return_to_confirm and "add_confirm" or "add_loc"
+    self:emit_signal("input::request", signal)
+    return
+  end
+
+  if type == "add_loc" then
+    self.add_loc = input
+    self:emit_signal("input::request", "add_confirm")
+    return
+  end
+
+  if type == "add_confirm" and (input == "s" or input == "S") then
+    self.return_to_confirm = false
+    local titlecmd = self.add_title and " --title "    .. self.add_title or ""
+    local loccmd   = self.add_loc   and " --where "    .. self.add_loc or ""
+    local durcmd   = self.add_dur   and " --duration " .. self.add_dur or ""
+    local whencmd  = self.add_when  and " --when "     .. self.add_when or ""
+    cmd = "gcalcli add " .. titlecmd .. loccmd .. durcmd .. whencmd .. " --noprompt"
+  end
+
+  if type == "add_confirm" and (input ~= "s" and input ~= "S") then
+    self.return_to_confirm = true
+
+    if input == "t" then
+      self:emit_signal("input::request", "add_title")
+    elseif input == "w" then
+      self:emit_signal("input::request", "add_when")
+    elseif input == "d" then
+      self:emit_signal("input::request", "add_dur")
+    elseif input == "l" then
+      self:emit_signal("input::request", "add_loc")
+    end
+
+    return
+  end
+
+  ------- end add command handling
+
+  local title = self.cur_title or ""
+  local date  = self.cur_date or ""
 
   if type == "delete" then
     cmd = "echo 'y' | gcalcli delete '" .. title .. "' " .. date
   end
 
-  if type == "refresh" then
-    self:update_cache()
-    return
-  end
+  --- edit commands
 
   local gcalcli_edit_cmd = "gcalcli edit '" .. title .. "' " .. date
 
@@ -190,9 +258,8 @@ function agenda:execute_request(_, type, input)
     cmd = genpipecmd({ 'g', input, 's', 'q'}) .. ' | ' .. gcalcli_edit_cmd
   end
 
-  print('CORE: ' .. cmd)
   awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
-    print('STDOUT:\n' .. stdout)
+    print('CORE: ' .. cmd)
     print('STDERR:\n' .. stderr)
   end)
 end

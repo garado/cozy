@@ -6,7 +6,6 @@
 
 local beautiful = require("beautiful")
 local colorize = require("helpers").ui.colorize_text
-local box = require("helpers").ui.create_boxed_widget
 local header = require("helpers").dash.widget_header
 local wibox = require("wibox")
 local xresources = require("beautiful.xresources")
@@ -80,4 +79,4 @@ local widget = wibox.widget({
   layout  = wibox.layout.fixed.vertical,
 })
 
-return box(widget, dpi(0), dpi(400), beautiful.dash_widget_bg)
+return widget

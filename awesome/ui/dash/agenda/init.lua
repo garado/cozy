@@ -9,30 +9,22 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local area = require("modules.keynav.area")
 
-local calendar    = require(... .. ".calendar")
-local deadlines   = require(... .. ".deadlines")
-local prompt      = require(... .. ".prompt")
-local events, nav_events = require(... .. ".eventlist")()
+local calendar = require(... .. ".calendar")
+local prompt   = require(... .. ".prompt")
+local infobox, nav_infobox  = require(... .. ".infobox")()
+local events, nav_events    = require(... .. ".eventlist")()
 
 -- Keynav
 local nav_agenda = area:new({
   name = "agenda"
 })
+nav_agenda:append(nav_infobox)
 nav_agenda:append(nav_events)
 
-local header = wibox.widget({
-  markup = colorize("This week", beautiful.main_accent),
-  font    = beautiful.font_name .. "17",
-  --font = beautiful.alt_font_name .. "Light 30",
-  align = "center",
-  widget = wibox.widget.textbox,
-})
-
-local widget = wibox.widget({
+local main_contents = wibox.widget({
   {
-    -- header,
     calendar,
-    deadlines,
+    infobox,
     layout = wibox.layout.fixed.vertical,
   },
   {
@@ -46,5 +38,5 @@ local widget = wibox.widget({
 })
 
 return function()
-  return widget, nav_agenda
+  return main_contents, nav_agenda
 end

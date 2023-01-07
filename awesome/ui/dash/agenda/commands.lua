@@ -15,7 +15,7 @@ local curmode = 1
 local commands = {
   ["normal"] = {
     ["R"] = "refresh",
-    ["a"] = "add",
+    ["a"] = "add_title",
     ["d"] = "delete",
     ["m"] = "modify",
   },
