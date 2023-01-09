@@ -14,6 +14,7 @@ local area    = require("modules.keynav.area")
 local navtext = require("modules.keynav.navitem").Textbox
 local box = require("helpers.ui").create_boxed_widget
 local colorize = require("helpers.ui").colorize_text
+local prompt   = require("ui.dash.agenda.prompt")
 
 local MAX_EVENTS_SHOWN = 21
 
@@ -175,15 +176,35 @@ cal:connect_signal("input::request_get_info", function(_, type)
   cal:emit_signal("input::request", type)
 end)
 
+local header = wibox.widget({
+  markup  = colorize("Upcoming Events", beautiful.fg),
+  font    = beautiful.alt_large_font,
+  align   = "center",
+  valign  = "center",
+  widget  = wibox.widget.textbox,
+  -----
+})
+
+cal:connect_signal("selected::date", function(_, date)
+  local mkup = colorize("January "..date, beautiful.fg)
+  header:set_markup_silently(colorize(mkup, beautiful.fg))
+end)
+
+cal:connect_signal("deselected", function()
+  local mkup = colorize("Upcoming Events", beautiful.fg)
+  header:set_markup_silently(mkup)
+end)
+
 local widget = wibox.widget({
-  wibox.widget({
-    markup  = colorize("Upcoming Events", beautiful.fg),
-    font    = beautiful.alt_large_font,
-    align   = "center",
-    valign  = "center",
-    widget  = wibox.widget.textbox,
-  }),
+  header,
   event_list,
+  wibox.widget({
+    color = beautiful.bg_l3,
+    forced_height = dpi(5),
+    span_ratio = 0.95,
+    widget = wibox.widget.separator,
+  }),
+  prompt,
   spacing = dpi(15),
   layout = wibox.layout.fixed.vertical,
 })

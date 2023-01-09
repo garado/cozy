@@ -13,8 +13,7 @@ local colorscheme = {
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
 local awesome_cfg = gfs.get_configuration_dir()
--- colorscheme.wall_path = awesome_cfg .. "theme/assets/walls/mountain_modified_fuji.png"
-colorscheme.wall_path = "/home/alexis/Pictures/Wallpapers/mountain/dark/shore.png"
+colorscheme.wall_path = awesome_cfg .. "theme/colorschemes/mountain/fuji.png"
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
@@ -43,6 +42,14 @@ colorscheme.colors.red         = "#c49ea0"
 colorscheme.colors.green       = "#89ab8a"
 colorscheme.colors.yellow      = "#c4c19e"
 colorscheme.colors.transparent = "#ffffff00"
+
+colorscheme.colors.gradient = {
+  [0] = "#191919",
+  [1] = "#333539",
+  [2] = "#4e545d",
+  [3] = "#6b7584",
+  [4] = "#8a98ac",
+}
 
 -- █▀█ █░█ █▀▀ █▀█ █▀█ █ █▀▄ █▀▀ 
 -- █▄█ ▀▄▀ ██▄ █▀▄ █▀▄ █ █▄▀ ██▄ 
