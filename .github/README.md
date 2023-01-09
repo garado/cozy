@@ -1,14 +1,12 @@
 <h1 align="center">cozy</h1>
 
 <p align="center">
-  <img title="" src="assets/animation_demo.gif">
+  <img title="" src="assets/showcase.png" width="900">
 </p>
 
 <p>
 Hi! This is <b>cozy</b>, my Arch config with <a href="https://awesomewm.org" target="_blank">AwesomeWM</a>. Thanks for checking it out!
 </p>
-
-<h2>⚠️ This project is undergoing heavy refactoring. It probably won't work on your machine. It's best used as just a reference for now.</h2>
 
 <p>
   The primary goals of this setup are to create an environment that:
@@ -19,6 +17,9 @@ Hi! This is <b>cozy</b>, my Arch config with <a href="https://awesomewm.org" tar
 <li>integrates all the cli tools I use to manage my life into a nice dashboard</li>
 <li>looks awesome!</li>
 </ol>
+
+<h2>⚠️ This project is undergoing heavy refactoring. It probably won't work on your machine. It's best used as just a reference for now.</h2>
+<p>Support is limited to nonexistent as I'm busy with school.</p>
 
 <h2>🚀 Features</h2>
 <h3>Dashboard</h3>
@@ -36,8 +37,6 @@ Hi! This is <b>cozy</b>, my Arch config with <a href="https://awesomewm.org" tar
 <li>Fancy finances (with <a href="https://github.com/ledger/" target="_blank">Ledger</a>)</li>
 <li>(WIP) Different tabs to show even more information!</li>
 </ul>
-
-<b>Like the dashboard but don't want to use AwesomeWM? There's a work-in-progress <a href="https://github.com/garado/dashboard" target="_blank">rewrite of the dashboard in Flutter</a>.</b>
 
 <h4>To do list applet (Taskwarrior)</h4>
 <p align="center">
