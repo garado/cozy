@@ -6,7 +6,6 @@
 
 local beautiful = require("beautiful")
 local colorize = require("helpers").ui.colorize_text
-local header = require("helpers").dash.widget_header
 local wibox = require("wibox")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
@@ -15,6 +14,13 @@ local json = require("modules.json")
 local format_due_date = require("helpers").dash.format_due_date
 
 local tasklist = wibox.widget({
+  wibox.widget({
+    markup = colorize("No tasks due this week. Yay!", beautiful.fg_sub),
+    font   = beautiful.base_small_font,
+    align  = "center",
+    valign = "center",
+    widget = wibox.widget.textbox,
+  }),
   spacing = dpi(5),
   layout = wibox.layout.flex.vertical,
 })
@@ -22,7 +28,6 @@ local tasklist = wibox.widget({
 --- Creates a task wibox.
 -- @param desc Task description.
 -- @param due Task due date.
--- @return A new task wibox.
 local function create_task(desc, due)
   local desc_wibox = wibox.widget({
     markup = colorize(desc, beautiful.fg),
@@ -55,6 +60,7 @@ local function generate_tasklist()
   local cmd = "task +WEEK export rc.json.array=on"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local json_arr = json.decode(stdout)
+    if #json_arr > 0 then tasklist:reset() end
     for i = 1, #json_arr do
       local desc = json_arr[i]["description"]
       local due = json_arr[i]["due"] or ""
@@ -75,7 +81,7 @@ local widget = wibox.widget({
     widget  = wibox.widget.textbox,
   }),
   tasklist,
-  spacing = dpi(8),
+  spacing = dpi(10),
   layout  = wibox.layout.fixed.vertical,
 })
 

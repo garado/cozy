@@ -20,9 +20,6 @@ local color = require("helpers.color")
 -----------------------------------------------------------
 
 -- Module-level variables
-local fday
-local days_in_month
-local calgrid
 
 -----------------------------------------------------------
 
@@ -35,18 +32,18 @@ local calgrid
 -- @param hours   Number of hours.
 local function heat(base, events)
   -- To get the right heat color, we modify the base color's lightness.
-  -- The range of valid lightness values is 0 - 1.
+  -- The range of is_valid lightness values is 0 - 1.
 
-  -- local max_events = 5
-  -- if (hours > 20) then
-  --   hours = max_hours
-  -- end
+  local MAX_EVENTS = 6
+  if (events > MAX_EVENTS) then
+    events = MAX_EVENTS
+  end
 
-  if events > 2 then
-    local lmod = events * 0.015
+  if events >= (MAX_EVENTS / 2) then
+    local lmod = events * 0.08
     return color.pywal_lighten(base, lmod)
   else
-    local lmod = events * 0.04
+    local lmod = events * 0.35
     return color.pywal_darken(base, lmod)
   end
 end
@@ -61,9 +58,7 @@ local accent = beautiful.timew_cal_heatmap_accent
 
 --- Creates SMTWTFS week labels.
 local function create_week_label()
-  local labels = {
-    "S", "M", "T", "W", "T", "F", "S"
-  }
+  local labels = { "S", "M", "T", "W", "T", "F", "S" }
 
   local week_label_cont = wibox.widget ({
     spacing = dpi(20),
@@ -73,10 +68,10 @@ local function create_week_label()
   for i = 1, 7, 1 do
     local label = wibox.widget({
       markup    = colorize(labels[i], beautiful.fg_sub),
-      font      = beautiful.font_name .. "11",
-      forced_width = dpi(35),
+      font      = beautiful.base_small_font,
       align     = "center",
       valign    = "center",
+      forced_width = dpi(35),
       widget    = wibox.widget.textbox,
     })
     week_label_cont:add(label)
@@ -87,18 +82,17 @@ end
 
 --- Create wibox for a single day of the calendar.
 -- @param date    The date (1-31)
--- @param valid   Whether it's a day within this month or not
-local function _create_day(date, valid)
+-- @param is_valid   Whether it's a day within this month or not
+local function create_daybox(date, is_valid)
   local cnt = cal:get_num_events(os.date("%m"), date)
-  local heat_color = (valid and cnt > 0) and heat(accent, cnt) or nil
+  local heat_color = (is_valid and cnt > 0) and heat(accent, cnt) or nil
 
-  local fg = valid > 0 and beautiful.fg or beautiful.fg_sub
+  local fg = is_valid and beautiful.fg or beautiful.fg_sub
 
   local day = wibox.widget({
-    {
-      -- Date
+    { -- Date
       markup  = colorize(date, fg),
-      font    = beautiful.font_name .. "12",
+      font    = beautiful.base_small_font,
       align   = "center",
       valign  = "center",
       widget  = wibox.widget.textbox,
@@ -120,21 +114,25 @@ local function create_month_widget(month, year)
 
   -- Get number of days in the month.
   local _days_in_month = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
-  days_in_month = _days_in_month[tonumber(os.date("%m"))]
+  local days_in_month = _days_in_month[tonumber(os.date("%m"))]
 
-  -- The calendar is laid out as a grid.
-  calgrid = wibox.widget({
+  -- TODO: handle case where month is 5 rows
+  local calgrid = wibox.widget({
     forced_num_cols = 7,
     forced_num_rows = 4,
     orientation = "vertical",
     spacing = dpi(20),
     homogeneous = true,
     layout = wibox.layout.grid,
+    -----
+    get_daybox = function(self, idx)
+      return self.children[idx]
+    end
   })
 
   -- Get date of first day of the month.
   -- This is a number 0-6 (Sunday - Saturday)
-  fday = os.date("%w", os.time{ year=year, month=month, day=1, hour=0, sec=0})
+  local fday = os.date("%w", os.time{ year=year, month=month, day=1, hour=0, sec=0 })
 
   -- If the first day of the month doesn't start on Sunday, then we should
   -- backfill with days from last month
@@ -142,25 +140,32 @@ local function create_month_widget(month, year)
     local days_in_last_month = _days_in_month[tonumber(os.date("%m")) - 1]
     for i = fday - 1, 0, -1 do
       local backfilled_date = days_in_last_month - i
-      local day = _create_day(backfilled_date, -1)
+      local day = create_daybox(backfilled_date, -1)
       calgrid:add(day)
     end
   end
 
   for i = 1, days_in_month do
-    local day = _create_day(i, 1)
+    local day = create_daybox(i, true)
     calgrid:add(day)
   end
 
-  -- Change today's color
-  -- TODO new theme variable for today color
-  local today = tonumber(os.date("%d"))
-  local today_wibox = calgrid.children[today].children[1]
-  today_wibox:set_markup_silently(colorize(today, beautiful.red))
+  -- If the last day of the month doesn't end on Saturday (day of week == 6),
+  -- fill with days from next month
+  local lday = os.date("%w", os.time{ year=year, month=month, day=days_in_month, hour=0, sec=0 })
+  for i = 1, 6 - lday do
+    local day = create_daybox(i, false)
+    calgrid:add(day)
+  end
+
+  -- Change today's daybox color
+  local today = os.date("%d")
+  local todaybox = calgrid:get_daybox(tonumber(today))
+  todaybox.bg = beautiful.purple or beautiful.red
 
   return wibox.widget({
     calgrid,
-    widget = wibox.container.constraint,
+    widget = wibox.container.place,
   })
 end
 
@@ -184,28 +189,39 @@ local month_label = wibox.widget({
 })
 
 local calendar = wibox.widget({
-  {
-    {
-      month_label,
-      create_week_label(),
-      spacing = dpi(20),
-      layout = wibox.layout.fixed.vertical,
-    },
-    margins = dpi(20),
-    widget = wibox.container.margin,
-  },
-  widget = wibox.container.constraint,
+  month_label,
+  create_week_label(),
+  spacing = dpi(20),
+  layout = wibox.layout.fixed.vertical,
+  -----
+  get_daybox = function(self, idx)
+    self.children[3]:get_daybox(idx)
+  end,
+  update = function(self, month, year)
+    local monthwidget = create_month_widget(month, year)
+    if not self.children[3] then
+      self:add(monthwidget)
+    else
+      self:set(3, monthwidget)
+    end
+  end
 })
 
-local _calendar = box(calendar, dpi(450), dpi(420), beautiful.dash_widget_bg)
+local calendar_container = wibox.widget({
+  {
+    calendar,
+    margins = dpi(10),
+    widget = wibox.container.margin,
+  },
+  widget = wibox.container.place,
+})
 
 -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
 
 cal:connect_signal("ready::month_events", function()
-  local month = create_month_widget(_thismonth, _thisyear)
-  local ugh = calendar.children[1].children[1]
-  ugh:add(month)
+  calendar:update(_thismonth, _thisyear)
 end)
 
-return _calendar
+local final_widget = box(calendar_container, dpi(430), dpi(400), beautiful.dash_widget_bg)
+return final_widget

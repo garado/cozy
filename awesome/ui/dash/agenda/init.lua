@@ -30,8 +30,8 @@ local main_contents = wibox.widget({
   {
     events,
     prompt,
-    spacing = dpi(5),
-    layout = wibox.layout.fixed.vertical,
+    spacing = dpi(10),
+    layout  = wibox.layout.fixed.vertical,
   },
   spacing = dpi(10),
   layout = wibox.layout.fixed.horizontal,

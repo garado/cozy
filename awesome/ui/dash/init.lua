@@ -14,6 +14,8 @@ local area = require("modules.keynav.area")
 local dashtab = require("modules.keynav.navitem").Dashtab
 local nav = require("modules.keynav").navigator
 
+local init = false
+
 local navigator, nav_root = nav:new()
 
 local nav_tabs = area:new({
@@ -30,12 +32,12 @@ local tasks,  nav_tasks   = require("ui.dash.task")()
 local time                = require("ui.dash.time")()
 --   local time,   nav_time    = require("ui.dash.time")()
 local journal, nav_journal = require(... .. ".journal")()
-local agenda  = require("ui.dash.agenda")
+local agenda, nav_agenda  = require("ui.dash.agenda")()
 
-local tablist   = { main,     tasks,      time,   cash,     agenda,   journal,      }
-local tabnames  = { "main",   "tasks",    "time", "cash",   "agenda", "journal",    }
-local tab_icons = { "",      "",        "",    "",      "",      "",          }
-local navitems  = { nav_main, nav_tasks,  nil,    nav_cash, nil,      nav_journal,  }
+local tablist   = { main,     tasks,      agenda,     cash,     time,   journal,     }
+local tabnames  = { "main",   "tasks",    "agenda",   "cash",   "time", "journal",   }
+local tab_icons = { "",      "",        "",        "",      "",    "",         }
+local navitems  = { nav_main, nav_tasks,  nav_agenda, nav_cash, nil,    nav_journal, }
 
 --- Display a specific tab on the dashboard
 -- @param i The tab number.
@@ -144,6 +146,12 @@ dashcore:connect_signal("updatestate::open", function()
   dash.visible = true
   navigator:start()
   dashcore:emit_signal("newstate::opened")
+
+  -- Ledger arc chart animation needs tabswitch signal to trigger
+  if not init then
+    switch_tab(1)
+    init = true
+  end
 end)
 
 dashcore:connect_signal("updatestate::close", function()
@@ -172,9 +180,6 @@ dash = awful.popup({
     layout = wibox.layout.align.horizontal,
   }),
 })
-
-switch_tab(1)
-
 
 return function(_) -- s
 end

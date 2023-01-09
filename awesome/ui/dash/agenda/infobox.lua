@@ -15,18 +15,22 @@ local dpi = xresources.apply_dpi
 local area = require("modules.keynav.area")
 local Background = require("modules.keynav.navitem").Background
 
-local deadlines = require("ui.dash.agenda.deadlines")
 local weather   = require("ui.dash.agenda.weather")
+local deadlines = require("ui.dash.agenda.deadlines")
+local goals     = require("ui.dash.agenda.goals")
 
--- █░█ █ 
--- █▄█ █ 
+local infobox_widgets = { weather, deadlines, goals }
 
---- Creates a single indicator widget.
-local function indicator(color)
-  color = color or beautiful.fg
+local NEXT = 1
+local PREV = -1
+
+-- █░█ █
+-- █▄█ █
+
+local function indicator()
   return wibox.widget({
     {
-      bg = color,
+      bg = beautiful.bg_l3,
       forced_width  = 6,
       forced_height = 6,
       shape = gears.shape.circle,
@@ -36,57 +40,64 @@ local function indicator(color)
   })
 end
 
-local indicator_container = wibox.widget({
-  indicator(beautiful.main_accent),
-  indicator(),
+local indicators = wibox.widget({
   spacing = dpi(6),
-  layout = wibox.layout.fixed.horizontal,
+  layout  = wibox.layout.fixed.horizontal,
+  -----
+  cur_active = 1,
+  set_active = function(self, index)
+    self.children[self.cur_active].children[1].bg = beautiful.bg_l3
+    self.children[index].children[1].bg = beautiful.main_accent
+    self.cur_active = index
+  end,
+  init = function(self)
+    for _ = 1, #infobox_widgets do
+      self:add(indicator())
+    end
+    self:set_active(1)
+  end
 })
+indicators:init()
 
 local infobox = wibox.widget({
   {
-    deadlines,
-    nil,
+    {
+      infobox_widgets[1],
+      forced_height = dpi(300),
+      widget = wibox.container.place,
+    },
     wibox.widget({
-      indicator_container,
+      indicators,
       widget = wibox.container.place,
     }),
-    spacing = dpi(20),
     layout = wibox.layout.fixed.vertical,
   },
-  margins = dpi(20),
+  margins = dpi(5),
   widget = wibox.container.margin,
+  -----
+  set = function(self, widget)
+    self.children[1].children[1].widget = widget
+  end,
 })
-
-local infobox_cont = box(infobox, dpi(0), dpi(350), beautiful.dash_widget_bg)
 
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄ 
 -- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀ 
 
-local infobox_widgets = { deadlines, weather }
-
-local cur_infobox_index = 1
+local cur_index = 1
 
 --- Changes the widget displayed in the infobox.
--- @param direction An integer -1 or 1. -1 means cycle left, 1 means cycle right.
+-- @param direction NEXT or PREV (1 or -1)
 local function switch_view(direction)
-  -- Update old indicator
-  local oldindicator = indicator_container.children[cur_infobox_index].children[1]
-  oldindicator.bg = beautiful.fg
-
-  -- Get new infobox index
-  if direction > 0 then
-    cur_infobox_index = cur_infobox_index + 1
-    if cur_infobox_index > #infobox_widgets then cur_infobox_index = 1 end
-  else
-    cur_infobox_index = cur_infobox_index - 1
-    if cur_infobox_index == 0 then cur_infobox_index = #infobox_widgets end
+  if direction == NEXT then
+    cur_index = cur_index + 1
+    if cur_index > #infobox_widgets then cur_index = 1 end
+  elseif direction == PREV then
+    cur_index = cur_index - 1
+    if cur_index == 0 then cur_index = #infobox_widgets end
   end
 
-  -- Change widget and indicator
-  infobox.children[1]:set(1, infobox_widgets[cur_infobox_index])
-  local curindicator = indicator_container.children[cur_infobox_index].children[1]
-  curindicator.bg = beautiful.main_accent
+  indicators:set_active(cur_index)
+  infobox:set(infobox_widgets[cur_index])
 end
 
 -- Keyboard navigation
@@ -94,10 +105,12 @@ local nav_infobox = area:new({
   name = "infobox",
   circular = true,
   keys = {
-    ["h"] = {["function"] = switch_view, ["args"] = -1},
-    ["l"] = {["function"] = switch_view, ["args"] = 1},
+    ["h"] = {["function"] = switch_view, ["args"] = PREV},
+    ["l"] = {["function"] = switch_view, ["args"] = NEXT},
   },
 })
+
+local infobox_cont = box(infobox, dpi(0), dpi(350), beautiful.dash_widget_bg)
 
 local navbox = Background:new(infobox_cont.children[1])
 nav_infobox:append(navbox)

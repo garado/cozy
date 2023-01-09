@@ -55,7 +55,7 @@ agenda:connect_signal("input::request", function(_, type)
       (agenda.add_title or "") ..
       " at "     .. (agenda.add_loc or "-") ..
       ", starting at " .. (agenda.add_when or "-") ..
-      " for " .. (agenda.add_dur or "-") .. " ",
+      " for " .. (agenda.add_dur_unconverted or "-") .. " ",
     ["modify"]    = "Modify: (t)itle (l)ocation (w)hen (d)uration ",
     ["delete"]    = "Delete event? (y/n) ",
     ["refresh"]   = "Refresh events? (y/n) ",
@@ -85,6 +85,7 @@ prompt_textbox_colorized:set_fg(beautiful.fg)
 
 return wibox.widget({
   prompt_textbox_colorized,
-  margins = dpi(15),
+  left   = dpi(15),
+  right  = dpi(15),
   widget = wibox.container.margin,
 })
