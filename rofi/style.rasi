@@ -28,7 +28,7 @@ configuration {
 
 /*****----- Global Properties -----*****/
 * {
-    font:                        "Roboto Mono Nerd Font 10";
+    font:                        "DisposableDroid BB 15";
     background:                  #20242c;
     background-alt:              #2e3440;
     foreground:                  #FFFFFF;
