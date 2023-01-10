@@ -22,24 +22,25 @@ local weather_widget = weather({
   icons = 'pixels',
   icons_extension = '.png',
   show_daily_forecast = true,
+  show_current_forecast = false,
   timeout = 10 * 60, -- 10 min refresh rate
 })
 
--- return wibox.widget({
---   wibox.widget({
---     markup = colorize("Forecast", beautiful.fg),
---     align = "center",
---     valign = "center",
---     font = beautiful.alt_large_font,
---     widget = wibox.widget.textbox,
---   }),
---   {
---     weather_widget,
---     valign = 'center',
---     widget = wibox.container.place,
---   },
---   spacing = dpi(10),
---   layout = wibox.layout.fixed.vertical,
--- })
+local widget = wibox.widget({
+  wibox.widget({
+    markup = colorize("Forecast", beautiful.fg),
+    align = "center",
+    valign = "center",
+    font = beautiful.alt_large_font,
+    widget = wibox.widget.textbox,
+  }),
+  {
+    weather_widget,
+    valign = 'center',
+    widget = wibox.container.place,
+  },
+  spacing = dpi(10),
+  layout = wibox.layout.fixed.vertical,
+})
 
-return weather_widget
+return widget

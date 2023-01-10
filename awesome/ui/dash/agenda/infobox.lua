@@ -105,8 +105,8 @@ local nav_infobox = area:new({
   name = "infobox",
   circular = true,
   keys = {
-    ["h"] = {["function"] = switch_view, ["args"] = PREV},
-    ["l"] = {["function"] = switch_view, ["args"] = NEXT},
+    ["h"] = { f = function() switch_view(PREV) end },
+    ["l"] = { f = function() switch_view(NEXT) end },
   },
 })
 

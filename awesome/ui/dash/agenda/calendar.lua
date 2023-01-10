@@ -11,6 +11,7 @@ local beautiful = require("beautiful")
 local dpi = xresources.apply_dpi
 local area = require("modules.keynav.area")
 local navbase = require("modules.keynav.navitem").Base
+local navbg = require("modules.keynav.navitem").Background
 local gears = require("gears")
 local cal = require("core.system.cal")
 
@@ -24,14 +25,27 @@ local today = tonumber(os.date("%d"))
 
 local febdays = (tonumber(os.date("%Y")) % 400 == 0 and 29) or 28
 local DAYS_IN_MONTH = { 31, febdays, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
+local MONTH_NAMES = { "January", "February", "March", "April", "May",
+  "June", "July", "August", "September", "October", "November", "December" }
 
-local nav_gcal = area:new({
-  name = "nav_gcal",
+local NEXT = 1
+local PREV = -1
+
+local calendar
+
+local nav_dayboxes = area:new({
+  name = "nav_dayboxes",
   circular = true,
   is_grid = true,
   grid_cols = 7,
   -- grid_rows = 5, -- TODO what if it isn't 5!!!
 })
+
+local nav_cal = area:new({ name = "nav_cal" })
+
+nav_cal.keys = {
+  ["t"] = { f = function() calendar:jump_to_today() end }
+}
 
 -----------------------------------------------------------
 
@@ -42,13 +56,12 @@ local nav_gcal = area:new({
 -- @param base    Middle color
 -- @param hours   Number of hours.
 local function heat(base, events)
-  -- To get the right heat color, we modify the base color's lightness.
-  -- The range of valid lightness values is 0 - 1.
-
   local MAX_EVENTS = 5
   events = events > MAX_EVENTS and MAX_EVENTS or events
 
   -- Shitty default algorithm
+  -- To get the right heat color, we modify the base color's lightness.
+  -- The range of valid lightness values is 0 - 1.
   if not beautiful.gradient then
     if events > (MAX_EVENTS / 2) then
       local lmod = events * 0.1
@@ -97,8 +110,8 @@ end
 --- Create wibox and navitem for a single day of the calendar.
 -- @param date    The date (1-31)
 -- @param is_valid   True if day within month to display, false otherwise
-local function create_daybox(date, is_valid)
-  local cnt = cal:get_num_events(os.date("%m"), date)
+local function create_daybox(date, month, is_valid)
+  local cnt = cal:get_num_events(month, date)
   local heat_color = (is_valid and cnt > 0) and heat(beautiful.main_accent, cnt) or nil
 
   local fg = is_valid and beautiful.fg or beautiful.fg_sub
@@ -122,6 +135,7 @@ local function create_daybox(date, is_valid)
   -- New class for keyboard navigation
   local navday = navbase:new(day)
   navday.date = date
+
   function navday:select_on()
     self.selected = true
     self.widget.border_width = dpi(3)
@@ -131,6 +145,7 @@ local function create_daybox(date, is_valid)
       self.widget.border_color = beautiful.fg
     end
   end
+
   function navday:select_off()
     self.selected = false
     self.widget.border_width = dpi(0)
@@ -148,15 +163,15 @@ end
 -- @param month   The month (as an integer).
 -- @param year    The year.
 local function create_month_widget(month, year)
-  local days_in_month = DAYS_IN_MONTH[tonumber(os.date("%m"))]
+  local days_in_month = DAYS_IN_MONTH[month]
 
   -- TODO: handle case where month is not 5 rows
   local calgrid = wibox.widget({
     forced_num_cols = 7,
     orientation = "vertical",
-    spacing = dpi(20),
     homogeneous = true,
-    layout = wibox.layout.grid,
+    spacing = dpi(20),
+    layout  = wibox.layout.grid,
     -----
     get_daybox = function(self, idx)
       return self.children[idx]
@@ -170,27 +185,27 @@ local function create_month_widget(month, year)
   -- If the first day of the month doesn't start on Sunday, then we should
   -- backfill with days from last month
   if fday ~= 0 then
-    local last_month_idx = tonumber(os.date("%m")) - 1
+    local last_month_idx = month - 1
     if last_month_idx == 0 then last_month_idx = 12 end
     local days_last_month = DAYS_IN_MONTH[last_month_idx]
     for i = fday - 1, 0, -1 do
       local backfilled_date = days_last_month - i
-      local day = create_daybox(backfilled_date, -1)
+      local day = create_daybox(backfilled_date, month, false)
       calgrid:add(day)
     end
   end
 
   for i = 1, days_in_month do
-    local day, navday = create_daybox(i, true)
+    local day, navday = create_daybox(i, month, true)
     calgrid:add(day)
-    nav_gcal:append(navday)
+    nav_dayboxes:append(navday)
   end
 
   -- If the last day of the month doesn't end on Saturday (day of week == 6),
   -- fill with days from next month
   local lday = os.date("%w", os.time{ year=year, month=month, day=days_in_month, hour=0, sec=0 })
   for i = 1, 6 - lday do
-    local day = create_daybox(i, false)
+    local day = create_daybox(i, month, false)
     calgrid:add(day)
   end
 
@@ -212,36 +227,107 @@ end
 
 -- Putting all of the wiboxes together.
 
--- Get this month and year
-local _thismonth = os.date("%m")
-local _thisyear = os.date("%Y")
-
 local month_label = wibox.widget({
+  id      = "month_label",
   markup  = colorize(os.date("%B %Y"), beautiful.fg),
   font    = beautiful.alt_large_font,
   align   = "center",
   valign  = "center",
   widget  = wibox.widget.textbox,
+  ----
+  set_label = function(self, monthnum, year)
+    local text = MONTH_NAMES[monthnum] .. " " .. year
+    self:set_markup_silently(colorize(text, beautiful.fg))
+  end
 })
 
-local calendar = wibox.widget({
-  month_label,
+-- Buttons to move forwards/backwards
+local function create_button(dir)
+  local text = dir == NEXT and "&gt;" or "&lt;"
+  local btn = wibox.widget({
+    {
+      markup = colorize(text, beautiful.fg),
+      align  = "center",
+      valign = "center",
+      forced_width = dpi(50),
+      font   = beautiful.base_xsmall_font,
+      widget = wibox.widget.textbox,
+    },
+    forced_width = dpi(20),
+    shape  = gears.shape.circle,
+    widget = wibox.container.background,
+  })
+
+  local nav_calbtn = navbg:new(btn)
+  nav_calbtn.bg_on = beautiful.main_accent
+  nav_calbtn.bg_off = nil
+
+  function nav_calbtn:release()
+    calendar:iter_month(dir)
+  end
+
+  return btn, nav_calbtn
+end
+
+local next_btn, nav_nextbtn = create_button(NEXT)
+local prev_btn, nav_prevbtn = create_button(PREV)
+
+local nav_calbtns = area:new({ name = "nav_calbtns "})
+nav_calbtns:append(nav_prevbtn)
+nav_calbtns:append(nav_nextbtn)
+
+nav_cal:append(nav_calbtns)
+nav_cal:append(nav_dayboxes)
+
+calendar = wibox.widget({
+  {
+    prev_btn,
+    month_label,
+    next_btn,
+    layout = wibox.layout.align.horizontal,
+  },
   create_week_label(),
   spacing = dpi(20),
   layout = wibox.layout.fixed.vertical,
-  -----
-  get_daybox = function(self, idx)
-    self.children[3]:get_daybox(idx)
-  end,
-  update = function(self, month, year)
-    local monthwidget = create_month_widget(month, year)
-    if not self.children[3] then
-      self:add(monthwidget)
-    else
-      self:set(3, monthwidget)
-    end
-  end
 })
+
+function calendar:get_daybox(idx)
+  self.children[3]:get_daybox(idx)
+end
+
+function calendar:update(month, year)
+  self.month = month
+  self.year  = year
+  nav_dayboxes:remove_all_items()
+  local monthwidget = create_month_widget(month, year)
+  if not self.children[3] then
+    self:add(monthwidget)
+  else
+    self:set(3, monthwidget)
+  end
+
+  local mlabel = self.children[1].children[2]
+  mlabel:set_label(month, year)
+end
+
+function calendar:iter_month(dir)
+  local newmonth = self.month + dir
+  local newyear = self.year
+  if newmonth == 0 then
+    newmonth = 12
+    newyear  = self.year - 1
+  elseif newmonth > 12 then
+    newmonth = 1
+    newyear = self.year + 1
+  end
+  -- BUG: get children by id not working
+  -- local mlabel = self:get_children_by_id("month_label")[1]
+  cal:fetch_month(newmonth, newyear)
+end
+
+function calendar:jump_to_today()
+  cal:fetch_month(os.date("%m"), os.date("%Y"))
+end
 
 local calendar_container = wibox.widget({
   {
@@ -252,15 +338,13 @@ local calendar_container = wibox.widget({
   widget = wibox.container.place,
 })
 
--- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
--- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
+local final_widget = box(calendar_container, dpi(430), dpi(400), beautiful.dash_widget_bg)
+-- nav_dayboxes.widget = navbg:new(final_widget.children[1])
 
-cal:connect_signal("ready::month_events", function()
-  calendar:update(_thismonth, _thisyear)
+cal:connect_signal("ready::month_events", function(_, month, year)
+  calendar:update(month, year)
 end)
 
-local final_widget = box(calendar_container, dpi(430), dpi(400), beautiful.dash_widget_bg)
-
 return function()
-  return final_widget, nav_gcal
+  return final_widget, nav_cal
 end

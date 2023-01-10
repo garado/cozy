@@ -18,6 +18,7 @@ local commands = {
     ["a"] = "add_title",
     ["x"] = "delete",
     ["m"] = "modify",
+    ["o"] = "open", -- copy location
   },
   ["modify"] = {
     ["t"]   = "mod_title",
@@ -53,13 +54,14 @@ agenda:connect_signal("input::complete", function()
 end)
 
 return {
-  ["Esc"] = {["function"] = modeswitch,    ["args"] = 1},
-  ["m"]   = {["function"] = request_input, ["args"] = "m"},
-  ["R"]   = {["function"] = request_input, ["args"] = "R"},
-  ["a"]   = {["function"] = request_input, ["args"] = "a"},
-  ["t"]   = {["function"] = request_input, ["args"] = "t"},
-  ["l"]   = {["function"] = request_input, ["args"] = "l"},
-  ["w"]   = {["function"] = request_input, ["args"] = "w"},
-  ["x"]   = {["function"] = request_input, ["args"] = "x"},
-  ["d"]   = {["function"] = request_input, ["args"] = "d"},
+  ["Esc"] = { f = function() modeswitch(1)      end },
+  ["m"]   = { f = function() request_input('m') end },
+  ["R"]   = { f = function() request_input('R') end },
+  ["a"]   = { f = function() request_input('a') end },
+  ["t"]   = { f = function() request_input('t') end },
+  ["l"]   = { f = function() request_input('l') end },
+  ["o"]   = { f = function() request_input('o') end },
+  ["w"]   = { f = function() request_input('w') end },
+  ["x"]   = { f = function() request_input('x') end },
+  ["d"]   = { f = function() request_input('d') end },
 }

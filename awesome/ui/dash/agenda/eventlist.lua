@@ -33,12 +33,17 @@ local function create_event(event)
   local endtime   = cal:get_end_time(event)
   local place     = cal:get_location(event)
 
+  local displaytitle = title
+  if string.find(title, "birthday") or string.find(title, "bday") then
+    displaytitle = " " .. title
+  end
   local name = wibox.widget({
-    markup  = colorize(title, beautiful.fg),
+    markup  = colorize(displaytitle, beautiful.fg),
     align   = "left",
     valign  = "top",
     font    = beautiful.font_name .. "11",
     ellipsize = "end",
+    forced_height = 15,
     forced_width = 220,
     widget  = wibox.widget.textbox,
   })
@@ -55,16 +60,18 @@ local function create_event(event)
     font    = beautiful.font_name .. "11",
     valign = "top",
     ellipsize = "end",
+    forced_height = 15,
     forced_width  = 150,
     widget = wibox.widget.textbox,
   })
 
   local _place = wibox.widget({
-    markup = colorize(place, beautiful.fg),
+    markup  = colorize(place, beautiful.fg),
     font    = beautiful.font_name .. "11",
-    align = "left",
-    valign = "top",
+    align   = "left",
+    valign  = "top",
     ellipsize = "end",
+    forced_height = 15,
     forced_width = 250,
     widget = wibox.widget.textbox,
   })
@@ -85,6 +92,14 @@ local function create_event(event)
   local navevent = navtext:new(name)
   navevent.title = title
   navevent.date  = date
+  navevent.loc   = place
+
+  function navevent:custom_on()
+  end
+
+  function navevent:custom_off()
+  end
+
   return event_wibox, navevent
 end
 
@@ -173,6 +188,7 @@ cal:connect_signal("input::request_get_info", function(_, type)
   local cur_navevent = nav_events:get_curr_item()
   cal.cur_title = cur_navevent.title
   cal.cur_date  = cur_navevent.date
+  cal.cur_loc   = cur_navevent.loc
   cal:emit_signal("input::request", type)
 end)
 

@@ -15,15 +15,13 @@ local remove_pango    = require("helpers.dash").remove_pango
 local format_due_date = require("helpers.dash").format_due_date
 local dpi   = xresources.apply_dpi
 local task  = require("core.system.task")
-local debug = require("core.debug")
 
--- Scroll stuff
 local MAX_TASKS_SHOWN = 21
 local MAX_TASKLIST_HEIGHT = dpi(580)
+
 local first_position_index = 1
 
 -- These overflow containers are for ui elements only
--- The keynav elements do not have containers - they are always present
 local overflow_top    = {}
 local overflow_bottom = {}
 
@@ -34,12 +32,13 @@ end
 -- █▄▀ █▀▀ █▄█ █▄▄ █▀█ ▄▀█ █▀█ █▀▄  
 -- █░█ ██▄ ░█░ █▄█ █▄█ █▀█ █▀▄ █▄▀  
 
-local nav_tasklist
-nav_tasklist = area:new({
+local nav_tasklist = area:new({
   name = "tasklist",
   circular = true,
   keys = require("ui.dash.task.keys.tasklist")
 })
+
+
 
 -- █░█ █
 -- █▄█ █
@@ -320,6 +319,11 @@ end)
 
 task:connect_signal("tasklist::update_task_name", function(_, index, new_desc)
   local modtask = tasklist.children[1].children[index]
+  if not modtask then
+    print("ERROR: MODTASK NIL!! (in task/tasklist/tasks.lua)")
+    print("index is "..index)
+    print('tasklist has ' .. #tasklist.children[1].children)
+  end
   local desc_wibox = modtask:get_children_by_id("description")[1]
   new_desc = new_desc:gsub("%^l", string.upper)
   desc_wibox:set_markup_silently(colorize(new_desc, beautiful.fg))

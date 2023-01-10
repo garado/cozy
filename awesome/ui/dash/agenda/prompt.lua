@@ -56,6 +56,7 @@ agenda:connect_signal("input::request", function(_, type)
       " at "     .. (agenda.add_loc or "-") ..
       ", starting at " .. (agenda.add_when or "-") ..
       " for " .. (agenda.add_dur_unconverted or "-") .. " ",
+    ["open"]      = "Open location link in clipboard? (y/n) ",
     ["modify"]    = "Modify: (t)itle (l)ocation (w)hen (d)uration ",
     ["delete"]    = "Delete event? (y/n) ",
     ["refresh"]   = "Refresh events? (y/n) ",

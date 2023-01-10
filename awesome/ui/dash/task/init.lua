@@ -75,19 +75,23 @@ local rightside = wibox.widget({
 
 local tasks_dashboard = wibox.widget({
   {
-    sidebar,
+    { -- needs its own layout box to prevent some weird layout issues
+      sidebar,
+      layout = wibox.layout.fixed.vertical,
+    },
     {
       {
         rightside,
         prompt,
         layout = wibox.layout.fixed.vertical,
       },
-      left = dpi(15),
-      right = dpi(20),
+      left = dpi(10),
+      right = dpi(15),
       widget = wibox.container.margin,
     },
     spacing = dpi(15),
-    layout = wibox.layout.align.horizontal,
+    fill_space = true,
+    layout = wibox.layout.fixed.horizontal,
   },
   margins = dpi(15),
   widget = wibox.container.margin,
