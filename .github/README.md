@@ -6,12 +6,10 @@
 
 <p> Hi! This is <b>Cozy</b>, my AwesomeWM config. </p>
 
-<h2>Features</h2>
-
 <!-- █▀▄ ▄▀█ █▀ █░█ █▄▄ █▀█ ▄▀█ █▀█ █▀▄ -->
 <!-- █▄▀ █▀█ ▄█ █▀█ █▄█ █▄█ █▀█ █▀▄ █▄▀ -->
 
-<h3>Dashboard</h3>
+<h2>Dashboard</h2>
 
 <p>
   I love the terminal, but I love a good UI even more. The dashboard is a collection of graphical interfaces for several command-line applications, including <a href="https://github.com/ledger/" target="_blank">ledger</a>, <a href="https://taskwarrior.org/" target="_blank">taskwarrior</a>, <a href="https://timewarrior.net" target="_blank">timewarrior</a>, and <a href="https://github.com/insanum/gcalcli" target="_blank">gcalcli</a>.
@@ -72,7 +70,7 @@
 <!-- █▀▀ █▀█ █▄░█ ▀█▀ █▀█ █▀█ █░░    █▀▀ █▀▀ █▄░█ ▀█▀ █▀▀ █▀█ --> 
 <!-- █▄▄ █▄█ █░▀█ ░█░ █▀▄ █▄█ █▄▄    █▄▄ ██▄ █░▀█ ░█░ ██▄ █▀▄ --> 
 
-<h3>Control center</h3>
+<h2>Control center</h2>
 
 <p>
   Fancy little thing.
@@ -82,7 +80,7 @@
 <!-- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ -->
 <!-- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ -->
 
-<h3>Theme switcher</h3>
+<h2>Theme switcher</h2>
 
 <p>
   Changes NvChad and Kitty themes, as well as AwesomeWM theme.
