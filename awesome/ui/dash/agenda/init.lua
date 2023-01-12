@@ -3,24 +3,26 @@
 -- █▄▀ █▀█ ▄█ █▀█ ▄    █▀█ █▄█ ██▄ █░▀█ █▄▀ █▀█ 
 
 local wibox = require("wibox")
-local beautiful = require("beautiful")
-local colorize = require("helpers").ui.colorize_text
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local area = require("modules.keynav.area")
+local calpopup = require("core.cozy.calpopup")
 
 local calendar, nav_gcal    = require(... .. ".calendar")()
--- local prompt   = require(... .. ".prompt")
 local infobox, nav_infobox  = require(... .. ".infobox")()
 local events, nav_events    = require(... .. ".eventlist")()
 
--- Keynav
-local nav_agenda = area:new({
-  name = "agenda"
+local nav_agenda = area({
+  name = "agenda",
+  keys = {
+    ["A"] = function() calpopup:toggle() end,
+  },
+  children = {
+    nav_gcal,
+    nav_infobox,
+    nav_events,
+  },
 })
-nav_agenda:append(nav_gcal)
-nav_agenda:append(nav_infobox)
-nav_agenda:append(nav_events)
 
 local main_contents = wibox.widget({
   {
@@ -29,12 +31,6 @@ local main_contents = wibox.widget({
     layout = wibox.layout.fixed.vertical,
   },
   events,
-  -- {
-  --   events,
-  --   prompt,
-  --   spacing = dpi(10),
-  --   layout  = wibox.layout.fixed.vertical,
-  -- },
   spacing = dpi(10),
   layout = wibox.layout.fixed.horizontal,
 })

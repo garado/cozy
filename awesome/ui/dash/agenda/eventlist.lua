@@ -7,7 +7,7 @@
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
-local background = require("modules.keynav.navitem").Background
+local navbg = require("modules.keynav.navitem").Background
 local dpi = xresources.apply_dpi
 local cal = require("core.system.cal")
 local area    = require("modules.keynav.area")
@@ -16,22 +16,25 @@ local box = require("helpers.ui").create_boxed_widget
 local colorize = require("helpers.ui").colorize_text
 local prompt   = require("ui.dash.agenda.prompt")
 
-local MAX_EVENTS_SHOWN = 21
+local MAX_EVENTS_SHOWN = 23
+
+local MONTH_NAMES = { "January", "February", "March", "April", "May",
+  "June", "July", "August", "September", "October", "November", "December" }
 
 -- Keyboard navigation
-local nav_events = area:new({
+local nav_events = area({
   name = "events",
+  keys = require("ui.dash.agenda.commands"),
   circular = true,
-  keys = require("ui.dash.agenda.commands")
 })
 
 -- Assemble a single event box and its corresponding keynav items
 local function create_event(event)
-  local title     = cal:get_title(event)
-  local date      = cal:get_start_date(event)
-  local starttime = cal:get_start_time(event)
-  local endtime   = cal:get_end_time(event)
-  local place     = cal:get_location(event)
+  local title     = event[cal.TITLE]
+  local date      = event[cal.START_DATE]
+  local starttime = event[cal.START_TIME]
+  local endtime   = event[cal.END_TIME]
+  local place     = event[cal.LOCATION] or ""
 
   local displaytitle = title
   if string.find(title, "birthday") or string.find(title, "bday") then
@@ -89,30 +92,35 @@ local function create_event(event)
     widget = wibox.container.place
   })
 
-  local navevent = navtext:new(name)
-  navevent.title = title
-  navevent.date  = date
-  navevent.loc   = place
-
-  function navevent:custom_on()
-  end
-
-  function navevent:custom_off()
-  end
+  local navevent = navtext({
+    widget = name,
+    title  = title,
+    date   = date,
+    loc    = place,
+  })
+  function navevent:custom_on()  end
+  function navevent:custom_off() end
 
   return event_wibox, navevent
 end
 
+local event_list_placeholder = wibox.widget({
+  markup = colorize("No events found.", beautiful.fg),
+  align  = "center",
+  valign = "center",
+  font   = beautiful.font_name .. "11",
+  widget = wibox.widget.textbox,
+})
+
 local event_list = wibox.widget({
-  wibox.widget({ -- placeholder
-    markup = colorize("No events found.", beautiful.fg),
-    align  = "center",
-    valign = "center",
-    font   = beautiful.font_name .. "11",
-    widget = wibox.widget.textbox,
-  }),
+  event_list_placeholder,
   spacing = dpi(15),
   layout = wibox.layout.fixed.vertical,
+  ----
+  init = function(self)
+    self:reset()
+    self:add(event_list_placeholder)
+  end
 })
 
 local datelist = wibox.widget({
@@ -137,19 +145,23 @@ end
 cal:connect_signal("ready::upcoming", function()
   local upcoming = cal:get_upcoming_events()
   datelist:reset()
-  event_list:reset()
+  event_list:init()
   nav_events:remove_all_items()
   nav_events:reset()
+
+  if #upcoming == 0 then return end
+
+  event_list:reset()
 
   -- Events are grouped by date.
   -- while event has same date as prev event, add to cureventbox
   -- if date != prevdate, add cureventbox to UI, then clear cureventbox and restart
   local cureventbox
-  local prev_date = cal:get_start_date(upcoming[1])
+  local prev_date = upcoming[1][cal.START_DATE]
   for i = 1, #upcoming do
     if i > MAX_EVENTS_SHOWN then break end
 
-    local date = cal:get_start_date(upcoming[i])
+    local date = upcoming[i][cal.START_DATE]
     local entry, navevent= create_event(upcoming[i])
 
     -- Add to view
@@ -201,8 +213,9 @@ local header = wibox.widget({
   -----
 })
 
-cal:connect_signal("selected::date", function(_, date)
-  local mkup = colorize("January "..date, beautiful.fg)
+cal:connect_signal("selected::date", function(_, year, month, date)
+  month = MONTH_NAMES[month]
+  local mkup = colorize('From ' .. month .. ' ' .. date .. ' ' .. year, beautiful.fg)
   header:set_markup_silently(colorize(mkup, beautiful.fg))
 end)
 
@@ -213,20 +226,23 @@ end)
 
 local widget = wibox.widget({
   header,
-  event_list,
   wibox.widget({
-    color = beautiful.bg_l3,
-    forced_height = dpi(5),
-    span_ratio = 0.95,
-    widget = wibox.widget.separator,
+    event_list,
+    widget = wibox.container.place,
   }),
+  -- wibox.widget({
+  --   color = beautiful.bg_l3,
+  --   forced_height = dpi(5),
+  --   span_ratio = 0.95,
+  --   widget = wibox.widget.separator,
+  -- }),
   prompt,
   spacing = dpi(15),
   layout = wibox.layout.fixed.vertical,
 })
 
 local argh = box(widget, dpi(1000), dpi(700), beautiful.dash_widget_bg)
-nav_events.widget = background:new(argh.children[1])
+nav_events.widget = navbg({ widget = argh.children[1] })
 
 return function()
   return argh, nav_events

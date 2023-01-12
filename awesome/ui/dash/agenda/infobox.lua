@@ -9,11 +9,10 @@ local wibox = require("wibox")
 local gears = require("gears")
 local box   = require("helpers").ui.create_boxed_widget
 local beautiful = require("beautiful")
-local colorize = require("helpers").ui.colorize_text
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local area = require("modules.keynav.area")
-local Background = require("modules.keynav.navitem").Background
+local navbg = require("modules.keynav.navitem").Background
 
 local weather   = require("ui.dash.agenda.weather")
 local deadlines = require("ui.dash.agenda.deadlines")
@@ -101,18 +100,18 @@ local function switch_view(direction)
 end
 
 -- Keyboard navigation
-local nav_infobox = area:new({
+local nav_infobox = area({
   name = "infobox",
   circular = true,
   keys = {
-    ["h"] = { f = function() switch_view(PREV) end },
-    ["l"] = { f = function() switch_view(NEXT) end },
+    ["h"] = function() switch_view(PREV) end,
+    ["l"] = function() switch_view(NEXT) end,
   },
 })
 
-local infobox_cont = box(infobox, dpi(0), dpi(350), beautiful.dash_widget_bg)
+local infobox_cont = box(infobox, dpi(0), dpi(310), beautiful.dash_widget_bg)
 
-local navbox = Background:new(infobox_cont.children[1])
+local navbox = navbg({ widget = infobox_cont.children[1] })
 nav_infobox:append(navbox)
 
 return function()

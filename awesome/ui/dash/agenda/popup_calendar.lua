@@ -108,8 +108,8 @@ end
 --- Create wibox and navitem for a single day of the calendar.
 -- @param date    The date (1-31)
 -- @param is_valid   True if day within month to display, false otherwise
-local function create_daybox(date, month, year, is_valid)
-  local cnt = cal:get_num_events(tonumber(month), tonumber(date))
+local function create_daybox(date, month, is_valid)
+  local cnt = cal:get_num_events(month, date)
   local heat_color = (is_valid and cnt > 0) and heat(beautiful.main_accent, cnt) or nil
 
   local fg = is_valid and beautiful.fg or beautiful.fg_sub
@@ -131,30 +131,28 @@ local function create_daybox(date, month, year, is_valid)
   })
 
   -- New class for keyboard navigation
-  local navday = navbase({
-    widget = day,
-    date   = date,
-    month  = month,
-    year   = year,
-    select_on = function(self)
-      self.selected = true
-      self.widget.border_width = dpi(3)
-      if self.date == today then -- because todaybox is white
-        self.widget.border_color = beautiful.main_accent
-      else
-        self.widget.border_color = beautiful.fg
-      end
-    end,
-    select_off = function(self)
-      self.selected = false
-      self.widget.border_width = dpi(0)
-    end,
-    release = function()
-      local strdate = year .. '-' .. string.format('%02d', month) .. '-' .. string.format('%02d', date)
-      cal:fetch_upcoming(strdate)
-      cal:emit_signal("selected::date", year, month, date)
+  local navday = navbase({ widget = day })
+  navday.date = date
+
+  function navday:select_on()
+    self.selected = true
+    self.widget.border_width = dpi(3)
+    if self.date == today then -- because todaybox is white
+      self.widget.border_color = beautiful.main_accent
+    else
+      self.widget.border_color = beautiful.fg
     end
-  })
+  end
+
+  function navday:select_off()
+    self.selected = false
+    self.widget.border_width = dpi(0)
+  end
+
+  function navday:release()
+    print(self.date)
+    cal:emit_signal("selected::date", date)
+  end
 
   return day, navday
 end
@@ -189,13 +187,13 @@ local function create_month_widget(month, year)
     local days_last_month = DAYS_IN_MONTH[last_month_idx]
     for i = fday - 1, 0, -1 do
       local backfilled_date = days_last_month - i
-      local day = create_daybox(backfilled_date, month, year, false)
+      local day = create_daybox(backfilled_date, month, false)
       calgrid:add(day)
     end
   end
 
   for i = 1, days_in_month do
-    local day, navday = create_daybox(i, month, year, true)
+    local day, navday = create_daybox(i, month, true)
     calgrid:add(day)
     nav_cal:append(navday)
   end
@@ -204,7 +202,7 @@ local function create_month_widget(month, year)
   -- fill with days from next month
   local lday = os.date("%w", os.time{ year=year, month=month, day=days_in_month, hour=0, sec=0 })
   for i = 1, 6 - lday do
-    local day = create_daybox(i, month, year, false)
+    local day = create_daybox(i, month, false)
     calgrid:add(day)
   end
 

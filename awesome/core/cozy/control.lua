@@ -32,9 +32,27 @@ function control:open()
   self._private.visible = true
 end
 
+function control:redraw()
+  for i = 1, #self.widgets do
+    local path = "ui.control." .. self.widgets[i]
+    package.loaded[path] = nil
+  end
+  -- collectgarbage("collect")
+  self:emit_signal("redraw")
+end
+
 function control:new()
   self._private = {}
   self._private.visible = false
+  self.widgets = {
+    "uptime",
+    "profile",
+    "stats",
+    "fetch",
+    "picom",
+    "quick_actions",
+    "power",
+  }
 end
 
 local function new()

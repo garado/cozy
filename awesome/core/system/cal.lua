@@ -2,7 +2,7 @@
 -- █▀▀ ▄▀█ █░░ █▀▀ █▄░█ █▀▄ ▄▀█ █▀█ 
 -- █▄▄ █▀█ █▄▄ ██▄ █░▀█ █▄▀ █▀█ █▀▄ 
 
--- For interfacing with Google agendaendar through gcalcli
+-- For interfacing with Google Calendar through gcalcli
 
 local gobject = require("gears.object")
 local gtable  = require("gears.table")
@@ -14,8 +14,8 @@ local agenda = { }
 local instance = nil
 local cache_path = gfs.get_cache_dir() .. "cal"
 
-local curmonth  = os.date("%m")
-local curdate   = os.date("%d")
+local curmonth  = tonumber(os.date("%m"))
+local curdate   = tonumber(os.date("%d"))
 
 ---------------------------------------------------------------------
 
@@ -39,22 +39,24 @@ function agenda:check_cache_empty()
   end)
 end
 
---- Use gcalcli cmd to write the last 3 months and next 3 months of data to cache
+--- Use gcalcli cmd to write the last 5 months and next 5 months of data to cache
 function agenda:update_cache()
-  local cmd = "gcalcli agenda '3 months ago' '3 months' --details location --tsv > " .. cache_path
+  local cmd = "gcalcli agenda '5 months ago' '5 months' --details location --tsv > " .. cache_path
   awful.spawn.easy_async_with_shell(cmd, function(_)
     self:emit_signal("cache::updated")
     self:emit_signal("cache::not_empty")
   end)
 end
 
---- Fetch data from cache for a specific month and store in object.
+--- TODO: Should sort by year as well
+--- Fetch data from cache for a specific month and store in table.
 -- @param year The year (yyyy)
 -- @param month The month (mm)
-function agenda:fetch_month(year, month)
+function agenda:fetch_month(month, year)
   -- Default to this year, this month if no args provided
-  year  = year or os.date("%Y")
-  month = month or curmonth
+  year  = year or tonumber(os.date("%Y"))
+  month = tonumber(month) or curmonth
+  print('fetching month for ' .. month .. ' ' .. year)
 
   -- Command looks like: cat cache_path | grep 2022-07
   local date = year .. "-" .. string.format("%02d", month)
@@ -62,7 +64,7 @@ function agenda:fetch_month(year, month)
   local cmd = "cat " .. cache_path .. " | "  .. grep
 
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    self._private.events[month] = {}
+    self.events[month] = {}
     local lines = core.split("\r\n", stdout)
 
     --- Grab tab-separated fields of each event
@@ -76,19 +78,20 @@ function agenda:fetch_month(year, month)
       end
 
       local day = tonumber(string.sub(event[1], -2)) or 0
-      if not self._private.events[month][day] then
-        self._private.events[month][day] = {}
+      if not self.events[month][day] then
+        self.events[month][day] = {}
       end
-      table.insert(self._private.events[month][day], event)
+      table.insert(self.events[month][day], event)
     end
 
-    self:emit_signal("ready::month_events")
+    self:emit_signal("ready::month_events", tonumber(month), tonumber(year))
   end)
 end
 
 --- Fetch the next few upcoming events starting from a given date.
-function agenda:fetch_upcoming()
-  local cmd = gfs.get_configuration_dir() .. "utils/fetchupcoming " .. cache_path
+function agenda:fetch_upcoming(date)
+  date = date or os.date("%Y-%m-%d")
+  local cmd = gfs.get_configuration_dir() .. "utils/fetchupcoming " .. cache_path .. " " .. date
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local upcoming = {}
 
@@ -176,7 +179,13 @@ function agenda:execute_request(_, type, input)
 
   local cmd = ""
 
-  --- Add command requires multiple consecutive inputs
+  -- Open link
+  if type == "open" then
+    cmd = "xdg-open '" .. self.cur_loc .. "'"
+  end
+
+  -- Add commands (gcalcli add requires multiple consecutive inputs)
+
   if type == "add_title" then
     self.add_title = input
     local signal = self.return_to_confirm and "add_confirm" or "add_when"
@@ -192,6 +201,7 @@ function agenda:execute_request(_, type, input)
   end
 
   if type == "add_dur" then
+    self.add_dur_unconverted = input
     self.add_dur = convert_duration(input)
     local signal = self.return_to_confirm and "add_confirm" or "add_loc"
     self:emit_signal("input::request", signal)
@@ -206,10 +216,10 @@ function agenda:execute_request(_, type, input)
 
   if type == "add_confirm" and (input == "s" or input == "S") then
     self.return_to_confirm = false
-    local titlecmd = self.add_title and " --title "    .. self.add_title or ""
-    local loccmd   = self.add_loc   and " --where "    .. self.add_loc or ""
-    local durcmd   = self.add_dur   and " --duration " .. self.add_dur or ""
-    local whencmd  = self.add_when  and " --when "     .. self.add_when or ""
+    local titlecmd = (self.add_title and " --title '"    .. self.add_title .. "'") or ""
+    local loccmd   = (self.add_loc   and " --where '"    .. self.add_loc   .. "'") or ""
+    local durcmd   = (self.add_dur   and " --duration '" .. self.add_dur   .. "'") or ""
+    local whencmd  = (self.add_when  and " --when '"     .. self.add_when  .. "'") or ""
     cmd = "gcalcli add " .. titlecmd .. loccmd .. durcmd .. whencmd .. " --noprompt"
   end
 
@@ -229,16 +239,14 @@ function agenda:execute_request(_, type, input)
     return
   end
 
-  ------- end add command handling
-
   local title = self.cur_title or ""
   local date  = self.cur_date or ""
 
   if type == "delete" then
-    cmd = "echo 'y' | gcalcli delete '" .. title .. "' " .. date
+    cmd = genpipecmd({ 'y', 'q' }) .. ' | ' .. " gcalcli delete '" .. title .. "' " .. date
   end
 
-  --- edit commands
+  -- Edit commands ------------
 
   local gcalcli_edit_cmd = "gcalcli edit '" .. title .. "' " .. date
 
@@ -260,45 +268,43 @@ function agenda:execute_request(_, type, input)
 
   awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
     print('CORE: ' .. cmd)
+    print('STDOUT:\n' .. stdout)
     print('STDERR:\n' .. stderr)
+
+    -- If command executed successfully, update UI to reflect changes
+    if stderr == "" then
+      self:update_cache()
+    end
   end)
 end
 
-function agenda:create_event()
-end
-
-function agenda:edit_event()
-end
-
-function agenda:delete_event()
+function agenda:selected_date(year, month, date)
 end
 
 ---------------------------------------------------------------------
 
-function agenda:get_events() return self._private.events end
+function agenda:get_events() return self.events end
 function agenda:get_upcoming_events() return self._private.upcoming end
 
-function agenda:get_start_date(entry)  return entry[1] end
-function agenda:get_start_time(entry)  return entry[2] end
-function agenda:get_end_date(entry)    return entry[3] end
-function agenda:get_end_time(entry)    return entry[4] end
-function agenda:get_title(entry)       return entry[5] end
-
-function agenda:get_location(entry)
-  return #entry > 5 and entry[6] or ""
-end
-
 function agenda:get_num_events(month, date)
-  if not self._private.events[month] then return 0 end
-  if not self._private.events[month][date] then return 0 end
-
-  return #self._private.events[month][date]
+  if not self.events[month] then return 0 end
+  if not self.events[month][date] then return 0 end
+  return #self.events[month][date]
 end
 
 ---------------------------------------------------------------------
 
 function agenda:new()
-  self._private.events = {}
+  self.events = {}
+
+  -- Enum for accessing fields within event table
+  self.START_DATE = 1
+  self.START_TIME = 2
+  self.END_DATE   = 3
+  self.END_TIME   = 4
+  self.TITLE      = 5
+  self.LOCATION   = 6
+
   self:check_cache_empty()
 
   self:connect_signal("cache::not_empty", function()
@@ -309,6 +315,10 @@ function agenda:new()
   --- BUG: issues when directly setting execute_request as callback
   self:connect_signal("input::complete", function(_, type, input)
     self:execute_request(_, type, input)
+  end)
+
+  self:connect_signal("selected::date", function(_, date)
+    self:selected_date(date)
   end)
 end
 

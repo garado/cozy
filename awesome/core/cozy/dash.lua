@@ -14,7 +14,7 @@ local instance = nil
 ---------------------------------------------------------------------
 
 function dash:toggle()
-  if self._private.visible then
+  if self.visible then
     self:close()
   else
     self:open()
@@ -23,18 +23,17 @@ end
 
 function dash:close()
   self:emit_signal("updatestate::close")
-  self._private.visible = false
+  self.visible = false
 end
 
 function dash:open()
   cozy:close_all()
   self:emit_signal("updatestate::open")
-  self._private.visible = true
+  self.visible = true
 end
 
 function dash:new()
-  self._private = {}
-  self._private.visible = false
+  self.visible = false
 end
 
 local function new()

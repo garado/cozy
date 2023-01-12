@@ -205,7 +205,6 @@ end
 --- Open Ledger files in new popup window.
 function ledger:open_ledger()
   local cmd = "kitty sh -c 'nvim -p " .. ledger_dir .. "*'"
-  -- awesome.emit_signal("dash::toggle")
   awful.spawn(cmd, {
     floating = true,
     geometry = {x=360, y=90, height=900, width=1200},

@@ -4,7 +4,11 @@
   <img title="" src="assets/showcase.png" width="900">
 </p>
 
-<p> Hi! This is <b>Cozy</b>, my AwesomeWM config that I've spent wayway  too much time on. </p>
+<p> Hi! This is <b>Cozy</b>, my AwesomeWM config that I've spent way too much time on. </p>
+
+<h3> ⚠️ Warning </h3>
+
+<p>This project is undergoing heavy refactoring and is best used as a code reference for now. It probably won't work out of the box on your machine. Support is also limited as I'm busy with school. </p>
 
 <!-- █▀▄ ▄▀█ █▀ █░█ █▄▄ █▀█ ▄▀█ █▀█ █▀▄ -->
 <!-- █▄▀ █▀█ ▄█ █▀█ █▄█ █▄█ █▀█ █▀▄ █▄▀ -->
@@ -122,7 +126,7 @@
 </p>
 
 <ul>
-  <li>Picom animation settings (sometimes animations get really annoying)</li>
+  <li>Picom animation settings</li>
   <li>Handy set of quick actions</li>
 </ul>
 

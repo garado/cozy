@@ -47,23 +47,23 @@ end
 -- then calls function to actually start the prompt
 agenda:connect_signal("input::request", function(_, type)
   local prompt_options = {
-    ["add_title"] = "Adding new event...\nTitle: ",
-    ["add_when"]  = "Adding new event...\nWhen: ",
-    ["add_dur"]   = "Adding new event...\nDuration: ",
-    ["add_loc"]   = "Adding new event...\nLocation: ",
-    ["add_confirm"] = "(s)ave or edit: (t)itle, (w)hen, (d)uration, (l)ocation\n" ..
+    ["add_title"] = "[ADD] Title: ",
+    ["add_when"]  = "[ADD] When: ",
+    ["add_dur"]   = "[ADD] Duration: ",
+    ["add_loc"]   = "[ADD] Location: ",
+    ["add_confirm"] = "(s)ave or edit (t)itle, (w)hen, (d)uration, (l)ocation\n" ..
       (agenda.add_title or "") ..
       " at "     .. (agenda.add_loc or "-") ..
       ", starting at " .. (agenda.add_when or "-") ..
       " for " .. (agenda.add_dur_unconverted or "-") .. " ",
-    ["open"]      = "Open location link in clipboard? (y/n) ",
+    ["open"]      = "Open location link? (y/n) ",
     ["modify"]    = "Modify: (t)itle (l)ocation (w)hen (d)uration ",
     ["delete"]    = "Delete event? (y/n) ",
     ["refresh"]   = "Refresh events? (y/n) ",
-    ["mod_title"] = "Modify title: ",
-    ["mod_loc"]   = "Modify location: ",
-    ["mod_when"]  = "Modify when: ",
-    ["mod_dur"]   = "Modify duration: ",
+    ["mod_title"] = "[MOD] Title: ",
+    ["mod_loc"]   = "[MOD] Location: ",
+    ["mod_when"]  = "[MOD] When: ",
+    ["mod_dur"]   = "[MOD] Duration: ",
     -- ["search"]    = "/",
   }
 
@@ -83,6 +83,11 @@ end)
 local prompt_textbox_colorized = wibox.container.background()
 prompt_textbox_colorized:set_widget(prompt_textbox)
 prompt_textbox_colorized:set_fg(beautiful.fg)
+
+agenda:connect_signal("prompt::clear", function()
+  print('clearing this bitch')
+  prompt_textbox:set_markup_silently("")
+end)
 
 return wibox.widget({
   prompt_textbox_colorized,

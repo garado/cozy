@@ -13,6 +13,8 @@ local gfs = require("gears.filesystem")
 local config = require("config")
 local naughty = require("naughty")
 
+local dash = require("core.cozy.dash")
+
 local themeswitcher = { }
 local instance = nil
 
@@ -50,7 +52,7 @@ function themeswitcher:fetch_themes()
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     for theme in string.gmatch(stdout, "[^\n\r]+") do
       theme = string.gsub(theme, ".lua", "")
-      if restrict_themes and displayed_themes[theme] and theme ~= "init" then
+      if restrict_themes and displayed_themes[theme] and theme ~= "init.lua" then
         self._private.themes[theme] = {}
         self._private.total_themes = self._private.total_themes + 1
       end
@@ -67,7 +69,7 @@ function themeswitcher:fetch_styles()
   for theme, _ in pairs(self._private.themes) do
 
     local dir = cfg .. "theme/colorschemes/" .. theme .. "/"
-    local cmd = "ls " .. dir
+    local cmd = "ls " .. dir .. " | grep '.lua'"
     awful.spawn.easy_async_with_shell(cmd, function(stdout)
       for style in string.gmatch(stdout, "[^\n\r]+") do
         if style ~= "init.lua" then
@@ -83,7 +85,7 @@ function themeswitcher:fetch_styles()
       end
     end)
 
-  end -- end for theme in pairs(themes)
+  end
 end
 
 function themeswitcher:apply_selected_theme()
@@ -94,8 +96,8 @@ function themeswitcher:apply_selected_theme()
   if not gears.table.hasitem(self:get_themes()[theme], style)  == nil then
     naughty.notification {
       app_name = "System notification",
-      title = "Theme switcher error",
-      message = "Could not find style "..style.." for theme "..theme,
+      title    = "Theme switcher error",
+      message  = "Could not find style "..style.." for theme "..theme,
     }
     return
   end
@@ -111,12 +113,16 @@ function themeswitcher:apply_selected_theme()
     }
     return
   end
+
   local config_path = gfs.get_configuration_dir() .. "config.lua"
-  local replace_theme = "sed -i 's/theme_name.*/theme_name = \"" .. theme .. "\",/' "
-  local replace_style = "sed -i 's/theme_style.*/theme_style = \"" .. style .. "\",/' "
-  awful.spawn.with_shell(replace_theme .. config_path)
-  awful.spawn.with_shell(replace_style .. config_path)
-  awesome.restart()
+  local replace_theme = "sed -i 's/theme_name.*/theme_name = \"" .. theme .. "\",/' " .. config_path
+  local replace_style = "sed -i 's/theme_style.*/theme_style = \"" .. style .. "\",/' " .. config_path
+
+  local cmd = replace_theme  .. ' ; ' .. replace_style
+
+  awful.spawn.easy_async_with_shell(cmd, function()
+    awesome.restart()
+  end)
 end
 
 ---------------------------------------------------------------------
