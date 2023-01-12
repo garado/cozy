@@ -15,6 +15,7 @@ local projects, nav_projects  = require(... .. ".projects")()
 local tasklist, nav_tasklist  = require(... .. ".tasklist.tasks")()
 local header  = require(... .. ".header")
 local prompt  = require(... .. ".prompt")
+local unpack = table.unpack
 
 --------
 
