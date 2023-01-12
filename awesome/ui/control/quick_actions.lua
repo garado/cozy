@@ -8,19 +8,24 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local naughty = require("naughty")
-local helpers = require("helpers")
-local widgets = require("ui.widgets")
+local helpers_ui = require("helpers.ui")
+local colorize = helpers_ui.colorize_text
+local simplebtn = helpers_ui.simple_button
 local gfs = require("gears.filesystem")
 local apps = require("configuration.apps")
 local Area = require("modules.keynav.area")
 local control = require("core.cozy.control")
-local Qaction = require("modules.keynav.navitem").Qaction
 
-local nav_qactions = Area:new({
+local navbg = require("modules.keynav.navitem").Background
+
+local nav_qactions = Area({
   name = "qactions",
-  is_row = true,
-  is_grid_container = true,
   circular = true,
+  is_grid  = true,
+  grid_cols = 5,
+  grid_rows = 2,
+  -- is_row = true,
+  -- is_grid_container = true,
 })
 
 local scripts = gfs.get_configuration_dir() .. "utils/ctrl/"
@@ -118,73 +123,53 @@ local function nightshift_func()
 end
 
 -- Helper function to create a quick action button
-local function create_quick_action(icon, name, func, area)
-  local quick_action = widgets.button.text.normal({
+local function create_quick_action(icon, name, func)
+  local quick_action = simplebtn({
     text = icon,
-    text_normal_bg = beautiful.fg,
-    normal_bg = beautiful.ctrl_qa_btn_bg,
-    animate_size = false,
-    size = 20,
-    on_release = function()
-      if func then func() end
-    end,
-    on_hover = function()
-      local markup = string.upper(name)
-      markup = helpers.ui.colorize_text(markup, beautiful.ctrl_header_fg)
-      qaction_header:set_markup_silently(markup)
-    end
+    bg   = beautiful.ctrl_qa_btn_bg,
+    width  = dpi(50),
+    height = dpi(50),
   })
 
-  local action = wibox.widget({
-    {
-      quick_action,
-      forced_width = dpi(50),
-      forced_height = dpi(50),
-      widget = wibox.container.margin,
-    },
-    widget = wibox.container.place,
+  local nav_qa = navbg({
+    widget = quick_action.children[1],
+    bg_off = beautiful.ctrl_qa_btn_bg,
+    bg_on  = beautiful.bg_l3,
   })
 
-  area:append(Qaction:new(quick_action))
-  return action
+  function nav_qa:custom_on()
+    local mkup = colorize(string.upper(name), beautiful.ctrl_header_fg)
+    qaction_header:set_markup_silently(mkup)
+  end
+
+  function nav_qa:release()
+    if func then func() end
+  end
+
+  nav_qactions:append(nav_qa)
+  return quick_action
 end
 
 -- █░█ █ 
 -- █▄█ █ 
 
-local row1 = Area:new({
-  name = "qaction_row1",
-  is_row = true,
-  group_name = "nav_qactions",
-  circular = true,
-})
-
-local row2 = Area:new({
-  name = "qaction_row2",
-  is_row = true,
-  group_name = "nav_qactions",
-  circular = true,
-})
-
 -- Restore quick action header when leaving the area
 awesome.connect_signal("nav::area_changed", function(last_area_name)
   local valid_areas = {
-    ["qactions"]      = true,
-    ["qactions_row1"] = true,
-    ["qactions_row2"] = true,
+    ["qactions"] = true,
   }
   local selected = nav_qactions.selected
   if not selected and not valid_areas[last_area_name] or last_area_name == "" then
-    local markup = helpers.ui.colorize_text("QUICK ACTIONS", beautiful.ctrl_header_fg)
+    local markup = colorize("QUICK ACTIONS", beautiful.ctrl_header_fg)
     qaction_header:set_markup_silently(markup)
   end
 end)
 
 qaction_header = wibox.widget({
-  markup = helpers.ui.colorize_text("QUICK ACTIONS", beautiful.ctrl_header_fg),
+  markup = colorize("QUICK ACTIONS", beautiful.ctrl_header_fg),
   align = "center",
   valign = "center",
-  font = beautiful.font_name .. "10",
+  font = beautiful.base_xsmall_font,
   widget = wibox.widget.textbox,
 })
 
@@ -199,18 +184,18 @@ local qactions = wibox.widget({
     {
       -- create_quick_action arguments:
       -- icon name function navarea
-      create_quick_action("", "Rotate", rotate_screen_func, row1),
-      create_quick_action("", "Conservation mode", consmode_func, row1),
-      create_quick_action("", "Onboard", onboard_func, row1),
-      create_quick_action("", "Calculator", calculator_func, row1),
-      create_quick_action("", "Nightshift", nightshift_func, row1),
+      create_quick_action("", "Rotate", rotate_screen_func),
+      create_quick_action("", "Conservation mode", consmode_func),
+      create_quick_action("", "Onboard", onboard_func),
+      create_quick_action("", "Calculator", calculator_func),
+      create_quick_action("", "Nightshift", nightshift_func),
 
       -- unfinished --
-      create_quick_action("", "Timer", incomplete, row2),
-      create_quick_action("便", "Rotate bar", incomplete, row2),
-      create_quick_action("", "Journal", incomplete, row2),
-      create_quick_action("", "Eyebleach", incomplete, row2),
-      create_quick_action("", "Do not disturb", incomplete, row2),
+      create_quick_action("", "Timer", incomplete),
+      create_quick_action("便", "Rotate bar", incomplete),
+      create_quick_action("", "Journal", incomplete),
+      create_quick_action("", "Eyebleach", incomplete),
+      create_quick_action("", "Do not disturb", incomplete),
 
       spacing = dpi(15),
       forced_num_rows = 2,
@@ -223,9 +208,6 @@ local qactions = wibox.widget({
   },
   widget = wibox.container.place,
 })
-
-nav_qactions:append(row1)
-nav_qactions:append(row2)
 
 return function()
   return nav_qactions, qactions

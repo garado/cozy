@@ -11,13 +11,13 @@ local wheader = require("helpers.ui").create_dash_widget_header
 local colorize = require("helpers.ui").colorize_text
 local navtext = require("modules.keynav.navitem").Textbox
 local navbg = require("modules.keynav.navitem").Background
-local Area = require("modules.keynav.area")
+local area = require("modules.keynav.area")
 local task = require("core.system.task")
 
 -- █▄▀ █▀▀ █▄█ █▄░█ ▄▀█ █░█ 
 -- █░█ ██▄ ░█░ █░▀█ █▀█ ▀▄▀ 
 local nav_tags
-nav_tags = Area:new({
+nav_tags = area({
   name = "tags",
   keys = {
     ["l"] = function()
@@ -70,7 +70,7 @@ local function create_tag_button(tag)
     forced_height = dpi(20),
   })
 
-  local nav_tag = navtext:new(tag_wibox)
+  local nav_tag = navtext({ widget = tag_wibox })
   function nav_tag:release()
     task:emit_signal("selected::tag", tag)
   end
@@ -90,7 +90,7 @@ task:connect_signal("taglist::update_all", function()
     nav_tags:append(nav_tag)
   end
 
-  nav_tags.widget = navbg:new(taglist_widget)
+  nav_tags.widget = navbg({ widget = taglist_widget })
 end)
 
 task:connect_signal("taglist::add", function(_, tag)

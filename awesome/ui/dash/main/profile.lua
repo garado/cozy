@@ -70,4 +70,3 @@ local profile = wibox.widget({
 })
 
 return box(profile, dpi(400), dpi(180), beautiful.dash_bg)
-

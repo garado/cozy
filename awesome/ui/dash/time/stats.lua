@@ -1,6 +1,7 @@
 
 -- █▀ ▀█▀ ▄▀█ ▀█▀ █▀ 
 -- ▄█ ░█░ █▀█ ░█░ ▄█ 
+
 -- Displays stats for the currently selected month and week.
 
 local wibox = require("wibox")
@@ -10,6 +11,7 @@ local dpi = xresources.apply_dpi
 local gobject = require("gears.object")
 local area = require("modules.keynav.area")
 local gears = require("gears")
+local time  = require("core.system.time")
 
 local helpers = require("helpers")
 local box = require("helpers.ui").create_boxed_widget
@@ -72,31 +74,36 @@ end
 -- █░█ █    ▄▀█ █▀ █▀ █▀▀ █▀▄▀█ █▄▄ █░░ █▄█ 
 -- █▄█ █    █▀█ ▄█ ▄█ ██▄ █░▀░█ █▄█ █▄▄ ░█░ 
 
-return function(data)
-  local total_hours = create_stats_ui_textbox("Total hours worked")
-  local most_hours_worked = create_stats_ui_textbox("Most hours worked")
-  local highest_day = create_stats_ui_textbox("Most hours worked on")
-  local avg_week = create_stats_ui_textbox("Average hours/week")
+local total_hours = create_stats_ui_textbox("Total hours worked")
+local most_hours_worked = create_stats_ui_textbox("Most hours worked")
+local highest_day = create_stats_ui_textbox("Most hours worked on")
+local avg_week = create_stats_ui_textbox("Average hours/week")
 
-  local stats_cont = wibox.widget({
-    {
-      total_hours,
-      highest_day,
-      most_hours_worked,
-      avg_week,
-      spacing = dpi(12),
-      layout = wibox.layout.fixed.vertical,
-    },
-    widget = wibox.container.place,
-  })
+local stats_cont = wibox.widget({
+  {
+    wibox.widget({
+      markup = colorize("Statistics", beautiful.fg),
+      font   = beautiful.alt_med_font,
+      align  = "center",
+      valign = "center",
+      widget = wibox.widget.textbox,
+    }),
+    total_hours,
+    highest_day,
+    most_hours_worked,
+    avg_week,
+    spacing = dpi(12),
+    layout = wibox.layout.fixed.vertical,
+  },
+  widget = wibox.container.place,
+})
 
-  data:connect_signal("timew::hours_by_day_processed", function(_)
-    local total_hours_, highest_day_, highest_hours_ = get_stats(data)
-    highest_day.children[2]:set_markup_silently(colorize(highest_day_, beautiful.fg_sub))
-    total_hours.children[2]:set_markup_silently(colorize(total_hours_, beautiful.fg_sub))
-    most_hours_worked.children[2]:set_markup_silently(colorize(highest_hours_, beautiful.fg_sub))
-    avg_week.children[2]:set_markup_silently(colorize(round(total_hours_ / 7, 2), beautiful.fg_sub))
-  end)
+-- time:connect_signal("ready::hours_by_day", function(_)
+--   local total_hours_, highest_day_, highest_hours_ = get_stats(data)
+--   highest_day.children[2]:set_markup_silently(colorize(highest_day_, beautiful.fg_sub))
+--   total_hours.children[2]:set_markup_silently(colorize(total_hours_, beautiful.fg_sub))
+--   most_hours_worked.children[2]:set_markup_silently(colorize(highest_hours_, beautiful.fg_sub))
+--   avg_week.children[2]:set_markup_silently(colorize(round(total_hours_ / 7, 2), beautiful.fg_sub))
+-- end)
 
-  return box(stats_cont, dpi(300), dpi(500), beautiful.dash_widget_bg)
-end
+return box(stats_cont, dpi(300), dpi(500), beautiful.dash_widget_bg)

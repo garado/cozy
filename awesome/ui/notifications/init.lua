@@ -12,6 +12,7 @@ local helpers = require("helpers")
 local menubar = require("menubar")
 local animation = require("modules.animation")
 local widgets = require("ui.widgets")
+local colorize = require("helpers.ui").colorize_text
 
 naughty.persistence_enabled = true
 naughty.config.defaults.ontop = true
@@ -54,7 +55,7 @@ end)
 
 naughty.connect_signal("request::display", function(n)
   local accent_color = beautiful.random_accent_color()
-  n.font = beautiful.font_name .. "10"
+  n.font = beautiful.base_small_font
   n.fg = beautiful.fg
 
 	--- table of icons
@@ -100,17 +101,15 @@ naughty.connect_signal("request::display", function(n)
 	})
 
   local title = wibox.widget({
-    widget = wibox.container.scroll.horizontal,
+    {
+      markup = colorize(n.title, beautiful.fg),
+      font   = beautiful.base_small_font,
+      widget = wibox.widget.textbox,
+    },
     step_function = wibox.container.scroll.step_functions.waiting_nonlinear_back_and_forth,
     fps = 60,
     speed = 75,
-    widgets.text({
-      font = beautiful.font,
-      color = beautiful.fg,
-      bold = true,
-      size = 10,
-      text = n.title,
-    }),
+    widget = wibox.container.scroll.horizontal,
   })
 
   -- dumb hack - bright/vol notifs need to be replaceable
@@ -120,11 +119,10 @@ naughty.connect_signal("request::display", function(n)
     message = naughty.widget.message
   else
     message = wibox.widget({
-      widgets.text({
-        font = beautiful.font,
-        size = 10,
-        color = beautiful.fg,
-        text = n.message,
+      wibox.widget({
+        markup  = colorize(n.message, beautiful.fg),
+        font    = beautiful.base_small_font,
+        widget  = wibox.widget.textbox,
       }),
       step_function = wibox.container.scroll.step_functions.waiting_nonlinear_back_and_forth,
       fps = 60,
@@ -152,7 +150,7 @@ naughty.connect_signal("request::display", function(n)
 				{
 					{
 						id = "text_role",
-						font = beautiful.font_name .. "10",
+						font = beautiful.base_xsmall_font,
 						widget = wibox.widget.textbox,
 					},
 					left = dpi(6),
@@ -173,15 +171,13 @@ naughty.connect_signal("request::display", function(n)
 		widget = naughty.list.actions,
   })
 
-  local app_name = widgets.text({
-    font = beautiful.font,
-    color = accent_color,
-    size = 8,
-    bold = true,
-    text = string.upper(n.app_name),
+  local app_name = wibox.widget({
+    markup = colorize(string.upper(n.app_name), accent_color),
+    font   = beautiful.base_xsmall_font,
+    widget = wibox.widget.textbox,
   })
 
-	local dismiss = widgets.button.text.normal({
+  local dismiss = widgets.button.text.normal({
     font = beautiful.font,
     size = 10,
 		paddings = dpi(2),

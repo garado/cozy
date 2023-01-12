@@ -10,24 +10,29 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local control = require("core.cozy.control")
 
-local Navigator = require("modules.keynav.navigator")
+local nav = require("modules.keynav.navigator")
 
--- Import widgets
-local uptime = require("ui.control.uptime")
-local profile = require("ui.control.profile")
-local stats = require("ui.control.stats")
-local fetch = require("ui.control.fetch")
-local nav_picom, picom = require("ui.control.picom")()
-local nav_qactions, qactions = require("ui.control.quick_actions")()
-local power_opts, power_confirm, nav_power = require("ui.control.power")()
--- local nav_links, links = require("ui.control.links")()
+local navigator, control_center
+local power_confirm, power_opts, nav_power
 
-local navigator, nav_root = Navigator:new()
-nav_root:append(nav_picom)
-nav_root:append(nav_qactions)
-nav_root:append(nav_power)
+local function control_center_contents()
+  local uptime  = require("ui.control.uptime")
+  local profile = require("ui.control.profile")
+  local stats   = require("ui.control.stats")
+  local fetch   = require("ui.control.fetch")
+  local nav_picom, picom        = require("ui.control.picom")()
+  local nav_qactions, qactions  = require("ui.control.quick_actions")()
+  power_opts, power_confirm, nav_power = require("ui.control.power")()
 
-return function()
+  -- Import widgets
+  navigator, _ = nav({
+    root_children = {
+      nav_picom,
+      nav_qactions,
+      nav_power
+    }
+  })
+
   local body = wibox.widget({
     {
       {
@@ -71,9 +76,7 @@ return function()
     widget = wibox.container.background,
   })
 
-  -- assemble the full control center
-  power_confirm.visible = false
-  local control_center_contents = wibox.widget({
+  return wibox.widget({
     {
       {
         body,
@@ -90,9 +93,11 @@ return function()
     widget = wibox.container.background,
     bg = beautiful.ctrl_bg,
   })
+end
 
+return function()
   local control_center_width = dpi(450)
-  local control_center = awful.popup ({
+  control_center = awful.popup ({
     type = "popup_menu",
     minimum_width = control_center_width,
     maximum_width = control_center_width,
@@ -100,7 +105,7 @@ return function()
     bg = beautiful.transparent,
     shape = gears.shape.rect,
     ontop = true,
-    widget = control_center_contents,
+    widget = control_center_contents(),
     visible = false,
   })
 
@@ -132,6 +137,9 @@ return function()
     power_confirm.visible = true
   end)
 
+  control:connect_signal("redraw", function()
+    control_center.widget = control_center_contents()
+  end)
+
   return control_center
 end
-

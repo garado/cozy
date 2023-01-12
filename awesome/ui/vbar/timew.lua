@@ -14,7 +14,7 @@ local colorize = require("helpers.ui").colorize_text
 local icon = wibox.widget({
   visible = false,
   markup  = colorize("", beautiful.wibar_fg),
-  font    = beautiful.font_name .. "13",
+  font    = beautiful.base_xsmall_font,
   widget  = wibox.widget.textbox,
 })
 

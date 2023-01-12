@@ -5,16 +5,16 @@
 -- Arc chart showing monthly spending.
 -- Also shows account balances and total spent this month.
 
-local wibox = require("wibox")
-local beautiful = require("beautiful")
-local xresources = require("beautiful.xresources")
-local dpi = xresources.apply_dpi
+local wibox   = require("wibox")
 local helpers = require("helpers")
-local animation = require("modules.animation")
-local colorize = require("helpers.ui").colorize_text
-local box = require("helpers.ui").create_boxed_widget
-local ledger = require("core.system.ledger")
-local dash = require("core.cozy.dash")
+local animation   = require("modules.animation")
+local colorize    = require("helpers.ui").colorize_text
+local beautiful   = require("beautiful")
+local xresources  = require("beautiful.xresources")
+local dpi     = xresources.apply_dpi
+local box     = require("helpers.ui").create_boxed_widget
+local ledger  = require("core.system.ledger")
+local dash    = require("core.cozy.dash")
 
 -- Module-level variables
 local chart, legend
@@ -33,7 +33,7 @@ local color_palette = beautiful.cash_arccolors
 local function create_legend_entry(text, amount, color)
   local circle = colorize(" ", color)
   local label = colorize(text, beautiful.fg)
-  local amt = colorize(" — $" .. amount, beautiful.cash_alttext_fg)
+  local amt   = colorize(" — $" .. amount, beautiful.cash_alttext_fg)
 
   local legend_entry = wibox.widget({
     markup = circle .. label .. amt,
@@ -73,7 +73,7 @@ local function create_chart_sections(entries, total_spending)
   arc_chart.max_value = tonumber(total_spending)
 
   local cnt = 1
-  for cat, amt in pairs(entries) do
+  for _, amt in pairs(entries) do
     table.insert(tmp_arc_values, 0)
     table.insert(arc_values, (tonumber(amt)))
     table.insert(colors, color_palette[cnt])
@@ -113,8 +113,10 @@ local function create_chart_sections(entries, total_spending)
     end,
   })
 
-  dash:connect_signal("updatestate::open", function()
-    arc_chart_animation:set(arc_chart.max_value)
+  dash:connect_signal("tabswitch", function(_, tab)
+    if tab == "main" then
+      arc_chart_animation:set(arc_chart.max_value)
+    end
   end)
 
   arc_chart.colors = colors
@@ -172,12 +174,12 @@ chart = wibox.widget({
       widget = wibox.widget.textbox,
     },
     id = "arc",
-    thickness = 30,
+    thickness = 40,
     border_width = 0,
     widget = wibox.container.arcchart,
   },
-  forced_height = dpi(120),
-  forced_width = dpi(120),
+  forced_height = dpi(150),
+  forced_width = dpi(150),
   widget = wibox.container.place,
 })
 
@@ -201,7 +203,7 @@ local top = wibox.widget({
   widget = wibox.container.place,
 })
 
--- Arc chart or placeholder text
+-- If we've spent money this month, show arc + legend as normal
 local bottom_yes_spent = wibox.widget({
     {
       chart,
@@ -212,6 +214,7 @@ local bottom_yes_spent = wibox.widget({
     widget = wibox.container.place,
   })
 
+-- Otherwise show this placeholder
 local bottom_no_spent = wibox.widget({
   {
     text    = "Nothing spent this month.",
@@ -241,21 +244,26 @@ local widget = wibox.widget({
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
 
 -- Update arc chart and total spending balance
--- BUG: setting bottom_yes_spent not working
 ledger:connect_signal("update::month", function()
   local entries = ledger:get_monthly_overview()
   local total = ledger:get_total_spent_this_month()
 
   if tonumber(total) == 0 then
-    bottom.set(2, bottom_no_spent)
+    bottom:set(2, bottom_no_spent)
   else
+    -- Reset UI
+    legend.children[1]:reset()
+    local arc_chart = chart:get_children_by_id("arc")[1]
+    arc_chart.values = {}
+
+    -- Update UI
     create_chart_sections(entries, total)
     create_legend(entries)
 
-    local markup = colorize("$" .. total)
+    local markup = colorize("$" .. total, beautiful.fg)
     local spent = total_spent.children[1].children[2]
     spent:set_markup_silently(markup)
-    bottom.set(2, bottom_yes_spent)
+    bottom:set(2, bottom_yes_spent)
   end
 end)
 
@@ -271,4 +279,4 @@ ledger:connect_signal("update::balances", function()
   savings:set_markup_silently(colorize(savings_value, beautiful.fg))
 end)
 
-return box(widget, dpi(0), dpi(310), beautiful.dash_widget_bg)
+return box(widget, dpi(0), dpi(350), beautiful.dash_widget_bg)

@@ -8,54 +8,64 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local widgets = require("ui.widgets")
 local dashcore = require("core.cozy.dash")
-local area = require("modules.keynav.area")
-local dashtab = require("modules.keynav.navitem").Dashtab
+local colorize = require("helpers.ui").colorize_text
+
 local nav = require("modules.keynav").navigator
+local area = require("modules.keynav.area")
+local background = require("modules.keynav.navitem").Background
 
 local init = false
 
-local navigator, nav_root = nav:new()
+local dash, dash_content
+local switch_tab
 
-local nav_tabs = area:new({
-  name = "tabs",
+local navigator, nav_root = nav({
+  root_keys = {
+    ["1"] = function() switch_tab(1) end,
+    ["2"] = function() switch_tab(2) end,
+    ["3"] = function() switch_tab(3) end,
+    ["4"] = function() switch_tab(4) end,
+    ["5"] = function() switch_tab(5) end,
+    ["6"] = function() switch_tab(6) end,
+  }
+})
+
+local nav_tabs = area({
+  name     = "tabs",
   circular = true,
 })
 
-local dash, dash_content
-
 -- Import tab contents
-local main,   nav_main    = require("ui.dash.main")()
-local cash,   nav_cash    = require("ui.dash.finances")()
-local tasks,  nav_tasks   = require("ui.dash.task")()
-local time                = require("ui.dash.time")()
---   local time,   nav_time    = require("ui.dash.time")()
+local main,   nav_main     = require(... .. ".main")()
+local tasks,  nav_tasks    = require(... .. ".task")()
+local agenda, nav_agenda   = require(... .. ".agenda")()
+local cash,   nav_cash     = require(... .. ".finances")()
+local time                 = require(... .. ".time")()
 local journal, nav_journal = require(... .. ".journal")()
-local agenda, nav_agenda  = require("ui.dash.agenda")()
+--   local time,   nav_time    = require("ui.dash.time")()
 
-local tablist   = { main,     tasks,      agenda,     cash,     time,   journal,     }
-local tabnames  = { "main",   "tasks",    "agenda",   "cash",   "time", "journal",   }
-local tab_icons = { "",      "",        "",        "",      "",    "",         }
-local navitems  = { nav_main, nav_tasks,  nav_agenda, nav_cash, nil,    nav_journal, }
+local tablist   = { main,     tasks,      agenda,     cash,     time,   journal     }
+local tabnames  = { "main",   "tasks",    "agenda",   "cash",   "time", "journal"   }
+local tab_icons = { "",      "",        "",        "",      "",    ""         }
+local navitems  = { nav_main, nav_tasks,  nav_agenda, nav_cash, nil,    nav_journal }
 
 --- Display a specific tab on the dashboard
 -- @param i The tab number.
-local function switch_tab(i)
-  -- If trying to switch to the currently selected tab, 
-  -- do nothing
+function switch_tab(i)
+  -- If trying to switch to the currently selected tab, do nothing
   if navitems[i] and nav_root:contains(navitems[i]) then return end
 
   -- Turn off highlight for all other tabs
   nav_tabs:foreach(function(tab)
-    tab.widget:nav_hl_off()
+    tab:select_off()
   end)
 
   -- Set the dash content to the proper tab
   local contents = dash_content:get_children_by_id("content")[1]
   contents:set(1, tablist[i])
   nav_root:remove_all_items()
-  nav_tabs.items[i].widget:nav_hl_on()
+  nav_tabs.items[i]:select_on()
 
   -- Insert all areas for the new tab
   if navitems[i] and not nav_root:contains(navitems[i]) then
@@ -69,29 +79,6 @@ local function switch_tab(i)
   dashcore:emit_signal("tabswitch", tabnames[i])
 end
 
-nav_root.keys = {
-  ["1"] = {["function"] = switch_tab, ["args"] = 1},
-  ["2"] = {["function"] = switch_tab, ["args"] = 2},
-  ["3"] = {["function"] = switch_tab, ["args"] = 3},
-  ["4"] = {["function"] = switch_tab, ["args"] = 4},
-  ["5"] = {["function"] = switch_tab, ["args"] = 5},
-  ["6"] = {["function"] = switch_tab, ["args"] = 6},
-}
-
-dash_content = wibox.widget({
-  {
-    {
-      id = "content",
-      layout = wibox.layout.fixed.vertical,
-    },
-    widget = wibox.container.margin,
-    margins = dpi(10),
-  },
-  bg = beautiful.dash_bg,
-  shape = gears.shape.rect,
-  widget = wibox.container.background,
-})
-
 local function create_tab_bar()
   local tab_bar = wibox.widget({
     {
@@ -104,43 +91,50 @@ local function create_tab_bar()
     bg = beautiful.dash_tab_bg,
   })
 
-  for i,v in ipairs(tab_icons) do
-    local widget
-    widget = widgets.button.text.normal({
-      text = v,
-      text_normal_bg = beautiful.fg,
-      normal_bg = beautiful.dash_tab_bg,
-      animate_size = false,
-      size = 15,
-      on_release = function()
-        switch_tab(i)
-      end
+  for _, v in ipairs(tab_icons) do
+    local tabwidget = wibox.widget({
+      {
+        markup = colorize(v, beautiful.fg),
+        align  = "center",
+        valign = "center",
+        font   = beautiful.base_small_font,
+        widget = wibox.widget.textbox,
+      },
+      bg     = beautiful.dash_tab_bg,
+      widget = wibox.container.background,
     })
-    nav_tabs:append(dashtab:new(widget))
-    tab_bar.children[1]:add(widget)
+
+    local navtab = background({
+      widget = tabwidget,
+      bg_on  = beautiful.bg_l2,
+    })
+
+    nav_tabs:append(navtab)
+    tab_bar.children[1]:add(tabwidget)
   end
 
   return tab_bar
 end
 
-local tab_bar = create_tab_bar()
+dash_content = wibox.widget({
+  {
+    {
+      id = "content",
+      layout = wibox.layout.fixed.vertical,
+    },
+    widget = wibox.container.margin,
+    margins = dpi(10),
+  },
+  bg      = beautiful.dash_bg,
+  shape   = gears.shape.rect,
+  widget  = wibox.container.background,
+})
 
 -- Start off with main
 dash_content:get_children_by_id("content")[1]:add(main)
 
 -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
--- Emitted by keybind to open dash.
--- dashcore:connect_signal("updatestate::toggle", function()
---   if dash.visible then
---     navigator:stop()
---   else
---     require("ui.shared").close_other_popups("dash")
---     dashcore:emit_signal("newstate::opened")
---     navigator:start()
---   end
---   dash.visible = not dash.visible
--- end)
 
 dashcore:connect_signal("updatestate::open", function()
   dash.visible = true
@@ -162,8 +156,6 @@ end)
 
 -- ▄▀█ █▀ █▀ █▀▀ █▀▄▀█ █▄▄ █░░ █▀▀ 
 -- █▀█ ▄█ ▄█ ██▄ █░▀░█ █▄█ █▄▄ ██▄ 
--- local swidth = s.geometry.width
--- local sheight = s.geometry.height
 dash = awful.popup({
   type = "splash",
   minimum_height = dpi(810),
@@ -175,11 +167,10 @@ dash = awful.popup({
   visible = false,
   placement = awful.placement.centered,
   widget = ({
-    tab_bar,
+    create_tab_bar(),
     dash_content,
     layout = wibox.layout.align.horizontal,
   }),
 })
 
-return function(_) -- s
-end
+return function(_) return dash end

@@ -9,7 +9,8 @@ local wibox       = require("wibox")
 local xresources  = require("beautiful.xresources")
 local gears       = require("gears")
 local area        = require("modules.keynav.area")
-local navtask     = require("modules.keynav.navitem").Task
+-- local navtask     = require("modules.keynav.navitem").Task
+local navtask     = require("modules.keynav.navitem").Textbox
 local colorize    = require("helpers.ui").colorize_text
 local remove_pango    = require("helpers.dash").remove_pango
 local format_due_date = require("helpers.dash").format_due_date
@@ -120,8 +121,11 @@ local function create_task_wibox(task_table)
 end
 
 local function create_task_nav(task_wibox, _task, index)
-  local ntask = navtask:new(task_wibox.children[1], nil, _task["id"])
-  ntask.index = index
+  local ntask = navtask({
+    widget = task_wibox.children[1],
+    name   = _task["id"],
+    index  = index,
+  })
 
   function ntask:select_on()
     self.selected = true

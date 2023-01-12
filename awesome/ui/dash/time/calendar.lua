@@ -12,6 +12,7 @@ local dpi = xresources.apply_dpi
 local awful = require("awful")
 local area = require("modules.keynav.area")
 local gears = require("gears")
+local time  = require("core.system.time")
 
 local box = require("helpers.ui").create_boxed_widget
 local colorize = require("helpers.ui").colorize_text
@@ -165,82 +166,54 @@ end
 
 -- █░█ █    ▄▀█ █▀ █▀ █▀▀ █▀▄▀█ █▄▄ █░░ █▄█ 
 -- █▄█ █    █▀█ ▄█ ▄█ ██▄ █░▀░█ █▄█ █▄▄ ░█░ 
--- Putting all of the wiboxes together.
 
-return function(data)
-  -- Get this month and year
-  local _thismonth = os.date("%m")
-  local _thisyear = os.date("%Y")
-  local month = create_month_widget(_thismonth, _thisyear)
+-- Add tooltip to grid object showing hours
+local function tooltip_assemble(grid_item, hours)
+  local tooltip = awful.tooltip{}
+  tooltip:add_to_object(grid_item)
 
-  local month_label = wibox.widget({
-    markup  = colorize(os.date("%B %Y"), beautiful.fg),
-    font    = beautiful.font_name .. "17",
-    align   = "center",
-    valign  = "center",
-    widget  = wibox.widget.textbox,
-  })
-
-  local calendar = wibox.widget({
-    {
-      {
-        month_label,
-        create_week_label(),
-        month,
-        spacing = dpi(20),
-        layout = wibox.layout.fixed.vertical,
-      },
-      margins = dpi(20),
-      widget = wibox.container.margin,
-    },
-    widget = wibox.container.constraint,
-  })
-
-  calendar = box(calendar, dpi(450), dpi(420), beautiful.dash_widget_bg)
-
-  -- Once the json is ready we can update the heatmap
-  -- Loop through every entry and count the hours worked per day
-  -- Kind of ugly but it works lol
-  data:connect_signal("timew::json_processed", function(_)
-    -- Find the first date
-    local first_ts  = datestr_to_ts(data.entry[1]["start"])
-    local last_date = tonumber(os.date("%d", first_ts)) or 0
-    local hours_this_date = 0
-
-    for i in ipairs(data.entry) do
-      local ts = datestr_to_ts(data.entry[i]["start"])
-      local this_date = tonumber(os.date("%d", ts)) or 0
-
-      -- The date is different, which means we finished processing all 
-      -- the entries from the last day, so we can update the heatmap for
-      -- the last day
-      if this_date ~= last_date or i == data.num_entries then
-        local grid_item = calgrid.children[fday + last_date]
-        local this_heat = heat(beautiful.timew_cal_heatmap_accent, hours_this_date)
-        grid_item.bg = this_heat
-
-        -- for other modules to keep track of hours by date 
-        data.days[last_date] = hours_this_date
-
-        -- Add tooltip showing hours
-        -- BUG: hours always show as 0 in tooltip despite printing fine above
-        -- local tooltip = awful.tooltip{}
-        -- tooltip:add_to_object(grid_item)
-
-        -- grid_item:connect_signal("mouse::enter", function()
-        --   tooltip.text = tostring(hours_this_date) .. "h"
-        -- end)
-
-        last_date = this_date
-        hours_this_date = 0
-      end
-
-      -- Update hours this date
-      hours_this_date = hours_this_date + (data.entry[i]["duration"] or 0)
-    end
-
-    data:emit_signal("timew::hours_by_day_processed")
+  grid_item:connect_signal("mouse::enter", function()
+    tooltip.text = tostring(hours) .. "h"
   end)
-
-  return calendar
 end
+
+-- Get this month and year
+local _thismonth = os.date("%m")
+local _thisyear = os.date("%Y")
+local month = create_month_widget(_thismonth, _thisyear)
+
+local month_label = wibox.widget({
+  markup  = colorize(os.date("%B %Y"), beautiful.fg),
+  font    = beautiful.font_name .. "17",
+  align   = "center",
+  valign  = "center",
+  widget  = wibox.widget.textbox,
+})
+
+local calendar = wibox.widget({
+  {
+    {
+      month_label,
+      create_week_label(),
+      month,
+      spacing = dpi(20),
+      layout = wibox.layout.fixed.vertical,
+    },
+    margins = dpi(20),
+    widget = wibox.container.margin,
+  },
+  widget = wibox.container.constraint,
+})
+
+calendar = box(calendar, dpi(450), dpi(420), beautiful.dash_widget_bg)
+
+time:connect_signal("ready::hours_by_day", function(_)
+  for date, hours in ipairs(time.days) do
+    local grid_item = calgrid.children[date]
+    local this_heat = heat(beautiful.timew_cal_heatmap_accent, hours)
+    grid_item.bg = this_heat
+    tooltip_assemble(grid_item, hours)
+  end
+end)
+
+return calendar

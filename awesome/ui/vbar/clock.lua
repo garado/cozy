@@ -4,13 +4,12 @@
 
 local wibox = require("wibox")
 local beautiful = require("beautiful")
-local xresources = require("beautiful.xresources")
 
 local clock = wibox.widget({
   format  = "%H\n%M",
   align   = "center",
   valign  = "center",
-  font    = beautiful.font_name .. "Medium 10",
+  font    = beautiful.alt_small_font,
   widget  = wibox.widget.textclock,
 })
 

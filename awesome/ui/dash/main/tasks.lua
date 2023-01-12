@@ -7,30 +7,29 @@
 local awful = require("awful")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
-local xresources = require("beautiful.xresources")
-local dpi = xresources.apply_dpi
-local helpers = require("helpers")
+local dpi       = beautiful.xresources.apply_dpi
+local json  = require("modules.json")
 
-local json = require("modules.json")
-local math = math
-local os = os
+local box       = require("helpers.ui").create_boxed_widget
+local colorize  = require("helpers.ui").colorize_text
+local wheader   = require("helpers.ui").create_dash_widget_header
+local math  = math
+local os    = os
 
 local function widget()
   local header = wibox.widget({
-    helpers.ui.create_dash_widget_header("Tasks"),
+    wheader("Tasks"),
     margins = dpi(5),
     widget = wibox.container.margin,
   })
 
-  local placeholder = wibox.widget({
-    markup = helpers.ui.colorize_text("No tasks found", beautiful.fg),
-    align = "center",
-    valign = "center",
-    widget = wibox.widget.textbox,
-  })
-
   local task_list = wibox.widget({
-    placeholder,
+    wibox.widget({
+      markup = colorize("No tasks found", beautiful.fg),
+      align = "center",
+      valign = "center",
+      widget = wibox.widget.textbox,
+    }),
     spacing = dpi(5),
     layout = wibox.layout.fixed.vertical,
   })
@@ -94,7 +93,7 @@ local function widget()
 
     -- assemble widget
     local description = wibox.widget({
-      markup = helpers.ui.colorize_text(desc, desc_color),
+      markup = colorize(desc, desc_color),
       align = "left",
       widget = wibox.widget.textbox,
       ellipsize = "end",
@@ -102,7 +101,7 @@ local function widget()
     })
 
     local due_ = wibox.widget({
-      markup = helpers.ui.colorize_text(due_date_text, beautiful.task_due_fg),
+      markup = colorize(due_date_text, beautiful.task_due_fg),
       align = "right",
       widget = wibox.widget.textbox,
     })
@@ -120,7 +119,7 @@ local function widget()
   -- use `task export` to get task json, 
   -- then convert that to a table
   local function update_tasks()
-    local cmd = "task limit:8 +MONTH status:pending export rc.json.array=on"
+    local cmd = "task limit:8 +WEEK status:pending export rc.json.array=on"
     awful.spawn.easy_async_with_shell(cmd, function(stdout)
       local empty_json = "[\n]\n"
       if stdout ~= empty_json and stdout ~= "" then
@@ -161,5 +160,4 @@ local function widget()
   return task_widget
 end
 
-return helpers.ui.create_boxed_widget(widget(), dpi(220), dpi(230), beautiful.dash_widget_bg)
-
+return box(widget(), dpi(220), dpi(190), beautiful.dash_widget_bg)

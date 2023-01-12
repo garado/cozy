@@ -12,6 +12,7 @@ local os = os
 local dash = require("core.cozy.dash")
 local control = require("core.cozy.control")
 local themeswitcher = require("core.cozy.themeswitcher")
+local wspace = require("core.cozy.workspace")
 
 local mod   = "Mod4"
 local alt   = "Mod1"
@@ -71,10 +72,10 @@ awesome.connect_signal("startup", function()
   scratchpad:turn_off()
 end)
 
-
 -- ░█▀▀░█░░░█▀█░█▀▄░█▀█░█░░░░░█░█░█▀▀░█░█░█▀▄░▀█▀░█▀█░█▀▄░█▀▀
 -- ░█░█░█░░░█░█░█▀▄░█▀█░█░░░░░█▀▄░█▀▀░░█░░█▀▄░░█░░█░█░█░█░▀▀█
 -- ░▀▀▀░▀▀▀░▀▀▀░▀▀░░▀░▀░▀▀▀░░░▀░▀░▀▀▀░░▀░░▀▀░░▀▀▀░▀░▀░▀▀░░▀▀▀
+
 awful.keyboard.append_global_keybindings({
 
   -- ▄▀█ █░█░█ █▀▀ █▀ █▀█ █▀▄▀█ █▀▀
@@ -91,10 +92,17 @@ awful.keyboard.append_global_keybindings({
   awful.key({ mod }, "s", hotkeys_popup.show_help,
     { description = "help", group = "Awesome"}),
 
-  -- Daily briefing
-  awful.key({ mod }, "d", function()
+  -- -- Daily briefing
+  -- awful.key({ mod }, "d", function()
+  --   scratchpad:turn_off()
+  --   awesome.emit_signal("daily_briefing::toggle", s)
+  -- end, { description = "daily briefing", group = "Awesome" }),
+
+  -- Workspace switcher
+  awful.key({ mod }, "space", function()
     scratchpad:turn_off()
-    awesome.emit_signal("daily_briefing::toggle", s)
+    -- awesome.emit_signal("wspace::toggle", s)
+    wspace:toggle()
   end, { description = "daily briefing", group = "Awesome" }),
 
   -- Toggle dash
@@ -116,10 +124,10 @@ awful.keyboard.append_global_keybindings({
   end, { description = "dash", group = "Awesome" }),
 
   -- Toggle layout list switcher
-  awful.key({ mod }, "u", function()
-    scratchpad:turn_off()
-    awesome.emit_signal("layoutlist::toggle")
-  end, { description = "layout list", group = "Awesome"}),
+  -- awful.key({ mod }, "u", function()
+  --   scratchpad:turn_off()
+  --   awesome.emit_signal("layoutlist::toggle")
+  -- end, { description = "layout list", group = "Awesome"}),
 
 
   -- █░█ █▀█ ▀█▀ █▄▀ █▀▀ █▄█ █▀
@@ -174,6 +182,8 @@ awful.keyboard.append_global_keybindings({
   -- Screenshot and select region
   awful.key({ mod, alt }, "s", function()
     local home = os.getenv("HOME")
+    -- local cmd = 'import -window root -crop 1370x830-0-0 -gravity center -quality 90 /home/alexis/Github/cozy/.github/assets/SS.png'
+    -- local cmd = 'import -window root -crop 1920x1280-0-0 -gravity center -quality 90 /home/alexis/Github/cozy/.github/assets/SS.png'
     local cmd = "scrot " .. home  .. "/Pictures/Screenshots/%b%d::%H%M%S.png --silent 'xclip -selection clipboard -t image/png -i $f'"
     awful.spawn.easy_async(cmd, function() end)
   end, { description = "screenshot (whole screen)", group = "Hotkeys" }),

@@ -10,17 +10,17 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local area = require("modules.keynav.area")
 
-local nav_finances = area:new({ name = "finances" })
+local transactions  = require(... .. ".transactions")
+local balances      = require(... .. ".balances")
+local budget        = require(... .. ".budget")
+local actions, nav_actions = require(... .. ".actions")()
 
-local fin = "ui.dash.finances."
-local transactions          = require(fin .. "transactions")
-local balances              = require(fin .. "balances")
-local budget        = require(fin .. "budget")
--- local keygrabber    = require(fin .. "keygrabber")(cash)
--- local edit          = require(fin .. "edit")(cash)
-local nav_actions, actions  = require(fin .. "actions")()
-
-nav_finances:append(nav_actions)
+local nav_finances = area({
+  name = "finances",
+  children = {
+    nav_actions
+  }
+})
 
 local widget = wibox.widget({
   {

@@ -7,7 +7,7 @@
 local wibox   = require("wibox")
 local gears   = require("gears")
 local area    = require("modules.keynav.area")
-local naventry    = require("modules.keynav.navitem").Textbox
+local navtext    = require("modules.keynav.navitem").Textbox
 local beautiful   = require("beautiful")
 local colorize    = require("helpers").ui.colorize_text
 local xresources  = require("beautiful.xresources")
@@ -15,7 +15,7 @@ local dpi     = xresources.apply_dpi
 local journal = require("core.system.journal")
 
 -- Keyboard navigation
-local nav_entrylist = area:new({ name = "entrylist" })
+local nav_entrylist = area({ name = "entrylist" })
 
 -- █░█ █ 
 -- █▄█ █ 
@@ -41,34 +41,28 @@ local ui_entrylist_container = wibox.widget({
 
 local function create_entry_list_item(title, date, index)
   local entry = wibox.widget({
-    markup = colorize(title, beautiful.fg),
+    markup = colorize(date .. " " .. title, beautiful.fg),
     align  = "left",
     valign = "center",
     widget = wibox.widget.textbox,
   })
 
-  local nav = naventry:new(entry)
-  function nav:release()
+  local naventry = navtext({ widget = entry })
+  function naventry:release()
     journal.entry_index = index
     journal:emit_signal("entry_selected", index)
   end
 
-  local fuckyou = wibox.widget({
-    markup = colorize(" - " .. date, beautiful.fg_sub),
-    widget = wibox.widget.textbox,
-  })
-
-  return wibox.widget({
-    entry,
-    fuckyou,
-    layout = wibox.layout.fixed.horizontal,
-  }), nav
+  return entry, naventry
 end
 
 local function create_entry_list()
-  local entry_data = journal.entries
-  for i = 1, #entry_data do
+  ui_entrylist:reset()
+  nav_entrylist:remove_all_items()
+  nav_entrylist:reset()
 
+  local entry_data = journal.entries
+  for i = #entry_data, 1, -1 do
     local title = entry_data[i][journal.title]
     local date  = entry_data[i][journal.date]
     local entry, nav = create_entry_list_item(title, date, i)

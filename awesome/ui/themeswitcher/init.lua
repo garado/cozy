@@ -2,8 +2,6 @@
 -- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ 
 -- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ 
 
--- This file is super messy. Good luck reading it lol.
-
 local awful = require("awful")
 local gears = require("gears")
 local wibox = require("wibox")
@@ -18,22 +16,29 @@ local colorize = require("helpers.ui").colorize_text
 local keynav = require("modules.keynav")
 local Area = keynav.area
 local Navigator = keynav.navigator
+
 local Elevated = keynav.navitem.Elevated
+local simplebtn = require("helpers.ui").simple_button
+local navbg = require("modules.keynav.navitem").Background
 
 ------------------------------------------
 
 -- Setup for keyboard navigation
-local navigator, nav_root = Navigator:new()
-local nav_themes  = Area:new({ name = "nav_themes"  })
-local nav_styles  = Area:new({
+local nav_themes  = Area({ name = "nav_themes" })
+
+local nav_styles  = Area({
   name = "nav_styles",
   is_row = true
 })
-local nav_actions = Area:new({
+
+local nav_actions = Area({
   name = "nav_actions",
   is_row = true
 })
-nav_root:append(nav_themes)
+
+local navigator, nav_root = Navigator({
+  root_children = { nav_themes }
+})
 
 -- Module-level vars
 local theme_sel_textbox, theme_name_textbox, theme_style_textbox, current_selections
@@ -89,26 +94,32 @@ end
 
 --- Create a single theme button
 local function create_theme_button(themename)
-  local theme_button = widgets.button.text.normal({
-    text = themename,
-    text_normal_bg = beautiful.fg,
-    normal_bg = beautiful.switcher_opt_btn_bg,
-    animate_size = false,
-    size = 12,
-    on_release = function()
-      nav_styles:remove_all_items()
-      tscore:set_selected_theme(themename)
-      tscore:set_selected_style("")
-      theme_style_textbox:set_markup_silently("", beautiful.fg)
-      select_new_theme(themename)
-      -- create_style_buttons(themename)
-    end
+  local themebtn = simplebtn({
+    text  = themename,
+    bg    = beautiful.switcher_opt_btn_bg,
+    height = dpi(40),
+    width  = dpi(200),
   })
-  nav_themes:append(Elevated:new(theme_button))
+
+  local nav_themebtn = navbg({
+    widget = themebtn.children[1],
+    bg_on  = beautiful.bg_l3,
+    bg_off = beautiful.switcher_opt_btn_bg,
+  })
+
+  function nav_themebtn:release()
+    nav_styles:remove_all_items()
+    tscore:set_selected_theme(themename)
+    tscore:set_selected_style("")
+    theme_style_textbox:set_markup_silently("", beautiful.fg)
+    select_new_theme(themename)
+  end
+
+  nav_themes:append(nav_themebtn)
 
   return wibox.widget({
     {
-      theme_button,
+      themebtn,
       forced_width = dpi(200),
       widget = wibox.container.background,
     },

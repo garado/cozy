@@ -9,7 +9,6 @@ local dpi       = require("beautiful.xresources").apply_dpi
 local colorize  = require("helpers.ui").colorize_text
 local wheader   = require("helpers.ui").create_dash_widget_header
 local task      = require("core.system.task")
-local remove_pango = require("helpers.dash").remove_pango
 
 local area = require("modules.keynav.area")
 local navbg = require("modules.keynav.navitem").Background
@@ -58,7 +57,7 @@ local projects_widget = wibox.widget({
   shape = gears.shape.rounded_rect,
   widget = wibox.container.background,
 })
-nav_projects.widget = navbg:new(projects_widget)
+nav_projects.widget = navbg({ widget = projects_widget })
 
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄ 
 -- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀ 
@@ -80,7 +79,7 @@ local function create_project_button(tag, project, index)
     widget  = wibox.widget.textbox,
   })
 
-  local nav_project = navtext:new(textbox)
+  local nav_project = navtext({ widget = textbox })
   nav_project.index = index
 
   function nav_project:release()

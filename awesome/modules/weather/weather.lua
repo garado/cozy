@@ -137,6 +137,7 @@ local function worker(user_args)
   local both_units_widget = args.both_units_widget or false
   local show_hourly_forecast = args.show_hourly_forecast
   local show_daily_forecast = args.show_daily_forecast
+  local show_current_forecast = args.show_current_forecast
   local icon_pack_name = args.icons or 'weather-underground-icons'
   local icons_extension = args.icons_extension or '.png'
   local timeout = args.timeout or 120
@@ -299,11 +300,13 @@ local function worker(user_args)
     widget:set_image(ICONS_DIR .. icon_map[result.current.weather[1].icon] .. icons_extension)
     widget:set_text(gen_temperature_str(result.current.temp, '%.0f', both_units_widget, units))
 
-    current_weather_widget:update(result.current)
 
     weather_widget.children[1]:reset()
 
-    weather_widget.children[1]:add(current_weather_widget)
+    if show_current_forecast then
+      current_weather_widget:update(result.current)
+      weather_widget.children[1]:add(current_weather_widget)
+    end
 
     if show_daily_forecast then
       daily_forecast_widget:update(result.daily, result.timezone_offset)
