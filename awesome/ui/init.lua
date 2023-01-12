@@ -1,6 +1,6 @@
 require(... .. ".notifications")
 
-local bar = require(... .. ".bar")
+local bar = require(... .. ".vbar")
 local dash = require(... .. ".dash")
 local control_center = require(... .. ".control")
 local switcher = require(... .. ".themeswitcher")
