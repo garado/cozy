@@ -8,65 +8,70 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local widgets = require("ui.widgets")
 local box = require("helpers.ui").create_boxed_widget
 local ledger = require("core.system.ledger")
 local dash = require("core.cozy.dash")
-
+local gears = require("gears")
+local colorize = require("helpers.ui").colorize_text
 local area = require("modules.keynav.area")
-local elevated = require("modules.keynav.navitem").Elevated
-local dashwidget = require("modules.keynav.navitem").Dashwidget
+local navbg = require("modules.keynav.navitem").Background
+
+local function create_button(text)
+  local btn = wibox.widget({
+    {
+      markup = colorize(text, beautiful.fg),
+      font   = beautiful.base_small_font,
+      align  = "center",
+      valign = "center",
+      widget = wibox.widget.textbox,
+    },
+    forced_height = dpi(50),
+    shape  = gears.shape.rounded_rect,
+    bg     = beautiful.cash_action_btn,
+    widget = wibox.container.background,
+  })
+
+  local nav_btn = navbg({
+    widget = btn,
+    bg_off = beautiful.cash_action_btn,
+  })
+
+  return btn, nav_btn
+end
+
+local open_btn, nav_open = create_button("Open ledger")
+function nav_open:release()
+  ledger:open_ledger()
+  dash:close()
+end
+
+local reload_btn, nav_reload = create_button("Reload")
+function nav_reload:release()
+  ledger:reload()
+end
 
 local nav_actions = area:new({
   name = "nav_actions",
   circular = true,
+  children = {
+    nav_open,
+    nav_reload,
+  }
 })
-
-local open_button = widgets.button.text.normal({
-  text = "Open ledger",
-  text_normal_bg = beautiful.fg,
-  normal_bg = beautiful.cash_action_btn,
-  animate_size = true,
-  font = beautiful.font,
-  size = 12,
-  on_release = function()
-    ledger:open_ledger()
-    dash:close()
-  end,
-})
-
-local reload_button = widgets.button.text.normal({
-  text = "Reload",
-  text_normal_bg = beautiful.fg,
-  normal_bg = beautiful.cash_action_btn,
-  animate_size = true,
-  font = beautiful.font,
-  size = 12,
-  on_release = function()
-    ledger:reload()
-  end
-})
-
-nav_actions:append(elevated:new(open_button))
-nav_actions:append(elevated:new(reload_button))
 
 local actions = wibox.widget({
   {
-    {
-      open_button,
-      reload_button,
-      spacing = dpi(20),
-      layout = wibox.layout.fixed.horizontal,
-    },
-    widget = wibox.container.place,
+    open_btn,
+    reload_btn,
+    spacing = dpi(20),
+    layout = wibox.layout.fixed.horizontal,
   },
-  widget = wibox.container.background,
+  widget = wibox.container.place,
 })
 
 local container = box(actions, dpi(0), dpi(80), beautiful.dash_widget_bg)
-nav_actions.widget = dashwidget:new(container)
+nav_actions.widget = navbg({ widget = container })
 
 return function()
-  return nav_actions, container
+  return container, nav_actions
 end
-

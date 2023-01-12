@@ -14,12 +14,14 @@ local dpi = xresources.apply_dpi
 local journal = require("core.system.journal")
 
 -- Imports
-local lock_ui     = require(... .. ".lock")
-local contents    = require(... .. ".contents")()
+local lock_ui  = require(... .. ".lock")
+local contents = require(... .. ".contents")()
 local entrylist, nav_entrylist = require(... .. ".entrylist")()
+local actions, nav_actions     = require(... .. ".actions")()
 
 -- Keyboard navigation
 local nav_journal = area:new({ name = "journal" })
+nav_journal:append(nav_actions)
 nav_journal:append(nav_entrylist)
 
 -- █░█ █ 
@@ -33,6 +35,7 @@ local sidebar = wibox.widget({
     valign = "center",
     widget = wibox.widget.textbox,
   }),
+  actions,
   entrylist,
   spacing       = dpi(15),
   forced_width  = dpi(400),

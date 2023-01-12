@@ -2,7 +2,7 @@
 -- █▀▀ █▀█ █▄░█ ▀█▀ █▀▀ █▄░█ ▀█▀ █▀ 
 -- █▄▄ █▄█ █░▀█ ░█░ ██▄ █░▀█ ░█░ ▄█ 
 
--- Textbox showing log entry contents and a scrollbar.
+-- Textbox showing log entry contents and a scrollbar, as well as a list of tags.
 
 local wibox   = require("wibox")
 local gears   = require("gears")
@@ -13,8 +13,6 @@ local colorize    = require("helpers.ui").colorize_text
 local xresources  = require("beautiful.xresources")
 local dpi     = xresources.apply_dpi
 local journal = require("core.system.journal")
-
-----
 
 -- █░█ █ 
 -- █▄█ █ 
@@ -34,6 +32,11 @@ local contents_wibox = wibox.widget({
   widget  = wibox.widget.textbox,
 })
 
+local tag_subheader = wibox.widget({
+  markup = colorize("Tags", beautiful.main_accent),
+  widget = wibox.widget.textbox,
+})
+
 local header_and_contents_container = wibox.widget({
   { -- Header
     title_wibox,
@@ -41,6 +44,7 @@ local header_and_contents_container = wibox.widget({
     datetime_wibox,
     layout = wibox.layout.align.horizontal,
   },
+  contents_wibox,
   { -- Separator
     {
       color = beautiful.bg_l3,
@@ -50,7 +54,10 @@ local header_and_contents_container = wibox.widget({
     bottom = dpi(5),
     widget = wibox.container.margin,
   },
-  contents_wibox,
+  { -- Tags
+    tag_subheader,
+    layout = wibox.layout.fixed.horizontal,
+  },
   spacing = dpi(5),
   layout = wibox.layout.fixed.vertical,
   visible = false,
@@ -79,7 +86,7 @@ local function update_contents(title, date, time, stdout)
   markup = colorize(time .. " " .. date, beautiful.main_accent)
   datetime_wibox:set_markup_silently(markup)
 
-  contents_wibox.text = stdout
+  contents_wibox:set_markup_silently(colorize(stdout, beautiful.fg))
 end
 
 journal:connect_signal("lock", function()

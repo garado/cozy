@@ -13,8 +13,7 @@ local colorscheme = {
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
 local awesome_cfg = gfs.get_configuration_dir()
--- colorscheme.wall_path = awesome_cfg .. "theme/assets/walls/mountain_modified_fuji.png"
-colorscheme.wall_path = "/home/alexis/Pictures/Wallpapers/mountain/dark/shore.png"
+colorscheme.wall_path = awesome_cfg .. "theme/colorschemes/mountain/fuji.png"
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
@@ -44,6 +43,14 @@ colorscheme.colors.green       = "#89ab8a"
 colorscheme.colors.yellow      = "#c4c19e"
 colorscheme.colors.transparent = "#ffffff00"
 
+colorscheme.colors.gradient = {
+  [0] = "#191919",
+  [1] = "#333539",
+  [2] = "#4e545d",
+  [3] = "#6b7584",
+  [4] = "#8a98ac",
+}
+
 -- █▀█ █░█ █▀▀ █▀█ █▀█ █ █▀▄ █▀▀ 
 -- █▄█ ▀▄▀ ██▄ █▀▄ █▀▄ █ █▄▀ ██▄ 
 colorscheme.override.wibar_focused = "#5b6572"
@@ -53,5 +60,6 @@ colorscheme.override.wibar_focused = "#5b6572"
 colorscheme.switcher.kitty   = "Mountain Fuji"
 colorscheme.switcher.nvchad  = "mountain"
 colorscheme.switcher.zathura = "mountain_fuji"
+colorscheme.switcher.rofi    = "mountain-fuji"
 
 return colorscheme

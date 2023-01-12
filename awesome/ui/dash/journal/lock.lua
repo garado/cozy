@@ -14,6 +14,8 @@ local xresources  = require("beautiful.xresources")
 local dpi     = xresources.apply_dpi
 local journal = require("core.system.journal")
 
+local kprompt = require("modules.kasperprompt")
+
 journal.is_locked = true
 
 -- █░█ █ 
@@ -26,6 +28,7 @@ local prompt_textbox = wibox.widget({
     font    = beautiful.base_small_font,
     widget  = wibox.widget.textbox,
   },
+  valign  = "center",
   widget  = wibox.container.place,
 })
 
@@ -50,6 +53,7 @@ local widget = wibox.widget({
   header,
   subheader,
   prompt_textbox,
+  valign = "center",
   layout = wibox.layout.fixed.vertical,
 })
 

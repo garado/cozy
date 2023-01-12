@@ -9,11 +9,10 @@ local dpi       = require("beautiful.xresources").apply_dpi
 local colorize  = require("helpers.ui").colorize_text
 local wheader   = require("helpers.ui").create_dash_widget_header
 local task      = require("core.system.task")
-local remove_pango = require("helpers.dash").remove_pango
 
 local area = require("modules.keynav.area")
-local taskbox = require("modules.keynav.navitem").Taskbox
-local tasks_textbox = require("modules.keynav.navitem").Tasks_Textbox
+local navbg = require("modules.keynav.navitem").Background
+local navtext = require("modules.keynav.navitem").Textbox
 
 -- █▄▀ █▀▀ █▄█ █▄▄ █▀█ ▄▀█ █▀█ █▀▄ 
 -- █░█ ██▄ ░█░ █▄█ █▄█ █▀█ █▀▄ █▄▀ 
@@ -58,7 +57,7 @@ local projects_widget = wibox.widget({
   shape = gears.shape.rounded_rect,
   widget = wibox.container.background,
 })
-nav_projects.widget = taskbox:new(projects_widget)
+nav_projects.widget = navbg({ widget = projects_widget })
 
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄ 
 -- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀ 
@@ -80,22 +79,8 @@ local function create_project_button(tag, project, index)
     widget  = wibox.widget.textbox,
   })
 
-  local nav_project = tasks_textbox:new(textbox)
+  local nav_project = navtext({ widget = textbox })
   nav_project.index = index
-
-  function nav_project:select_on()
-    self.selected = true
-    local text    = remove_pango(self.widget.text)
-    local mkup    = colorize(text, beautiful.main_accent)
-    self.widget:set_markup_silently(mkup)
-  end
-
-  function nav_project:select_off()
-    self.selected = false
-    local text    = remove_pango(self.widget.text)
-    local mkup    = colorize(text, beautiful.fg)
-    self.widget:set_markup_silently(mkup)
-  end
 
   function nav_project:release()
     task:emit_signal("selected::project", project)
@@ -109,8 +94,10 @@ task:connect_signal("project_list::update_all", function(_, tag)
   nav_projects:remove_all_items()
   nav_projects:reset()
   local index = 1
-  for project, _ in pairs(task:get_projects(tag)) do
-    local textbox, nav = create_project_button(tag, project, index)
+
+  local pnames = task:project_names(tag)
+  for i = 1, #pnames do
+    local textbox, nav = create_project_button(tag, pnames[i], index)
     project_list:add(textbox)
     nav_projects:append(nav)
     index = index + 1

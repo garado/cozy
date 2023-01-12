@@ -18,6 +18,7 @@ local notif   = require(... .. ".notif")
 local app_launcher = require(... .. ".app_launcher")
 local launchers = require(... .. ".launchers")
 local timew     = require(... .. ".timew")
+local logo    = require(... .. ".logo")
 
 -- local systray = require(... .. ".systray")
 -- local layout, layout_popup = require(... .. ".layout")()
@@ -36,12 +37,12 @@ return function(s)
         {
           { -- Top
             {
-              app_launcher,
-              launchers[1],
-              launchers[2],
-              launchers[3],
-              git,
-              spacing = dpi(15),
+              logo,
+              -- app_launcher,
+              -- launchers[1],
+              -- launchers[2],
+              -- launchers[3],
+              -- git,
               layout = wibox.layout.fixed.vertical,
             },
             top = dpi(8),
@@ -58,7 +59,7 @@ return function(s)
               battery,
               clock,
               --systray,
-              spacing = dpi(8),
+              spacing = dpi(10),
               layout = wibox.layout.fixed.vertical,
             },
             bottom = dpi(6),

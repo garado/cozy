@@ -50,7 +50,7 @@ local gears   = require("gears")
 local config  = require("config")
 
 local debug   = require("core.debug")
--- debug:off()
+debug:off()
 
 local task = { }
 local instance = nil
@@ -101,12 +101,38 @@ function task:parse_tasks_for_tag(tag)
         local proj = json_arr[i]["project"] or "No project"
         if not projects[proj] then
           projects[proj] = {}
+          projects[proj].name  = proj
           projects[proj].tasks = {}
           projects[proj].total = 0
           project_names[#project_names+1] = proj
           self:parse_total_tasks_for_proj(tag, proj)
         end
         table.insert(projects[proj].tasks, v)
+      end
+
+      -- Sort projects alphabetically
+      table.sort(project_names, function(a, b)
+        return a < b
+      end)
+
+      -- Sort tasks by due date, then alphabetically 
+      for i = 1, #project_names do
+        table.sort(projects[project_names[i]].tasks, function(a, b)
+          -- If neither have due dates, or they have the same due date,
+          -- then sort alphabetically
+          if (not a.due and not b.due) or (a.due == b.due) then
+            return a.description < b.description
+          end
+
+          -- Closest due date should come first
+          if a.due and not b.due then
+            return true
+          elseif not a.due and b.due then
+            return false
+          else
+            return a.due < b.due
+          end
+        end)
       end
 
       self._private.tags[tag] = {}
@@ -269,6 +295,10 @@ end
 function task:project_names(tag)
   if not self._private.tags[tag] then return end
   return self._private.tags[tag].project_names
+end
+
+function task:get_project_by_name(tag, project)
+  return self._private.tags[tag].projects[project]
 end
 
 --- everything below here needs to be refactored or renamed

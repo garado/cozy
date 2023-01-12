@@ -10,6 +10,7 @@ local awful   = require("awful")
 local core    = require("helpers.core")
 local config  = require("config")
 local debug   = require("core.debug")
+local dash    = require("core.cozy.dash")
 
 local journal   = { }
 local instance  = nil
@@ -18,7 +19,7 @@ local instance  = nil
 
 --- Call jrnl command to extract entries, then store them in a table.
 function journal:parse_entries()
-  local cmd = "jrnl -to today --short -n 100"
+  local cmd = "jrnl -to today --short -n 30"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local lines = core.split('\r\n', stdout)
 
@@ -82,6 +83,22 @@ function journal:try_unlock(input)
   end
 end
 
+--- Close dash, open term, start new jrnl entry
+function journal:new_entry()
+  local cmd = "kitty sh -c 'jrnl'"
+  awful.spawn(cmd, {
+    floating = true,
+    geometry = {x=360, y=90, height=900, width=1200},
+    placement = awful.placement.centered,
+  })
+end
+
+function journal:reload()
+  self.entries = {}
+  self:parse_entries()
+  self:emit_signal("ready::entries")
+end
+
 -------------------------
 
 function journal:new()
@@ -99,7 +116,6 @@ function journal:new()
   end)
 
   self:connect_signal("entry_selected", function(_, index)
-    print('selected entry index '..index)
     local entry = self.entries[index]
     local date  = entry[self.date]
     local title = entry[self.title]

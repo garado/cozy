@@ -1,19 +1,17 @@
 require(... .. ".notifications")
 
-local bar = require(... .. ".vbar")
+local vbar = require(... .. ".vbar")
 local dash = require(... .. ".dash")
-local control_center = require(... .. ".control")
+local ctrl = require(... .. ".control")
 local switcher = require(... .. ".themeswitcher")
-local layoutlist = require(... .. ".layoutlist")
-local daily_briefing = require(... .. ".daily_briefing")
+local calpopup = require(... .. ".dash.agenda.popup")
 
--- Put bar on each screen
 local awful = require("awful")
+
 awful.screen.connect_for_each_screen(function(s)
-  bar(s)
+  vbar(s)
   dash(s)
-  control_center()
+  ctrl(s)
   switcher()
-  layoutlist(s)
-  daily_briefing()
+  calpopup()
 end)

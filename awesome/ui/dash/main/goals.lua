@@ -23,7 +23,7 @@ end
 
 local widget = wibox.widget({
   {
-    wheader("Questlog"),
+    wheader("Goals"),
     {
       id = "goals",
       spacing = dpi(5),
@@ -37,8 +37,8 @@ local widget = wibox.widget({
 
 local goals_list = config.goals
 local w = widget:get_children_by_id("goals")[1]
-for _,v in ipairs(goals_list) do
-  w:add(create_goal(v))
+for i = 1, #goals_list do
+  w:add(create_goal(goals_list[i]))
 end
 
 return box(widget, dpi(220), dpi(220), beautiful.dash_widget_bg)

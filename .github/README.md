@@ -1,148 +1,172 @@
-<h1 align="center">cozy</h1>
+<h1 align="center">Cozy</h1>
 
 <p align="center">
-  <img title="" src="assets/animation_demo.gif">
+  <img title="" src="assets/showcase.png" width="900">
+</p>
+
+<p> Hi! This is <b>Cozy</b>, my AwesomeWM config that I've spent way too much time on. </p>
+
+<h3> ⚠️ Warning </h3>
+
+<p>This project is undergoing heavy refactoring and is best used as a code reference for now. It probably won't work out of the box on your machine. Support is also limited as I'm busy with school. </p>
+
+<!-- █▀▄ ▄▀█ █▀ █░█ █▄▄ █▀█ ▄▀█ █▀█ █▀▄ -->
+<!-- █▄▀ █▀█ ▄█ █▀█ █▄█ █▄█ █▀█ █▀▄ █▄▀ -->
+
+<h2>Dashboard</h2>
+
+<p>
+  The dashboard is a collection of graphical interfaces for several command-line applications, including <a href="https://github.com/ledger/" target="_blank">ledger</a>, <a href="https://taskwarrior.org/" target="_blank">taskwarrior</a>, <a href="https://timewarrior.net" target="_blank">timewarrior</a>, and <a href="https://github.com/insanum/gcalcli" target="_blank">gcalcli</a>.
 </p>
 
 <p>
-Hi! This is <b>cozy</b>, my Arch config with <a href="https://awesomewm.org" target="_blank">AwesomeWM</a>. Thanks for checking it out!
+  The dashboard (as well as every other popup) is fully keyboard navigable with Vim-like keybinds using a custom navigation library.
 </p>
 
-<h2>⚠️ This project is undergoing heavy refactoring. It probably won't work on your machine. It's best used as just a reference for now.</h2>
-
-<p>
-  The primary goals of this setup are to create an environment that:
-</p>
-
-<ol>
-<li>can be used easily on both my laptop and my touchscreen tablet</li>
-<li>integrates all the cli tools I use to manage my life into a nice dashboard</li>
-<li>looks awesome!</li>
-</ol>
-
-<h2>🚀 Features</h2>
-<h3>Dashboard</h3>
+<h4>Main tab</h4>
 <p align="center">
-  <img title="" src="assets/dash_main.png" alt="" width="800">
+  <img title="" src="./assets/dash_main.png" width="800">
 </p>
-
 <ul>
-<li><b>Fully keyboard navigable!</b></li>
-<li>Fancy music player (thank you <a href="https://github.com/rxyhn/yoru" target="_blank">rxhyn</a>)</li>
-<li>Calendar (with Google Calendar) </li>
-<li>To do list (with <a href="https://taskwarrior.org/" target="_blank">Taskwarrior</a>)</li>
-<li>Time tracking (with <a href="https://timewarrior.net" target="_blank">Timewarrior</a>)</li>
-<li>Interactive habit tracker (with <a href="https://pixe.la" target="_blank">Pixela</a>)</li>
-<li>Fancy finances (with <a href="https://github.com/ledger/" target="_blank">Ledger</a>)</li>
-<li>(WIP) Different tabs to show even more information!</li>
+  <li>Habit-tracking with <a href="https://pixe.la">Pixela</a></li>
+  <li>Github contributions widget <a href="https://github.com/streetturtle/awesome-wm-widgets/blob/master/github-contributions-widget/README.md">(streetturtle)</a></li>
+  <li>View current Timewarrior time-tracking</li>
 </ul>
 
-<b>Like the dashboard but don't want to use AwesomeWM? There's a work-in-progress <a href="https://github.com/garado/dashboard" target="_blank">rewrite of the dashboard in Flutter</a>.</b>
-
-<h4>To do list applet (Taskwarrior)</h4>
+<h4>Task management</h4>
 <p align="center">
-  <img title="" src="assets/task_demo.gif" alt="" width="800">
+  <img title="" src="./assets/dash_task.png" width="800">
 </p>
 <ul>
-  <li>View tags, projects, and project stats</li>
-  <li>Easily add and modify tasks</li>
-  <li>Supports starting and stopping tasks for easy time-tracking</li>
+  <li>Aesthetic and easy-to-use GUI for Taskwarrior</li>
+  <li>Add, view, and edit tasks from dashboard</li>
+  <li>Start and stop tasks for easy time-tracking</li>
 </ul>
 
-<h4>Finances at a glance</h4>
+<details>
+<summary>Task manager keybinds</summary>
+
+| Keybind          | Action                 |
+| -------          | ------                 |
+| <kbd>a</kbd>     | Add task               |
+| <kbd>s</kbd>     | Toggle start/stop task |
+| <kbd>d</kbd>     | Mark task as done      |
+| <kbd>x</kbd>     | Delete task            |
+| <kbd>R</kbd>     | Reload tasks           |
+| <kbd>/</kbd>     | Search                 |
+| <kbd>m + d</kbd> | (modify) due date      |
+| <kbd>m + p</kbd> | (modify) project name  |
+| <kbd>m + t</kbd> | (modify) tag name      |
+| <kbd>m + n</kbd> | (modify) task name     |
+
+</details>
+
+<h4>Agenda</h4>
 <p align="center">
-  <img title="" src="assets/ledger.png" alt="" width="800">
+  <img title="" src="./assets/dash_agenda.png" width="800">
 </p>
 <ul>
-  <li>Uses Ledger as a backend - have the convenience of a banking app without relying on a shady 3rd party</li>
+  <li>Add, view, and edit Google Calendar events</li>
+  <li>Open meeting links directly from dashboard</li>
+  <li>View <a href="https://github.com/streetturtle/awesome-wm-widgets/blob/master/weather-widget/weather.lua" target="_blank">forecast</a>, goals, and deadlines for this week</li>
+  <li>Calendar with heatmap showing which days are busiest</li>
+</ul>
+
+<details>
+<summary>Agenda keybinds</summary>
+
+| Event list       | Action                 |
+| -------          | ------                 |
+| <kbd>R</kbd>     | Refresh/resync         |
+| <kbd>a</kbd>     | Add event              |
+| <kbd>x</kbd>     | Delete event           |
+| <kbd>o</kbd>     | Open link              |
+| <kbd>m + t</kbd> | (modify) event title   |
+| <kbd>m + l</kbd> | (modify) location      |
+| <kbd>m + w</kbd> | (modify) when          |
+| <kbd>m + d</kbd> | (modify) duration      |
+
+
+| Calendar     | Action               |
+| -------      | ------               |
+| <kbd>H</kbd> | Previous month       |
+| <kbd>L</kbd> | Next month           |
+| <kbd>t</kbd> | Jump to this month   |
+
+| Infobox (bottom left) | Action         |
+| -------               | ------         |
+| <kbd>h, l</kbd>       | Cycle  widgets |
+
+</details>
+
+<h4>Ledger</h4>
+<p align="center">
+  <img title="" src="./assets/dash_ledger.png" width="800">
+</p>
+<ul>
+  <li>View budget, account balances, and spending history</li>
   <li>Quickly access ledger files to add or update ledger entries</li>
 </ul>
 
-<h4>Time tracking</h4>
+<h4>Journal</h4>
 <p align="center">
-  <img title="" src="assets/timewarrior.png" alt="" width="800">
+  <img title="" src="./assets/dash_journal.png" width="800">
 </p>
 <ul>
-  <li>Heatmap showing which days you've worked the hardest</li>
-  <li>View time tracking statistics and recent sessions</li>
+  <li>View past journal entries and quickly create new ones (idk, I like to reread them a lot)</li>
 </ul>
 
-<h3>Control center</h3>
-<p align="center">
-  <img title="" src="assets/control_center.gif" alt="" width="400">
-</p>
-Also fully keyboard navigable!
+<!-- █▀▀ █▀█ █▄░█ ▀█▀ █▀█ █▀█ █░░    █▀▀ █▀▀ █▄░█ ▀█▀ █▀▀ █▀█ --> 
+<!-- █▄▄ █▄█ █░▀█ ░█░ █▀▄ █▄█ █▄▄    █▄▄ ██▄ █░▀█ ░█░ ██▄ █▀▄ --> 
 
-
-<h3>Theme switcher</h3>
+<h2>Control center</h2>
 
 <p align="center">
-  <img title="" src="assets/theme_switcher.gif" alt="" width="800">
+  <img title="" src="./assets/control.png" width="400">
 </p>
-
-The theme switcher can set the theme for your entire system - not just Awesome. By default, it switches Kitty and NvChad themes, but it is easily extensible to whichever applications you use.
-
-Built-in themes:
-
-| Theme name | Styles       |
-|------------|--------------|
-| nord       | dark, light  |
-| dracula    | dark         |
-| tokyonight | dark         |
-| gruvbox    | dark, light  |
-| catpuccin  | mocha, latte |
 
 <ul>
-  <li>
-    <details><summary><b>nord</b></summary>
-      <p align="center">
-        <img title="" width="800" src="assets/themes/nord_dark.png">
-      </p>
-      <p align="center">
-        <img title="" width="800" src="assets/themes/nord_light.png">
-      </p>
-    </details>
-  </li>
-  <li>
-    <details><summary><b>dracula</b></summary>
-      <p align="center">
-        <img title="" width="800" src="assets/themes/dracula.png">
-      </p>
-    </details>
-  </li>
-  <li>
-    <details><summary><b>catpuccin</b></summary>
-      <p align="center">
-        <img title="" width="800" src="assets/themes/catppuccin_macchiato.png">
-      </p>
-    </details>
-  </li>
-  <li>
-    <details><summary><b>tokyo_night</b></summary>
-      <p align="center">
-        <img title="" width="800" src="assets/themes/tokyo_night.png">
-      </p>
-    </details>
-  </li>
-  <li>
-    <details><summary><b>gruvbox</b></summary>
-      <p align="center">
-        <img title="" width="800" src="assets/themes/gruvbox_dark.png">
-      </p>
-      <p align="center">
-        <img title="" width="800" src="assets/themes/gruvbox_light.png">
-      </p>
-    </details>
-  </li>
+  <li>Picom animation settings</li>
+  <li>Handy set of quick actions</li>
 </ul>
 
-<h3>Install and configure</h3>
-See the <a href="https://github.com/garado/cozy/wiki" target="_blank">wiki</a> for complete install instructions.
+<!-- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ -->
+<!-- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ -->
+
+<h2>Theme switcher</h2>
+
+<p align="center">
+  <img title="" src="./assets/themeswitch.gif">
+</p>
+
+<p>
+  Changes AwesomeWM theme and themes for other applications (Rofi, Zathura, Nvim, Kitty). Easily extendable to other applications as well.
+</p>
+
+<details><summary>Themes preview</summary>
+  <p align="center">
+    <img title="nord" width="550" src="./assets/themes/nord.png">
+  </p>
+  <p align="center">
+    <img title="kanagawa" width="550" src="./assets/themes/kanagawa.png">
+  </p>
+  <p align="center">
+    <img title="mountain" width="550" src="./assets/themes/mountain.png">
+  </p>
+  <p align="center">
+    <img title="nostalgia" width="550" src="./assets/themes/nostalgia.png">
+  </p>
+  <p align="center">
+    <img title="gruvbox" width="550" src="./assets/themes/gruvbox.png">
+  </p>
+</details>
+
+<!-- █▀▀ █▀█ █▀█ ▀█▀ █▄░█ █▀█ ▀█▀ █▀▀ █▀ --> 
+<!-- █▀░ █▄█ █▄█ ░█░ █░▀█ █▄█ ░█░ ██▄ ▄█ --> 
 
 <h3>Other stuff</h3>
 <b>Why is it called 'cozy'?</b> 
-
-I've spent a lot of time tweaking this setup to be just the way I like it, so now this setup feels very personal, comfortable, and <b>cozy</b>.  :-)
+I've spent a lot of time tweaking this setup to be just the way I like it, so now this setup feels very personal, comfortable, and cozy.  :-)
 
 <h3>Credits</h3>
 <ul>

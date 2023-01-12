@@ -8,6 +8,7 @@
 local awful   = require("awful")
 local task    = require("core.system.task")
 local core    = require("helpers.core")
+local time    = require("core.system.time")
 
 local function request(type)
   if not type then return end
@@ -86,8 +87,10 @@ task:connect_signal("key::input_completed", function(_, type, input)
   elseif type == "start" then
     if _task["start"] then
       cmd = "task " .. id .. " stop"
+      time:emit_signal("set_tracking_inactive")
     else
       cmd = "task " .. id .. " start"
+      time:emit_signal("set_tracking_active")
     end
   elseif type == "reload" then
     if input == "y" or input == "Y" then
@@ -109,6 +112,9 @@ task:connect_signal("key::input_completed", function(_, type, input)
 
   -- Execute command
   awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
+    print(cmd)
+    print(stdout)
+    print(stderr)
     -- Check for invalid date
     if string.find(stderr, "is not a valid date") then return end
 
@@ -126,17 +132,16 @@ task:connect_signal("key::input_completed", function(_, type, input)
 end)
 
 return {
-  ["m"] = modeswitch, -- enter modify mode
-  -- ["H"] = {["function"] = handle_key, ["args"] = "H"}, -- help menu
-  ["a"] = {["function"] = handle_key, ["args"] = "a"}, -- add new task
-  ["x"] = {["function"] = handle_key, ["args"] = "x"}, -- delete
-  ["s"] = {["function"] = handle_key, ["args"] = "s"}, -- toggle start
-  ["u"] = {["function"] = handle_key, ["args"] = "u"}, -- undo
-  ["d"] = {["function"] = handle_key, ["args"] = "d"}, -- done; (modify) due date
-  ["p"] = {["function"] = handle_key, ["args"] = "p"}, -- add new project; (modify) project
-  ["t"] = {["function"] = handle_key, ["args"] = "t"}, -- add new tag; (modify) task
-  ["n"] = {["function"] = handle_key, ["args"] = "n"}, -- next; (modify) taskname
-  ["R"] = {["function"] = handle_key, ["args"] = "R"}, -- restart + reload all tasks
-  ["/"] = {["function"] = handle_key, ["args"] = "/"}, -- search
-  ["Escape"] = {["function"] = handle_key, ["args"] = "Escape"}, -- (modify) clear
+  ["m"]      = { f = function() modeswitch()    end },
+  ["a"]      = { f = function() handle_key("a") end },
+  ["x"]      = { f = function() handle_key("x") end },
+  ["s"]      = { f = function() handle_key("s") end },
+  ["u"]      = { f = function() handle_key("u") end },
+  ["d"]      = { f = function() handle_key("d") end },
+  ["p"]      = { f = function() handle_key("p") end },
+  ["t"]      = { f = function() handle_key("t") end },
+  ["n"]      = { f = function() handle_key("n") end },
+  ["R"]      = { f = function() handle_key("R") end },
+  ["/"]      = { f = function() handle_key("/") end },
+  ["Escape"] = { f = function() handle_key("Escape") end},
 }

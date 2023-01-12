@@ -2,11 +2,13 @@
 -- █▀█ █ ▀▄▀ █▀▀ █░░ ▄▀█ 
 -- █▀▀ █ █░█ ██▄ █▄▄ █▀█ 
 
+-- Habit tracking by API with Pixela.
+
 local gobject = require("gears.object")
-local gtable = require("gears.table")
-local awful = require("awful")
-local config = require("config")
-local gfs = require("gears.filesystem")
+local gtable  = require("gears.table")
+local awful   = require("awful")
+local config  = require("config")
+local gfs     = require("gears.filesystem")
 local naughty = require("naughty")
 
 local pixela = { }
@@ -36,7 +38,7 @@ end
 --- For every habit specified in the user's config file, grab the last
 -- 4 days of habit data from the cache file in ~/.cache/awesome/pixela.
 -- Store the data directly within config.habit table from user config file
--- because why bother making another table with the same info.
+-- because didn't want to bother with multiple data tables.
 function pixela:parse_cache_data()
   -- Get graph ids from user config file
   local habits = config.habit
@@ -64,9 +66,7 @@ function pixela:parse_cache_data()
 
       config.habit[graph_id]["completion"] = completion
       self:emit_signal("update::habits", graph_id)
-
     end)
-
   end
 end -- end pixela:parse_cache_data
 

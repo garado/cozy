@@ -10,41 +10,36 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local colorize = require("helpers").ui.colorize_text
+local simplebtn = require("helpers").ui.simple_button
 local box = require("helpers").ui.create_boxed_widget
 local dash_header = require("helpers").ui.create_dash_widget_header
-local widgets = require("ui.widgets")
-local config = require("config")
-local string = string
 local dash = require("core.cozy.dash")
+local time = require("core.system.time")
+local format_time = require("helpers.core").format_time
 
-local Elevated = require("modules.keynav.navitem").Elevated
-local Dashwidget = require("modules.keynav.navitem").Dashwidget
-local Area = require("modules.keynav.area")
+local navbg = require("modules.keynav.navitem").Background
+local area  = require("modules.keynav.area")
 
-local nav_timewarrior   = Area:new({ name = "timewarrior" })
-local nav_timew_topics  = Area:new({ name = "timew_topics", circular = true })
-local nav_timew_actions = Area:new({ name = "timew_actions" })
+local nav_timewarrior = area({ name = "timewarrior" })
 
-local update_ui, init_start_ui
-local ui_started, ui_stopped
-local topic_list = config.pomo.topics
+local timew_widget
 
--- Creates a subsection.
--- Subsections: current session, working on, total today
+--- Creates a subsection with a header.
+-- Subsections used: current session, working on, total today
 local function create_ui_subsection(header, text, text_size)
   local _header = wibox.widget({
     markup = colorize(header, beautiful.timew_header_fg),
-    font = beautiful.font_name .. "Bold 10",
+    font   = beautiful.font_name .. "Bold 10",
     valign = "center",
-    align = "center",
+    align  = "center",
     widget = wibox.widget.textbox,
   })
 
   local _text = wibox.widget({
     markup = colorize(text, beautiful.fg),
-    font = beautiful.alt_font_name .. text_size,
+    font   = beautiful.alt_font_name .. text_size,
     valign = "center",
-    align = "center",
+    align  = "center",
     widget = wibox.widget.textbox,
   })
 
@@ -52,111 +47,85 @@ local function create_ui_subsection(header, text, text_size)
     _header,
     _text,
     layout = wibox.layout.fixed.vertical,
+    -------
+    set_text = function(self, new_text)
+      self.children[2]:set_markup_silently(colorize(new_text, beautiful.fg))
+    end
   })
 end
+
+local total_all_tags = create_ui_subsection("TOTAL TODAY", "--", 15)
+local current_time   = create_ui_subsection("CURRENT SESSION", "--", 30)
+local current_tag    = create_ui_subsection("WORKING ON", "--", 15)
+
+function total_all_tags:update()
+  local cmd = "timew sum | tail -n 2"
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    total_all_tags:set_text(format_time(stdout))
+  end)
+end
+
+function current_time:update()
+  local cmd = "timew | tail -n 1"
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    current_time:set_text(format_time(stdout))
+  end)
+end
+
+function current_tag:update()
+  local cmd = "timew | head -n 1"
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    local tag = string.gsub(stdout, "Tracking ", "")
+    tag = string.gsub(tag, "%s+.+$", "")
+    self:set_text(tag)
+  end)
+end
+
 
 -- █▀ ▀█▀ █▀█ █▀█ █▀█ █▀▀ █▀▄ 
 -- ▄█ ░█░ █▄█ █▀▀ █▀▀ ██▄ █▄▀ 
--- When Timewarrior is stopped, display a list of topics.
 
--- Creates a button to start timew tracking for a given
--- topic (aka tag).
-local function create_topic_button(topic)
-  local topic_btn = widgets.button.text.normal({
-    text = topic,
-    text_normal_bg = beautiful.fg,
-    normal_bg = beautiful.timew_btn_bg,
-    animate_size = true,
-    font = beautiful.font,
-    size = 12,
-    on_release = function()
-      awful.spawn("timew start " .. topic)
-      nav_timewarrior:remove_all_items()
-      nav_timewarrior:append(nav_timew_actions)
-      init_start_ui()
-      update_ui(ui_started)
-    end
-  })
-  nav_timew_topics:append(Elevated:new(topic_btn))
-  return topic_btn
-end
-
--- Loops through all topics set in config and creates a button
--- for each.
-local function create_topic_buttons()
-  local topic_buttons = wibox.widget({
-    spacing = dpi(10),
-    layout = wibox.layout.fixed.vertical,
-  })
-
-  for i = 1, #topic_list do
-    local button = create_topic_button(topic_list[i])
-    topic_buttons:add(button)
-  end
-
-  return topic_buttons
-end
-local topic_buttons = create_topic_buttons()
-local text = wibox.widget({
-  markup = colorize("Start a new session", beautiful.fg),
-  valign = "center",
-  align = "center",
-  widget = wibox.widget.textbox,
-})
-
-ui_stopped = wibox.widget({
-  text,
-  topic_buttons,
-  spacing = dpi(10),
+local ui_stopped = wibox.widget({
+  wibox.widget({
+    markup = colorize("No active time tracking.", beautiful.fg),
+    valign = "center",
+    align  = "center",
+    widget = wibox.widget.textbox,
+  }),
+  total_all_tags,
+  spacing = dpi(20),
   layout = wibox.layout.fixed.vertical,
 })
 
 -- █▀ ▀█▀ ▄▀█ █▀█ ▀█▀ █▀▀ █▀▄ 
 -- ▄█ ░█░ █▀█ █▀▄ ░█░ ██▄ █▄▀ 
--- When Timewarrior is started, show the current session time,
--- the current tag, and the total time worked today.
-local current_time = create_ui_subsection("CURRENT SESSION", "--", 30)
-local total_all_tags = create_ui_subsection("TOTAL TODAY", "--", 15)
-local current_tag = create_ui_subsection("WORKING ON", "--", 15)
 
--- Timewarrior reports time in H+:MM:SS format (6:15:08)
--- But I prefer it in 6h 15m format.
-local function format_time(str)
-  -- remove whitespace and seconds
-  str = string.gsub(str, "[%a+%s+\n\r]", "")
-  str = string.gsub(str, ":%d+$", "")
-
-  local min_str  = string.gsub(str, "^%d+:", "")
-  local hour_str = string.gsub(str, ":%d+$", "")
-  local min  = tonumber(min_str) or 0
-  local hour = tonumber(hour_str)
-
-  local txt = "--"
-  local valid_hour = hour and hour > 0
-  if min_str  then txt = min .. "m" end
-  if valid_hour then txt = hour .. "h " .. txt end
-
-  return txt
-end
-
-local stop_button = widgets.button.text.normal({
+local stop_button = simplebtn({
   text = "Stop",
-  text_normal_bg = beautiful.fg,
-  normal_bg = beautiful.timew_btn_bg,
-  animate_size = false,
-  font = beautiful.font,
-  size = 12,
-  on_release = function()
+  bg   = beautiful.timew_btn_bg,
+  width   = dpi(100),
+  margins = {
+    left   = dpi(15),
+    right  = dpi(15),
+    top    = dpi(10),
+    bottom = dpi(10),
+  },
+})
+
+local nav_stop = navbg({
+  widget  = stop_button.children[1],
+  bg_on   = beautiful.bg_l3,
+  bg_off  = beautiful.timew_btn_bg,
+  release = function()
     awful.spawn.with_shell("timew stop")
     awful.spawn.with_shell("echo 'all' | task status:pending stop")
     nav_timewarrior:remove_all_items()
-    nav_timewarrior:append(nav_timew_topics)
-    update_ui(ui_stopped)
+    time:emit_signal("set_tracking_inactive")
+    timew_widget:set(ui_stopped)
   end
 })
-nav_timew_actions:append(Elevated:new(stop_button))
 
-ui_started = wibox.widget({
+local ui_started = wibox.widget({
   {
     current_time,
     {
@@ -173,41 +142,16 @@ ui_started = wibox.widget({
   layout = wibox.layout.fixed.vertical,
 })
 
--- The function to run whenever 
+-----------------------
+
 local function update_timew_information()
-  -- current tag
-  -- with the way I use taskwarrior, I always have multiple tasks,
-  -- but I only need to use the 1st tag. so only take the 1st word
-  local cmd = "timew | head -n 1"
-  awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    local tag = string.gsub(stdout, "Tracking ", "")
-    tag = string.gsub(tag, "%s+.+$", "")
-    local markup = colorize(tag, beautiful.fg)
-    current_tag.children[2]:set_markup_silently(markup)
-  end)
-
-  -- total tracked time today across all tags
-  local total_cmd = "timew sum | tail -n 2"
-  awful.spawn.easy_async_with_shell(total_cmd, function(stdout)
-    local markup = colorize(format_time(stdout), beautiful.fg)
-    total_all_tags.children[2]:set_markup_silently(markup)
-  end)
-
-  -- current session time
-  local curr_cmd = "timew | tail -n 1"
-  awful.spawn.easy_async_with_shell(curr_cmd, function(stdout)
-    local markup = colorize(format_time(stdout), beautiful.fg)
-    current_time.children[2]:set_markup_silently(markup)
-  end)
+  current_tag:update()
+  total_all_tags:update()
+  current_time:update()
 end
 
--- What to do when switching to timew start mode
-function init_start_ui()
-  update_timew_information()
-end
-
--- Assemble widget
-local timew_widget = wibox.widget({
+-- Final assembly of widget
+timew_widget = wibox.widget({
   {
     dash_header("Timewarrior"),
     {
@@ -219,54 +163,47 @@ local timew_widget = wibox.widget({
     layout = wibox.layout.fixed.vertical,
   },
   widget = wibox.container.place,
+  -------------
+  set = function(self, widget)
+    local content = self:get_children_by_id("content")[1]
+    content:set(1, widget)
+  end
 })
 
-function update_ui(widget)
-  local content = timew_widget:get_children_by_id("content")[1]
-  content:set(1, widget)
-end
-
--- check timew output and set widget state accordingly
+-- Check timew output and set widget state accordingly
 local function read_timew_state()
   local cmd = "timew | tail -n 1"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    local content = timew_widget:get_children_by_id("content")[1]
     if stdout:find("no active time tracking") then
-      content:set(1, ui_stopped)
+      total_all_tags:update()
+      timew_widget:set(ui_stopped)
       nav_timewarrior:remove_all_items()
-      nav_timewarrior:append(nav_timew_topics)
-      nav_timewarrior.index = 1
+      nav_timewarrior:reset()
     else
-      content:set(1, ui_started)
-      init_start_ui()
-      nav_timewarrior:remove_all_items()
-      nav_timewarrior:append(nav_timew_actions)
+      update_timew_information()
+      timew_widget:set(ui_started)
+      nav_timewarrior:append(nav_stop)
     end
   end)
 end
 
 -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
--- Emitted by Timewarrior hook
-awesome.connect_signal("dash::update_timew", function()
-  print("Test")
-  read_timew_state()
-end)
 
--- Only update widget whenever dashboard is opened
+-- NOTE: I don't know why this is here, I don't think this is necessary
+-- Emitted by Timewarrior hook
+-- awesome.connect_signal("dash::update_timew", function()
+--   read_timew_state()
+-- end)
+
+-- Update widget whenever dashboard is opened
 dash:connect_signal("updatestate::open", function()
   read_timew_state()
-  --update_timew_information()
 end)
 
--- set initial state
-read_timew_state()
-
-local container = box(timew_widget, dpi(0), dpi(340), beautiful.dash_widget_bg)
-
-nav_timewarrior.widget = Dashwidget:new(container)
+local container = box(timew_widget, dpi(0), dpi(320), beautiful.dash_widget_bg)
 
 return function()
-  return nav_timewarrior, container
+  return container, nav_timewarrior
 end
 

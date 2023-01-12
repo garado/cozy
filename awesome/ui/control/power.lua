@@ -8,61 +8,63 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local helpers = require("helpers")
+local simplebtn = helpers.ui.simple_button
 local widgets = require("ui.widgets")
 local elevated = require("modules.keynav.navitem").Elevated
+local navbg = require("modules.keynav.navitem").Background
 local control = require("core.cozy.control")
 local Area = require("modules.keynav.area")
 
-local nav_power = Area:new({ name = "nav_power" })
-
-local nav_power_opts = Area:new({
+local nav_power_opts = Area({
   name = "power_opts",
   group = "power_opts",
   is_row = true,
   circular = true,
 })
 
-local nav_power_confirm = Area:new({
+local nav_power_confirm = Area({
   name = "power_confirm",
   group = "power_confirm",
   is_row = true,
   circular = true,
 })
 
-nav_power:append(nav_power_opts)
+local nav_power = Area({
+  name = "nav_power",
+  children = {
+    nav_power_opts
+  }
+})
 
 local state = "idle"
 local func = nil
 
-local yes = widgets.button.text.normal({
+local yes = simplebtn({
   text = "Yes",
-  text_normal_bg = beautiful.fg,
-  normal_bg = beautiful.switcher_opt_btn_bg,
-  animate_size = false,
-  size = 12,
-  on_release = function()
-    if func ~= nil then
-      func()
-    end
-    nav_power:remove_item(nav_power_confirm)
-    control:emit_signal("power::confirm_toggle")
-  end
+  bg = beautiful.switcher_opt_btn_bg,
 })
-nav_power_confirm:append(elevated:new(yes))
+local nav_yes = navbg({ widget = yes })
+function nav_yes:release()
+  if func ~= nil then
+    func()
+  end
+  nav_power:remove_item(nav_power_confirm)
+  control:emit_signal("power::confirm_toggle")
+end
 
-local no = widgets.button.text.normal({
+local no = simplebtn({
   text = "No",
-  text_normal_bg = beautiful.fg,
-  normal_bg = beautiful.switcher_opt_btn_bg,
-  animate_size = false,
-  size = 12,
-  on_release = function()
-    state = "idle"
-    nav_power:remove_item(nav_power_confirm)
-    control:emit_signal("power::confirm_toggle")
-  end
+  bg = beautiful.switcher_opt_btn_bg,
 })
-nav_power_confirm:append(elevated:new(no))
+local nav_no = navbg({ widget = no })
+function nav_no:release()
+  state = "idle"
+  nav_power:remove_item(nav_power_confirm)
+  control:emit_signal("power::confirm_toggle")
+end
+
+nav_power_confirm:append(nav_yes)
+nav_power_confirm:append(nav_no)
 
 local confirmation = wibox.widget({
   {
@@ -86,6 +88,7 @@ local confirmation = wibox.widget({
     },
     widget = wibox.container.place,
   },
+  visible = false,
   forced_height = dpi(60),
   bg = beautiful.ctrl_powopt_bg,
   widget = wibox.container.background,
@@ -120,7 +123,7 @@ local function create_power_btn(icon, confirm_text, cmd)
     end
   })
 
-  nav_power_opts:append(elevated:new(btn))
+  nav_power_opts:append(elevated({ widget = btn }))
 
   return wibox.widget({
     {

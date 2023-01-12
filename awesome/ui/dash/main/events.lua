@@ -89,10 +89,9 @@ cal:connect_signal("ready::upcoming", function()
   local max = 5
   for i = 1, #upcoming do
     if i > max then break end
-    local date = cal:get_start_date(upcoming[i])
-    date = cal:format_date(date)
-    local time = cal:get_start_time(upcoming[i])
-    local desc = cal:get_title(upcoming[i])
+    local date  = cal:format_date(upcoming[i][cal.START_DATE])
+    local time  = upcoming[i][cal.START_TIME]
+    local desc  = upcoming[i][cal.TITLE]
     local entry = create_calendar_entry(date, time, desc)
     events:add(entry)
   end

@@ -28,7 +28,7 @@ configuration {
 
 /*****----- Global Properties -----*****/
 * {
-    font:                        "Roboto Mono Nerd Font 10";
+    font:                        "DisposableDroid BB 12";
     background:                  #20242c;
     background-alt:              #2e3440;
     foreground:                  #FFFFFF;
@@ -87,6 +87,7 @@ inputbar {
 textbox-prompt-colon {
     enabled:                     true;
     expand:                      false;
+    font:                        "RobotoMono Nerd Font Mono 12";
     str:                         "";
     padding:                     8px 12px;
     border:                      0px 2px 2px 2px;
@@ -112,11 +113,12 @@ entry {
 /*****----- Mode Switcher -----*****/
 mode-switcher{
     enabled:                     true;
-    spacing:                     10px;
+    spacing:                     8px;
     background-color:            transparent;
     text-color:                  @foreground;
 }
 button {
+    font:                        "RobotoMono Nerd Font Mono 12";
     padding:                     8px;
     border-radius:               0px;
     background-color:            @background-alt;

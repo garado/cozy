@@ -12,7 +12,8 @@ local colorscheme = {
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
 local awesome_cfg = gfs.get_configuration_dir()
-colorscheme.wall_path = awesome_cfg .. "theme/assets/walls/nord_dark.jpeg"
+-- colorscheme.wall_path = awesome_cfg .. "theme/assets/walls/nord_dark.jpeg"
+colorscheme.wall_path = awesome_cfg .. "theme/colorschemes/nord/dark.png"
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
@@ -42,7 +43,16 @@ colorscheme.colors.main_accent = "#5e81ac"
 colorscheme.colors.red         = "#bf616a"
 colorscheme.colors.green       = "#a3be8c"
 colorscheme.colors.yellow      = "#ebcb8b"
+colorscheme.colors.purple      = "#b48ead"
 colorscheme.colors.transparent = "#ffffff00"
+
+colorscheme.colors.gradient = {
+  [0] = "#20242c",
+  [1] = "#2b3444",
+  [2] = "#3c4c65",
+  [3] = "#4d6688",
+  [4] = "#5e81ac",
+}
 
 -- █▀█ █░█ █▀▀ █▀█ █▀█ █ █▀▄ █▀▀ 
 -- █▄█ ▀▄▀ ██▄ █▀▄ █▀▄ █ █▄▀ ██▄ 
@@ -54,5 +64,6 @@ colorscheme.switcher.kitty   = "Nord"
 colorscheme.switcher.nvchad  = "nord"
 colorscheme.switcher.gtk     = "Nordic"
 colorscheme.switcher.zathura = "nord_dark"
+colorscheme.switcher.rofi    = "nord-dark"
 
 return colorscheme

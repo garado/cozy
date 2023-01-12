@@ -13,13 +13,14 @@ local colorize = require("helpers.ui").colorize_text
 local pixela = require("core.system.pixela")
 
 local Area = require("modules.keynav.area")
-local Habit = require("modules.keynav.navitem").Habit
-local Dashwidget = require("modules.keynav.navitem").Dashwidget
+local Checkbox = require("modules.keynav.navitem").Checkbox
+local Background = require("modules.keynav.navitem").Background
 
-local nav_dash_habits = Area:new({
-  name = "nav_dash_habits",
-  circular = true,
-  is_grid_container = true,
+local nav_dash_habits = Area({
+  name      = "nav_dash_habits",
+  circular  = true,
+  is_grid   = true,
+  grid_cols = 4,
 })
 
 local habit_list = config.habit
@@ -28,12 +29,12 @@ local habit_widget
 ---------------------------------
 
 local function create_habit_ui_entry(name, graph_id, frequency)
-  local nav_habit = Area:new({
-    name = name,
-    is_row = true,
-    circular = true,
-    row_wrap_vertical = true,
-  })
+  -- local nav_habit = Area({
+  --   name      = name,
+  --   is_row    = true,
+  --   circular  = true,
+  --   row_wrap_vertical = true,
+  -- })
 
   local habit_name = wibox.widget({
     markup = colorize(name, beautiful.fg),
@@ -132,17 +133,16 @@ local function create_habit_ui_entry(name, graph_id, frequency)
       pixela:update_cache(graph_id, cboxdate, qty)
 
       qty = not qty
-    end) -- end checkbox connect signal
+    end)
 
     -- Add individual checkbox to navtree and UI
-    nav_habit:append(Habit:new(checkbox))
+    nav_dash_habits:append( Checkbox({ widget = checkbox }) )
     days:add(checkbox)
 
   end -- end for i in days_ago
 
   -- Add entire habit to navtree and UI
   habit_widget.children[1]:add(habit_entry)
-  nav_dash_habits:append(nav_habit)
 
 end -- end create_habit_entry
 
@@ -150,14 +150,14 @@ end -- end create_habit_entry
 
 habit_widget = wibox.widget({
   {
-    spacing = dpi(10),
+    spacing = dpi(15),
     layout = wibox.layout.fixed.vertical,
   },
   widget = wibox.container.place
 })
 
-local container = box(habit_widget, dpi(550), dpi(410), beautiful.dash_widget_bg)
-nav_dash_habits.widget = Dashwidget:new(container)
+local container = box(habit_widget, dpi(250), dpi(270), beautiful.dash_widget_bg)
+nav_dash_habits.widget = Background({ widget = container.children[1] })
 
 pixela:connect_signal("update::habits", function(_, graph_id)
   local id = graph_id
@@ -167,5 +167,5 @@ pixela:connect_signal("update::habits", function(_, graph_id)
 end)
 
 return function()
-  return nav_dash_habits, container
+  return container, nav_dash_habits
 end

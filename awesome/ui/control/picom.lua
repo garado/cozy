@@ -11,10 +11,10 @@ local dpi = xresources.apply_dpi
 local awful = require("awful")
 local gfs = require("gears.filesystem")
 local helpers = require("helpers")
-local Area = require("modules.keynav.area")
+local area = require("modules.keynav.area")
 local Elevated = require("modules.keynav.navitem").Elevated
 
-local nav_picom = Area:new({
+local nav_picom = area({
   name = "picom",
   is_row = true,
   circular = true,
@@ -46,7 +46,7 @@ local function create_option_btn(opt)
       end
     end
   })
-  nav_picom:append(Elevated:new(btn))
+  nav_picom:append(Elevated({ widget = btn }))
   return btn
 end
 
@@ -56,7 +56,7 @@ local widget = wibox.widget({
       markup = helpers.ui.colorize_text("ANIMATIONS", beautiful.ctrl_header_fg),
       align = "center",
       valign = "center",
-      font = beautiful.font_name .. "10",
+      font = beautiful.base_xsmall_font,
       widget = wibox.widget.textbox,
     },
     {

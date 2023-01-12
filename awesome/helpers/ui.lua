@@ -96,4 +96,36 @@ function _ui.add_hover_cursor(w, hover_cursor)
 	end)
 end
 
+function _ui.simple_button(args)
+  local text = args.text
+  local fg   = args.fg or beautiful.fg
+  local font = args.font or beautiful.base_small_font
+  local width  = args.width
+  local height = args.height
+  local bg   = args.bg or beautiful.red
+  local margins = args.margins or dpi(6)
+
+  return wibox.widget({
+    {
+      {
+        {
+          markup = _ui.colorize_text(text, fg),
+          align  = "center",
+          valign = "center",
+          font   = font,
+          widget = wibox.widget.textbox,
+        },
+        margins = margins,
+        widget  = wibox.container.margin,
+      },
+      forced_width  = width,
+      forced_height = height,
+      shape  = gears.shape.rounded_rect,
+      bg     = bg,
+      widget = wibox.container.background,
+    },
+    widget = wibox.container.place,
+  })
+end
+
 return _ui
