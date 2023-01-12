@@ -23,7 +23,7 @@ colorscheme.colors.accents = {
   "#5a84bc",
   "#6791c9",
   "#f1cf8a",
-  "#c58cec",
+  "#ac78d0",
   "#70b8ca",
   "#e89982",
 }

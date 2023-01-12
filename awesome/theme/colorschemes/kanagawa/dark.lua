@@ -45,11 +45,21 @@ colorscheme.colors.green       = "#76946a"
 colorscheme.colors.yellow      = "#dca561"
 colorscheme.colors.transparent = "#ffffff00"
 
+colorscheme.colors.gradient = {
+  [0] = "#16161d",
+  [1] = "#1c283d",
+  [2] = "#21354d",
+  [3] = "#263f5d",
+  [4] = "#29475d",
+  [5] = "#2d4f6d",
+}
+
 -- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ 
 -- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ 
 colorscheme.switcher.kitty    = "kanagawabones"
 colorscheme.switcher.nvchad   = "kanagawa"
 colorscheme.switcher.gtk      = "Nordic"
 colorscheme.switcher.zathura  = "kanagawa"
+colorscheme.switcher.rofi     = "kanagawa"
 
 return colorscheme

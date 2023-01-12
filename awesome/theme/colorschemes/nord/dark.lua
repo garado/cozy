@@ -64,5 +64,6 @@ colorscheme.switcher.kitty   = "Nord"
 colorscheme.switcher.nvchad  = "nord"
 colorscheme.switcher.gtk     = "Nordic"
 colorscheme.switcher.zathura = "nord_dark"
+colorscheme.switcher.rofi    = "nord-dark"
 
 return colorscheme

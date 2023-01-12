@@ -6,22 +6,24 @@ local gears = require("gears")
 local gfs = require("gears.filesystem")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local config = require("config")
 local themes_path = gfs.get_themes_dir()
 local theme = dofile(themes_path .. "default/theme.lua")
 
+package.loaded["config"] = nil
+local config = require("config")
+
 -- Get user's color scheme
-local theme_name = config.theme_name
+local theme_name  = config.theme_name
 local theme_style = config.theme_style
 local colorscheme = require("theme.colorschemes." .. theme_name .. "." .. theme_style)
 local colors = colorscheme.colors
 
--- Automagically match system color schemes with awesome
+-- Automagically match system color schemes with Awesome
 -- color scheme
-local do_theme_integration = config.theme_switch_integration
-if do_theme_integration then
-  require("theme/theme_switcher")()
-end
+-- local do_theme_integration = config.theme_switch_integration
+-- if do_theme_integration then
+--   require("theme/theme_switcher")()
+-- end
 
 -- Theme-agnostic settings
 theme.pfp = gears.surface.load_uncached(gfs.get_configuration_dir() .. "theme/assets/pfp.png")
@@ -40,14 +42,15 @@ theme.wallpaper = gears.surface.load_uncached(colorscheme.wall_path)
 -- theme.alt_font  = theme.alt_font_name .. "Regular "
 -- theme.base_xsmall_font = theme.font .. " 10"
 -- theme.base_small_font  = theme.font .. " 12"
--- theme.base_med_font    = theme.font .. " 20"
--- theme.base_large_font  = theme.font .. " 25"
+-- theme.base_med_font    = theme.font .. " 15"
+-- theme.base_large_font  = theme.font .. " 20"
 -- theme.alt_small_font  = theme.alt_font .. " 12"
--- theme.alt_med_font    = theme.alt_font .. " 20"
--- theme.alt_large_font  = theme.alt_font .. " 25"
+-- theme.alt_med_font    = theme.alt_font .. " 16"
+-- theme.alt_large_font  = theme.alt_font .. " 20"
+-- theme.alt_xlarge_font  = theme.alt_font .. " 25"
 
 -- BEDSTEAD/DISPOSABLEDROID
-theme.font_name     = "Bedstead "
+theme.font_name     = "Bedstead Nerd Font "
 theme.alt_font_name = "DisposableDroid BB "
 theme.font      = theme.font_name .. "Regular "
 theme.alt_font  = theme.alt_font_name .. "Regular "
@@ -129,6 +132,7 @@ theme.cal_header_fg = colors.fg
 theme.cal_month_bg = theme.dash_widget_bg
 theme.cal_focus_fg = colors.main_accent
 theme.cal_focus_bg = theme.dash_widget_bg
+theme.cal_today_bg = theme.red
 theme.calendar_spacing = dpi(10)
 theme.calendar_long_weekdays = true
 

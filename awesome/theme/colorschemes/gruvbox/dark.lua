@@ -43,6 +43,15 @@ colorscheme.colors.green       = "#b8bb26"
 colorscheme.colors.yellow      = "#fabd2f"
 colorscheme.colors.transparent = "#ffffff00"
 
+colorscheme.colors.gradient = {
+  [0] = "#1d2021",
+  [1] = "#44422c",
+  [2] = "#5f5e2f",
+  [3] = "#7c7c2f",
+  [4] = "#9a9b2c",
+  [5] = "#b8bb26",
+}
+
 -- █▀█ █░█ █▀▀ █▀█ █▀█ █ █▀▄ █▀▀ 
 -- █▄█ ▀▄▀ ██▄ █▀▄ █▀▄ █ █▄▀ ██▄ 
 colorscheme.override.wibar_focused = "#504945"

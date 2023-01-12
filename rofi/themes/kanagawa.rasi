@@ -1,0 +1,17 @@
+
+/* █▄▀ ▄▀█ █▄░█ ▄▀█ █▀▀ ▄▀█ █░█░█ ▄▀█ */ 
+/* █░█ █▀█ █░▀█ █▀█ █▄█ █▀█ ▀▄▀▄▀ █▀█ */ 
+
+* {
+    font:           "DisposableDroid BB 13";
+    background:     #101017;
+    background-alt: #232331;
+    foreground:     #dcd7ba;
+    selected:       #c34043;
+    active:         #76946a;
+    urgent:         #2d4f67;
+}
+
+inputbar {
+  background-image: url("~/.config/rofi/themes/kanagawa.png", width);
+}
