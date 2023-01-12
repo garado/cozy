@@ -110,7 +110,7 @@ function battery_widget.new (args)
     args = gtable.crush({
         widget_template = default_template(),
         device_path = '',
-        use_display_device = false
+        use_display_device = true
     }, args or {})
 
     local widget = wbase.make_widget_from_value(args.widget_template)
