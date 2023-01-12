@@ -12,7 +12,7 @@ local core    = require("helpers.core")
 
 local cal = { }
 local instance = nil
-local cache_path = gfs.get_cache_dir() .. "cal"
+local cache_path = gfs.get_cache_dir() .. "calendar/agenda"
 
 local curmonth  = os.date("%m")
 local curdate   = os.date("%d")
