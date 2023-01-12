@@ -80,15 +80,15 @@ awful.keyboard.append_global_keybindings({
   -- ▄▀█ █░█░█ █▀▀ █▀ █▀█ █▀▄▀█ █▀▀
   -- █▀█ ▀▄▀▄▀ ██▄ ▄█ █▄█ █░▀░█ ██▄
   -- Restart awesome
-  awful.key({ shift, alt }, "r", awesome.restart,
+  awful.key({ mod, ctrl }, "r", awesome.restart,
     { description = "reload", group = "Awesome" }),
 
   -- Quit awesome
-  awful.key({ shift, alt }, "q", awesome.quit,
+  awful.key({ mod, ctrl }, "q", awesome.quit,
     { description = "quit", group = "Awesome" }),
 
   -- Show help
-  awful.key({ mod }, "s", hotkeys_popup.show_help,
+  awful.key({ mod }, "F1", hotkeys_popup.show_help,
     { description = "help", group = "Awesome"}),
 
   -- Daily briefing
@@ -98,25 +98,25 @@ awful.keyboard.append_global_keybindings({
   end, { description = "daily briefing", group = "Awesome" }),
 
   -- Toggle dash
-  awful.key({ mod }, "j", function()
+  awful.key({ mod, shift }, "d", function()
     scratchpad:turn_off()
     dash:toggle()
   end, { description = "dash", group = "Awesome" }),
 
   -- Toggle control center
-  awful.key({ mod }, "k", function()
+  awful.key({ mod }, "c", function()
     scratchpad:turn_off()
     control:toggle()
   end, { description = "control center", group = "Awesome" }),
 
   -- Toggle theme switcher
-  awful.key({ mod }, "l", function()
+  awful.key({ mod }, "s", function()
     scratchpad:turn_off()
     themeswitcher:toggle()
   end, { description = "dash", group = "Awesome" }),
 
   -- Toggle layout list switcher
-  awful.key({ mod }, "u", function()
+  awful.key({ mod, shift }, "u", function()
     scratchpad:turn_off()
     awesome.emit_signal("layoutlist::toggle")
   end, { description = "layout list", group = "Awesome"}),
@@ -186,22 +186,33 @@ awful.keyboard.append_global_keybindings({
   --  █░░ ▄▀█ █░█ █▄░█ █▀▀ █░█ █▀▀ █▀█ █▀
   --  █▄▄ █▀█ █▄█ █░▀█ █▄▄ █▀█ ██▄ █▀▄ ▄█
   -- Terminal
-  awful.key({ alt }, "Return", function()
+  awful.key({ mod }, "Return", function()
     awful.spawn(apps.default.terminal)
   end, { description = "terminal", group = "Launchers" }),
-
-  -- Toggle scratchpad
-  awful.key({ mod }, "p", function()
-    dash:close()
-    control:close()
-    themeswitcher:close()
-    scratchpad:toggle()
-  end, { description = "scratchpad", group = "Launchers"}),
+  
+  -- Floating Terminal
+  awful.key({ mod, shift }, "Return", function()
+    awful.spawn(apps.default.terminal, {
+      floating=true,
+      tag = mouse.screen.selected_tag,
+      placement = awful.placement.center
+    })
+  end, { description = "terminal", group = "Launchers" }),
 
   -- Rofi app launcher
-  awful.key({ alt }, "r", function()
+  awful.key({ mod }, "r", function()
     awful.spawn(apps.utils.app_launcher)
   end, { description = "app launcher", group = "Launchers" }),
+
+  -- Web browser
+  awful.key({ mod} , "w", function()
+    awful.spawn(apps.default.web_browser)
+  end, { description = "web browser", group ="Launchers"}),
+  --
+  -- file browser
+  awful.key({ mod } , "f", function()
+    awful.spawn(apps.default.file_manager)
+  end, { description = "file browser", group ="Launchers"}),
 
   -- Bluetooth menu
   awful.key({ alt }, "b", function()
@@ -215,41 +226,101 @@ awful.keyboard.append_global_keybindings({
 -- ░▀▀▀░▀▀▀░▀▀▀░▀▀▀░▀░▀░░▀░░░░▀░▀░▀▀▀░░▀░░▀▀░░▀▀▀░▀░▀░▀▀░░▀▀▀
 client.connect_signal("request::default_keybindings", function()
   awful.keyboard.append_client_keybindings({
+    -- Focus client by direction
+    -- Focus Up
+    awful.key({ mod }, "k", function()
+      awful.client.focus.bydirection("up")
+      bling.module.flash_focus.flashfocus(client.focus)
+    end, { description = "focus up", group = "Client" }),
 
+    -- Focus Down
+    awful.key({ mod }, "j", function()
+      awful.client.focus.bydirection("down")
+      bling.module.flash_focus.flashfocus(client.focus)
+    end, { description = "focus down", group = "Client" }),
+
+    -- Focus Left
+    awful.key({ mod }, "h", function()
+      awful.client.focus.bydirection("left")
+      bling.module.flash_focus.flashfocus(client.focus)
+    end, { description = "focus left", group = "Client" }),
+
+    -- Focus right
+    awful.key({ mod }, "l", function()
+      awful.client.focus.bydirection("right")
+      bling.module.flash_focus.flashfocus(client.focus)
+    end, { description = "focus right", group = "Client" }),
+  -- 
+  -- Focus by direction keys
+    awful.key({ mod }, "Up", function()
+      awful.client.focus.bydirection("up")
+      bling.module.flash_focus.flashfocus(client.focus)
+    end, { description = "focus up", group = "Client" }),
+    awful.key({ mod }, "Down", function()
+      awful.client.focus.bydirection("down")
+      bling.module.flash_focus.flashfocus(client.focus)
+    end, { description = "focus down", group = "Client" }),
+    awful.key({ mod }, "Left", function()
+      awful.client.focus.bydirection("left")
+      bling.module.flash_focus.flashfocus(client.focus)
+    end, { description = "focus left", group = "Client" }),
+    awful.key({ mod }, "Right", function()
+      awful.client.focus.bydirection("right")
+      bling.module.flash_focus.flashfocus(client.focus)
+    end, { description = "focus right", group = "Client" }),
+  --
+
+
+  -- Window layout keys
     -- Toggle floating
-    awful.key({ ctrl, shift }, "g", function()
+    awful.key({ mod, shift }, "t", function()
       client.focus.floating = not client.focus.floating
       client.focus:raise()
     end, { description = "floating", group = "Client" }),
 
     -- Toggle fullscreen
-    awful.key({ ctrl, shift }, "f", function()
+    awful.key({ mod, shift }, "f", function()
       client.focus.fullscreen = not client.focus.fullscreen
       client.focus:raise()
     end, { description = "fullscreen", group = "Client" }),
 
     -- Toggle sticky
-    awful.key({ ctrl, shift }, "d", function()
+    awful.key({ mod, shift }, "a", function()
       client.focus.sticky = not client.focus.sticky
     end, { description = "sticky", group = "Client" }),
 
-    -- Maximize
-    awful.key({ ctrl, shift }, "m", function(c)
+    -- MAXIMIZE KEYS
+    -- Toggle Maximize
+    awful.key({ mod }, "m", function(c)
       c.maximized = not c.maximized
       c:raise()
     end, { description = "(un)maximize", group = "Client" }),
+    -- Toggle maximize vertical
+    awful.key({ mod, ctrl }, "m", function(c)
+      c.maximized_vertical = not c.maximized_vertical
+      c:raise()
+    end, { description = "(un) maximize vertically", group = "Client"}),
+    -- Toggle maximize horizontal
+    awful.key({ mod, shift }, "m", function(c)
+      c.maximized_horizontal = not c.maximized_horizontal
+      c:raise()
+		end, { description = "(un)maximize horizontally", group = "Client" }),
+
 
     -- Close window
-    awful.key({ ctrl, shift }, "w", function()
+    awful.key({ mod, shift }, "c", function()
       client.focus:kill()
     end, { description = "close", group = "Client" }),
 
     -- Layout-aware resizing
-    awful.key({ alt, shift   }, "h", function () resize_horizontal(0.05) end,
-    { group = "Client", description = "(v) resize" }),
-    awful.key({ alt, shift   }, "l", function () resize_horizontal(-0.05) end),
-    awful.key({ alt, shift   }, "k", function () resize_vertical(-0.05) end),
-    awful.key({ alt, shift   }, "j", function () resize_vertical(0.05) end),
+    awful.key({ mod, ctrl }, "h", function () resize_horizontal(0.05) end,
+    { group = "Client", description = "(right) resize" }),
+    awful.key({ mod, ctrl   }, "l", function () resize_horizontal(-0.05) end, 
+      { group = "Client", description = "(left) resize"}),
+    awful.key({ mod, ctrl   }, "k", function () resize_vertical(-0.05) end,
+      { group = "Client", description = "(up) resize"}),
+    awful.key({ mod, ctrl   }, "j", function () resize_vertical(0.05) end,
+      { group = "Client", description = "(down) resize"}),
 
   -- Changing focus
   -- Special case: mstab layout (TODO)
@@ -274,19 +345,19 @@ client.connect_signal("request::default_keybindings", function()
 
   -- Swapping clients
   awful.key({ mod, shift }, "h", function()
-    awful.client.swap.bydirection("left")
+    awful.client.swap.global_bydirection("left")
   end, { description = "(v) swap left", group = "Client"}),
 
   awful.key({ mod, shift }, "j", function()
-    awful.client.swap.bydirection("down")
+    awful.client.swap.global_bydirection("down")
   end),
 
   awful.key({ mod, shift }, "k", function()
-    awful.client.swap.bydirection("up")
+    awful.client.swap.global_bydirection("up")
   end),
 
   awful.key({ mod, shift }, "l", function()
-    awful.client.swap.bydirection("right")
+    awful.client.swap.global_bydirection("right")
   end),
 
   })
@@ -332,6 +403,29 @@ awful.keyboard.append_global_keybindings({
         end
       end
     end,
+  }),
+
+  awful.key({ mod, alt }, "Tab", function()
+    if client.focus then
+        client.focus:move_to_screen()
+    end
+  end,{ description="Move focused client to next screen", group="Client"}),
+
+  awful.key({
+    modifiers = { mod, alt },
+    keygroup = "numrow",
+    description = "move focused client to workspace next screen",
+    group = "Workspace",
+    on_press = function(index)
+      if client.focus then
+        client.focus:move_to_screen()
+        local tag = client.focus.screen.tags[index]
+        if tag then
+          client.focus:move_to_tag(tag)
+          tag:view_only()
+        end
+      end
+    end,
   })
 })
 
@@ -349,5 +443,12 @@ client.connect_signal("request::default_mousebindings", function()
   })
 end)
 
-
-
+-- Screen
+-----------
+awful.keyboard.append_global_keybindings({
+-- No need for these (single screen setup)
+awful.key({ mod, ctrl, alt }, "j", function () awful.screen.focus_relative(1) end,
+  {description = "focus the next screen", group = "screen"}),
+awful.key({ mod, ctrl, alt }, "k", function () awful.screen.focus_relative(-1) end,
+  {description = "focus the previous screen", group = "screen"}),
+})

@@ -12,8 +12,8 @@ return {
 	--- Default Applications
 	default = {
 		terminal      = "kitty",
-		web_browser   = "firefox",
-		file_manager  = "thunar",
+		web_browser   = "librewolf",
+		file_manager  = "nautilus",
 	},
 
 	--- List of binaries/shell scripts that will execute for a certain task
