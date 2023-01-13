@@ -63,7 +63,7 @@
 
 <h4>Agenda</h4>
 <p align="center">
-  <img title="" src="./assets/dash_agenda.png" width="800">
+  <img title="" src="./assets/gif/agenda.gif" width="800">
 </p>
 <ul>
   <li>Add, view, and edit Google Calendar events</li>
@@ -110,7 +110,7 @@
 
 <h4>Journal</h4>
 <p align="center">
-  <img title="" src="./assets/dash_journal.png" width="800">
+  <img title="" src="./assets/gif/journal.gif" width="800">
 </p>
 <ul>
   <li>View past journal entries and quickly create new ones (idk, I like to reread them a lot)</li>
