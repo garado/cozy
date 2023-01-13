@@ -3,7 +3,6 @@
 -- █▄█ █▄█ █▄█ █▀▄ █░▀█ █▀█ █▄▄ 
 
 -- For interfacing with jrnl.
-
 local gobject = require("gears.object")
 local gtable  = require("gears.table")
 local awful   = require("awful")

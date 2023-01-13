@@ -17,7 +17,7 @@ local keynav = require("modules.keynav")
 local Area = keynav.area
 local Navigator = keynav.navigator
 
-local Elevated = keynav.navitem.Elevated
+local Elevated = require("modules.keynav.navitem").Elevated
 local simplebtn = require("helpers.ui").simple_button
 local navbg = require("modules.keynav.navitem").Background
 
@@ -145,7 +145,7 @@ function create_style_buttons(theme)
       end
     })
 
-    nav_styles:append(Elevated:new(style_button))
+    nav_styles:append(Elevated({ widget = style_button}))
 
     return wibox.widget ({
       style_button,
@@ -218,8 +218,8 @@ action_buttons = wibox.widget({
   visible = false,
   widget = wibox.container.place,
 })
-nav_actions:append(Elevated:new(apply_button.children[1]))
-nav_actions:append(Elevated:new(cancel_button.children[1]))
+nav_actions:append(Elevated({ widget = apply_button.children[1]}))
+nav_actions:append(Elevated({ widget = cancel_button.children[1]}))
 
 ------------------------------------------
 

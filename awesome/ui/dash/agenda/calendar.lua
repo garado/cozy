@@ -282,6 +282,7 @@ function calendar:iter_month(dir)
 end
 
 function calendar:jump_to_today()
+  cal:fetch_upcoming()
   cal:fetch_month(os.date("%m"), os.date("%Y"))
 end
 

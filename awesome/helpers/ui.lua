@@ -109,6 +109,7 @@ function _ui.simple_button(args)
     {
       {
         {
+          id     = "textbox",
           markup = _ui.colorize_text(text, fg),
           align  = "center",
           valign = "center",

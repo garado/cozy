@@ -12,9 +12,8 @@ local beautiful   = require("beautiful")
 local colorize    = require("helpers").ui.colorize_text
 local xresources  = require("beautiful.xresources")
 local dpi     = xresources.apply_dpi
+local vpad    = require("helpers.ui").vertical_pad
 local journal = require("core.system.journal")
-
-local kprompt = require("modules.kasperprompt")
 
 journal.is_locked = true
 
@@ -22,15 +21,17 @@ journal.is_locked = true
 -- █▄█ █ 
 
 local prompt_textbox = wibox.widget({
-  {
-    align   = "vertical",
-    valign  = "vertical",
-    font    = beautiful.base_small_font,
-    widget  = wibox.widget.textbox,
-  },
+  align   = "center",
   valign  = "center",
-  widget  = wibox.container.place,
+  font    = beautiful.base_small_font,
+  widget  = wibox.widget.textbox,
 })
+
+-- Obscure password text as user is typing
+prompt_textbox:connect_signal("widget::redraw_needed", function(self)
+  local text = self.text:gsub("[%a%d]", "*")
+  self:set_markup_silently(colorize(text, beautiful.main_accent))
+end)
 
 local header = wibox.widget({
   markup = colorize(" Log is locked", beautiful.fg),
@@ -50,11 +51,27 @@ local subheader = wibox.widget({
 })
 
 local widget = wibox.widget({
-  header,
-  subheader,
-  prompt_textbox,
-  valign = "center",
-  layout = wibox.layout.fixed.vertical,
+  {
+    header,
+    {
+      {
+        wibox.widget({
+          markup = colorize("Password: ", beautiful.fg),
+          widget = wibox.widget.textbox,
+        }),
+        prompt_textbox,
+        spacing = dpi(15),
+        halign  = "center",
+        valign  = "center",
+        layout  = wibox.layout.fixed.horizontal,
+      },
+      widget = wibox.container.place,
+    },
+    vpad(dpi(100)),
+    layout = wibox.layout.fixed.vertical,
+  },
+  fill_vertical = true,
+  widget = wibox.container.place,
 })
 
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄ 
@@ -67,12 +84,11 @@ local widget = wibox.widget({
 local function password_input()
   awful.prompt.run {
     font         = beautiful.base_small_font,
-    text         = "",
     fg           = beautiful.fg,
     bg           = beautiful.task_prompt_textbg,
     shape        = gears.shape.rounded_rect,
     bg_cursor    = beautiful.main_accent,
-    textbox      = prompt_textbox.children[1],
+    textbox      = prompt_textbox,
     exe_callback = function(input)
       if not input or #input == 0 then return end
       journal:emit_signal("input_complete", input)
@@ -81,9 +97,12 @@ local function password_input()
 end
 
 local function lock()
-  local markup = colorize(" Log is locked", beautiful.fg)
+  local markup = colorize(" Locked", beautiful.fg)
   header:set_markup_silently(markup)
 end
+
+-- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
+-- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
 
 dash:connect_signal("tabswitch", function(_, tab)
   if tab == "journal" and journal.is_locked then
