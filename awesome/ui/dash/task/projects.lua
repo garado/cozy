@@ -1,86 +1,61 @@
 
--- █▀█ █▀█ █▀█ ░░█ █▀▀ █▀▀ ▀█▀    █░░ █ █▀ ▀█▀ 
--- █▀▀ █▀▄ █▄█ █▄█ ██▄ █▄▄ ░█░    █▄▄ █ ▄█ ░█░ 
+-- █▀█ █▀█ █▀█ ░░█ █▀▀ █▀▀ ▀█▀ █▀ 
+-- █▀▀ █▀▄ █▄█ █▄█ ██▄ █▄▄ ░█░ ▄█ 
 
 local beautiful = require("beautiful")
-local wibox     = require("wibox")
-local gears     = require("gears")
-local dpi       = require("beautiful.xresources").apply_dpi
-local colorize  = require("helpers.ui").colorize_text
-local wheader   = require("helpers.ui").create_dash_widget_header
-local task      = require("core.system.task")
-
-local area = require("modules.keynav.area")
-local navbg = require("modules.keynav.navitem").Background
-local navtext = require("modules.keynav.navitem").Textbox
-
--- █▄▀ █▀▀ █▄█ █▄▄ █▀█ ▄▀█ █▀█ █▀▄ 
--- █░█ ██▄ ░█░ █▄█ █▄█ █▀█ █▀▄ █▄▀ 
-local nav_projects
-nav_projects = area:new({
-  name = "projects",
-  keys = {
-    ["l"] = function()
-      local navigator = nav_projects.nav
-      navigator:set_area("tasklist")
-    end,
-  },
-  hl_persist_on_area_switch = true,
-})
+local wibox = require("wibox")
+local xresources = require("beautiful.xresources")
+local dpi = xresources.apply_dpi
+local box = require("helpers.ui").create_boxed_widget
+local wheader = require("helpers.ui").create_dash_widget_header
+local colorize = require("helpers.ui").colorize_text
+local keynav = require("modules.keynav")
+local task = require("core.system.task")
 
 -- █░█ █ 
 -- █▄█ █ 
+
 local project_list = wibox.widget({
   spacing = dpi(5),
   layout = wibox.layout.flex.vertical,
 })
 
 local projects_widget = wibox.widget({
-  {
-    {
-      {
-        wheader("Projects"),
-        project_list,
-        spacing = dpi(10),
-        --forced_width = dpi(150),
-        fill_space = true,
-        layout = wibox.layout.fixed.vertical,
-      },
-      top = dpi(15),
-      bottom = dpi(20),
-      widget = wibox.container.margin,
-    },
-    widget = wibox.container.place
-  },
-  forced_width = dpi(290),
-  bg = beautiful.dash_widget_bg,
-  shape = gears.shape.rounded_rect,
-  widget = wibox.container.background,
+  wheader("Projects"),
+  project_list,
+  spacing    = dpi(10),
+  layout     = wibox.layout.fixed.vertical,
 })
-nav_projects.widget = navbg({ widget = projects_widget })
+
+local container = box(projects_widget, nil, nil, beautiful.dash_widget_bg)
+
 
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄ 
 -- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀ 
 
-local function create_project_button_markup(tag, project)
-  local per = task:get_proj_completion_percentage(tag, project)
-  local text = project.." ("..per.. "%)"
-  return colorize(text, beautiful.fg)
-end
+local nav_projects = keynav.area({
+  name   = "projects",
+  widget = keynav.navitem.background({ widget = container.children[1] }),
+  hl_persist_on_area_switch = true,
+})
 
-local function create_project_button(tag, project, index)
-  local markup = create_project_button_markup(tag, project)
+local function create_project_item(tag, project, index)
+  local per    = task:calc_completion_percentage(tag, project)
+  local markup = project.." ("..per.. "%)"
+
   local textbox = wibox.widget({
     id      = project,
-    markup  = markup,
+    markup  = colorize(markup, beautiful.fg),
     align   = "center",
     font    = beautiful.base_small_font,
     forced_height = dpi(20),
     widget  = wibox.widget.textbox,
   })
 
-  local nav_project = navtext({ widget = textbox })
-  nav_project.index = index
+  local nav_project = keynav.navitem.textbox({
+    widget = textbox,
+    index  = index,
+  })
 
   function nav_project:release()
     task:emit_signal("selected::project", project)
@@ -89,38 +64,20 @@ local function create_project_button(tag, project, index)
   return textbox, nav_project
 end
 
-task:connect_signal("project_list::update_all", function(_, tag)
+task:connect_signal("projects::update", function(_, tag)
   project_list:reset()
-  nav_projects:remove_all_items()
   nav_projects:reset()
-  local index = 1
 
-  local pnames = task:project_names(tag)
-  for i = 1, #pnames do
-    local textbox, nav = create_project_button(tag, pnames[i], index)
-    project_list:add(textbox)
-    nav_projects:append(nav)
+  local index  = 1
+  local tagdata = task.tags[tag]
+  for i = 1, #tagdata.project_names do
+    local ptext, pnav = create_project_item(tag, tagdata.project_names[i], index)
+    project_list:add(ptext)
+    nav_projects:add(pnav)
     index = index + 1
   end
 end)
 
-task:connect_signal("project_list::update", function(_, tag, project)
-  print(project)
-  print(project_list)
-  local textbox = project_list.children[1]:get_children_by_id(project)[1]
-
-  if not textbox then
-    print('error: textbox wibox is nil for '..tag..', '..project)
-    return
-  end
-
-  local markup = create_project_button_markup(tag, project)
-  textbox:set_markup_silently(markup)
-end)
-
-task:connect_signal("project_list::add", function(_, project)
-end)
-
 return function()
-  return projects_widget, nav_projects
+  return container, nav_projects
 end

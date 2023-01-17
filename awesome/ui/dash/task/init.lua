@@ -1,63 +1,58 @@
 
--- ▀█▀ ▄▀█ █▀ █▄▀ █▀    █▀▄ ▄▀█ █▀ █░█ █▄▄ █▀█ ▄▀█ █▀█ █▀▄ 
--- ░█░ █▀█ ▄█ █░█ ▄█    █▄▀ █▀█ ▄█ █▀█ █▄█ █▄█ █▀█ █▀▄ █▄▀ 
+-- ▀█▀ ▄▀█ █▀ █▄▀ █░█░█ ▄▀█ █▀█ █▀█ █ █▀█ █▀█ 
+-- ░█░ █▀█ ▄█ █░█ ▀▄▀▄▀ █▀█ █▀▄ █▀▄ █ █▄█ █▀▄ 
+
+-- Frontend for Taskwarrior.
 
 local wibox = require("wibox")
 local gears = require("gears")
 local beautiful = require("beautiful")
 local dpi = beautiful.xresources.apply_dpi
-local area = require("modules.keynav.area")
-local vpad = require("helpers.ui").vertical_pad
 local task = require("core.system.task")
+local keynav = require("modules.keynav")
+local ui = require("helpers.ui")
 
-local tag_list, nav_tags      = require(... .. ".tags")()
-local projects, nav_projects  = require(... .. ".projects")()
-local tasklist, nav_tasklist  = require(... .. ".tasklist.tasks")()
-local header  = require(... .. ".header")
-local prompt  = require(... .. ".prompt")
+local tag_list, nav_tags = require(... .. ".tags")()
+local project_list, nav_projects = require(... .. ".projects")()
+local tasklist, nav_tasklist = require(... .. ".tasklist")()
+local header = require(... .. ".header")
+local prompt = require(... .. ".prompt")
 
---------
+local nav_tasks = keynav.area({
+  name = "tasks",
+  children = {
+    nav_tags,
+    nav_projects,
+    nav_tasklist,
+  },
+})
 
--- Keyboard navigation
-local nav_tasks   = area:new({ name = "tasks" })
-local nav_sidebar = area:new({ name = "sidebar", circular = true })
-nav_sidebar:append(nav_tags)
-nav_sidebar:append(nav_projects)
-nav_tasks:append(nav_sidebar)
-nav_tasks:append(nav_tasklist)
-
-task:connect_signal("ui::switch_tasklist_index", function(_, index)
+task:connect_signal("tasklist::switch_index", function(_, index)
   nav_tasklist:set_curr_item(index)
   nav_tasks.nav:set_area("tasklist")
 end)
 
---------
-
-local colorize = require("helpers.ui").colorize_text
+----------
 
 local sidebar = wibox.widget({
-  wibox.widget({
-    markup = colorize("Questlog", beautiful.fg),
-    font   = beautiful.alt_xlarge_font,
+  {
+    markup = ui.colorize("Questlog", beautiful.fg),
+    font   = beautiful.alt_large_font,
     align  = "center",
     valign = "center",
     widget = wibox.widget.textbox,
-  }),
+  },
   tag_list,
-  projects,
-  -- stats,
-  spacing = dpi(15),
-  forced_height = dpi(730),
-  layout = wibox.layout.ratio.vertical,
+  project_list,
+  forced_width = dpi(300),
+  layout = wibox.layout.fixed.vertical,
 })
--- sidebar:adjust_ratio(2, unpack({0.4, 0.4, 0.2}))
-sidebar:adjust_ratio(2, unpack({0.075, 0.425, 0.5}))
 
-local rightside = wibox.widget({
+local main_contents = wibox.widget({
   {
     {
       header,
-      vpad(dpi(15)),
+      ui.vpad(dpi(15)),
       tasklist,
       layout = wibox.layout.fixed.vertical,
     },
@@ -67,9 +62,8 @@ local rightside = wibox.widget({
     right   = dpi(25),
     widget  = wibox.container.margin,
   },
-  forced_width = dpi(800),
-  bg = beautiful.dash_widget_bg,
-  shape = gears.shape.rounded_rect,
+  bg     = beautiful.dash_widget_bg,
+  shape  = gears.shape.rounded_rect,
   widget = wibox.container.background,
 })
 
@@ -81,20 +75,20 @@ local tasks_dashboard = wibox.widget({
     },
     {
       {
-        rightside,
+        main_contents,
         prompt,
         layout = wibox.layout.fixed.vertical,
       },
-      left = dpi(10),
-      right = dpi(15),
+      left   = dpi(10),
+      right  = dpi(15),
       widget = wibox.container.margin,
     },
-    spacing = dpi(15),
     fill_space = true,
-    layout = wibox.layout.fixed.horizontal,
+    spacing = dpi(15),
+    layout  = wibox.layout.fixed.horizontal,
   },
   margins = dpi(15),
-  widget = wibox.container.margin,
+  widget  = wibox.container.margin,
 })
 
 return function()

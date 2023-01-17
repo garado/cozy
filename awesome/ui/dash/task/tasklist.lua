@@ -1,16 +1,12 @@
 
--- ▀█▀ ▄▀█ █▀ █▄▀ █░░ █ █▀ ▀█▀ 
--- ░█░ █▀█ ▄█ █░█ █▄▄ █ ▄█ ░█░ 
-
--- List of task names & scrollbar
+-- ▀█▀ ▄▀█ █▀ █▄▀ █░░ █ █▀ ▀█▀
+-- ░█░ █▀█ ▄█ █░█ █▄▄ █ ▄█ ░█░
 
 local beautiful   = require("beautiful")
 local wibox       = require("wibox")
 local xresources  = require("beautiful.xresources")
 local gears       = require("gears")
-local area        = require("modules.keynav.area")
--- local navtask     = require("modules.keynav.navitem").Task
-local navtask     = require("modules.keynav.navitem").Textbox
+local keynav      = require("modules.keynav")
 local colorize    = require("helpers.ui").colorize_text
 local remove_pango    = require("helpers.dash").remove_pango
 local format_due_date = require("helpers.dash").format_due_date
@@ -22,7 +18,10 @@ local MAX_TASKLIST_HEIGHT = dpi(580)
 
 local first_position_index = 1
 
--- These overflow containers are for ui elements only
+-- █░█ █ 
+-- █▄█ █ 
+
+-- These overflow containers are for UI elements only, not navitems
 local overflow_top    = {}
 local overflow_bottom = {}
 
@@ -30,23 +29,9 @@ local function total_overflow()
   return #overflow_top + #overflow_bottom
 end
 
--- █▄▀ █▀▀ █▄█ █▄▄ █▀█ ▄▀█ █▀█ █▀▄  
--- █░█ ██▄ ░█░ █▄█ █▄█ █▀█ █▀▄ █▄▀  
-
-local nav_tasklist = area:new({
-  name = "tasklist",
-  circular = true,
-  keys = require("ui.dash.task.keys.tasklist")
-})
-
-
-
--- █░█ █
--- █▄█ █
-
 local tasklist = wibox.widget({
   spacing = dpi(8),
-  layout = wibox.layout.flex.vertical,
+  layout = wibox.layout.fixed.vertical,
 })
 
 -- Maximum and handle_width are set later
@@ -83,7 +68,14 @@ local tasklist_widget = wibox.widget({
 })
 
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄ 
--- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀
+-- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀ 
+
+-- UI element generation and keynav ------------------------
+local nav_tasklist = keynav.area({
+  name = "nav_tasklist",
+  keys = require("ui.dash.task.tasklist_keybinds"),
+  circular = true
+})
 
 --- Creates a single task wibox.
 local function create_task_wibox(task_table)
@@ -120,10 +112,9 @@ local function create_task_wibox(task_table)
   })
 end
 
-local function create_task_nav(task_wibox, _task, index)
-  local ntask = navtask({
-    widget = task_wibox.children[1],
-    name   = _task["id"],
+local function create_task_nav(task_wibox, task_table, index)
+  local ntask = keynav.navitem.textbox({
+    widget = task_wibox.children[1], -- description only
     index  = index,
   })
 
@@ -132,7 +123,7 @@ local function create_task_nav(task_wibox, _task, index)
     local text = remove_pango(self.widget.text)
     local markup = colorize(text, beautiful.main_accent)
     self.widget:set_markup_silently(markup)
-    task:set_focused_task(_task, self.index)
+    task:set_focused_task(task_table, self.index)
     task:emit_signal("selected::task")
   end
 
@@ -146,17 +137,17 @@ local function create_task_nav(task_wibox, _task, index)
   return ntask
 end
 
+--- note: dont rlly understand this one anymore lol
 -- Handles switching to the correct index after redrawing because a task
 -- was added/deleted/completed
 local function update_wibox_index()
   if task.need_switch_index then
-    task:emit_signal("ui::switch_tasklist_index", task.switch_index)
+    task:emit_signal("tasklist::switch_index", task.switch_index)
     task.need_switch_index = false
   end
 end
 
--- █▀ █▀▀ █▀█ █▀█ █░░ █░░ █▄▄ ▄▀█ █▀█ 
--- ▄█ █▄▄ █▀▄ █▄█ █▄▄ █▄▄ █▄█ █▀█ █▀▄ 
+-- Scrollbar ------------------------
 local function scroll_up()
   local bar = scrollbar.children[1]
   bar.value = bar.value - 1
@@ -222,19 +213,18 @@ local function update_scrollbar(num_tasks)
   scrollbar_cont.visible  = true
 end
 
-
 -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
 
 --- Draw all tasks for a project
-task:connect_signal("update::tasks", function()
-  nav_tasklist:remove_all_items()
-  nav_tasklist:reset()
+task:connect_signal("tasklist::update", function(_, tag, project)
+  print('caught tasklist::update for '..tag..' '..project)
   tasklist:reset()
-  overflow_top = {}
+  nav_tasklist:reset()
+  overflow_top    = {}
   overflow_bottom = {}
 
-  local json_tasklist = task:get_pending_tasks()
+  local json_tasklist = task.tags[tag].projects[project].tasks
   for i = 1, #json_tasklist do
     local task_wibox = create_task_wibox(json_tasklist[i])
     local ntask = create_task_nav(task_wibox, json_tasklist[i], i)
@@ -254,6 +244,16 @@ task:connect_signal("update::tasks", function()
     scrollbar_cont.visible = false
   end
 
+  -- Restore position on reload
+  if task.restore_required then
+    task.restore_required = false
+    if #nav_tasklist.items < task.task_index then
+      task.task_index = #nav_tasklist.items
+    end
+    nav_tasklist:set_curr_item(task.task_index)
+    nav_tasklist.nav:set_area("tasklist")
+  end
+
   update_wibox_index()
 end)
 
@@ -265,11 +265,12 @@ task:connect_signal("selected::task", function()
   local index     = task:focused_task_index()
   local old_index = task:old_focused_task_index()
   local gap = math.abs(index - old_index)
+  local pending_tasks = #task.tags[task.focused_tag].projects[task.focused_project].tasks -- ew
 
   if index == 1 and gap > 1 then
     if first_position_index == 1 then return end
     jump_top()
-  elseif index == #task:get_pending_tasks() and gap > 1 then
+  elseif index == pending_tasks and gap > 1 then
     if first_position_index == #task:get_pending_tasks() then return end
     jump_end()
   elseif index < first_position_index then
@@ -277,80 +278,6 @@ task:connect_signal("selected::task", function()
   elseif index > last_position_index then
     scroll_down()
   end
-end)
-
---- Add a single task to the task list
--- Note: this is called *after* task has been added to data table,
--- so #get_pending_tasks is the correct index
-task:connect_signal("tasklist::add", function(_, new_task)
-  local task_wibox = create_task_wibox(new_task)
-  local index = #task:get_pending_tasks()
-  local ntask = create_task_nav(task_wibox, new_task, index)
-  nav_tasklist:append(ntask)
-  tasklist:add(task_wibox)
-  update_wibox_index()
-  nav_tasklist:set_curr_item(index)
-end)
-
---- Remove a task from the task list and task keynav hierarchy
--- Note: this is called *after* task has been removed from data table
-task:connect_signal("tasklist::remove", function()
-  local index_to_remove = task:focused_task_index()
-  tasklist:remove(index_to_remove)
-  nav_tasklist:remove_index(index_to_remove)
-  update_wibox_index()
-
-  if #nav_tasklist.items == 0 then return end
-
-  -- Cursor will stay in the same position post removal
-  -- Unless there are no more tasks
-  -- (Unless you're removing the last one in the list, or there are no more tasks)
-  local new_nav_index = index_to_remove
-  local last_task_index = #task:get_pending_tasks()
-  if index_to_remove == last_task_index + 1 then
-    new_nav_index = new_nav_index - 1
-  end
-
-  -- The self.index field is used to set task.focused_task_index
-  -- whenever a new task navitem is selected
-  -- Must update these indices when you alter the order
-  for i = new_nav_index, #nav_tasklist.items do
-    nav_tasklist.items[i].index = i
-  end
-
-  nav_tasklist:set_curr_item(new_nav_index)
-end)
-
-task:connect_signal("tasklist::update_task_name", function(_, index, new_desc)
-  local modtask = tasklist.children[1].children[index]
-  if not modtask then
-    print("ERROR: MODTASK NIL!! (in task/tasklist/tasks.lua)")
-    print("index is "..index)
-    print('tasklist has ' .. #tasklist.children[1].children)
-  end
-  local desc_wibox = modtask:get_children_by_id("description")[1]
-  new_desc = new_desc:gsub("%^l", string.upper)
-  desc_wibox:set_markup_silently(colorize(new_desc, beautiful.fg))
-end)
-
-task:connect_signal("tasklist::update_task_due", function(_, index, due)
-  local modtask = tasklist.children[1].children[index]
-  local due_wibox = modtask:get_children_by_id("due")[1]
-  local due_text, due_color = format_due_date(due)
-  due_wibox:set_markup_silently(colorize(due_text, due_color))
-end)
-
---- Toggle start/stop: change text color between white (stopped) and green (started)
-task:connect_signal("tasklist::update_start", function(_, index, desc, is_started)
-  local modtask = tasklist.children[1].children[index]
-  local desc_wibox = modtask:get_children_by_id("description")[1]
-  local markup
-  if is_started then
-    markup = colorize(desc, beautiful.fg)
-  else
-    markup = colorize(desc, beautiful.green)
-  end
-  desc_wibox:set_markup_silently(markup)
 end)
 
 return function()

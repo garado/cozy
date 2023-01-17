@@ -12,38 +12,54 @@ local capi = { mouse = mouse }
 
 local _ui = {}
 
--- for dashboard
+-- For dashboard
 -- credit: @rxhyn
 function _ui.create_boxed_widget(widget_to_be_boxed, width, height, bg_color)
-	local box_container = wibox.container.background()
-  box_container.bg = bg_color
-	box_container.forced_height = height
-	box_container.forced_width = width
-  box_container.shape = gears.shape.rounded_rect
-
-	local boxed_widget = wibox.widget({
-		--- Add margins
+	return wibox.widget({
 		{
-			--- Add background color
 			{
-				--- The actual widget goes here
 				widget_to_be_boxed,
-				top = dpi(15),
-				bottom = dpi(15),
-				left = dpi(15),
-				right = dpi(15),
-				widget = wibox.container.margin,
+        margins = dpi(15),
+				widget  = wibox.container.margin,
 			},
-			widget = box_container,
+      forced_height = height or nil,
+      forced_width  = width or nil,
+      bg     = bg_color,
+      shape  = gears.shape.rounded_rect,
+			widget = wibox.container.background,
 		},
 		margins = dpi(10),
-		color = "#FF000000",
-		widget = wibox.container.margin,
+		color   = "#FF000000",
+		widget  = wibox.container.margin,
 	})
-	return boxed_widget
+end
+
+function _ui.box(widget_to_be_boxed, width, height, bg_color)
+	return wibox.widget({
+		{
+			{
+				widget_to_be_boxed,
+        margins = dpi(15),
+				widget  = wibox.container.margin,
+			},
+      forced_height = height or nil,
+      forced_width  = width or nil,
+      bg     = bg_color,
+      shape  = gears.shape.rounded_rect,
+			widget = wibox.container.background,
+		},
+		margins = dpi(10),
+		color   = "#FF000000",
+		widget  = wibox.container.margin,
+	})
 end
 
 function _ui.colorize_text(text, color)
+  color = color or "#FF000000"
+	return "<span foreground='" .. color .. "'>" .. text .. "</span>"
+end
+
+function _ui.colorize(text, color)
   color = color or "#FF000000"
 	return "<span foreground='" .. color .. "'>" .. text .. "</span>"
 end
@@ -56,6 +72,14 @@ function _ui.create_dash_widget_header(text)
     valign = "center",
     widget = wibox.widget.textbox,
   })
+end
+
+
+function _ui.vpad(height)
+	return wibox.widget({
+		forced_height = height,
+		layout = wibox.layout.fixed.vertical,
+	})
 end
 
 function _ui.vertical_pad(height)

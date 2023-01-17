@@ -8,7 +8,7 @@ local beautiful   = require("beautiful")
 local wibox       = require("wibox")
 local xresources  = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local animation   = require("modules.animation")
+-- local animation   = require("modules.animation")
 local colorize    = require("helpers.ui").colorize_text
 local task        = require("core.system.task")
 
@@ -83,7 +83,7 @@ local tasklist_header = wibox.widget({
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄ 
 -- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀ 
 
-local function update_header(tag, project)
+task:connect_signal("header::update", function(_, tag, project)
   local accent = task:get_accent(tag, project)
   if not accent then
     accent = beautiful.random_accent_color()
@@ -99,25 +99,21 @@ local function update_header(tag, project)
   name:set_markup_silently(colorize(name_text, accent))
 
   -- Completion statistics text
-  local pending = #task:get_pending_tasks(nil, project)
-  local total   = task:get_total_tasks(tag, project)
+  local pending = #task.tags[tag].projects[project].tasks
+  local total   = task.tags[tag].projects[project].total
   local rem     = pending.."/"..total.." REMAINING"
   local text    = string.upper(tag).." - "..rem
   local markup  = colorize(text, beautiful.fg)
   subheader:set_markup_silently(markup)
 
   -- Progress bar
-  local percent = task:get_proj_completion_percentage(tag, project)
+  local percent = task:calc_completion_percentage(tag, project)
   progress_bar.value = percent
   progress_bar.color = accent
 
   -- Completion percentage
   markup = colorize(percent.."%", beautiful.fg)
   percent_completion:set_markup_silently(markup)
-end
-
-task:connect_signal("header::update", function(_, tag, project)
-  update_header(tag, project)
 end)
 
 return tasklist_header
