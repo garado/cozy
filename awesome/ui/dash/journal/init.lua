@@ -16,15 +16,21 @@ local journal = require("core.system.journal")
 -- Import modules
 local lock_ui  = require(... .. ".lock")
 local contents = require(... .. ".contents")()
+local tags, nav_tags           = require(... .. ".tags")()
 local entrylist, nav_entrylist = require(... .. ".entrylist")()
 local actions, nav_actions     = require(... .. ".actions")()
 
--- Keyboard navigation
 local nav_journal = area:new({
   name = "journal",
   children = {
     nav_actions,
     nav_entrylist,
+    nav_tags,
+  },
+  keys = {
+    ["Escape"] = function()
+      journal:emit_signal("ready::entries")
+    end
   }
 })
 
@@ -32,22 +38,26 @@ local nav_journal = area:new({
 -- █▄█ █ 
 
 local sidebar = wibox.widget({
-  wibox.widget({
+  {
     markup = colorize("Journal", beautiful.fg),
     font   = beautiful.alt_large_font,
     align  = "center",
     valign = "center",
     widget = wibox.widget.textbox,
-  }),
+  },
   actions,
   entrylist,
+  tags,
   spacing       = dpi(15),
-  forced_width  = dpi(400),
+  forced_width  = dpi(375),
   layout        = wibox.layout.fixed.vertical,
 })
 
 local unlock_ui = wibox.widget({
-  sidebar,
+  { -- needs its own layoutbox to fix strange layout issues
+    sidebar,
+    layout = wibox.layout.fixed.vertical,
+  },
   contents,
   spacing = dpi(15),
   layout  = wibox.layout.fixed.horizontal,

@@ -59,5 +59,11 @@ return {
       repo = "",
       msg = "",
     },
+  },
+  journal = {
+    -- This is obviously NOT meant to be bulletproof
+    -- This is just to prevent for example people sitting behind you from seeind
+    -- your deep dark jrnl secrets.
+    password = "password"
   }
 }
