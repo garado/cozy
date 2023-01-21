@@ -54,17 +54,18 @@ local navitems  = { nav_main, nav_tasks,  nav_agenda, nav_cash, nil,    nav_jour
 -- @param i The tab number.
 function switch_tab(i)
   -- If trying to switch to the currently selected tab, do nothing
-  if navitems[i] and nav_root:contains(navitems[i]) then return end
+  -- if navitems[i] and nav_root:contains(navitems[i]) then return end
 
   -- Turn off highlight for all other tabs
   nav_tabs:foreach(function(tab)
     tab:select_off()
   end)
 
+  nav_root:reset()
+
   -- Set the dash content to the proper tab
   local contents = dash_content:get_children_by_id("content")[1]
   contents:set(1, tablist[i])
-  nav_root:remove_all_items()
   nav_tabs.items[i]:select_on()
 
   -- Insert all areas for the new tab
@@ -73,7 +74,6 @@ function switch_tab(i)
     nav_root:verify_nav_references()
   end
 
-  nav_root:reset()
   navigator.curr_area = navigator.root
 
   dashcore:emit_signal("tabswitch", tabnames[i])

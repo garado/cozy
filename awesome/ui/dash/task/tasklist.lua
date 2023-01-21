@@ -8,7 +8,6 @@ local xresources  = require("beautiful.xresources")
 local gears       = require("gears")
 local keynav      = require("modules.keynav")
 local colorize    = require("helpers.ui").colorize_text
-local remove_pango    = require("helpers.dash").remove_pango
 local format_due_date = require("helpers.dash").format_due_date
 local dpi   = xresources.apply_dpi
 local task  = require("core.system.task")
@@ -82,24 +81,24 @@ local function create_task_wibox(task_table)
   local desc  = task_table["description"]
   local due   = task_table["due"] or ""
   local start = task_table["start"]
+  local wait  = task_table["wait"]
 
   desc = desc:gsub("%^l", string.upper)
-  local taskname_color = start and beautiful.green or beautiful.fg
+  local taskname_color = (start and beautiful.green) or (wait and beautiful.fg_sub) or beautiful.fg
   local taskname = wibox.widget({
-    id = "description",
     markup = colorize(desc, taskname_color),
     font = beautiful.base_small_font,
     ellipsize = "end",
     widget = wibox.widget.textbox,
   })
 
-  local due_text, due_color = format_due_date(due)
+  local due_text = format_due_date(due)
+  local due_color = task_table["urgency"] > 7 and beautiful.red or beautiful.fg_sub
   local due_ = wibox.widget({
-    id = "due",
-    markup = colorize(due_text, due_color or beautiful.fg_sub),
-    font = beautiful.base_small_font,
+    markup = colorize(due_text, due_color),
+    font   = beautiful.base_small_font,
     halign = "right",
-    align = "center",
+    align  = "center",
     widget = wibox.widget.textbox,
   })
 
@@ -113,31 +112,19 @@ local function create_task_wibox(task_table)
 end
 
 local function create_task_nav(task_wibox, task_table, index)
-  local ntask = keynav.navitem.textbox({
-    widget = task_wibox.children[1], -- description only
+  return keynav.navitem.textbox({
+    widget = task_wibox.children[1], -- highlight description only
     index  = index,
+    fg_off = (task_table["start"] and beautiful.green)
+      or (task_table["wait"] and beautiful.fg_sub) or beautiful.fg,
+    custom_on = function(self)
+      task:set_focused_task(task_table, self.index)
+      task:emit_signal("selected::task")
+    end,
   })
-
-  function ntask:select_on()
-    self.selected = true
-    local text = remove_pango(self.widget.text)
-    local markup = colorize(text, beautiful.main_accent)
-    self.widget:set_markup_silently(markup)
-    task:set_focused_task(task_table, self.index)
-    task:emit_signal("selected::task")
-  end
-
-  function ntask:select_off()
-    self.selected = false
-    local text = remove_pango(self.widget.text)
-    local markup = colorize(text, beautiful.fg)
-    self.widget:set_markup_silently(markup)
-  end
-
-  return ntask
 end
 
---- note: dont rlly understand this one anymore lol
+--- note from a month later: dont really understand this anymore lol but it works
 -- Handles switching to the correct index after redrawing because a task
 -- was added/deleted/completed
 local function update_wibox_index()
@@ -218,7 +205,6 @@ end
 
 --- Draw all tasks for a project
 task:connect_signal("tasklist::update", function(_, tag, project)
-  print('caught tasklist::update for '..tag..' '..project)
   tasklist:reset()
   nav_tasklist:reset()
   overflow_top    = {}
@@ -229,12 +215,18 @@ task:connect_signal("tasklist::update", function(_, tag, project)
     local task_wibox = create_task_wibox(json_tasklist[i])
     local ntask = create_task_nav(task_wibox, json_tasklist[i], i)
 
+    if json_tasklist[i]["wait"] and not task.show_waiting then
+      goto continue
+    end
+
     nav_tasklist:append(ntask)
     if i > MAX_TASKS_SHOWN then
       overflow_bottom[#overflow_bottom+1] = task_wibox
     else
       tasklist:add(task_wibox)
     end
+
+    ::continue::
   end
 
   -- Scrollbar UI

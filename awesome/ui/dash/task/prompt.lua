@@ -91,7 +91,10 @@ local function task_input(type, prompt, text)
     bg_cursor    = beautiful.main_accent,
     textbox      = prompt_textbox,
     exe_callback = function(input)
-      if not input or #input == 0 then return end
+      if not input or #input == 0 then
+        task:emit_signal("input::cancelled")
+        return
+      end
       task:emit_signal("input::complete", type, input)
     end,
     completion_callback = comp_callback,
@@ -101,20 +104,22 @@ end
 --- Generates the prompt to display based on type of input requested,
 -- then calls function to actually start the prompt
 task:connect_signal("input::request", function(_, type)
-  print("prompt::caught input_request signal")
+  -- print("prompt::caught input_request signal")
 
   local prompt_options = {
     ["add"]       = "Add quest: ",
-    ["modify"]    = "Modify: " .. "(d) due date, (n) quest name, (p) project, (t) tag",
+    ["annotate"]  = "Annotate: ",
+    ["modify"]    = "Modify: " .. "(d) due, (n) name, (p) project, (t) tag, (w) wait",
     ["done"]      = "Complete quest? (y/n) ",
     ["delete"]    = "Abandon quest? (y/n) ",
     ["reload"]    = "Reload quests? (y/n) ",
-    ["undo"]      = "",
+    ["undo"]      = "Undo? This is not reversible! (y/n)",
     ["search"]    = "/",
     ["mod_proj"]  = "Modify project: ",
     ["mod_tag"]   = "Modify tag: ",
     ["mod_due"]   = "Modify due date: ",
     ["mod_name"]	= "Modify quest name: ",
+    ["mod_wait"]  = "Modify wait date: ",
   }
 
   local text_options = {
@@ -132,7 +137,13 @@ task:connect_signal("input::request", function(_, type)
 
   if type == "start" then
     prompt_textbox:set_markup_silently(prompt)
-    task:emit_signal("key::input_completed", "start", "")
+    task:emit_signal("input::complete", "start", "")
+    return
+  end
+
+  -- Just clear the prompt
+  if type == "mod_clear" then
+    prompt_textbox:set_markup_silently("")
     return
   end
 

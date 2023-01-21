@@ -3,11 +3,13 @@
 -- ░█░ █▀█ ▄█ █░█ ▀▄▀▄▀ █▀█ █▀▄ █▀▄ █ █▄█ █▀▄ 
 
 -- For interfacing with Taskwarrior.
+-- The way this entire module is written is so fucking confusing lmao sorry but
+-- I have provided as much documentation as I can
 
 -- SIGNALS            EMITTED WHEN
 -- --------------     -----------------
--- ready::tags        Tags have been parsed
--- ready::all_projects    Projects for a given tag have been parsed
+-- ready::tag_names        Tags have been parsed
+-- ready::project_information    Projects for a given tag have been parsed
 -- selected::tag      A tag has been selected (emitted in tags.lua)
 -- selected::project  A project has been selected (emitted in projects.lua)
 -- input::request     A valid keybind is pressed. Triggers awful.prompt. (handled in prompt.lua)
@@ -29,34 +31,46 @@
 -- -------------------------------
 -- # tag_names : (table) all active tags, indexed numerically
 -- # tags{}    : (table) all active tags, indexed by tag name
+  -- # projects_ready : (int) number of projects have their total task count available
+  -- # project_names  : (table of strings) all active project names
   -- # projects{} : table of all active projects associated with tag, indexed by project name
     -- # tasks{}  : table of all active tasks in project, indexed numerically
 
--- DATA FLOW (incomplete)
+-- INITIALIZATION PIPELINE
+-- ---------------------------
+-- At module initialization, init flag is set to true
+-- After every stage, inits_complete--
+-- Once inits_complete == NUM_COMPONENTS, initialization has completed
 --                
---    STARTUP     ready:: ┌────────────┐   ready::
---  ┌────────────┐ tags   │parse_tasks_│    tasks
---  │parse_tags()│───┬──► │ for_tags() │──────────────────►
---  └────────────┘   ▼    └────────────┘   ready::
---               UI update:              project_list
---                  tags
+--                 ready::  ┌────────────┐     ready::tasks     ┌─────────────────────┐       ready::
+--  ┌────────────┐tag_names │parse_tasks_│ ready::project_names │ parse_total_tasks_  │ project_information     init
+--  │parse_tags()│───┬─────►│ for_tags() │──────────┬─────────► │    for_project()    │─────────┬───────────► complete!
+--  └────────────┘   ▼      └────────────┘          ▼           └─────────────────────┘         ▼
+--               UI update:                     UI update:                                  UI update:
+--                  tags                         tasklist                               header, project list
 
-local gobject = require("gears.object")
-local gtable  = require("gears.table")
-local awful   = require("awful")
-local json    = require("modules.json")
-local core    = require("helpers.core")
-local gears   = require("gears")
-local config  = require("config")
-local time    = require("core.system.time")
+local gobject   = require("gears.object")
+local gtable    = require("gears.table")
+local awful     = require("awful")
+local json      = require("modules.json")
+local core      = require("helpers.core")
+local config    = require("config")
+local time      = require("core.system.time")
+local beautiful = require("beautiful")
 
 local debug   = require("core.debug")
-debug:off()
+-- debug:off()
 
 local task = {}
 local instance = nil
 
 local EMPTY_JSON = "[\n]\n"
+local NUM_COMPONENTS = 4
+
+local inits_complete = 0
+local function initializing()
+  return not (inits_complete == NUM_COMPONENTS)
+end
 
 --------------------------------
 
@@ -65,7 +79,6 @@ function task:report_focused(src)
   local curtag = self.focused_tag or "NIL"
   local curproj = self.focused_project or "NIL"
   src = (src and ' from ' .. src) or ""
-  debug:print("\tcore::task: focused tag is "..curtag..", focused proj is "..curproj .. src)
 end
 
 -- █ █▄░█ ▀█▀ █▀▀ █▀█ █▀▀ ▄▀█ █▀▀ █ █▄░█ █▀▀ 
@@ -79,44 +92,29 @@ function task:parse_tags()
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local tags = core.split('\r\n', stdout)
     self.tag_names = tags
-    self:emit_signal("ready::tags")
-  end)
-end
-
-function task:sort_projects(tag)
-  table.sort(self.tags[tag].project_names, function(a, b)
-    return a < b
+    self:emit_signal("ready::tag_names")
   end)
 end
 
 --- Parse all pending tasks for a given tag and then sort them by project
 -- (As far as I'm aware this is the only way to initially obtain the list of projects for a tag) 
 function task:parse_tasks_for_tag(tag)
-  local cmd = "task context none; task tag:"..tag.. " status:pending export rc.json.array=on"
+  local cmd = "task context none; task +'"..tag.. "' '(status:pending or status:waiting)' export rc.json.array=on"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     if stdout == EMPTY_JSON or stdout == "" then return end
+
+    if not self.tags[tag] then self:add_new_tag(tag) end
 
     local json_arr = json.decode(stdout)
 
     -- Iterate through all pending tasks for tag and separate by project
-    local projects = {}
-    local project_names = {}
     for i, v in ipairs(json_arr) do
-      local project_name = json_arr[i]["project"] or "Unsorted"
-      if not projects[project_name] then
-        projects[project_name] = {}
-        projects[project_name].tasks = {}
-        projects[project_name].total = 0
-        project_names[#project_names+1] = project_name
+      local pname = json_arr[i]["project"] or "Unsorted"
+      if not self.tags[tag].projects[pname] then
+        self:add_new_project(tag, pname)
       end
-      table.insert(projects[project_name].tasks, v)
+      table.insert(self.tags[tag].projects[pname].tasks, v)
     end
-
-    -- Store final data in task object
-    self.tags[tag] = {}
-    self.tags[tag].projects = projects
-    self.tags[tag].projects_ready = 0
-    self.tags[tag].project_names = project_names
 
     self:sort_projects(tag)
 
@@ -126,7 +124,7 @@ function task:parse_tasks_for_tag(tag)
       self:sort_task_descriptions(tag, pname)
     end
 
-    self:emit_signal("ready::project_list", tag)
+    self:emit_signal("ready::project_names", tag)
     -- self:emit_signal("ready::tasks", tag)
   end)
 end
@@ -134,8 +132,8 @@ end
 -- Used to update only one project (almost positively the focused project).
 -- Called after the user modifies a task to reflect the user's changes.
 function task:parse_tasks_for_project(tag, project)
-  local cmd = "task tag:'"..tag.."' project:'"..project.."' status:pending export rc.json.array=on"
-  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+  local cmd = "task +'"..tag.."' project:'"..project.."' '(status:pending or status:waiting)' export rc.json.array=on"
+  awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
     if stdout == EMPTY_JSON or stdout == "" then return end
     self.tags[tag].projects[project].tasks = json.decode(stdout)
     self:sort_task_descriptions(tag, project)
@@ -148,8 +146,8 @@ end
 -- This information is required by project list and header.
 function task:parse_total_tasks_for_project(tag, project)
   local unset_context = "task context none ; "
-  local filters = "task tag:'"..tag.."' project:'"..project.."' "
-  local status = " '(status:pending or status:completed)' "
+  local filters = "task +'"..tag.."' project:'"..project.."' "
+  local status = " '(status:pending or status:completed or status:waiting)' "
   local cmd = unset_context .. filters .. status .. "count"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local total = tonumber(stdout) or 0
@@ -157,8 +155,8 @@ function task:parse_total_tasks_for_project(tag, project)
 
     local ready = self.tags[tag].projects_ready + 1
     self.tags[tag].projects_ready = ready
-    if ready == #self.tags[tag].project_names then
-      self:emit_signal("ready::all_projects", tag)
+    if ready >= #self.tags[tag].project_names then
+      self:emit_signal("ready::project_information", tag)
     end
   end)
 end
@@ -176,6 +174,17 @@ function task:execute_command(type, input)
   if type == "add" then
     cmd = "task add proj:'"..fproj.."' tag:'"..ftag.."' '"..input.."'"
   end
+
+  if type == "annotate" then
+    cmd = "task " .. id .. " annotate " .. input
+  end
+
+  -- currently not used bc my taskwarrior hook fails when executing task undo
+  -- if type == "undo" then
+  --   if input == "y" or input == "Y" then
+  --     cmd = "echo 'y' | task undo"
+  --   else return end
+  -- end
 
   if type == "delete" then
     if input == "y" or input == "Y" then
@@ -219,6 +228,7 @@ function task:execute_command(type, input)
 
   -- Modal modify requests
   if type == "mod_due" then
+    if input == "none" then input = '' end
     cmd = "task "..id.." mod due:'"..input.."'"
   elseif type == "mod_proj" then
     cmd = "task "..id.." mod proj:'"..input.."'"
@@ -226,167 +236,27 @@ function task:execute_command(type, input)
     cmd = "task "..id.." mod tag:'"..input.."'"
   elseif type == "mod_name" then
     cmd = "task "..id.." mod desc:'"..input.."'"
+  elseif type == "mod_wait" then
+    cmd = "task "..id.." mod wait:'"..input.."'"
   end
 
   awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
-    print(cmd)
-    print(stdout)
-    print(stderr)
-
-    local ft  = self.focused_tag
-    local fp  = self.focused_project
-    local ntasks = #self.tags[ft].projects[fp].tasks
-    local nproj  = #self.tags[ft].project_names
-    local pnames = self.tags[ft].project_names
-
-    -- Check for invalid date
-    -- TODO tell the user and awful.prompt persist
-    if string.find(stderr, "is not a valid date") then
-      print('Invalid date')
-    end
-
-    self.restore_required = true
-
-    -- Reflect changes by selectively reloading components 
-    local case1 = type == "mod_proj" and ntasks > 1  and nproj > 1
-    local case2 = (type == "mod_proj" or type == "done" or type == "delete") and ntasks == 1 and nproj > 1
-    local case3 = (type == "mod_proj" or type == "done" or type == "delete") and ntasks == 1 and nproj == 1
-    local case4 = type == "mod_tag" and ntasks == 1 and nproj > 1
-    local case5 = type == "mod_tag" and ntasks == 1 and nproj == 1
-    local casex = not case1 and not case2 and not case3
-
-    print('Case 1 '..(case1 and 'true' or 'false'))
-    print('Case 2 '..(case2 and 'true' or 'false'))
-    print('Case 3 '..(case3 and 'true' or 'false'))
-    print('Case x '..(casex and 'true' or 'false'))
-
-    -- Case 1: Modifying two projects, focused tag/focused project remain
-    -- Reload both projects
-    if case1 then
-      -- Usually ready == #projects, but if you're adding a new project, 
-      -- then ready == #projects-1
-      local readymod = 2
-
-      -- Initialize new project if it doesn't exist already
-      if self.tags[ft].projects[input] == nil then
-        self.tags[ft].projects[input] = {}
-        self.tags[ft].projects[input].tasks = {}
-        self.tags[ft].projects[input].total = 0
-        table.insert(self.tags[ft].project_names, input)
-        self:sort_projects(ft)
-        readymod = 1
-      end
-
-      self.tags[ft].projects_ready = self.tags[ft].projects_ready - readymod
-      self:parse_tasks_for_project(ft, fproj)
-      self:parse_tasks_for_project(ft, input)
-    end
-
-    -- Case 2: Focused project completes, focused tag remains
-    -- Change focused project, reload new focused project
-    if case2 then
-      -- Remove completed project from project list
-      self.tags[ft].projects[fp] = nil
-      for i = 1, #pnames do
-        if pnames[i] == fp then
-          table.remove(pnames, i)
-          break
-        end
-      end
-
-      -- Determine new focused project
-      self.focused_project = type == "mod_proj" and input or pnames[1]
-
-      self.tags[ft].projects_ready = self.tags[ft].projects_ready - 2
-      self:parse_tasks_for_project(self.focused_tag, self.focused_project)
-    end
-
-    -- Case 3: Focused project completes, causing focused tag to complete
-    -- Reload tag list, reload project list, switch focused tag
-    -- TODO: account for if the completed tag is the last tag remaining
-    if case3 then
-      -- Remove completed tag
-      self.tags[ft] = nil
-      for i = 1, #self.tag_names do
-        if self.tag_names[i] == ft then
-          table.remove(self.tag_names, i)
-          break
-        end
-      end
-
-      -- Set new focused tag and project
-      self.focused_tag = self.tag_names[1]
-      self.focused_project = nil
-      self:set_focused_project(self.focused_tag)
-
-      self:emit_signal("taglist::update")
-      self:emit_signal("projects::update", self.focused_tag, self.focused_project)
-      self:emit_signal("tasklist::update", self.focused_tag, self.focused_project)
-      self:emit_signal("header::update", self.focused_tag, self.focused_project)
-    end
-
-    -- Init new tag if it does not already exist
-    if type == "mod_tag" and not self.tags[input] then
-      if not self.tags[input] then
-        self.tag_names[#self.tag_names+1] = input
-        self.tags[input] = {}
-        self:parse_tasks_for_tag(input)
-      end
-    end
-
-    -- Case 4: mod tag causes project to complete, but not tag
-    -- Set new fproj, reload plist
-    if case4 then
-      -- Remove project from tag
-      self.tags[ft].projects[fp] = nil
-      for i = 1, pnames do
-        if pnames[i] == fp then
-          table.remove(pnames, i)
-          break
-        end
-      end
-
-      self.focused_project = nil
-      self:set_focused_project(self.focused_tag)
-
-      self:emit_signal("projects::update", self.focused_tag, self.focused_project)
-      self:emit_signal("tasklist::update", self.focused_tag, self.focused_project)
-      self:emit_signal("header::update", self.focused_tag, self.focused_project)
-    end
-
-    -- Case 5: mod tag causes project and tag to complete
-    if case5 then
-      -- Remove old tag
-      self.tags[ft] = nil
-      for i = 1, #self.tag_names do
-        if self.tag_names[i] == ft then
-          table.remove(self.tag_names, i)
-          break
-        end
-      end
-
-      -- Set new focused tag/project
-      self.focused_tag = input
-      self.focused_project = nil
-      self:set_focused_project(self.focused_tag)
-
-      --self:emit_signal("projects::update", self.focused_tag, self.focused_project)
-      --self:emit_signal("tasklist::update", self.focused_tag, self.focused_project)
-      --self:emit_signal("header::update", self.focused_tag, self.focused_project)
-    end
-
-    -- Case X: Everything else (modifying one project, ft+fp remain)
-    if casex then
-      self:parse_tasks_for_project(ftag, fproj)
-    end
+    self:selective_reload(type, input)
   end)
 end
 
 
--- ▄▀█ █▀ █▀▄ █▀▀ ▄▀█ █▀ █▀▄ █▀▀ ▄▀█ █▀ █▀▄ 
--- █▀█ ▄█ █▄▀ █▀░ █▀█ ▄█ █▄▀ █▀░ █▀█ ▄█ █▄▀ 
+-- █▀▄ ▄▀█ ▀█▀ ▄▀█ █▄▄ ▄▀█ █▀ █▀▀ 
+-- █▄▀ █▀█ ░█░ █▀█ █▄█ █▀█ ▄█ ██▄ 
 
--- Manipulation of already parsed data
+-- Functions for handling already-parsed data
+
+--- Sort projects alphabetically
+function task:sort_projects(tag)
+  table.sort(self.tags[tag].project_names, function(a, b)
+    return a < b
+  end)
+end
 
 -- Sort tasks by due date, then alphabetically 
 function task:sort_task_descriptions(tag, project)
@@ -407,6 +277,190 @@ function task:sort_task_descriptions(tag, project)
     end
   end)
 end
+
+-- A bunch of helper functions for data management
+function task:add_new_project(tag, new_project)
+  self.tags[tag].projects[new_project] = {}
+  self.tags[tag].projects[new_project].tasks  = {}
+  self.tags[tag].projects[new_project].total  = 0
+  self.tags[tag].projects[new_project].accent = beautiful.random_accent_color()
+  local pnames = self.tags[tag].project_names
+  pnames[#pnames+1] = new_project
+end
+
+-- Avoid duplicate tag names
+function task:add_tag_name(new_tag)
+  for i = 1, #self.tag_names do
+    if self.tag_names[i] == new_tag then return end
+  end
+  local tnames = self.tag_names
+  tnames[#tnames+1] = new_tag
+end
+
+function task:add_new_tag(new_tag)
+  self.tags[new_tag] = {}
+  self.tags[new_tag].projects = {}
+  self.tags[new_tag].project_names  = {}
+  self.tags[new_tag].projects_ready = 0
+  self:add_tag_name(new_tag)
+end
+
+function task:delete_tag(tag_to_delete)
+  for i = 1, #self.tag_names do
+    if self.tag_names[i] == tag_to_delete then
+      table.remove(self.tag_names, i)
+      break
+    end
+  end
+  self.tags[tag_to_delete] = nil
+end
+
+function task:delete_project(tag, project_to_delete)
+  if not self.tags[tag] then return end
+  self.tags[tag].projects[project_to_delete] = nil
+  local pnames = self.tags[tag].project_names
+  for i = 1, #pnames do
+    if pnames[i] == project_to_delete then
+      table.remove(pnames, i)
+      return
+    end
+  end
+end
+
+function task:adjust_project_total(tag, project, amt)
+  self.tags[tag].projects[project].total = self.tags[tag].projects[project].total + amt
+end
+
+function task:selective_reload(type, input)
+  -- Flag detected by tasklist; used when restoring nav position after reloading
+  -- the focused project
+  self.restore_required = true
+
+  local ft = self.focused_tag
+  local fp = self.focused_project
+  local ftask = self.focused_task
+  local ntasks = #self.tags[ft].projects[fp].tasks
+  local nproj  = #self.tags[ft].project_names
+
+  -- Command types that remove a task from the focused project.
+  local remove_task_type = type == "done" or type == "delete"
+
+  if type == "mod_tag"  and input == ft then return end
+  if type == "mod_proj" and input == fp then return end
+
+  -- Move focused task to other project within tag
+  if type == "mod_proj" then
+    local new_project = input
+
+    -- Create project if necessary + move task
+    if not self.tags[ft].projects[new_project] then
+      self:add_new_project(ft, new_project)
+    end
+
+    table.insert(self.tags[ft].projects[new_project].tasks, ftask)
+    table.remove(self.tags[ft].projects[fp].tasks, self.task_index)
+    self:sort_task_descriptions(ft, new_project)
+    self:adjust_project_total(ft, new_project, 1) -- total tasks++ for new proj
+    self:adjust_project_total(ft, fp, -1) -- total tasks-- for old proj
+
+    -- If necessary, delete old focused project and set new one
+    if ntasks == 1 then
+      self:delete_project(ft, fp)
+      self.focused_project = new_project
+    end
+
+    self:emit_signal("tasklist::update", ft, self.focused_project)
+    self:emit_signal("projects::update", ft, self.focused_project)
+    self:emit_signal("header::update", ft, self.focused_project)
+  end
+
+  -- Move focused task to other tag
+  if type == "mod_tag" then
+    local new_tag = input
+
+    -- Create tag/project if necessary + move task
+    if not self.tags[new_tag] then
+      self:add_new_tag(new_tag)
+    end
+
+    if not self.tags[new_tag].projects[fp] then
+      self:add_new_project(new_tag, fp)
+    end
+
+    table.insert(self.tags[new_tag].projects[fp].tasks, ftask)
+    table.remove(self.tags[ft].projects[fp].tasks, self.task_index)
+    self:sort_task_descriptions(new_tag, fp)
+    self:adjust_project_total(new_tag, fp, 1) -- total tasks++ for new proj
+    self:adjust_project_total(ft, fp, -1) -- total tasks-- for old proj
+
+    if ntasks == 1 and nproj == 1 then
+      -- Since ntask == 1 and nproj == 1, moving this task means the focused project and tag gets erased
+      self:delete_tag(ft)
+      self.focused_tag = new_tag
+      self.focused_project = fp
+    elseif ntasks == 1 and nproj > 1 then
+      -- Since ntasks == 1 and nproj > 1, moving this task means the focused project gets erased
+      -- Focus follows moved task
+      self:delete_project(ft, fp)
+      self.focused_tag = new_tag
+      self.focused_project = fp
+    end
+
+    self:emit_signal("tasklist::update", self.focused_tag, self.focused_project)
+    self:emit_signal("taglist::update", self.focused_tag, self.focused_project)
+    self:emit_signal("projects::update", self.focused_tag, self.focused_project)
+    self:emit_signal("header::update", self.focused_tag, self.focused_project)
+  end
+
+  if remove_task_type and ntasks == 1 and nproj == 1 then
+    -- Since ntasks == 1 and nproj == 1, the focused tag and project get erased
+    self:delete_tag(ft)
+    self.focused_tag = nil
+    self.focused_project = nil
+    self:set_focused_tag()
+    self:set_focused_project(self.focused_tag, nil)
+
+    self:emit_signal("tasklist::update", self.focused_tag, self.focused_project)
+    self:emit_signal("taglist::update", self.focused_tag, self.focused_project)
+    self:emit_signal("projects::update", self.focused_tag, self.focused_project)
+    self:emit_signal("header::update", self.focused_tag, self.focused_project)
+  end
+
+  if remove_task_type and ntasks == 1 then
+    if nproj == 1 then
+      -- Since ntasks == 1 and nproj == 1, delete focused tag/project
+      self:delete_tag(ft)
+      self.focused_tag = nil
+      self.focused_project = nil
+      self:set_focused_tag()
+      self:set_focused_project(self.focused_tag, nil)
+      self:emit_signal("taglist::update", self.focused_tag, self.focused_project)
+    elseif nproj > 1 then
+      -- Since ntasks == 1 and nproj > 1, delete focused project
+      self:delete_project(ft, fp)
+      self.focused_project = nil
+      self:set_focused_project(self.focused_tag, nil)
+    end
+
+    self:emit_signal("tasklist::update", self.focused_tag, self.focused_project)
+    self:emit_signal("projects::update", self.focused_tag, self.focused_project)
+    self:emit_signal("header::update", self.focused_tag, self.focused_project)
+  end
+
+  if remove_task_type and (ntasks > 1) then
+    self:parse_tasks_for_project(ft, fp)
+  end
+
+  -- If none of the other cases happen, then just reload current project
+  if not (remove_task_type) and not (type == "mod_proj") and not (type == "mod_tag") then
+    self:parse_tasks_for_project(ft, fp)
+  end
+end
+
+
+-- ▄▀█ █▀ █▀▄ █▀▀ ▄▀█ █▀ █▀▄ █▀▀ ▄▀█ █▀ █▀▄ 
+-- █▀█ ▄█ █▄▀ █▀░ █▀█ ▄█ █▄▀ █▀░ █▀█ ▄█ █▄▀ 
+-- idk what to call this section
 
 --- Sets the focused tag to the given tag.
 -- If a tag is not provided: 
@@ -478,36 +532,70 @@ function task:set_accent(tag, project, accent)
   self.tags[tag].projects[project].accent = accent
 end
 
+function task:format_date(date, format)
+  -- Taskwarrior returns due date as string
+  -- Convert that to a lua timestamp
+  local pattern = "(%d%d%d%d)(%d%d)(%d%d)T(%d%d)(%d%d)(%d%d)Z"
+  local xyear, xmon, xday, xhr, xmin, xsec = date:match(pattern)
+  local ts = os.time({
+    year = xyear, month = xmon, day = xday,
+    hour = xhr, min = xmin, sec = xsec })
+
+  -- account for timezone (america/los_angeles: -8 hours)
+  ts = ts - (8 * 60 * 60)
+
+  format = format or '%A %B %d %Y'
+  return os.date(format, ts)
+end
+
 
 -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░    █▀ █▀▀ ▀█▀ █░█ █▀█ 
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄    ▄█ ██▄ ░█░ █▄█ █▀▀ 
 
 function task:signal_setup()
-  -- READY -------------------------
+
+  -- █▀█ █▀▀ ▄▀█ █▀▄ █▄█ 
+  -- █▀▄ ██▄ █▀█ █▄▀ ░█░ 
+
   -- List of tags is ready
-  self:connect_signal("ready::tags", function()
-    self:set_focused_tag()
-    self:parse_tasks_for_tag(self.focused_tag)
-    -- self:report_focused('ready::tags signal')
+  self:connect_signal("ready::tag_names", function()
+    if initializing() then
+      inits_complete = inits_complete + 1
+      self:set_focused_tag()
+      self:parse_tasks_for_tag(self.focused_tag)
+    end
+    self:report_focused('ready::tag_names signal')
     self:emit_signal("taglist::update")
   end)
 
   -- List of projects for a tag is ready
-  self:connect_signal("ready::project_list", function(_, tag)
-    self.focused_project = nil
-    self:set_focused_project(tag, nil)
-    -- self:report_focused('readY::projectlist signal')
+  self:connect_signal("ready::project_names", function(_, tag)
+    if initializing() then
+      inits_complete = inits_complete + 1
+      self.focused_project = nil
+      self:set_focused_project(tag, nil)
+    end
+    if not self.focused_project then
+      self:set_focused_project(tag, nil)
+    end
+    self:report_focused('ready::project_names signal')
     self:emit_signal("tasklist::update", tag, self.focused_project)
   end)
 
   -- All project information is ready (project list and total tasks per project)
-  self:connect_signal("ready::all_projects", function(_, tag)
-    -- self:report_focused('readty::projects signal')
+  self:connect_signal("ready::project_information", function(_, tag)
+    if initializing() then
+      -- add 2 because this initializes the header and project list components
+      inits_complete = inits_complete + 2
+    end
+    self:report_focused('readty::projects signal')
     self:emit_signal("projects::update", tag)
     self:emit_signal("header::update", tag, self.focused_project)
   end)
 
-  -- TODO refactor and clarify i barely know wtf is going on
+  -- Emitted after parse_tasks_for_project() has completed.
+  -- (This is not emitted during initialization. During initialization, 
+  -- project tasks are parsed from parse_tasks_for_tag.)
   self:connect_signal("ready::project_tasks", function(_, tag, project)
     if project == self.focused_project then
       self:emit_signal("tasklist::update", tag, project)
@@ -515,7 +603,10 @@ function task:signal_setup()
     self:parse_total_tasks_for_project(tag, project)
   end)
 
-  -- SELECTED -------------------------
+
+  -- █▀ █▀▀ █░░ █▀▀ █▀▀ ▀█▀ █▀▀ █▀▄ 
+  -- ▄█ ██▄ █▄▄ ██▄ █▄▄ ░█░ ██▄ █▄▀ 
+
   self:connect_signal("selected::tag", function(_, tag)
     if tag == self.focused_tag then return end
     self.focused_tag     = tag
@@ -534,13 +625,26 @@ function task:signal_setup()
 
   self:connect_signal("selected::project", function(_, project)
     self.focused_project = project
-    -- self:report_focused()
+    self:report_focused()
     self:emit_signal("header::update", self.focused_tag, self.focused_project)
     self:emit_signal("tasklist::update", self.focused_tag, project)
   end)
 
-  -- INPUT -------------------------
+
+  -- █ █▄░█ █▀█ █░█ ▀█▀ 
+  -- █ █░▀█ █▀▀ █▄█ ░█░ 
+
   self:connect_signal("input::complete", self.execute_command)
+
+
+  -- █▀▄▀█ █ █▀ █▀▀ 
+  -- █░▀░█ █ ▄█ █▄▄ 
+
+  self:connect_signal("toggle_show_waiting", function()
+    self.show_waiting = not self.show_waiting
+    self:emit_signal("tasklist::update", self.focused_tag, self.focused_project)
+    self:emit_signal("header::update", self.focused_tag, self.focused_project)
+  end)
 end
 
 --------------------------------
@@ -554,6 +658,7 @@ function task:reset()
 end
 
 function task:new()
+  self.show_waiting = false
   self.tags = {}
   self.focused_tag      = nil
   self.focused_project  = nil

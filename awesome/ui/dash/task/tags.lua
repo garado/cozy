@@ -38,6 +38,16 @@ local container = box(widget, nil, nil, beautiful.dash_widget_bg)
 local nav_tags = keynav.area({
   name   = "nav_tags",
   widget = keynav.navitem.background({ widget = container.children[1] }),
+  hl_persist_on_area_switch = true,
+  on_area_changed = function(self)
+    self:select_off_recursive()
+    for i = 1, #self.items do
+      if self.items[i].label == task.focused_tag then
+        self:set_curr_item(i)
+        return
+      end
+    end
+  end
 })
 
 local function create_tag_item(tag)
@@ -50,10 +60,13 @@ local function create_tag_item(tag)
     forced_height = dpi(20),
   })
 
-  local nav_tag = keynav.navitem.textbox({ widget = tag_wibox })
-  function nav_tag:release()
-    task:emit_signal("selected::tag", tag)
-  end
+  local nav_tag = keynav.navitem.textbox({
+    widget  = tag_wibox,
+    label   = tag,
+    release = function()
+      task:emit_signal("selected::tag", tag)
+    end
+  })
 
   return tag_wibox, nav_tag
 end
@@ -68,6 +81,8 @@ task:connect_signal("taglist::update", function()
     nav_tags:add(nav_tag)
   end
 end)
+
+
 
 return function()
   return container, nav_tags

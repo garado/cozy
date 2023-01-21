@@ -25,7 +25,7 @@
 
 <h4>Main tab</h4>
 <p align="center">
-  <img title="" src="./assets/dash_main.png" width="800">
+  <img title="" src="./assets/gif/main.gif" width="800">
 </p>
 <ul>
   <li>Habit-tracking with <a href="https://pixe.la">Pixela</a></li>
@@ -46,18 +46,21 @@
 <details>
 <summary>Task manager keybinds</summary>
 
-| Keybind          | Action                 |
-| -------          | ------                 |
-| <kbd>a</kbd>     | Add task               |
-| <kbd>s</kbd>     | Toggle start/stop task |
-| <kbd>d</kbd>     | Mark task as done      |
-| <kbd>x</kbd>     | Delete task            |
-| <kbd>R</kbd>     | Reload tasks           |
-| <kbd>/</kbd>     | Search                 |
-| <kbd>m + d</kbd> | (modify) due date      |
-| <kbd>m + p</kbd> | (modify) project name  |
-| <kbd>m + t</kbd> | (modify) tag name      |
-| <kbd>m + n</kbd> | (modify) task name     |
+| Keybind          | Action                    |
+| -------          | ------                    |
+| <kbd>a</kbd>     | Add task                  |
+| <kbd>s</kbd>     | Toggle start/stop task    |
+| <kbd>d</kbd>     | Mark task as done         |
+| <kbd>x</kbd>     | Delete task               |
+| <kbd>z</kbd>     | Toggle show task details  |
+| <kbd>W</kbd>     | Toggle show waiting tasks |
+| <kbd>R</kbd>     | Reload tasks              |
+| <kbd>/</kbd>     | Search tasks in project   |
+| <kbd>m + d</kbd> | (modify) due date         |
+| <kbd>m + p</kbd> | (modify) project name     |
+| <kbd>m + t</kbd> | (modify) tag name         |
+| <kbd>m + n</kbd> | (modify) task name        |
+| <kbd>m + w</kbd> | (modify) wait             |
 
 </details>
 

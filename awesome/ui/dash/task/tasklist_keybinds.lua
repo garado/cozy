@@ -18,6 +18,7 @@ local curmode = NORMAL
 
 local keybinds = {
   normal = {
+    ["A"] = "annotate",
     ["a"] = "add",
     ["s"] = "start",
     ["u"] = "undo",
@@ -36,15 +37,13 @@ local keybinds = {
     ["p"] = "mod_proj",
     ["t"] = "mod_tag",
     ["n"] = "mod_name",
+    ["w"] = "mod_wait",
     ["Escape"] = "mod_clear",
   }
 }
 
 local function modeswitch(mode)
   curmode = mode
-  if curmode == NORMAL then
-    -- TODO clear prompt
-  end
 end
 
 --- Determines the type of input to request based on the key input and the current mode.
@@ -56,6 +55,7 @@ local function request_input(key)
 
   if not cmd then return end
   if key == 'm' then modeswitch(MODIFY) end
+  if key == 'Escape' then modeswitch(NORMAL) end
 
   task:emit_signal("input::request", cmd)
 end
@@ -64,12 +64,18 @@ task:connect_signal("input::complete", function()
   modeswitch(NORMAL)
 end)
 
+task:connect_signal("input::cancelled", function()
+  modeswitch(NORMAL)
+end)
+
 return {
   ["m"] = function() request_input("m") end,
   ["a"] = function() request_input("a") end,
+  ["w"] = function() request_input("w") end,
+  ["A"] = function() request_input("A") end,
   ["x"] = function() request_input("x") end,
   ["s"] = function() request_input("s") end,
-  ["u"] = function() request_input("u") end,
+  -- ["u"] = function() request_input("u") end, -- currently broken bc of taskwarrior hook
   ["d"] = function() request_input("d") end,
   ["p"] = function() request_input("p") end,
   ["t"] = function() request_input("t") end,

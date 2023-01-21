@@ -8,7 +8,7 @@ local beautiful   = require("beautiful")
 local wibox       = require("wibox")
 local xresources  = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
--- local animation   = require("modules.animation")
+local animation   = require("modules.animation")
 local colorize    = require("helpers.ui").colorize_text
 local task        = require("core.system.task")
 
@@ -50,11 +50,10 @@ local progress_bar = wibox.widget({
   widget = wibox.widget.progressbar,
 })
 
--- Progress bar animations
 -- local progress_bar_animation = animation:new({
 --   duration = 1,
---   value = 0,
---   easing = animation.easing.inOutExpo,
+--   value    = 0,
+--   easing   = animation.easing.inOutExpo,
 --   reset_on_stop = true,
 --   update = function(self, pos)
 --     progress_bar.value = dpi(pos)
@@ -103,6 +102,11 @@ task:connect_signal("header::update", function(_, tag, project)
   local total   = task.tags[tag].projects[project].total
   local rem     = pending.."/"..total.." REMAINING"
   local text    = string.upper(tag).." - "..rem
+  if task.show_waiting then
+    text = text .. " (WAIT SHOWN)"
+  else
+    text = text .. " (WAIT HIDDEN)"
+  end
   local markup  = colorize(text, beautiful.fg)
   subheader:set_markup_silently(markup)
 

@@ -37,6 +37,15 @@ local nav_projects = keynav.area({
   name   = "projects",
   widget = keynav.navitem.background({ widget = container.children[1] }),
   hl_persist_on_area_switch = true,
+  on_area_changed = function(self)
+    self:select_off_recursive()
+    for i = 1, #self.items do
+      if self.items[i].label == task.focused_project then
+        self:set_curr_item(i)
+        return
+      end
+    end
+  end
 })
 
 local function create_project_item(tag, project, index)
@@ -53,13 +62,13 @@ local function create_project_item(tag, project, index)
   })
 
   local nav_project = keynav.navitem.textbox({
-    widget = textbox,
-    index  = index,
+    widget  = textbox,
+    index   = index,
+    label   = project,
+    release = function()
+      task:emit_signal("selected::project", project)
+    end,
   })
-
-  function nav_project:release()
-    task:emit_signal("selected::project", project)
-  end
 
   return textbox, nav_project
 end
