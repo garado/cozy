@@ -8,8 +8,6 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local themes_path = gfs.get_themes_dir()
 local theme = dofile(themes_path .. "default/theme.lua")
-
-package.loaded["config"] = nil
 local config = require("config")
 
 -- Get user's color scheme
@@ -20,10 +18,10 @@ local colors = colorscheme.colors
 
 -- Automagically match system color schemes with Awesome
 -- color scheme
--- local do_theme_integration = config.theme_switch_integration
--- if do_theme_integration then
---   require("theme/theme_switcher")()
--- end
+local do_theme_integration = config.theme_switch_integration
+if do_theme_integration then
+  require("theme/theme_switcher")()
+end
 
 -- Theme-agnostic settings
 theme.pfp = gears.surface.load_uncached(gfs.get_configuration_dir() .. "theme/assets/pfp.png")

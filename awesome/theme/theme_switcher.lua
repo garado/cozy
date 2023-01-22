@@ -10,10 +10,11 @@ local awful  = require("awful")
 local gears  = require("gears")
 local gfs    = gears.filesystem
 
-local config
-local theme_name
-local theme_style
-local theme
+local config = require("config")
+local theme_name = config.theme_name
+local theme_style = config.theme_style
+local theme = require("theme.colorschemes." .. theme_name .. "." .. theme_style)
+theme = theme.switcher
 
 local HOME = os.getenv("HOME")
 local CONFIG = HOME .. "/.config/"
@@ -100,20 +101,6 @@ local function rofi()
 end
 
 return function()
-  -- require() caches file contents so set to nil in order to hot reload
-  -- package.loaded["config"] = nil
-
-  -- config = require("config")
-  -- theme_name = config.theme_name
-  -- theme_style = config.theme_style
-  -- theme = require("theme.colorschemes." .. theme_name .. "." .. theme_style).switcher
-
-  -- package.loaded["theme"] = nil
-  -- package.loaded["beautiful"] = nil
-  -- collectgarbage("collect")
-  -- local theme_dir = gears.filesystem.get_configuration_dir() .. "theme/"
-  -- beautiful.init(theme_dir .. "theme.lua")
-
   if theme.kitty   then kitty()   end
   if theme.nvchad  then nvchad()  end
   if theme.gtk     then gtk()     end

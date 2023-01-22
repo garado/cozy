@@ -64,7 +64,7 @@ colorscheme.override.wibar_empty    = "#363c49"
 -- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ 
 colorscheme.switcher.kitty    = "Yoru"
 colorscheme.switcher.nvchad   = "yoru"
+colorscheme.switcher.rofi     = "yoru"
 colorscheme.switcher.gtk      = "Nordic"
-colorscheme.switcher.zathura  = "kanagawa"
 
 return colorscheme
