@@ -155,7 +155,8 @@ end
 
 function time:tag_color(tag)
   if not self.tag_colors[tag] then
-    self.tag_colors[tag] = beautiful.accents[#self.tag_colors + 1]
+    self.num_tag_colors = self.num_tag_colors + 1
+    self.tag_colors[tag] = beautiful.accents[self.num_tag_colors]
   end
 
   return self.tag_colors[tag]
@@ -174,6 +175,8 @@ end
 ---------------------------------------------------------------------
 
 function time:new()
+  self.num_tag_colors = 0
+
   self:determine_if_active()
   self:parse_month_data()
 

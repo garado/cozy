@@ -56,7 +56,6 @@ function agenda:fetch_month(month, year)
   -- Default to this year, this month if no args provided
   year  = year or tonumber(os.date("%Y"))
   month = tonumber(month) or curmonth
-  print('fetching month for ' .. month .. ' ' .. year)
 
   -- Command looks like: cat cache_path | grep 2022-07
   local date = year .. "-" .. string.format("%02d", month)

@@ -145,7 +145,7 @@ end
 function journal:reload()
   self.entries = {}
   self:parse_entries()
-  self:emit_signal("ready::entries")
+  self:parse_tags()
 end
 
 -------------------------
