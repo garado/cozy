@@ -19,6 +19,9 @@ function _dash.format_due_date(due)
     year = xyear, month = xmon, day = xday,
     hour = xhr, min = xmin, sec = xsec })
 
+  -- account for timezone (america/los_angeles: -8 hours)
+  ts = ts - (8 * 60 * 60)
+
   -- turn timestamp into human-readable format
   local now = os.time()
   local time_difference = ts - now

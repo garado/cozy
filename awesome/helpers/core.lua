@@ -65,7 +65,6 @@ function core.pango_bold(text, color)
   return colorize(text, color)
 end
 
-
 -- Timewarrior reports time in H+:MM:SS format (6:15:08)
 -- But I prefer it in 6h 15m format.
 function core.format_time(str)

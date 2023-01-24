@@ -7,6 +7,7 @@ local task   = {}
 
 local NUM_COMPONENTS = 4
 
+--- Convert Taskwarrior's datetime format to a human-readable one
 function task:format_date(date, format)
   -- Taskwarrior returns due date as string
   -- Convert that to a lua timestamp
@@ -21,6 +22,12 @@ function task:format_date(date, format)
 
   format = format or '%A %B %d %Y'
   return os.date(format, ts)
+end
+
+--- Sometimes links don't show correctly in markup because of ampersands
+-- Or they're too long to display comfortably
+function task:format_link(link)
+  local len = string.len(link)
 end
 
 function task:initializing()

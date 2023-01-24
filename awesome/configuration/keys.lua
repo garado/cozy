@@ -2,24 +2,27 @@
 -- █▄▀ █▀▀ █▄█ █▀
 -- █░█ ██▄ ░█░ ▄█
 
-local awful = require("awful")
+-- Keybindings
+
 local hotkeys_popup = require("awful.hotkeys_popup")
-local apps = require("configuration.apps")
-local bling = require("modules.bling")
+local awful   = require("awful")
+local apps    = require("configuration.apps")
 local naughty = require("naughty")
+local bling   = require("modules.bling")
 local os = os
 
+local cozy = require("core.cozy.cozy")
 local dash = require("core.cozy.dash")
-local control = require("core.cozy.control")
+local bookmarks = require("core.cozy.bookmarks")
+local control   = require("core.cozy.control")
 local themeswitcher = require("core.cozy.themeswitcher")
-local wspace = require("core.cozy.workspace")
 
 local mod   = "Mod4"
 local alt   = "Mod1"
 local ctrl  = "Control"
 local shift = "Shift"
 
--- Sane(er) keyboard resizing
+-- Saner keyboard resizing
 local function resize_horizontal(factor) local layout = awful.layout.get(awful.screen.focused())
   if layout == awful.layout.suit.tile then
     awful.tag.incmwfact(-factor)
@@ -47,18 +50,8 @@ local function resize_vertical(factor)
   end
 end
 
--- check if currently focused client is master
-local function focused_is_master()
-  local master = awful.client.getmaster()
-  local focused = awful.client.focus
-  local nmaster = math.min(t.master_count, #p.clients)
-  for i = 1, nmaster do
-    require("naughty").notification { message = "master selected" }
-  end
-end
-
 local scratchpad = bling.module.scratchpad {
-  command = "kitty --class spad --session sessions/scratchpad",
+  command = "kitty --class spad --instance-group scratch --session sessions/scratchpad",
   rule = { instance = "spad" },
   sticky = true,
   autoclose = true,
@@ -80,6 +73,7 @@ awful.keyboard.append_global_keybindings({
 
   -- ▄▀█ █░█░█ █▀▀ █▀ █▀█ █▀▄▀█ █▀▀
   -- █▀█ ▀▄▀▄▀ ██▄ ▄█ █▄█ █░▀░█ ██▄
+
   -- Restart awesome
   awful.key({ shift, alt }, "r", awesome.restart,
     { description = "reload", group = "Awesome" }),
@@ -92,46 +86,43 @@ awful.keyboard.append_global_keybindings({
   awful.key({ mod }, "s", hotkeys_popup.show_help,
     { description = "help", group = "Awesome"}),
 
-  -- -- Daily briefing
-  -- awful.key({ mod }, "d", function()
-  --   scratchpad:turn_off()
-  --   awesome.emit_signal("daily_briefing::toggle", s)
-  -- end, { description = "daily briefing", group = "Awesome" }),
+  -- █▀▀ █▀█ ▀█ █▄█ 
+  -- █▄▄ █▄█ █▄ ░█░ 
 
-  -- Workspace switcher
-  awful.key({ mod }, "space", function()
+  awful.key({ mod }, "h", function()
     scratchpad:turn_off()
-    -- awesome.emit_signal("wspace::toggle", s)
-    wspace:toggle()
-  end, { description = "daily briefing", group = "Awesome" }),
+    awesome.emit_signal("lockscreen::toggle")
+  end, { description = "dash", group = "Cozy" }),
 
-  -- Toggle dash
+  awful.key({ mod }, "x", function()
+    cozy:close_all()
+    scratchpad:turn_off()
+  end, { description = "close all", group = "Cozy"}),
+
   awful.key({ mod }, "j", function()
     scratchpad:turn_off()
     dash:toggle()
-  end, { description = "dash", group = "Awesome" }),
+  end, { description = "dash", group = "Cozy" }),
 
-  -- Toggle control center
   awful.key({ mod }, "k", function()
     scratchpad:turn_off()
     control:toggle()
-  end, { description = "control center", group = "Awesome" }),
+  end, { description = "control center", group = "Cozy" }),
 
-  -- Toggle theme switcher
   awful.key({ mod }, "l", function()
     scratchpad:turn_off()
     themeswitcher:toggle()
-  end, { description = "dash", group = "Awesome" }),
+  end, { description = "theme switcher", group = "Cozy" }),
 
-  -- Toggle layout list switcher
-  -- awful.key({ mod }, "u", function()
-  --   scratchpad:turn_off()
-  --   awesome.emit_signal("layoutlist::toggle")
-  -- end, { description = "layout list", group = "Awesome"}),
+  awful.key({ mod }, "b", function()
+    scratchpad:turn_off()
+    bookmarks:toggle()
+  end, { description = "bookmarks", group = "Cozy" }),
 
 
   -- █░█ █▀█ ▀█▀ █▄▀ █▀▀ █▄█ █▀
   -- █▀█ █▄█ ░█░ █░█ ██▄ ░█░ ▄█
+
   -- Adjust brightness
 	awful.key({}, "XF86MonBrightnessUp", function()
 		awful.spawn("brightnessctl set 5%+ -q", false)
@@ -172,6 +163,7 @@ awful.keyboard.append_global_keybindings({
     awful.spawn("playerctl next", false)
   end, { description = "next track", group = "Hotkeys" }),
 
+  -- TODO replace with awful screenshot
   -- Screenshot of entire screen
   awful.key({ mod, shift }, "s", function()
     local home = os.getenv("HOME")
@@ -182,11 +174,9 @@ awful.keyboard.append_global_keybindings({
   -- Screenshot and select region
   awful.key({ mod, alt }, "s", function()
     local home = os.getenv("HOME")
-    -- local cmd = 'import -window root -crop 1370x830-0-0 -gravity center -quality 90 /home/alexis/Github/cozy/.github/assets/SS.png'
-    -- local cmd = 'import -window root -crop 1920x1280-0-0 -gravity center -quality 90 /home/alexis/Github/cozy/.github/assets/SS.png'
     local cmd = "scrot " .. home  .. "/Pictures/Screenshots/%b%d::%H%M%S.png --silent 'xclip -selection clipboard -t image/png -i $f'"
     awful.spawn.easy_async(cmd, function() end)
-  end, { description = "screenshot (whole screen)", group = "Hotkeys" }),
+  end, { description = "screenshot (screen)", group = "Hotkeys" }),
 
   -- Dismiss notifications
   awful.key({ mod }, "n", function()
@@ -195,6 +185,7 @@ awful.keyboard.append_global_keybindings({
 
   --  █░░ ▄▀█ █░█ █▄░█ █▀▀ █░█ █▀▀ █▀█ █▀
   --  █▄▄ █▀█ █▄█ █░▀█ █▄▄ █▀█ ██▄ █▀▄ ▄█
+
   -- Terminal
   awful.key({ alt }, "Return", function()
     awful.spawn(apps.default.terminal)
@@ -202,13 +193,11 @@ awful.keyboard.append_global_keybindings({
 
   -- Toggle scratchpad
   awful.key({ mod }, "p", function()
-    dash:close()
-    control:close()
-    themeswitcher:close()
+    cozy:close_all()
     scratchpad:toggle()
   end, { description = "scratchpad", group = "Launchers"}),
 
-  -- Rofi app launcher
+  -- Rofi
   awful.key({ alt }, "r", function()
     awful.spawn(apps.utils.app_launcher)
   end, { description = "app launcher", group = "Launchers" }),
@@ -220,9 +209,9 @@ awful.keyboard.append_global_keybindings({
 })
 
 
--- ░█▀▀░█░░░▀█▀░█▀▀░█▀█░▀█▀░░░█░█░█▀▀░█░█░█▀▄░▀█▀░█▀█░█▀▄░█▀▀
--- ░█░░░█░░░░█░░█▀▀░█░█░░█░░░░█▀▄░█▀▀░░█░░█▀▄░░█░░█░█░█░█░▀▀█
--- ░▀▀▀░▀▀▀░▀▀▀░▀▀▀░▀░▀░░▀░░░░▀░▀░▀▀▀░░▀░░▀▀░░▀▀▀░▀░▀░▀▀░░▀▀▀
+-- █▀▀ █░░ █ █▀▀ █▄░█ ▀█▀    █▄▀ █▀▀ █▄█ █▄▄ █ █▄░█ █▀▄ █▀ 
+-- █▄▄ █▄▄ █ ██▄ █░▀█ ░█░    █░█ ██▄ ░█░ █▄█ █ █░▀█ █▄▀ ▄█ 
+
 client.connect_signal("request::default_keybindings", function()
   awful.keyboard.append_client_keybindings({
 
@@ -243,7 +232,7 @@ client.connect_signal("request::default_keybindings", function()
       client.focus.sticky = not client.focus.sticky
     end, { description = "sticky", group = "Client" }),
 
-    -- Maximize
+    -- Toggle maximize
     awful.key({ ctrl, shift }, "m", function(c)
       c.maximized = not c.maximized
       c:raise()
@@ -256,7 +245,7 @@ client.connect_signal("request::default_keybindings", function()
 
     -- Layout-aware resizing
     awful.key({ alt, shift   }, "h", function () resize_horizontal(0.05) end,
-    { group = "Client", description = "(v) resize" }),
+    { group = "Client", description = "(vimlike) resize" }),
     awful.key({ alt, shift   }, "l", function () resize_horizontal(-0.05) end),
     awful.key({ alt, shift   }, "k", function () resize_vertical(-0.05) end),
     awful.key({ alt, shift   }, "j", function () resize_vertical(0.05) end),
@@ -332,7 +321,7 @@ awful.keyboard.append_global_keybindings({
   awful.key({
     modifiers = { mod, shift },
     keygroup = "numrow",
-    description = "move focused client to workspace",
+    -- description = "move focused client to workspace",
     group = "Workspace",
     on_press = function(index)
       if client.focus then
@@ -358,6 +347,4 @@ client.connect_signal("request::default_mousebindings", function()
     end),
   })
 end)
-
-
 

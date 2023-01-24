@@ -1,6 +1,7 @@
 
 -- █▀█ █▀▀ █▀ ▀█▀ █▀█ █▀█ █▀▀ 
 -- █▀▄ ██▄ ▄█ ░█░ █▄█ █▀▄ ██▄ 
+
 -- When restarting awesome, save client/tag state, restart, and then restore client/tag states.
 
 -- Note: I was having so much trouble getting the double quotes to echo to file correctly
@@ -12,7 +13,6 @@
 local awful = require("awful")
 local gfs = require("gears.filesystem")
 local json = require("modules.json")
-local bling = require("modules.bling")
 
 local cache_dir = gfs.get_cache_dir()
 local client_cache = cache_dir .. "restore/client"

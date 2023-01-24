@@ -17,6 +17,7 @@ function cozy:close_all()
   require("core.cozy.dash"):close()
   require("core.cozy.control"):close()
   require("core.cozy.themeswitcher"):close()
+  require("core.cozy.bookmarks"):close()
 end
 
 -- function cozy:new()

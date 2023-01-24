@@ -10,4 +10,4 @@
 cachefile=$1
 date=$2
 
-awk -F, ' BEGIN { "echo '$date'" | getline a } { if ( $0>a ) { print $0 }} ' $cachefile | head -30
+awk -F, ' BEGIN { "echo '$date'" | getline a } { if ( $0>a ) { print $0 }} ' $cachefile | head -22
