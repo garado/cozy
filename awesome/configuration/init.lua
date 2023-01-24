@@ -5,6 +5,7 @@ require(... .. ".layout")
 require(... .. ".ruled")
 require(... .. ".tags")
 require(... .. ".restore")
+require(... .. ".help")
 
 -- idk where to put this
 -- Only show border when there's more than 1 window on screen

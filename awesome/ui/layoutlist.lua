@@ -2,6 +2,9 @@
 -- █░░ ▄▀█ █▄█ █▀█ █░█ ▀█▀    █░░ █ █▀ ▀█▀ 
 -- █▄▄ █▀█ ░█░ █▄█ █▄█ ░█░    █▄▄ █ ▄█ ░█░ 
 
+-- Custom layoutlist because the default doesn't have enough customizations options
+-- for me.
+
 local awful = require("awful")
 local gears = require("gears")
 local wibox = require("wibox")

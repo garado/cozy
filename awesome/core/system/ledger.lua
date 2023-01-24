@@ -4,12 +4,13 @@
 
 -- For interfacing with Ledger and interacting with Ledger files.
 
+-- TODO remove all this ._private bullshit
+
 local gobject = require("gears.object")
 local gtable = require("gears.table")
 local awful = require("awful")
 local config = require("config")
 local core = require("helpers.core")
-local ledger_dir  = config.ledger.ledger_dir
 local ledger_file = config.ledger.ledger_file
 local budget_file = config.ledger.budget_file
 
@@ -204,7 +205,14 @@ end
 
 --- Open Ledger files in new popup window.
 function ledger:open_ledger()
-  local cmd = "kitty sh -c 'nvim -p " .. ledger_dir .. "*'"
+  local cmd = "kitty sh -c 'nvim -p "
+  for i = 1, #config.ledger.ledger_open do
+    cmd = cmd .. config.ledger.ledger_open[i] .. " "
+  end
+  cmd = cmd .. "'"
+
+  print(cmd)
+
   awful.spawn(cmd, {
     floating = true,
     geometry = {x=360, y=90, height=900, width=1200},

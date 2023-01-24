@@ -14,7 +14,6 @@ local colorscheme = {
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
 local awesome_cfg = gfs.get_configuration_dir()
 colorscheme.wall_path = awesome_cfg .. "theme/colorschemes/nord/light.jpg"
-colorscheme.override.lockscreen_bg = awesome_cfg .. "theme/colorschemes/nord/light_lockscreen.jpg"
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
@@ -65,5 +64,6 @@ colorscheme.switcher.kitty   = "Nord Light"
 colorscheme.switcher.nvchad  = "onenord_light"
 colorscheme.switcher.gtk     = "Graphite-Light-nord"
 colorscheme.switcher.zathura = "nord_light"
+colorscheme.switcher.firefox = "nord-light"
 
 return colorscheme

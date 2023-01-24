@@ -65,5 +65,7 @@ colorscheme.switcher.nvchad  = "nord"
 colorscheme.switcher.gtk     = "Nordic"
 colorscheme.switcher.zathura = "nord_dark"
 colorscheme.switcher.rofi    = "nord-dark"
+colorscheme.switcher.firefox = "nord-dark"
+colorscheme.switcher.start   = "nord-dark"
 
 return colorscheme

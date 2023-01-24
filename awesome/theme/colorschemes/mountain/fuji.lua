@@ -17,6 +17,7 @@ colorscheme.wall_path = awesome_cfg .. "theme/colorschemes/mountain/fuji.png"
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
+
 colorscheme.colors.accents = {
   "#a39ec4",
   "#c49ec4",
@@ -53,13 +54,17 @@ colorscheme.colors.gradient = {
 
 -- █▀█ █░█ █▀▀ █▀█ █▀█ █ █▀▄ █▀▀ 
 -- █▄█ ▀▄▀ ██▄ █▀▄ █▀▄ █ █▄▀ ██▄ 
+
 colorscheme.override.wibar_focused = "#5b6572"
 
 -- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ 
 -- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ 
+
 colorscheme.switcher.kitty   = "Mountain Fuji"
 colorscheme.switcher.nvchad  = "mountain"
 colorscheme.switcher.zathura = "mountain_fuji"
 colorscheme.switcher.rofi    = "mountain-fuji"
+colorscheme.switcher.firefox = "mountain-fuji"
+colorscheme.switcher.start   = "mountain-fuji"
 
 return colorscheme

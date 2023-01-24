@@ -20,7 +20,7 @@ local colors = colorscheme.colors
 -- color scheme
 local do_theme_integration = config.theme_switch_integration
 if do_theme_integration then
-  require("theme/theme_switcher")()
+  require("theme/theme_integration")()
 end
 
 -- Theme-agnostic settings
@@ -45,6 +45,24 @@ theme.base_med_font    = theme.font .. " 15"
 theme.base_large_font  = theme.font .. " 20"
 
 theme.alt_small_font  = theme.alt_font .. " 12"
+theme.alt_med_font    = theme.alt_font .. " 16"
+theme.alt_large_font  = theme.alt_font .. " 20"
+theme.alt_xlarge_font = theme.alt_font .. " 25" ]]
+-- }}}
+
+-- Open Sans {{{
+--[[ theme.font_name     = "Montserrat "
+theme.alt_font_name = "Open Sans "
+theme.font      = theme.font_name .. "Regular "
+theme.alt_font  = theme.alt_font_name .. "Regular "
+
+theme.base_xsmall_font = theme.font .. " 9"
+theme.base_small_font  = theme.font .. " 11"
+theme.base_med_font    = theme.font .. " 16"
+theme.base_large_font  = theme.font .. " 20"
+
+theme.alt_xsmall_font = theme.alt_font .. " 9"
+theme.alt_small_font  = theme.alt_font .. " 11"
 theme.alt_med_font    = theme.alt_font .. " 16"
 theme.alt_large_font  = theme.alt_font .. " 20"
 theme.alt_xlarge_font = theme.alt_font .. " 25" ]]
