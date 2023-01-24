@@ -33,21 +33,24 @@ theme.wallpaper = gears.surface.load_uncached(colorscheme.wall_path)
 -- █▀▀ █▀█ █▄░█ ▀█▀ █▀
 -- █▀░ █▄█ █░▀█ ░█░ ▄█
 
--- ROBOTO/ROBOTOMONO
--- theme.font_name = "RobotoMono Nerd Font Mono "
--- theme.alt_font_name = "Roboto "
--- theme.font      = theme.font_name .. "Regular "
--- theme.alt_font  = theme.alt_font_name .. "Regular "
--- theme.base_xsmall_font = theme.font .. " 10"
--- theme.base_small_font  = theme.font .. " 12"
--- theme.base_med_font    = theme.font .. " 15"
--- theme.base_large_font  = theme.font .. " 20"
--- theme.alt_small_font  = theme.alt_font .. " 12"
--- theme.alt_med_font    = theme.alt_font .. " 16"
--- theme.alt_large_font  = theme.alt_font .. " 20"
--- theme.alt_xlarge_font  = theme.alt_font .. " 25"
+-- Roboto/RobotoMono {{{
+--[[ theme.font_name     = "Akkurat "
+theme.alt_font_name = "RobotoMono Nerd Font Mono "
+theme.font      = theme.font_name .. "Regular "
+theme.alt_font  = theme.alt_font_name .. "Regular "
 
--- BEDSTEAD/DISPOSABLEDROID
+theme.base_xsmall_font = theme.font .. " 10"
+theme.base_small_font  = theme.font .. " 12"
+theme.base_med_font    = theme.font .. " 15"
+theme.base_large_font  = theme.font .. " 20"
+
+theme.alt_small_font  = theme.alt_font .. " 12"
+theme.alt_med_font    = theme.alt_font .. " 16"
+theme.alt_large_font  = theme.alt_font .. " 20"
+theme.alt_xlarge_font = theme.alt_font .. " 25" ]]
+-- }}}
+
+-- Bedstead/DisposableDroid {{{
 theme.font_name     = "Bedstead Nerd Font "
 theme.alt_font_name = "DisposableDroid BB "
 theme.font      = theme.font_name .. "Regular "
@@ -58,10 +61,12 @@ theme.base_small_font  = theme.font .. " 12"
 theme.base_med_font    = theme.font .. " 15"
 theme.base_large_font  = theme.font .. " 20"
 
-theme.alt_small_font  = theme.alt_font .. " 12"
+theme.alt_xsmall_font = theme.alt_font .. " 12"
+theme.alt_small_font  = theme.alt_font .. " 16"
 theme.alt_med_font    = theme.alt_font .. " 20"
 theme.alt_large_font  = theme.alt_font .. " 25"
 theme.alt_xlarge_font = theme.alt_font .. " 32"
+-- }}}
 
 -- █░█ █   █▀▀ █░░ █▀▀ █▀▄▀█ █▀▀ █▄░█ ▀█▀ █▀
 -- █▄█ █   ██▄ █▄▄ ██▄ █░▀░█ ██▄ █░▀█ ░█░ ▄█
@@ -247,8 +252,8 @@ theme.hotkeys_bg = colors.bg_l0
 theme.hotkeys_fg = colors.fg
 theme.hotkeys_border_width = dpi(0)
 theme.hotkeys_group_margin = dpi(25)
-theme.hotkeys_font = theme.font .. "13"
-theme.hotkeys_description_font = theme.font .. "12"
+theme.hotkeys_font = theme.alt_small_font
+theme.hotkeys_description_font = theme.base_small_font
 
 -- Override default vars with vars defined in colorscheme
 gears.table.crush(theme, colorscheme.colors) -- shouldn't be here

@@ -27,4 +27,5 @@ gears.timer({
 require("configuration")
 require("modules")
 require("ui")
+require("apps")
 require("helpers")

@@ -1,0 +1,17 @@
+
+/* █▄█ █▀█ █▀█ █░█ */ 
+/* ░█░ █▄█ █▀▄ █▄█ */ 
+
+* {
+    font:           "DisposableDroid BB 13";
+    background:     #0c0e0f;
+    background-alt: #27292a;
+    foreground:     #edeff0;
+    selected:       #df5b61;
+    active:         #78b892;
+    urgent:         #6791c9;
+}
+
+inputbar {
+  background-image: url("~/.config/rofi/themes/yoru", width);
+}

@@ -1,11 +1,16 @@
--- █▀ ▄▀█ █▀▄▀█ █▀█ █░░ █▀▀    █░█ █▀ █▀▀ █▀█    █░█ ▄▀█ █▀█ █▀ 
--- ▄█ █▀█ █░▀░█ █▀▀ █▄▄ ██▄    █▄█ ▄█ ██▄ █▀▄    ▀▄▀ █▀█ █▀▄ ▄█ 
+
+-- █▀ ▄▀█ █▀▄▀█ █▀█ █░░ █▀▀    █▀▀ █▀█ █▄░█ █▀▀ █ █▀▀ 
+-- ▄█ █▀█ █░▀░█ █▀▀ █▄▄ ██▄    █▄▄ █▄█ █░▀█ █▀░ █ █▄█ 
 
 -- Copy this to config.lua!
 
 return {
-  theme_name  = "mountain",
-  theme_style = "fuji",
+  lock = {
+    pin = "1356", -- must be a string
+    enable_lockscreen_on_start = false,
+  },
+  theme_name  = "nord",
+  theme_style = "dark",
   theme_switch_integration = false,
   -- Define displayed_themes if you want to only show specific themes
   -- in the theme switcher
@@ -62,8 +67,11 @@ return {
   },
   journal = {
     -- This is obviously NOT meant to be bulletproof
-    -- This is just to prevent for example people sitting behind you from seeind
+    -- This is just to prevent for example people sitting behind you from seeing
     -- your deep dark jrnl secrets.
     password = "password"
-  }
+  },
+  bookmarks = {
+    path = "$HOME/Documents/bookmarks.json",
+  },
 }

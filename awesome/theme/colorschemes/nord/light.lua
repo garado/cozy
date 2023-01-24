@@ -13,7 +13,8 @@ local colorscheme = {
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
 local awesome_cfg = gfs.get_configuration_dir()
-colorscheme.wall_path = awesome_cfg .. "theme/colorschemes/nord/dark.png"
+colorscheme.wall_path = awesome_cfg .. "theme/colorschemes/nord/light.jpg"
+colorscheme.override.lockscreen_bg = awesome_cfg .. "theme/colorschemes/nord/light_lockscreen.jpg"
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
@@ -45,20 +46,18 @@ colorscheme.colors.green       = "#75905e"
 colorscheme.colors.yellow      = "#ebcb8b"
 colorscheme.colors.transparent = "#ffffff00"
 
+colorscheme.colors.gradient = { -- needs work
+  [0] = "#bac0cb",
+  [1] = "#b0b6c1",
+  [2] = "#4c566a",
+  [3] = "#4d6688",
+  [4] = "#5e81ac",
+}
+
 -- █▀█ █░█ █▀▀ █▀█ █▀█ █ █▀▄ █▀▀ 
 -- █▄█ ▀▄▀ ██▄ █▀▄ █▀▄ █ █▄▀ ██▄ 
--- colorscheme.override.wibar_occupied = "#a1a7b2"
-colorscheme.override.wibar_bg       = "#2e3440"
 colorscheme.override.wibar_focused  = "#6181a1"
-colorscheme.override.wibar_occupied = "#eceff4"
-colorscheme.override.wibar_empty    = "#4c566a"
-colorscheme.override.wibar_fg       = "#eceff4"
-
--- theme.wibar_fg       = "#dee4ef"
--- theme.wibar_bg       = "#2e3440"
--- theme.wibar_focused  = "#6181a1"
--- theme.wibar_occupied = "#eceff4"
--- theme.wibar_empty    = "#4c566a"
+colorscheme.override.wibar_occupied = "#2e3440"
 
 -- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ 
 -- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ 
