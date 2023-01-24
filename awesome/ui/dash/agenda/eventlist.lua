@@ -2,7 +2,7 @@
 -- █░█ █▀█ █▀▀ █▀█ █▀▄▀█ █ █▄░█ █▀▀ 
 -- █▄█ █▀▀ █▄▄ █▄█ █░▀░█ █ █░▀█ █▄█ 
 
--- View upcoming events.
+-- View list of upcoming events.
 
 local wibox = require("wibox")
 local beautiful = require("beautiful")
@@ -10,21 +10,20 @@ local xresources = require("beautiful.xresources")
 local navbg = require("modules.keynav.navitem").Background
 local dpi = xresources.apply_dpi
 local cal = require("core.system.cal")
-local area    = require("modules.keynav.area")
-local navtext = require("modules.keynav.navitem").Textbox
+local keynav = require("modules.keynav")
+local navtext = keynav.navitem.textbox
 local box = require("helpers.ui").create_boxed_widget
 local colorize = require("helpers.ui").colorize_text
 local prompt   = require("ui.dash.agenda.prompt")
 
-local MAX_EVENTS_SHOWN = 23
+local MAX_EVENTS_SHOWN = 22
 
 local MONTH_NAMES = { "January", "February", "March", "April", "May",
   "June", "July", "August", "September", "October", "November", "December" }
 
--- Keyboard navigation
-local nav_events = area({
+local nav_events = keynav.area({
   name = "events",
-  keys = require("ui.dash.agenda.commands"),
+  keys = require("ui.dash.agenda.keybinds"),
   circular = true,
 })
 
@@ -219,31 +218,29 @@ cal:connect_signal("selected::date", function(_, year, month, date)
   header:set_markup_silently(colorize(mkup, beautiful.fg))
 end)
 
-cal:connect_signal("deselected", function()
-  local mkup = colorize("Upcoming Events", beautiful.fg)
-  header:set_markup_silently(mkup)
+cal:connect_signal("header::reset", function()
+  header:set_markup_silently(colorize("Upcoming Events", beautiful.fg))
 end)
+
+-- cal:connect_signal("deselected", function()
+--   local mkup = colorize("Upcoming Events", beautiful.fg)
+--   header:set_markup_silently(mkup)
+-- end)
 
 local widget = wibox.widget({
   header,
-  wibox.widget({
+  {
     event_list,
     widget = wibox.container.place,
-  }),
-  -- wibox.widget({
-  --   color = beautiful.bg_l3,
-  --   forced_height = dpi(5),
-  --   span_ratio = 0.95,
-  --   widget = wibox.widget.separator,
-  -- }),
+  },
   prompt,
   spacing = dpi(15),
   layout = wibox.layout.fixed.vertical,
 })
 
-local argh = box(widget, dpi(1000), dpi(700), beautiful.dash_widget_bg)
-nav_events.widget = navbg({ widget = argh.children[1] })
+local widget_container = box(widget, dpi(1000), dpi(700), beautiful.dash_widget_bg)
+nav_events.widget = navbg({ widget = widget_container.children[1] })
 
 return function()
-  return argh, nav_events
+  return widget_container, nav_events
 end

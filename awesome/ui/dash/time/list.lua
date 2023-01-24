@@ -8,8 +8,6 @@
 local beautiful   = require("beautiful")
 local wibox = require("wibox")
 local dpi   = beautiful.xresources.apply_dpi
-local area  = require("modules.keynav.area")
-local gears = require("gears")
 local time  = require("core.system.time")
 
 local colorize = require("helpers.ui").colorize_text
@@ -111,11 +109,33 @@ end
 -- █░█ █    ▄▀█ █▀ █▀ █▀▀ █▀▄▀█ █▄▄ █░░ █▄█ 
 -- █▄█ █    █▀█ ▄█ ▄█ ██▄ █░▀░█ █▄█ █▄▄ ░█░ 
 
+local header = wibox.widget({
+  {
+    {
+      markup = colorize("Recent Sessions", beautiful.fg),
+      valign = "center",
+      halign = "center",
+      font   = beautiful.alt_large_font,
+      widget = wibox.widget.textbox,
+    },
+    widget = wibox.container.place,
+  },
+  bottom = dpi(5),
+  widget = wibox.container.margin,
+})
+
 local list_cont = wibox.widget({
+  header,
   layout = wibox.layout.fixed.vertical,
+  -----
+  _reset = function(self)
+    self:reset()
+    self:add(header)
+  end
 })
 
 time:connect_signal("ready::month_data", function(_, month)
+  list_cont:_reset()
   list_cont:add(ui_create_all_entries())
 end)
 

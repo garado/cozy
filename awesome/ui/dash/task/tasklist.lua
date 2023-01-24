@@ -180,13 +180,11 @@ local function jump_top()
 end
 
 local function jump_end()
-  -- is this necessary? idk
-  nav_tasklist:set_curr_item(#task:get_pending_tasks() - #overflow_bottom)
-
+  local num_pending_tasks = #task.tags[task.focused_tag].projects[task.focused_project].tasks -- ew
   while #overflow_bottom > 0 do
     scroll_down()
   end
-  nav_tasklist:set_curr_item(#task:get_pending_tasks())
+  nav_tasklist:set_curr_item(num_pending_tasks)
 end
 
 local function update_scrollbar(num_tasks)
@@ -254,16 +252,16 @@ task:connect_signal("selected::task", function()
   if total_overflow() == 0 then return end
 
   local last_position_index = first_position_index + MAX_TASKS_SHOWN - 1
-  local index     = task:focused_task_index()
-  local old_index = task:old_focused_task_index()
+  local index     = task.task_index
+  local old_index = task.old_task_index
   local gap = math.abs(index - old_index)
-  local pending_tasks = #task.tags[task.focused_tag].projects[task.focused_project].tasks -- ew
+  local num_pending_tasks = #task.tags[task.focused_tag].projects[task.focused_project].tasks -- ew
 
   if index == 1 and gap > 1 then
     if first_position_index == 1 then return end
     jump_top()
-  elseif index == pending_tasks and gap > 1 then
-    if first_position_index == #task:get_pending_tasks() then return end
+  elseif index == num_pending_tasks and gap > 1 then
+    if first_position_index == num_pending_tasks then return end
     jump_end()
   elseif index < first_position_index then
     scroll_up()

@@ -30,8 +30,8 @@ local function indicator()
   return wibox.widget({
     {
       bg = beautiful.bg_l3,
-      forced_width  = 6,
-      forced_height = 6,
+      forced_width  = 5,
+      forced_height = 5,
       shape = gears.shape.circle,
       widget = wibox.container.background,
     },
@@ -62,7 +62,7 @@ local infobox = wibox.widget({
   {
     {
       infobox_widgets[1],
-      forced_height = dpi(300),
+      forced_height = dpi(250),
       widget = wibox.container.place,
     },
     wibox.widget({
@@ -78,6 +78,9 @@ local infobox = wibox.widget({
     self.children[1].children[1].widget = widget
   end,
 })
+
+local infobox_cont = box(infobox, dpi(0), dpi(310), beautiful.dash_widget_bg)
+local navbox = navbg({ widget = infobox_cont.children[1] })
 
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄ 
 -- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀ 
@@ -107,12 +110,8 @@ local nav_infobox = area({
     ["h"] = function() switch_view(PREV) end,
     ["l"] = function() switch_view(NEXT) end,
   },
+  children = { navbox }
 })
-
-local infobox_cont = box(infobox, dpi(0), dpi(310), beautiful.dash_widget_bg)
-
-local navbox = navbg({ widget = infobox_cont.children[1] })
-nav_infobox:append(navbox)
 
 return function()
   return infobox_cont, nav_infobox

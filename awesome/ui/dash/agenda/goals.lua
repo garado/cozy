@@ -5,10 +5,7 @@
 local wibox = require("wibox")
 local beautiful  = require("beautiful")
 local xresources = require("beautiful.xresources")
-local background = require("modules.keynav.navitem").Background
 local dpi = xresources.apply_dpi
-local cal = require("core.system.cal")
-local box = require("helpers.ui").create_boxed_widget
 local colorize = require("helpers.ui").colorize_text
 
 local goals = wibox.widget({

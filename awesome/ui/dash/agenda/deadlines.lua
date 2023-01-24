@@ -57,7 +57,7 @@ end
 --- Generate a list of tasks that are due this week, then
 -- populate the tasklist wibox.
 local function generate_tasklist()
-  local cmd = "task +WEEK export rc.json.array=on"
+  local cmd = "task limit:8 due.before:7d export rc.json.array=on"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local json_arr = json.decode(stdout)
     if #json_arr > 0 then tasklist:reset() end

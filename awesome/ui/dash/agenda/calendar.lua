@@ -139,7 +139,7 @@ local function create_daybox(date, month, year, is_valid)
     select_on = function(self)
       self.selected = true
       self.widget.border_width = dpi(3)
-      if self.date == today then -- because todaybox is white
+      if self.date == today then -- todaybox is white
         self.widget.border_color = beautiful.main_accent
       else
         self.widget.border_color = beautiful.fg
@@ -284,6 +284,7 @@ end
 function calendar:jump_to_today()
   cal:fetch_upcoming()
   cal:fetch_month(os.date("%m"), os.date("%Y"))
+  cal:emit_signal("header::reset")
 end
 
 local calendar_container = wibox.widget({

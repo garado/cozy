@@ -13,7 +13,7 @@ local normal_color    = beautiful.wibar_bat_nrml
 
 local percentage = wibox.widget({
   markup  = "50",
-  font    = beautiful.alt_small_font,
+  font    = beautiful.alt_xsmall_font,
   align   = "center",
   valign  = "center",
   widget  = wibox.widget.textbox,
@@ -34,4 +34,4 @@ awesome.connect_signal("signal::battery", function(value, state)
   percentage:set_markup(colorize(math.floor(value), percent_color))
 end)
 
-return percentage 
+return percentage

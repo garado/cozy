@@ -109,8 +109,9 @@ task:connect_signal("input::request", function(_, type)
   local prompt_options = {
     ["add"]       = "Add quest: ",
     ["annotate"]  = "Annotate: ",
-    ["modify"]    = "Modify: " .. "(d) due, (n) name, (p) project, (t) tag, (w) wait",
+    ["modify"]    = "Modify (d)ue, (n)ame, (p)roject, (t)ag, (w)ait, (L)ink: ",
     ["done"]      = "Complete quest? (y/n) ",
+    ["open"]      = "Open link? (y/n) ",
     ["delete"]    = "Abandon quest? (y/n) ",
     ["reload"]    = "Reload quests? (y/n) ",
     ["undo"]      = "Undo? This is not reversible! (y/n)",
@@ -120,6 +121,7 @@ task:connect_signal("input::request", function(_, type)
     ["mod_due"]   = "Modify due date: ",
     ["mod_name"]	= "Modify quest name: ",
     ["mod_wait"]  = "Modify wait date: ",
+    ["mod_link"]  = "Modify link: ",
   }
 
   local text_options = {

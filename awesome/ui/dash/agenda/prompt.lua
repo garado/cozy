@@ -28,7 +28,7 @@ local prompt_textbox = wibox.widget({
 -- @param text The initial textbox text.
 local function agenda_input(type, prompt, text)
   awful.prompt.run {
-    font         = beautiful.base_small_font,
+    font         = beautiful.base_xsmall_font,
     prompt       = prompt,
     text         = text or "",
     fg           = beautiful.fg,

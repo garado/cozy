@@ -62,6 +62,8 @@ local function create_entry_list_item(title, date, index)
     markup = colorize(date .. " " .. title, beautiful.fg),
     align  = "left",
     valign = "center",
+    ellipsize = "right",
+    forced_width = dpi(200),
     widget = wibox.widget.textbox,
   })
 

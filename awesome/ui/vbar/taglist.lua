@@ -14,7 +14,7 @@ return function(s)
   -- Mouse + client actions
   local modkey = "Mod4"
   local taglist_buttons = gears.table.join(
-  	awful.button({}, 1, function(t)
+    awful.button({}, 1, function(t)
   		t:view_only()
   	end),
   	awful.button({ modkey }, 1, function(t)
@@ -39,7 +39,7 @@ return function(s)
   local function update_callback(self, c3, _)
     local tb = self.widget.children[1]
     if c3.selected then
-      tb:set_markup_silently(colorize(c3.name, beautiful.main_accent))
+      tb:set_markup_silently(colorize(c3.name, beautiful.wibar_focused))
     elseif #c3:clients() == 0 then
       tb:set_markup_silently(colorize(c3.name, beautiful.wibar_empty))
     else
@@ -59,7 +59,7 @@ return function(s)
 				local indicator = wibox.widget({
 					{
             markup = colorize("-", beautiful.fg),
-            font   = beautiful.alt_small_font,
+            font   = beautiful.alt_xsmall_font,
             align  = "center",
             valign = "center",
             widget = wibox.widget.textbox,

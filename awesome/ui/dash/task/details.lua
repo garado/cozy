@@ -21,6 +21,7 @@ local entries = {
   "recur",
   "until",
   "wait",
+  "link",
   "annotations",
 }
 
@@ -30,6 +31,7 @@ local entries_fancy = {
   "Recur",
   "Until",
   "Hide until",
+  "Link",
   "Annotations",
 }
 
@@ -83,7 +85,7 @@ local function entry(index)
     {
       markup = colorize(field_display_text, beautiful.fg),
       align  = "start",
-      valign = "center",
+      valign = "top",
       font   =  beautiful.base_small_font,
       forced_width = dpi(120),
       widget = wibox.widget.textbox,
@@ -91,7 +93,7 @@ local function entry(index)
     {
       markup = colorize(text, beautiful.fg),
       align  = "start",
-      valign = "center",
+      valign = "top",
       font   =  beautiful.base_small_font,
       widget = wibox.widget.textbox,
     },

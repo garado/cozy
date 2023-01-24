@@ -28,7 +28,7 @@ local weather_widget = weather({
 
 local widget = wibox.widget({
   wibox.widget({
-    markup = colorize("Forecast", beautiful.fg),
+    markup = colorize("Weekly Forecast", beautiful.fg),
     align = "center",
     valign = "center",
     font = beautiful.alt_large_font,
