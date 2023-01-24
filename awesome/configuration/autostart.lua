@@ -2,11 +2,14 @@
 -- ▄▀█ █░█ ▀█▀ █▀█ █▀ ▀█▀ ▄▀█ █▀█ ▀█▀
 -- █▀█ █▄█ ░█░ █▄█ ▄█ ░█░ █▀█ █▀▄ ░█░
 
+-- Configure apps that run on startup
+
 local awful = require("awful")
-local filesystem = require("gears.filesystem")
+local config = require("config")
 
-local function autostart()
-  awful.spawn.once("picom", false)
+awful.spawn.once("picom", false)
+
+if config.tabletmode then
+  awful.spawn.once("touchegg", false)
+  print('starting touchegg')
 end
-
-autostart()

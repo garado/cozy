@@ -1,6 +1,17 @@
+
+-- █░█ █    █▀▀ █░░ █▀▀ █▀▄▀█ █▀▀ █▄░█ ▀█▀ █▀ 
+-- █▄█ █    ██▄ █▄▄ ██▄ █░▀░█ ██▄ █░▀█ ░█░ ▄█ 
+
+-- Here Cozy's UI elements are added to the screen.
+
 require(... .. ".notifications")
 
+local awful  = require("awful")
 local config = require("config")
+
+if config.tabletmode then
+  require(... .. ".touchscreen")
+end
 
 local bar
 if config.barstyle == "vertical" then
@@ -11,14 +22,8 @@ end
 
 local control   = require(... .. ".control")
 local tswitch   = require(... .. ".themeswitcher")
-local lock      = require(... .. ".lockscreen")
-
-local awful = require("awful")
 
 awful.screen.connect_for_each_screen(function(s)
-  if config.lock.enable_lockscreen_on_start then
-    lock(s)
-  end
   control(s)
   tswitch()
   bar(s)
