@@ -1,6 +1,7 @@
 
 -- █▀█ █ █▀▀ █▀█ █▀▄▀█ 
 -- █▀▀ █ █▄▄ █▄█ █░▀░█ 
+
 -- Toggles Picom presets
 
 local beautiful = require("beautiful")
@@ -32,15 +33,19 @@ local function create_option_btn(opt)
     font = beautiful.font,
     size = 11,
     on_release = function()
-      -- Create backup of user's config if it doesn't exist 
-      local backup = "~/.config/picom.user.conf"
-      if not gfs.file_readable(backup) then
-        awful.spawn.with_shell("cp ~/.config/picom.conf " .. backup)
+      -- If necessary, create backup of user's config
+      local picomcfg = "~/.config/picom.conf"
+      if gfs.file_readable(picomcfg) then
+        local backup = "~/.config/picom.user.conf"
+        if not gfs.file_readable(backup) then
+          awful.spawn.with_shell("cp ~/.config/picom.conf " .. backup)
+        end
       end
 
+      -- Set desired picom settings
       local fname = picom_cfgs .. opt .. ".conf"
       local cmd = "cp " .. fname .. " ~/.config/picom.conf"
-      awful.spawn.with_shell(cmd)
+      awful.spawn.easy_async_with_shell(cmd, function() end)
       if opt == "off" then
         awful.spawn.with_shell("pkill picom")
       end
