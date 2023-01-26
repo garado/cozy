@@ -109,8 +109,8 @@ local function create_theme_button(themename)
 
   function nav_themebtn:release()
     nav_styles:remove_all_items()
-    tscore:set_selected_theme(themename)
-    tscore:set_selected_style("")
+    tscore.selected_theme = themename
+    tscore.selected_style = ""
     theme_style_textbox:set_markup_silently("", beautiful.fg)
     select_new_theme(themename)
   end
@@ -137,7 +137,7 @@ function create_style_buttons(theme)
       animate_size = false,
       size = 12,
       on_release = function()
-        tscore:set_selected_style(style)
+        tscore.selected_style = style
         action_buttons.visible = true
         if not nav_root:contains(nav_actions) then
           nav_root:append(nav_actions)
@@ -154,7 +154,7 @@ function create_style_buttons(theme)
   end
 
   style_buttons:reset()
-  local _styles = tscore:get_themes()[theme]
+  local _styles = tscore.themes[theme]
   for i = 1, #_styles do
     local sbutton = create_style_button(_styles[i])
     style_buttons:add(sbutton)
@@ -262,12 +262,12 @@ current_selections = wibox.widget({
     widget = wibox.widget.textbox,
   }),
   wibox.widget ({
-    markup = colorize(tscore:get_applied_theme(), beautiful.fg),
+    markup = colorize(tscore.applied_theme, beautiful.fg),
     id = "theme_name",
     widget = wibox.widget.textbox,
   }),
   wibox.widget ({
-    markup = colorize(" (" .. tscore:get_applied_style() .. ")", beautiful.fg),
+    markup = colorize(" (" .. tscore.applied_style .. ")", beautiful.fg),
     id = "theme_style",
     widget = wibox.widget.textbox,
   }),
@@ -321,7 +321,7 @@ local theme_switcher = awful.popup ({
 
 -- When tscore is finished grabbing information,
 tscore:connect_signal("update::themes", function()
-  themes = tscore:get_themes()
+  themes = tscore.themes
   reset_theme_switcher()
   nav_themes:remove_all_items()
   theme_buttons:reset()
@@ -331,12 +331,12 @@ tscore:connect_signal("update::themes", function()
   end
 end)
 
-tscore:connect_signal("updatestate::open", function()
+tscore:connect_signal("setstate::open", function()
   theme_switcher.visible = true
   navigator:start()
 end)
 
-tscore:connect_signal("updatestate::close", function()
+tscore:connect_signal("setstate::close", function()
   theme_switcher.visible = false
   reset_theme_switcher()
   navigator:stop()

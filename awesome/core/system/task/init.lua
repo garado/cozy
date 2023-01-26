@@ -93,7 +93,6 @@ end
 local function new()
   local ret = gobject{}
   gtable.crush(ret, task, true)
-  ret._private = {}
   ret:new()
   return ret
 end

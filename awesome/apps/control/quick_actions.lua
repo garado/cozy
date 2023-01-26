@@ -12,7 +12,7 @@ local helpers_ui = require("helpers.ui")
 local colorize = helpers_ui.colorize_text
 local simplebtn = helpers_ui.simple_button
 local gfs = require("gears.filesystem")
-local apps = require("configuration.apps")
+local apps = require("sysconf.apps")
 local Area = require("modules.keynav.area")
 local control = require("core.cozy.control")
 

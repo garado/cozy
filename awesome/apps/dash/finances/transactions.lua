@@ -97,7 +97,7 @@ local widget = wibox.widget({
 })
 
 ledger:connect_signal("update::transactions", function(_)
-  local t = ledger:get_transactions()
+  local t = ledger.transactions
   transaction_history:reset()
   for i = 1, #t do
     create_transaction_entry(t[i][1], t[i][2], t[i][3], t[i][4])

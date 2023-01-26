@@ -16,13 +16,13 @@ local navigator, control_center
 local power_confirm, power_opts, nav_power
 
 local function control_center_contents()
-  local uptime  = require("ui.control.uptime")
-  local profile = require("ui.control.profile")
-  local stats   = require("ui.control.stats")
-  local fetch   = require("ui.control.fetch")
-  local nav_picom, picom        = require("ui.control.picom")()
-  local nav_qactions, qactions  = require("ui.control.quick_actions")()
-  power_opts, power_confirm, nav_power = require("ui.control.power")()
+  local uptime  = require("apps.control.uptime")
+  local profile = require("apps.control.profile")
+  local stats   = require("apps.control.stats")
+  local fetch   = require("apps.control.fetch")
+  local nav_picom, picom        = require("apps.control.picom")()
+  local nav_qactions, qactions  = require("apps.control.quick_actions")()
+  power_opts, power_confirm, nav_power = require("apps.control.power")()
 
   -- Import widgets
   navigator, _ = nav({
@@ -111,13 +111,13 @@ return function()
 
   -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
   -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
-  control:connect_signal("updatestate::open", function()
+  control:connect_signal("setstate::open", function()
     control:emit_signal("newstate::opened")
     control_center.visible = true
     navigator:start()
   end)
 
-  control:connect_signal("updatestate::close", function()
+  control:connect_signal("setstate::close", function()
     navigator:stop()
     control_center.visible = false
     control:emit_signal("newstate::closed")

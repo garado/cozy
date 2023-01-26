@@ -13,7 +13,7 @@ local naughty = require("naughty")
 local helpers = require("helpers")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local config = require("config")
+local config = require("cozyconf")
 
 
 -- ░░█ █▀█ █▄░█ █░░

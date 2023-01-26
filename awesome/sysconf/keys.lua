@@ -6,7 +6,7 @@
 
 local hotkeys_popup = require("awful.hotkeys_popup")
 local awful   = require("awful")
-local apps    = require("configuration.apps")
+local apps    = require("sysconf.apps")
 local naughty = require("naughty")
 local bling   = require("modules.bling")
 local os = os

@@ -49,8 +49,7 @@ function _ui.box(widget_to_be_boxed, width, height, bg_color)
 			widget = wibox.container.background,
 		},
 		margins = dpi(10),
-		color   = "#FF000000",
-		widget  = wibox.container.margin,
+	  widget  = wibox.container.margin,
 	})
 end
 

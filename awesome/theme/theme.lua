@@ -8,7 +8,7 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local themes_path = gfs.get_themes_dir()
 local theme = dofile(themes_path .. "default/theme.lua")
-local config = require("config")
+local config = require("cozyconf")
 
 -- Get user's color scheme
 local theme_name  = config.theme_name

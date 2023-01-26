@@ -6,7 +6,7 @@
 
 local beautiful = require("beautiful")
 local gtable = require("gears.table")
-local config = require("config")
+local config = require("cozyconf")
 local task   = {}
 
 --- Sort projects alphabetically

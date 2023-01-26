@@ -16,7 +16,8 @@ local EMPTY_JSON = "[\n]\n"
 --- Parse all tags
 function task:parse_tags()
   local cmd = "task tag | head -n -2 | tail -n +4 | cut -f1 -d' ' "
-  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+  awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
+    if string.match(stderr, 'No tags') then return end
     local tags = core.split('\r\n', stdout)
     self.tag_names = tags
     self:emit_signal("ready::tag_names")

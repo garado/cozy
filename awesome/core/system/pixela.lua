@@ -7,7 +7,7 @@
 local gobject = require("gears.object")
 local gtable  = require("gears.table")
 local awful   = require("awful")
-local config  = require("config")
+local config  = require("cozyconf")
 local gfs     = require("gears.filesystem")
 local naughty = require("naughty")
 
@@ -27,7 +27,7 @@ function pixela:sync_cache_data()
     set_pixela_token  = "export PIXELA_USER_TOKEN=" .. config.pixela.token
   end
 
-  for id, _ in pairs(config.habit) do
+  for id, _ in pairs(config.pixela.habits) do
     local path = gfs.get_cache_dir() .. "pixela/" .. id
     local cmd = set_pixela_user .. " ; " .. set_pixela_token .. " ; "
     cmd = cmd .. "pi graphs pixels -g " .. id .. " > " .. path
@@ -37,11 +37,11 @@ end
 
 --- For every habit specified in the user's config file, grab the last
 -- 4 days of habit data from the cache file in ~/.cache/awesome/pixela.
--- Store the data directly within config.habit table from user config file
+-- Store the data directly within config.pixela.habits table from user config file
 -- because didn't want to bother with multiple data tables.
 function pixela:parse_cache_data()
   -- Get graph ids from user config file
-  local habits = config.habit
+  local habits = config.pixela.habits
 
   for graph_id, _ in pairs(habits) do
     local file = gfs.get_cache_dir() .. "pixela/" .. graph_id
@@ -64,7 +64,7 @@ function pixela:parse_cache_data()
         end
       end
 
-      config.habit[graph_id]["completion"] = completion
+      config.pixela.habits[graph_id]["completion"] = completion
       self:emit_signal("update::habits", graph_id)
     end)
   end
@@ -128,7 +128,7 @@ end
 
 --- Return the completion status of a habit
 function pixela:get_habit_data(graph_id, days_ago)
-  return config.habits[graph_id]["completion"][days_ago]
+  return config.pixela.habitss[graph_id]["completion"][days_ago]
 end
 
 function pixela:report_pixela_error(stderr)
@@ -165,7 +165,6 @@ end
 local function new()
   local ret = gobject{}
   gtable.crush(ret, pixela, true)
-  ret._private = {}
   ret:new()
   return ret
 end

@@ -9,7 +9,7 @@
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local helpers = require("helpers")
-local config = require("config")
+local config = require("cozyconf")
 local awful = require("awful")
 local naughty = require("naughty")
 

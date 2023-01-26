@@ -11,6 +11,9 @@ local dpi = xresources.apply_dpi
 local dashcore = require("core.cozy.dash")
 local colorize = require("helpers.ui").colorize_text
 local keynav   = require("modules.keynav")
+local config   = require("cozyconf")
+
+local exclude_tabs = config.exclude_dash_tabs
 
 local tabs, dash_content, switch_tab
 local init = false
@@ -38,6 +41,8 @@ local tablist   = { main,     tasks,      agenda,     cash,     time,   journal 
 local tabnames  = { "main",   "tasks",    "agenda",   "cash",   "time", "journal"   }
 local tab_icons = { "",      "",        "",        "",      "",    ""         }
 local navitems  = { nav_main, nav_tasks,  nav_agenda, nav_cash, nil,    nav_journal }
+
+
 
 --- Display a specific tab on the dashboard
 -- @param i The tab number.
@@ -95,7 +100,7 @@ local pfp = wibox.widget({
 local distro = wibox.widget({
   {
     {
-      markup = colorize("", beautiful.main_accent),
+      markup = colorize(config.distro_icon, beautiful.main_accent),
       align  = "center",
       valign = "center",
       font   = beautiful.base_small_font,
@@ -180,8 +185,8 @@ dash_content = wibox.widget({
       id = "content",
       layout = wibox.layout.fixed.vertical,
     },
-    widget = wibox.container.margin,
     margins = dpi(10),
+    widget  = wibox.container.margin,
   },
   bg      = beautiful.dash_bg,
   shape   = gears.shape.rect,
@@ -213,7 +218,7 @@ local dash = awful.popup({
 -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
 
-dashcore:connect_signal("updatestate::open", function()
+dashcore:connect_signal("setstate::open", function()
   dash.visible = true
   navigator:start()
   dashcore:emit_signal("newstate::opened")
@@ -225,7 +230,7 @@ dashcore:connect_signal("updatestate::open", function()
   end
 end)
 
-dashcore:connect_signal("updatestate::close", function()
+dashcore:connect_signal("setstate::close", function()
   dash.visible = false
   navigator:stop()
   dashcore:emit_signal("newstate::closed")

@@ -197,7 +197,7 @@ end
 -- end)
 
 -- Update widget whenever dashboard is opened
-dash:connect_signal("updatestate::open", function()
+dash:connect_signal("setstate::open", function()
   read_timew_state()
 end)
 

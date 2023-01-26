@@ -24,7 +24,7 @@ gears.timer({
 	end,
 })
 
-require("configuration")
+require("sysconf")
 require("modules")
 require("ui")
 require("apps")

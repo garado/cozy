@@ -81,7 +81,7 @@ local events_widget = wibox.widget({
 })
 
 cal:connect_signal("ready::upcoming", function()
-  local upcoming = cal:get_upcoming_events()
+  local upcoming = cal.upcoming
   if #upcoming > 0 then
     events:reset()
   end

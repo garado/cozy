@@ -14,8 +14,9 @@ local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local ui = require("helpers.ui")
-local config = require("config")
-local keynav = require("modules.keynav") -- todo add keyboard support
+local config = require("cozyconf")
+
+local pin = config.lock.pin or "1234"
 
 local enter_input, lockscreen
 
@@ -44,7 +45,7 @@ local input_feedback = wibox.widget({
   end
 })
 
-for _ = 1, #config.lock.pin do
+for _ = 1, #pin do
   local circle = wibox.widget({
     forced_height = dpi(10),
     forced_width  = dpi(10),
@@ -155,8 +156,8 @@ local function unlock_failed()
 end
 
 local function try_unlock()
-  for i = 1, string.len(config.lock.pin) do
-    if string.sub(config.lock.pin, i, i) ~= tostring(values_entered[i]) then
+  for i = 1, string.len(pin) do
+    if string.sub(pin, i, i) ~= tostring(values_entered[i]) then
       unlock_failed()
       return
     end
@@ -173,7 +174,7 @@ function enter_input(input)
     input_feedback.children[1].children[#values_entered]:fill()
   end
 
-  if #values_entered == #config.lock.pin then
+  if #values_entered == #pin then
     try_unlock()
   end
 end

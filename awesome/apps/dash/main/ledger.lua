@@ -220,8 +220,11 @@ local bottom_yes_spent = wibox.widget({
 -- Otherwise show this placeholder
 local bottom_no_spent = wibox.widget({
   {
-    text    = "Nothing spent this month.",
-    widget  = wibox.widget.textbox,
+    markup = colorize("Nothing spent this month.", beautiful.fg),
+    align  = "center",
+    valign = "center",
+    font   = beautiful.base_small_font,
+    widget = wibox.widget.textbox,
   },
   widget = wibox.container.place,
 })
@@ -248,8 +251,8 @@ local widget = wibox.widget({
 
 -- Update arc chart and total spending balance
 ledger:connect_signal("update::month", function()
-  local entries = ledger:get_monthly_overview()
-  local total = ledger:get_total_spent_this_month()
+  local entries = ledger.monthly_breakdown
+  local total = ledger.total_spent_this_month
 
   if tonumber(total) == 0 then
     bottom:set(2, bottom_no_spent)
@@ -272,8 +275,8 @@ end)
 
 -- Update checking and savings balance
 ledger:connect_signal("update::balances", function()
-  local checking_value  = ledger:get_account_balance("checking")
-  local savings_value   = ledger:get_account_balance("savings")
+  local checking_value  = ledger.checking or "$--.--"
+  local savings_value   = ledger.savings  or "$--.--"
 
   local checking = checking_bal.children[1].children[2]
   checking:set_markup_silently(colorize(checking_value, beautiful.fg))

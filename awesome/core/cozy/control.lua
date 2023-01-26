@@ -22,13 +22,13 @@ function control:toggle()
 end
 
 function control:close()
-  self:emit_signal("updatestate::close")
+  self:emit_signal("setstate::close")
   self._private.visible = false
 end
 
 function control:open()
   cozy:close_all()
-  self:emit_signal("updatestate::open")
+  self:emit_signal("setstate::open")
   self._private.visible = true
 end
 

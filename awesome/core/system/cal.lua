@@ -104,7 +104,7 @@ function agenda:fetch_upcoming(date)
       upcoming[#upcoming+1] = event
     end
 
-    self._private.upcoming = upcoming
+    self.upcoming = upcoming
     self:emit_signal("ready::upcoming")
   end)
 end
@@ -282,9 +282,6 @@ end
 
 ---------------------------------------------------------------------
 
-function agenda:get_events() return self.events end
-function agenda:get_upcoming_events() return self._private.upcoming end
-
 function agenda:get_num_events(month, date)
   if not self.events[month] then return 0 end
   if not self.events[month][date] then return 0 end
@@ -324,7 +321,6 @@ end
 local function new()
   local ret = gobject{}
   gtable.crush(ret, agenda, true)
-  ret._private = {}
   ret:new()
   return ret
 end

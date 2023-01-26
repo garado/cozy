@@ -4,12 +4,10 @@
 
 -- For interfacing with Ledger and interacting with Ledger files.
 
--- TODO remove all this ._private bullshit
-
 local gobject = require("gears.object")
 local gtable = require("gears.table")
 local awful = require("awful")
-local config = require("config")
+local config = require("cozyconf")
 local core = require("helpers.core")
 local ledger_file = config.ledger.ledger_file
 local budget_file = config.ledger.budget_file
@@ -37,11 +35,11 @@ function ledger:parse_account_balances()
       -- Remove everything except # $ . from string
       local str_stripped = string.gsub(lines[i], "[^0-9$.]", "")
       if str_assets ~= nil then
-        self._private.total = str_stripped
+        self.total = str_stripped
       elseif str_checking ~= nil then
-        self._private.checking = str_stripped
+        self.checking = str_stripped
       elseif str_savings ~= nil then
-        self._private.savings = str_stripped
+        self.savings = str_stripped
       end
     end
 
@@ -86,7 +84,7 @@ function ledger:parse_recent_transactions(amt)
       table.insert(transactions, { date, title, category, amount })
     end
 
-    self._private.transactions = transactions
+    self.transactions = transactions
     self:emit_signal("update::transactions")
   end)
 end
@@ -98,7 +96,7 @@ function ledger:parse_transactions_this_month()
   local format = " --balance-format '%A,%T\n'"
   local cmd = "ledger -f " .. ledger_file .. " bal" .. begin .. "--no-total" .. format .. " | grep Expenses"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    self._private.total_spent_this_month = 0
+    self.total_spent_this_month = 0
 
     local raw_entries = {}
 
@@ -140,12 +138,12 @@ function ledger:parse_transactions_this_month()
           -- Remove dollar sign from the amount
           local amt = string.gsub(raw_entries[i][2], "[^0-9.]", "")
           month[top_category] = tonumber(amt)
-          self._private.total_spent_this_month = self._private.total_spent_this_month + amt
+          self.total_spent_this_month = self.total_spent_this_month + amt
         end
       end
     end
 
-    self._private.monthly_breakdown = month
+    self.monthly_breakdown = month
 
     self:emit_signal("update::month")
   end)
@@ -162,7 +160,7 @@ function ledger:parse_budget(month)
     local budget_entries  = {}
     local total_spent     = 0
     local total_budgeted  = 0
-    self._private.budget  = {}
+    self.budget  = {}
 
     -- Iterate over lines to extract information
     local lines = core.split("\r\n", stdout)
@@ -196,9 +194,9 @@ function ledger:parse_budget(month)
       end
     end
 
-    self._private.budget = budget_entries
-    self._private.budget_total_spent    = total_spent
-    self._private.budget_total_budgeted = total_budgeted
+    self.budget = budget_entries
+    self.budget_total_spent    = total_spent
+    self.budget_total_budgeted = total_budgeted
     self:emit_signal("update::budget")
   end)
 end
@@ -222,50 +220,50 @@ end
 
 ---------------------------------------------------------------------
 
---- Return budget information.
--- @return A table containing budget information. Index into it with category name.
--- budget[cat][1] is the amount spent.
--- budget[cat][2] is the amount budgeted.
-function ledger:get_budget()
-  return self._private.budget
-end
-
-function ledger:get_budget_total_spent()
-  return self._private.budget_total_spent
-end
-
-function ledger:get_budget_total_budgeted()
-  return self._private.budget_total_budgeted
-end
-
---- Return a given account balance.
--- @param account A string "checking" "savings" or "total"
--- @return Current balance in the account
-function ledger:get_account_balance(account)
-  if account == "checking" then
-    return self._private.checking
-  elseif account == "savings" then
-    return self._private.savings
-  elseif account == "total" then
-    return self._private.total
-  end
-end
-
---- Get table of transactions.
-function ledger:get_transactions()
-  return self._private.transactions
-end
-
---- Get overview of monthly spending.
--- @return A key-value table containing a top-level spending category and the amount spent on that category
-function ledger:get_monthly_overview()
-  return self._private.monthly_breakdown
-end
-
---- Get total spent this month.
-function ledger:get_total_spent_this_month()
-  return self._private.total_spent_this_month
-end
+-- --- Return budget information.
+-- -- @return A table containing budget information. Index into it with category name.
+-- -- budget[cat][1] is the amount spent.
+-- -- budget[cat][2] is the amount budgeted.
+-- function ledger:get_budget()
+--   return self.budget
+-- end
+-- 
+-- function ledger:get_budget_total_spent()
+--   return self.budget_total_spent
+-- end
+-- 
+-- function ledger:get_budget_total_budgeted()
+--   return self.budget_total_budgeted
+-- end
+-- 
+-- --- Return a given account balance.
+-- -- @param account A string "checking" "savings" or "total"
+-- -- @return Current balance in the account
+-- function ledger:get_account_balance(account)
+--   if account == "checking" then
+--     return self.checking
+--   elseif account == "savings" then
+--     return self.savings
+--   elseif account == "total" then
+--     return self.total
+--   end
+-- end
+-- 
+-- --- Get table of transactions.
+-- function ledger:get_transactions()
+--   return self.transactions
+-- end
+-- 
+-- --- Get overview of monthly spending.
+-- -- @return A key-value table containing a top-level spending category and the amount spent on that category
+-- function ledger:get_monthly_overview()
+--   return self.monthly_breakdown
+-- end
+-- 
+-- --- Get total spent this month.
+-- function ledger:get_total_spent_this_month()
+--   return self.total_spent_this_month
+-- end
 
 ---------------------------------------------------------------------
 
@@ -286,7 +284,6 @@ end
 local function new()
   local ret = gobject{}
   gtable.crush(ret, ledger, true)
-  ret._private = {}
   ret:new()
   return ret
 end

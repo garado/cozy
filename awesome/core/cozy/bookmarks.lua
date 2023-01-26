@@ -5,7 +5,7 @@
 -- Handles backend for bookmarks applet.
 
 local cozy    = require("core.cozy.cozy")
-local config  = require("config")
+local config  = require("cozyconf")
 local gobject = require("gears.object")
 local json    = require("modules.json")
 local gtable  = require("gears.table")

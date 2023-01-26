@@ -103,7 +103,7 @@ local widget = wibox.widget({
 })
 
 ledger:connect_signal("update::budget", function(_)
-  create_bars(ledger:get_budget())
+  create_bars(ledger.budget)
 end)
 
 return box(widget, dpi(0), dpi(600), beautiful.dash_widget_bg)

@@ -142,7 +142,7 @@ end
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
 
 cal:connect_signal("ready::upcoming", function()
-  local upcoming = cal:get_upcoming_events()
+  local upcoming = cal.upcoming
   datelist:reset()
   event_list:init()
   nav_events:remove_all_items()

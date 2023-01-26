@@ -39,13 +39,13 @@ time.tag_colors = {}
 ---------------------------------------------------------------------
 
 --- Return the total time spent working on a particular project for a particular tag.
-function time:get_time_per_project(tag, project)
+function time:parse_time_per_project(tag, project)
   local _tag = tag .. ":" .. project
   local cmd = "timew sum :all " .. _tag .. " | tail -n 2 | head -n 1"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    if not self._private.tags then self._private.tags = {} end
-    if not self._private.tags[tag].projects then
-      self._private.tags[tag].projects = {}
+    if not self.tags then self.tags = {} end
+    if not self.tags[tag].projects then
+      self.tags[tag].projects = {}
     end
 
     -- If first char is a space, then there was (probably?) a valid
@@ -58,7 +58,7 @@ function time:get_time_per_project(tag, project)
       proj_time = string.gsub(stdout, "[^0-9:]", "")
     end
 
-    self._private.tags[tag]["projects"][project] = proj_time
+    self.tags[tag]["projects"][project] = proj_time
 
     self:emit_signal("update::project_stats")
   end)
@@ -199,7 +199,6 @@ end
 local function new()
   local ret = gobject{}
   gtable.crush(ret, time, true)
-  ret._private = {}
   ret:new()
   return ret
 end

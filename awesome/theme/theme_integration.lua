@@ -8,10 +8,10 @@
 local awful  = require("awful")
 local gears  = require("gears")
 local gfs    = gears.filesystem
-local config = require("config")
+local config = require("cozyconf")
 
-local theme_name  = config.theme_name
-local theme_style = config.theme_style
+local theme_name  = config.theme_name or "yoru"
+local theme_style = config.theme_style or "dark"
 local theme_path  = "theme.colorschemes." .. theme_name .. "." .. theme_style
 local theme = require(theme_path).switcher
 

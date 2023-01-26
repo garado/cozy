@@ -25,16 +25,15 @@ local time_dash = wibox.widget({
         font   = beautiful.alt_xlarge_font,
         widget = wibox.widget.textbox,
       },
-      cal,
-      stats,
-      spacing = dpi(15),
-      layout = wibox.layout.fixed.vertical,
+      top    = dpi(10),
+      widget = wibox.container.margin,
     },
-    list,
-    layout = wibox.layout.fixed.horizontal,
+    cal,
+    stats,
+    layout = wibox.layout.fixed.vertical,
   },
-  margins = dpi(15),
-  widget = wibox.container.margin,
+  list,
+  layout = wibox.layout.fixed.horizontal,
 })
 
 return function()

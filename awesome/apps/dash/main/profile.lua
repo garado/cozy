@@ -9,7 +9,7 @@ local dpi = xresources.apply_dpi
 local gears = require("gears")
 local colorize = require("helpers.ui").colorize_text
 local box = require("helpers.ui").create_boxed_widget
-local config = require("config")
+local config = require("cozyconf")
 local dash = require("core.cozy.dash")
 local math = math
 
@@ -34,7 +34,7 @@ local name = wibox.widget({
   align   = "center",
   valign  = "center",
   font    = beautiful.base_large_font,
-  markup  = colorize(config.display_name, beautiful.prof_name_fg),
+  markup  = colorize(config.display_name or "Display Name", beautiful.prof_name_fg),
   widget  = wibox.widget.textbox,
 })
 
@@ -48,8 +48,8 @@ local title = wibox.widget({
 
 -- New title every time you open dash
 -- BUG: this signal isn't being emitted properly...
-dash:connect_signal("updatestate::close", function()
-  local titles_list = config.titles
+dash:connect_signal("setstate::close", function()
+  local titles_list = config.titles or { "Linux enthusiast" }
   local random_title = titles_list[math.random(#titles_list)]
   title:set_markup(colorize(random_title, beautiful.fg))
 end)

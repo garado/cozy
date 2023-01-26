@@ -8,9 +8,8 @@ local gobject = require("gears.object")
 local gtable  = require("gears.table")
 local awful   = require("awful")
 local core    = require("helpers.core")
-local config  = require("config")
+local config  = require("cozyconf")
 local debug   = require("core.debug")
-local dash    = require("core.cozy.dash")
 
 local journal   = { }
 local instance  = nil
@@ -178,7 +177,6 @@ end
 local function new()
   local ret = gobject{}
   gtable.crush(ret, journal, true)
-  ret._private = {}
   ret:new()
   return ret
 end

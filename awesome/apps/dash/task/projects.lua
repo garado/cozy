@@ -17,18 +17,17 @@ local task = require("core.system.task")
 
 local project_list = wibox.widget({
   spacing = dpi(5),
-  layout = wibox.layout.flex.vertical,
+  layout = wibox.layout.fixed.vertical,
 })
 
 local projects_widget = wibox.widget({
   wheader("Projects"),
   project_list,
-  spacing    = dpi(10),
-  layout     = wibox.layout.fixed.vertical,
+  spacing = dpi(10),
+  layout  = wibox.layout.fixed.vertical,
 })
 
 local container = box(projects_widget, nil, nil, beautiful.dash_widget_bg)
-
 
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄ 
 -- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀ 

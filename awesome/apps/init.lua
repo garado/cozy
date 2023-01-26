@@ -1,10 +1,12 @@
 local awful = require("awful")
 local bookmarks = require(... .. ".bookmarks")
 local dashboard = require(... .. ".dash")
+local control = require(... .. ".control")
 local timer = require(... .. ".timer")
 
 awful.screen.connect_for_each_screen(function(s)
   bookmarks(s)
   dashboard(s)
+  control(s)
   timer(s)
 end)

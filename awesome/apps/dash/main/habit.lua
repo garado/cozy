@@ -6,7 +6,7 @@ local beautiful = require("beautiful")
 local wibox = require("wibox")
 local xresources = require("beautiful.xresources")
 local gears = require("gears")
-local config = require("config")
+local config = require("cozyconf") or {}
 local dpi = xresources.apply_dpi
 local box = require("helpers.ui").create_boxed_widget
 local colorize = require("helpers.ui").colorize_text
@@ -23,7 +23,7 @@ local nav_dash_habits = Area({
   grid_cols = 4,
 })
 
-local habit_list = config.habit
+local habit_list = config.pixela.habits
 local habit_widget
 
 ---------------------------------

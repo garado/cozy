@@ -41,15 +41,16 @@ end)
 
 local sidebar = wibox.widget({
   {
-    markup = ui.colorize("Questlog", beautiful.fg),
-    font   = beautiful.alt_large_font,
+    markup = ui.colorize("Taskwarrior", beautiful.fg),
+    font   = beautiful.alt_xlarge_font,
     align  = "center",
     valign = "center",
     widget = wibox.widget.textbox,
   },
   tag_list,
   project_list,
-  forced_width = dpi(300),
+  forced_width = dpi(310),
+  fill_space = true,
   layout = wibox.layout.fixed.vertical,
 })
 
@@ -74,27 +75,23 @@ local main_contents = wibox.widget({
 
 local tasks_dashboard = wibox.widget({
   {
-    { -- needs its own layout box to prevent some weird layout issues
+    { -- Needs its own layout box to prevent some weird layout issues
       sidebar,
       layout = wibox.layout.fixed.vertical,
     },
     {
-      {
-        main_contents,
-        details,
-        prompt,
-        layout = wibox.layout.fixed.vertical,
-      },
-      left   = dpi(10),
-      right  = dpi(15),
-      widget = wibox.container.margin,
+      main_contents,
+      details,
+      prompt,
+      layout = wibox.layout.fixed.vertical,
     },
     fill_space = true,
-    spacing = dpi(15),
+    spacing = dpi(10),
     layout  = wibox.layout.fixed.horizontal,
   },
-  margins = dpi(15),
-  widget  = wibox.container.margin,
+  top    = dpi(10),
+  right  = dpi(10),
+  widget = wibox.container.margin,
 })
 
 return function()

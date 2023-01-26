@@ -23,27 +23,23 @@ local nav_finances = area({
 })
 
 local widget = wibox.widget({
-  {
-    { -- Left side
-      {
-        balances[2],
-        balances[3],
-        layout = wibox.layout.flex.horizontal,
-      },
-      actions,
-      budget,
-      forced_width = dpi(420),
-      layout = wibox.layout.fixed.vertical,
+  { -- Left side
+    {
+      balances[2],
+      balances[3],
+      layout = wibox.layout.flex.horizontal,
     },
-    { -- Right side
-      transactions,
-      forced_width = dpi(850),
-      layout = wibox.layout.fixed.vertical,
-    },
-    layout = wibox.layout.fixed.horizontal,
+    actions,
+    budget,
+    forced_width = dpi(420),
+    layout = wibox.layout.fixed.vertical,
   },
-  margins = dpi(20),
-  widget = wibox.container.margin,
+  { -- Right side
+    transactions,
+    forced_width = dpi(900),
+    layout = wibox.layout.fixed.vertical,
+  },
+  layout = wibox.layout.fixed.horizontal,
 })
 
 return function()

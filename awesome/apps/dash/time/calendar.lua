@@ -192,17 +192,13 @@ local month_label = wibox.widget({
 
 local calendar = wibox.widget({
   {
-    {
-      month_label,
-      create_week_label(),
-      month,
-      spacing = dpi(20),
-      layout = wibox.layout.fixed.vertical,
-    },
-    margins = dpi(20),
-    widget = wibox.container.margin,
+    month_label,
+    create_week_label(),
+    month,
+    spacing = dpi(20),
+    layout = wibox.layout.fixed.vertical,
   },
-  widget = wibox.container.constraint,
+  widget = wibox.container.place,
 })
 
 calendar = box(calendar, dpi(450), dpi(420), beautiful.dash_widget_bg)

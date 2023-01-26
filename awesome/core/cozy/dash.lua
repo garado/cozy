@@ -22,13 +22,13 @@ function dash:toggle()
 end
 
 function dash:close()
-  self:emit_signal("updatestate::close")
+  self:emit_signal("setstate::close")
   self.visible = false
 end
 
 function dash:open()
   cozy:close_all()
-  self:emit_signal("updatestate::open")
+  self:emit_signal("setstate::open")
   self.visible = true
 end
 

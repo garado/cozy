@@ -45,8 +45,8 @@ local checking  = create_balance_box("Checking")
 local savings   = create_balance_box("Savings")
 
 ledger:connect_signal("update::balances", function(_)
-  local checking_bal  = ledger:get_account_balance("checking")
-  local savings_bal   = ledger:get_account_balance("savings")
+  local checking_bal  = ledger.checking or "$--.--"
+  local savings_bal   = ledger.savings  or "$--.--"
 
   local txt = checking.children[1]
   txt.children[2]:set_markup_silently(colorize(checking_bal, beautiful.dash_bg))

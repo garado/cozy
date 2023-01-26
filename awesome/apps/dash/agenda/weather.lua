@@ -10,21 +10,38 @@ local beautiful = require("beautiful")
 local dpi = beautiful.xresources.apply_dpi
 local colorize  = require("helpers.ui").colorize_text
 local weather = require("modules.weather.weather")
-local config = require("config")
+local config = require("cozyconf")
 
-local weather_widget = weather({
-  api_key = config.weather.api_key,
-  coordinates = config.weather.coordinates,
-  time_format_12h = true,
-  units = 'imperial',
-  both_units_widget = false,
-  font_name = beautiful.base_font_name,
-  icons = 'pixels',
-  icons_extension = '.png',
-  show_daily_forecast = true,
-  show_current_forecast = false,
-  timeout = 10 * 60, -- 10 min refresh rate
-})
+local api_key = config.agenda.weather_api_key
+local coords  = config.agenda.weather_coordinates
+
+local cozyconf_valid = config and api_key and api_key ~= "" and coords and coords ~= ""
+
+local widget_to_display
+
+if cozyconf_valid then
+  widget_to_display = weather({
+    api_key = api_key,
+    coordinates = coords,
+    time_format_12h = true,
+    units = 'imperial',
+    both_units_widget = false,
+    font_name = beautiful.base_font_name,
+    icons = 'pixels',
+    icons_extension = '.png',
+    show_daily_forecast = true,
+    show_current_forecast = false,
+    timeout = 10 * 60, -- 10 min refresh rate
+  })
+else
+  widget_to_display = {
+    markup = colorize("Couldn't display weather.\nMaybe check your cozyconf?", beautiful.fg_sub),
+    align  = "center",
+    valign = "center",
+    font   = beautiful.base_small_font,
+    widget = wibox.widget.textbox,
+  }
+end
 
 local widget = wibox.widget({
   wibox.widget({
@@ -35,7 +52,7 @@ local widget = wibox.widget({
     widget = wibox.widget.textbox,
   }),
   {
-    weather_widget,
+    widget_to_display,
     valign = 'center',
     widget = wibox.container.place,
   },

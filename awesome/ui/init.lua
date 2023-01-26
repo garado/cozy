@@ -7,24 +7,22 @@
 require(... .. ".notifications")
 
 local awful  = require("awful")
-local config = require("config")
+local config = require("cozyconf") or {}
 
 if config.tabletmode then
   require(... .. ".touchscreen")
 end
 
 local bar
-if config.barstyle == "vertical" then
+if config.barstyle == "vertical" or not config.barstyle then
   bar = require(... .. ".vbar")
 elseif config.barstyle == "horizontal" then
   bar = require(... .. ".hbar")
 end
 
-local control   = require(... .. ".control")
 local tswitch   = require(... .. ".themeswitcher")
 
 awful.screen.connect_for_each_screen(function(s)
-  control(s)
   tswitch()
   bar(s)
 end)
