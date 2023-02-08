@@ -12,6 +12,9 @@ return {
   theme_name  = "yoru",
   theme_style = "dark",
 
+  -- Possible values: modern
+  fontset = "modern",
+
   -- If the theme switcher changes the theme of other apps as well.
   -- Edit awesome/theme/theme_integrations.lua to customize which apps are affected.
   theme_switch_integration = true,

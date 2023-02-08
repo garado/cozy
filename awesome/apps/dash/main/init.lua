@@ -7,8 +7,9 @@ local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
 local area = require("modules.keynav.area")
 
-local habit, nav_habit  = require(... .. ".habit")()
-local time, nav_time    = require(... .. ".timewarrior")()
+local habit, nav_habit = require(... .. ".habit")()
+local time, nav_time   = require(... .. ".timewarrior")()
+local bus, nav_bus     = require(... .. ".bus")()
 
 local profile   = require(... .. ".profile")
 local events    = require(... .. ".events")
@@ -22,6 +23,7 @@ local github    = require(... .. ".github")
 local nav_main = area({
   name     = "main",
   children = {
+    nav_bus,
     nav_time,
     nav_habit,
   }
@@ -42,7 +44,8 @@ local widget = wibox.widget({
   {
     events,
     tasks,
-    ledger,
+    bus,
+    -- ledger,
     forced_width = dpi(550),
     layout = wibox.layout.fixed.vertical,
   },

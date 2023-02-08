@@ -7,6 +7,14 @@ local CWD = gfs.get_configuration_dir() .. "cozyconf/"
 
 return {
 
+  -- Certain widgets can send Pushover notifications.
+  -- Put your user key and application API token here.
+  -- https://pushover.net/settings
+  pushover = {
+    user_key = "",
+    api_token = "",
+  },
+
   -- █▀▄▀█ ▄▀█ █ █▄░█    ▀█▀ ▄▀█ █▄▄ 
   -- █░▀░█ █▀█ █ █░▀█    ░█░ █▀█ █▄█ 
 
@@ -53,14 +61,20 @@ return {
     },
   },
 
+  -- For bus tracking widget. You probably won't need this unless you
+  -- live in my city (Santa Cruz).
+  bus = {},
 
   -- ▀█▀ ▄▀█ █▀ █▄▀ █░█░█ ▄▀█ █▀█ █▀█ █ █▀█ █▀█ 
   -- ░█░ █▀█ ▄█ █░█ ▀▄▀▄▀ █▀█ █▀▄ █▀▄ █ █▄█ █▀▄ 
 
-  -- The Taskwarrior tag/project to show on tab startup.
   tasks = {
+    -- The Taskwarrior tag/project to show on tab startup.
     default_tag     = "",
     default_project = "",
+
+    -- Tags to exclude from display.
+    exclude_tags = { },
   },
 
 
@@ -73,6 +87,15 @@ return {
 
     -- The location to fetch weather for .
     weather_coords = { 36.98, -122.05 },
+
+    -- If false, weekview will show the current week Sunday-Saturday
+    -- If true, weekview will show today + 6 days
+    weekview_start_from_today = false,
+
+    -- Which day counts as the start of the week.
+    -- Possible values: any day of the week, fully spelled out, first letter
+    -- capitalized.
+    weekview_week_start = "Sunday",
   },
 
 
@@ -94,6 +117,34 @@ return {
   },
 
 
+  -- ▀█▀ █ █▀▄▀█ █▀▀ █░█░█ ▄▀█ █▀█ █▀█ █ █▀█ █▀█ 
+  -- ░█░ █ █░▀░█ ██▄ ▀▄▀▄▀ █▀█ █▀▄ █▀▄ █ █▄█ █▀▄ 
+
+  time = {
+
+    -- If enabled, you can view an estimate of your earnings from hourly-pay
+    -- jobs by tracking hours with Timewarrior under a specific tag.
+
+    -- Whether to enable earnings overview.
+    show_earnings = true,
+
+    -- Specify display name, work tag to search for,
+    -- and the hourly rate for each job.
+    jobs = {
+      {
+        name = "Nath",
+        tag  = "Work:Nath",
+        rate = 23.92,
+      },
+      {
+        name = "Siero",
+        tag  = "Work:Siero",
+        rate = 17.78,
+      },
+    },
+  },
+
+
   -- ░░█ █▀█ █░█ █▀█ █▄░█ ▄▀█ █░░ 
   -- █▄█ █▄█ █▄█ █▀▄ █░▀█ █▀█ █▄▄ 
 
@@ -101,7 +152,7 @@ return {
     -- This is obviously not secure as it's in plaintext.
     -- It's moreso to prevent people who are looking at your screen from
     -- seeing your journal entries if you accidentally open the journal
-    -- tab.
+  -- tab.
     password = "password",
   },
 
