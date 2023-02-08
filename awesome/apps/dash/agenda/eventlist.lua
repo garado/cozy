@@ -40,10 +40,10 @@ local function create_event(event)
     displaytitle = " " .. title
   end
   local name = wibox.widget({
-    markup  = colorize(displaytitle, beautiful.fg),
+    markup  = colorize(displaytitle, beautiful.fg_0),
     align   = "left",
     valign  = "top",
-    font    = beautiful.base_xsmall_font,
+    font    = beautiful.font_reg_xs,
     ellipsize = "end",
     forced_height = 15,
     forced_width = 220,
@@ -57,9 +57,9 @@ local function create_event(event)
     time = starttime .. " - " .. endtime
   end
   local times = wibox.widget({
-    markup = colorize(time, beautiful.fg),
+    markup = colorize(time, beautiful.fg_0),
     align = "left",
-    font    = beautiful.base_xsmall_font,
+    font    = beautiful.font_reg_xs,
     valign = "top",
     ellipsize = "end",
     forced_height = dpi(15),
@@ -68,8 +68,8 @@ local function create_event(event)
   })
 
   local _place = wibox.widget({
-    markup  = colorize(place, beautiful.fg),
-    font    = beautiful.base_xsmall_font,
+    markup  = colorize(place, beautiful.fg_0),
+    font    = beautiful.font_reg_xs,
     align   = "left",
     valign  = "top",
     ellipsize = "end",
@@ -104,10 +104,10 @@ local function create_event(event)
 end
 
 local event_list_placeholder = wibox.widget({
-  markup = colorize("No events found.", beautiful.fg),
+  markup = colorize("No events found.", beautiful.fg_0),
   align  = "center",
   valign = "center",
-  font   = beautiful.base_xsmall_font,
+  font   = beautiful.font_reg_xs,
   widget = wibox.widget.textbox,
 })
 
@@ -129,8 +129,8 @@ local datelist = wibox.widget({
 
 local function create_date_box(date)
   return wibox.widget({
-    markup = colorize(cal:format_date(date), beautiful.fg),
-    font   = beautiful.base_xsmall_font,
+    markup = colorize(cal:format_date(date), beautiful.fg_0),
+    font   = beautiful.font_reg_xs,
     align  = "left",
     valign = "top",
     forced_width = 150,
@@ -204,8 +204,8 @@ cal:connect_signal("input::request_get_info", function(_, type)
 end)
 
 local header = wibox.widget({
-  markup  = colorize("Upcoming Events", beautiful.fg),
-  font    = beautiful.alt_large_font,
+  markup  = colorize("Upcoming Events", beautiful.fg_0),
+  font    = beautiful.font_reg_l,
   align   = "center",
   valign  = "center",
   widget  = wibox.widget.textbox,
@@ -214,16 +214,16 @@ local header = wibox.widget({
 
 cal:connect_signal("selected::date", function(_, year, month, date)
   month = MONTH_NAMES[month]
-  local mkup = colorize('From ' .. month .. ' ' .. date .. ' ' .. year, beautiful.fg)
-  header:set_markup_silently(colorize(mkup, beautiful.fg))
+  local mkup = colorize('From ' .. month .. ' ' .. date .. ' ' .. year, beautiful.fg_0)
+  header:set_markup_silently(colorize(mkup, beautiful.fg_0))
 end)
 
 cal:connect_signal("header::reset", function()
-  header:set_markup_silently(colorize("Upcoming Events", beautiful.fg))
+  header:set_markup_silently(colorize("Upcoming Events", beautiful.fg_0))
 end)
 
 -- cal:connect_signal("deselected", function()
---   local mkup = colorize("Upcoming Events", beautiful.fg)
+--   local mkup = colorize("Upcoming Events", beautiful.fg_0)
 --   header:set_markup_silently(mkup)
 -- end)
 

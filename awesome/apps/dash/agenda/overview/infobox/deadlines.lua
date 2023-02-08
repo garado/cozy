@@ -15,8 +15,8 @@ local format_due_date = require("helpers").dash.format_due_date
 
 local tasklist = wibox.widget({
   wibox.widget({
-    markup = colorize("No tasks due this week. Yay!", beautiful.fg_sub),
-    font   = beautiful.base_small_font,
+    markup = colorize("No tasks due this week. Yay!", beautiful.fg_1),
+    font   = beautiful.font_reg_s,
     align  = "center",
     valign = "center",
     widget = wibox.widget.textbox,
@@ -30,7 +30,7 @@ local tasklist = wibox.widget({
 -- @param due Task due date.
 local function create_task(desc, due)
   local desc_wibox = wibox.widget({
-    markup = colorize(desc, beautiful.fg),
+    markup = colorize(desc, beautiful.fg_0),
     align = "left",
     ellipsize = "end",
     forced_width = dpi(290),
@@ -74,8 +74,8 @@ generate_tasklist()
 
 local widget = wibox.widget({
   wibox.widget({
-    markup  = colorize("Due this week", beautiful.fg),
-    font    = beautiful.alt_large_font,
+    markup  = colorize("Due this week", beautiful.fg_0),
+    font    = beautiful.font_reg_l,
     align   = "center",
     valign  = "center",
     widget  = wibox.widget.textbox,

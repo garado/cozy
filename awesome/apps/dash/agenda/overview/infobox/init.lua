@@ -14,9 +14,9 @@ local dpi = xresources.apply_dpi
 local area = require("modules.keynav.area")
 local navbg = require("modules.keynav.navitem").Background
 
-local weather   = require("apps.dash.agenda.weather")
-local deadlines = require("apps.dash.agenda.deadlines")
-local goals     = require("apps.dash.agenda.goals")
+local weather   = require(... .. ".weather")
+local deadlines = require(... .. ".deadlines")
+local goals     = require(... .. ".goals")
 
 local infobox_widgets = { weather, deadlines, goals }
 
@@ -29,7 +29,7 @@ local PREV = -1
 local function indicator()
   return wibox.widget({
     {
-      bg = beautiful.bg_l3,
+      bg = beautiful.bg_4,
       forced_width  = 5,
       forced_height = 5,
       shape = gears.shape.circle,
@@ -45,8 +45,8 @@ local indicators = wibox.widget({
   -----
   cur_active = 1,
   set_active = function(self, index)
-    self.children[self.cur_active].children[1].bg = beautiful.bg_l3
-    self.children[index].children[1].bg = beautiful.main_accent
+    self.children[self.cur_active].children[1].bg = beautiful.bg_4
+    self.children[index].children[1].bg = beautiful.primary_0
     self.cur_active = index
   end,
   init = function(self)

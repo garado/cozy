@@ -18,7 +18,7 @@ local agenda = require("core.system.cal")
 -------------------------
 
 local prompt_textbox = wibox.widget({
-  font    = beautiful.base_small_font,
+  font    = beautiful.font_reg_s,
   widget  = wibox.widget.textbox,
 })
 
@@ -28,13 +28,13 @@ local prompt_textbox = wibox.widget({
 -- @param text The initial textbox text.
 local function agenda_input(type, prompt, text)
   awful.prompt.run {
-    font         = beautiful.base_xsmall_font,
+    font         = beautiful.font_reg_xs,
     prompt       = prompt,
     text         = text or "",
-    fg           = beautiful.fg,
+    fg           = beautiful.fg_0,
     bg           = beautiful.task_prompt_textbg,
     shape        = gears.shape.rounded_rect,
-    bg_cursor    = beautiful.main_accent,
+    bg_cursor    = beautiful.primary_0,
     textbox      = prompt_textbox,
     exe_callback = function(input)
       if not input or #input == 0 then return end
@@ -82,7 +82,7 @@ end)
 
 local prompt_textbox_colorized = wibox.container.background()
 prompt_textbox_colorized:set_widget(prompt_textbox)
-prompt_textbox_colorized:set_fg(beautiful.fg)
+prompt_textbox_colorized:set_fg(beautiful.fg_0)
 
 agenda:connect_signal("prompt::clear", function()
   print('clearing this bitch')

@@ -12,24 +12,46 @@ local core    = require("helpers.core")
 
 local agenda = { }
 local instance = nil
-local cache_path = gfs.get_cache_dir() .. "cal"
+local CACHE_PATH = gfs.get_cache_dir() .. "cal"
 
 local curmonth  = tonumber(os.date("%m"))
-local curdate   = tonumber(os.date("%d"))
+
+local CONFIG = gfs.get_configuration_dir()
+local SECONDS_IN_DAY = 24 * 60 * 60
 
 ---------------------------------------------------------------------
+
+-- TODO put this somewhere better cause rn i keep copy pasting it places
+-- Convert date from gcalcli (YYYY-MM-DD) to a timestamp
+-- @return os.time timestamp
+local function date_to_int(date)
+  local pattern = "(%d%d%d%d)-(%d%d)-(%d%d)"
+  local xyear, xmon, xday = date:match(pattern)
+  return os.time({
+    year = xyear, month = xmon, day = xday,
+    hour = 0, min = 0, sec = 0})
+end
+
+-- Get year month date from YYYY-mm-dd
+-- @return year
+-- @return month
+-- @return date
+local function date_to_fields(date)
+  local ugh = core.split('-', date)
+  return ugh[1], ugh[2], ugh[3]
+end
 
 --- Checks if the cache is empty. If empty then gcalcli probably needs to be reauthenticated.
 -- Sends a notification asking if it should open the gcalcli reauthentication window.
 function agenda:check_cache_empty()
   -- First check if cache file exists (if not, then it creates it)
-  if not gfs.file_readable(cache_path) then
-    local cmd = "touch " .. cache_path
+  if not gfs.file_readable(CACHE_PATH) then
+    local cmd = "touch " .. CACHE_PATH
     awful.spawn.with_shell(cmd)
   end
 
   -- Then check empty
-  local cmd = "cat " .. cache_path
+  local cmd = "cat " .. CACHE_PATH
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     if stdout ~= "" then
       self:emit_signal("cache::not_empty")
@@ -41,7 +63,7 @@ end
 
 --- Use gcalcli cmd to write the last 5 months and next 5 months of data to cache
 function agenda:update_cache()
-  local cmd = "gcalcli agenda '5 months ago' '5 months' --details location --tsv > " .. cache_path
+  local cmd = "gcalcli agenda '5 months ago' '5 months' --details location --tsv > " .. CACHE_PATH
   awful.spawn.easy_async_with_shell(cmd, function(_)
     self:emit_signal("cache::updated")
     self:emit_signal("cache::not_empty")
@@ -57,10 +79,10 @@ function agenda:fetch_month(month, year)
   year  = year or tonumber(os.date("%Y"))
   month = tonumber(month) or curmonth
 
-  -- Command looks like: cat cache_path | grep 2022-07
+  -- Command looks like: cat CACHE_PATH | grep 2022-07
   local date = year .. "-" .. string.format("%02d", month)
   local grep = "grep " .. date
-  local cmd = "cat " .. cache_path .. " | "  .. grep
+  local cmd = "cat " .. CACHE_PATH .. " | "  .. grep
 
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     self.events[month] = {}
@@ -90,7 +112,7 @@ end
 --- Fetch the next few upcoming events starting from a given date.
 function agenda:fetch_upcoming(date)
   date = date or os.date("%Y-%m-%d")
-  local cmd = gfs.get_configuration_dir() .. "utils/fetchupcoming " .. cache_path .. " " .. date
+  local cmd = gfs.get_configuration_dir() .. "utils/fetchupcoming " .. CACHE_PATH .. " " .. date
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local upcoming = {}
 
@@ -106,6 +128,56 @@ function agenda:fetch_upcoming(date)
 
     self.upcoming = upcoming
     self:emit_signal("ready::upcoming")
+  end)
+end
+
+--- Fetches events from a date range. Date range is given in the form of 
+-- and "anchor" date and the number of days before/after the anchor date.
+-- i.e. it will fetch events in the range (anchor - days_before) to (anchor + days_after).
+function agenda:fetch_anchored_daterange(anchor, days_before, days_after)
+  anchor = anchor or os.date("%Y-%m-%d")
+
+  -- Convert to args for script
+  local anchor_ts = date_to_int(anchor)
+  local start_ts  = anchor_ts - (days_before * SECONDS_IN_DAY)
+  local end_ts    = anchor_ts + (days_after * SECONDS_IN_DAY)
+  local startdate = os.date("%Y-%m-%d", start_ts)
+  local enddate   = os.date("%Y-%m-%d", end_ts)
+  local args = CACHE_PATH .. ' ' .. startdate .. ' ' .. enddate
+
+  local cmd = CONFIG .. "utils/fetchrange " .. args
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    local lines = core.split("\r\n", stdout)
+    for i = 1, #lines do
+      -- Parse tsv and turn into table
+      local event = {}
+      local fields = core.split('\t', lines[i])
+      for j = 1, #fields do
+        event[#event+1] = fields[j]
+      end
+
+      -- Insert into database
+      -- TODO: optimize this, not sure how performant this is
+      local year, month, date = date_to_fields(event[self.START_DATE])
+      if not self.events[year] then self.events[year] = {} end
+      if not self.events[year][month] then self.events[year][month] = {} end
+      if not self.events[year][month][date] then self.events[year][month][date] = {} end
+      table.insert(self.events[year][month][date], event)
+    end
+
+    -- Tell UI components that they can update now
+    self:emit_signal("ready::weekview")
+  end)
+end
+
+--- Fetches events from a date range. Date range is given in the form of a
+-- start date and an end date, both in YYYY-MM-DD format.
+function agenda:fetch_daterange(startdate, enddate)
+  if not startdate or not enddate then return end
+  local args = CACHE_PATH .. ' ' .. startdate .. ' ' .. enddate
+  local cmd = CONFIG .. "utils/fetchrange"  .. args
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    print(stdout)
   end)
 end
 
@@ -304,8 +376,9 @@ function agenda:new()
   self:check_cache_empty()
 
   self:connect_signal("cache::not_empty", function()
-    self:fetch_month()
-    self:fetch_upcoming()
+    -- self:fetch_month()
+    -- self:fetch_upcoming()
+    self:fetch_anchored_daterange(nil, 7, 7)
   end)
 
   --- BUG: issues when directly setting execute_request as callback

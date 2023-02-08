@@ -10,8 +10,8 @@ local colorize = require("helpers.ui").colorize_text
 
 local goals = wibox.widget({
   wibox.widget({
-    markup = colorize("No goals so far.\nPerhaps you'd like to set some?", beautiful.fg_sub),
-    font   = beautiful.base_small_font,
+    markup = colorize("No goals so far.\nPerhaps you'd like to set some?", beautiful.fg_1),
+    font   = beautiful.font_reg_s,
     align  = "center",
     valign = "center",
     widget = wibox.widget.textbox,
@@ -22,8 +22,8 @@ local goals = wibox.widget({
 
 local widget = wibox.widget({
   {
-    markup = colorize("Weekly Goals", beautiful.fg),
-    font   = beautiful.alt_large_font,
+    markup = colorize("Weekly Goals", beautiful.fg_0),
+    font   = beautiful.font_reg_l,
     align  = "center",
     valign = "center",
     widget = wibox.widget.textbox,

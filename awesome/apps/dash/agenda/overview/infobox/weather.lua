@@ -13,9 +13,9 @@ local weather = require("modules.weather.weather")
 local config = require("cozyconf")
 
 local api_key = config.agenda.weather_api_key
-local coords  = config.agenda.weather_coordinates
+local coords  = config.agenda.weather_coords
 
-local cozyconf_valid = config and api_key and api_key ~= "" and coords and coords ~= ""
+local cozyconf_valid = config and api_key and api_key ~= "" and coords and #coords == 2
 
 local widget_to_display
 
@@ -35,20 +35,20 @@ if cozyconf_valid then
   })
 else
   widget_to_display = {
-    markup = colorize("Couldn't display weather.\nMaybe check your cozyconf?", beautiful.fg_sub),
+    markup = colorize("Couldn't display weather.\nMaybe check your cozyconf?", beautiful.fg_1),
     align  = "center",
     valign = "center",
-    font   = beautiful.base_small_font,
+    font   = beautiful.font_reg_s,
     widget = wibox.widget.textbox,
   }
 end
 
 local widget = wibox.widget({
   wibox.widget({
-    markup = colorize("Weekly Forecast", beautiful.fg),
+    markup = colorize("Weekly Forecast", beautiful.fg_0),
     align = "center",
     valign = "center",
-    font = beautiful.alt_large_font,
+    font = beautiful.font_reg_l,
     widget = wibox.widget.textbox,
   }),
   {
