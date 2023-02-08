@@ -7,13 +7,10 @@
 local beautiful   = require("beautiful")
 local xresources  = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
-local gears   = require("gears")
 local wibox   = require("wibox")
 local ui      = require("helpers.ui")
 local buscore = require("core.web.bus")
-local core    = require("helpers.core")
 local keynav  = require("modules.keynav")
-local config  = require("cozyconf")
 
 local select, nav_select = require(... .. ".select")()
 local track, nav_track   = require(... .. ".track")()

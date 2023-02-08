@@ -17,7 +17,7 @@ local TRACK  = 2
 
 local header = wibox.widget({
   markup = ui.colorize("Tracking the damn bus", beautiful.fg_0),
-  font   = beautiful.genfont("a", "r", "m"),
+  font   = beautiful.font_reg_m,
   align  = "center",
   widget = wibox.widget.textbox,
   -----
@@ -30,6 +30,7 @@ local header = wibox.widget({
 
 local last_updated = wibox.widget({
   align  = "center",
+  font   = beautiful.font_reg_s,
   widget = wibox.widget.textbox,
   -----
   update = function(self)
@@ -42,7 +43,7 @@ local last_updated = wibox.widget({
 local stop_button = ui.simple_button({
   text = "Stop tracking the damn bus",
   bg   = beautiful.bg_2,
-  font = beautiful.genfont("b", "l", "s"),
+  font = beautiful.font_light_s,
   margins = {
     left   = dpi(15),
     right  = dpi(15),
@@ -63,7 +64,7 @@ local nav_stop_button = keynav.navitem.background({
 
 local placeholder = wibox.widget({
   markup = ui.colorize("Loading...", beautiful.fg_0),
-  font   = beautiful.genfont("b", "l", "s"),
+  font   = beautiful.font_light_s,
   widget = wibox.widget.textbox,
 })
 
@@ -89,9 +90,9 @@ local function update_arrivals()
     local metro_arr  = info[buscore.METRO_ARR]
     local scheduled  = info[buscore.SCHEDULED_TIME]
 
-    local text = "in " .. time_until
+    local metro_text = ""
     if info[buscore.METRO_ARR] then
-      text = text .. " (arr. " .. info[buscore.METRO_ARR].. ")"
+      metro_text = " (arr. " .. info[buscore.METRO_ARR].. ")"
     end
 
     local arrival = wibox.widget({
@@ -99,15 +100,24 @@ local function update_arrivals()
         forced_width = dpi(50),
         markup = ui.colorize("   " .. route_name, beautiful.fg_0),
         align  = "left",
-        font   = beautiful.genfont("b", "r", "s"),
+        font   = beautiful.font_med_s,
         widget = wibox.widget.textbox,
       },
       nil,
       {
-        markup = ui.colorize(text, beautiful.fg_0),
-        align  = "end",
-        font   = beautiful.genfont("b", "l", "s"),
-        widget = wibox.widget.textbox,
+        { -- in x min
+          markup = ui.colorize("in " .. time_until, beautiful.fg_0),
+          align  = "end",
+          font   = beautiful.font_light_s,
+          widget = wibox.widget.textbox,
+        },
+        { -- arrival to metro
+          markup = ui.colorize(metro_text, beautiful.fg_1),
+          align  = "end",
+          font   = beautiful.font_light_s,
+          widget = wibox.widget.textbox,
+        },
+        layout = wibox.layout.fixed.horizontal,
       },
       fill_space = false,
       layout  = wibox.layout.fixed.horizontal,

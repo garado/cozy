@@ -45,6 +45,7 @@ for i = 1, #config.bus do
   local text = config.bus[i].from .."  ".. config.bus[i].to
   local label = wibox.widget({
     markup = ui.colorize(text, beautiful.fg_0),
+    font   = beautiful.font_reg_s,
     widget = wibox.widget.textbox,
   })
 
@@ -85,14 +86,15 @@ function deselect_options()
 end
 
 local header = wibox.widget({
-  markup = ui.colorize("Where's the damn bus?", beautiful.fg_0),
-  font   = beautiful.genfont("a", "r", "m"),
+  markup = ui.colorize("Where's the damn bus?", beautiful.primary_0),
+  font   = beautiful.font_med_m,
   align  = "center",
   widget = wibox.widget.textbox,
 })
 
 local subheader = wibox.widget({
   markup = ui.colorize("Select route to begin", beautiful.fg_0),
+  font   = beautiful.font_reg_s,
   align  = "center",
   widget = wibox.widget.textbox,
 })

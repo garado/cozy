@@ -124,7 +124,7 @@ function bus:get_data_single_stop(stop)
         if min <= 10 then
           local title = "Trip from " .. self.route_info["from"] .. " to " .. self.route_info["to"]
           local msg = self.data[i][ROUTE] .. " coming in " .. min .. " minutes"
-          -- pushover:post(title, msg)
+          pushover:post(title, msg)
           break
         end
       end
