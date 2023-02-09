@@ -9,6 +9,9 @@ local CWD = gfs.get_configuration_dir() .. "cozyconf/"
 
 return {
 
+  -- █▄▄ █▀█ █▀█ █▄▀ █▀▄▀█ ▄▀█ █▀█ █▄▀ █▀ 
+  -- █▄█ █▄█ █▄█ █░█ █░▀░█ █▀█ █▀▄ █░█ ▄█ 
+
   bookmarks = {
     -- The path to the json file to read bookmarks from.
     path = CWD .. "samplefiles/bookmarks.json",
@@ -18,6 +21,19 @@ return {
 
     -- If quicklinks popup should close after opening a new link.
     close_after_opening_link = false,
-  }
+  },
+
+
+  -- █▀▀ █▀█ █▄░█ ▀█▀ █▀█ █▀█ █░░ 
+  -- █▄▄ █▄█ █░▀█ ░█░ █▀▄ █▄█ █▄▄ 
+
+  control = {
+
+    -- Latitude and longitude for nightshift
+    nightshift = {
+      lat  = 32,
+      long = -122,
+    }
+  },
 
 }

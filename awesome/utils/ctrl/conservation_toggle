@@ -1,0 +1,11 @@
+#!/bin/bash
+
+status=$(ideapad-cm status)
+
+if [[ $status == *"enabled"* ]]; then
+  ideapad-cm disable
+  echo "Disabling conservation mode"
+else
+  ideapad-cm enable
+  echo "Enabling conservation mode"
+fi

@@ -5,42 +5,41 @@
 -- Shows CPU, RAM, and disk usage.
 -- Credit: rxyhn
 
-local beautiful = require("beautiful")
-local colorize = require("helpers").ui.colorize_text
-local wibox = require("wibox")
+local beautiful  = require("beautiful")
 local xresources = require("beautiful.xresources")
-local dpi = xresources.apply_dpi
-local watch = require("awful.widget.watch")
+local dpi        = xresources.apply_dpi
+local wibox   = require("wibox")
+local watch   = require("awful.widget.watch")
+local ui      = require("helpers.ui")
 local control = require("core.cozy.control")
 
---- Helper function to create UI.
--- @param name The label
--- @param accent_color The... accent color
-local function create_stats_ui(name, accent_color)
+--- Helper function to create stats UI
+-- @param name The stat label
+local function create_stats_ui(name)
   local label = wibox.widget({
-    markup = colorize(name, accent_color),
-    align = "right",
-    valign = "center",
     forced_width = dpi(50),
+    font   = beautiful.font_reg_s,
+    markup = ui.colorize(name, beautiful.primary_0),
+    align  = "right",
     widget = wibox.widget.textbox,
   })
 
   local percent = wibox.widget({
-    markup = colorize("0%", beautiful.ctrl_fg),
-    align = "center",
-    valign = "center",
     forced_width = dpi(40),
+    markup = ui.colorize("0%", beautiful.fg_0),
+    font   = beautiful.font_reg_s,
+    align  = "center",
     widget = wibox.widget.textbox,
   })
 
   local bar = wibox.widget({
-    border_width = dpi(0),
-    color = accent_color,
-    background_color = beautiful.ctrl_stats_bg,
-    max_value = 100,
+    background_color = beautiful.bg_3,
+    border_width  = dpi(0),
     forced_height = dpi(5),
-    forced_width = dpi(175),
-    widget = wibox.widget.progressbar
+    forced_width  = dpi(175),
+    max_value = 100,
+    color     = beautiful.primary_0,
+    widget    = wibox.widget.progressbar
   })
 
   return wibox.widget({
@@ -51,16 +50,18 @@ local function create_stats_ui(name, accent_color)
       widget = wibox.container.place,
     },
     spacing = dpi(7),
-    layout = wibox.layout.fixed.horizontal,
+    layout  = wibox.layout.fixed.horizontal,
   })
 end
 
+
 -- █▀▀ █▀█ █░█ 
--- █▄▄ █▀▀ █▄█ 
+-- █▄▄ █▀▀ █▄█
+
 local function cpu()
-  local ui = create_stats_ui("cpu", beautiful.ctrl_cpu_accent)
-  local percent = ui.children[2]
-  local bar = ui.children[3].children[1]
+  local cpu_ui = create_stats_ui("cpu")
+  local per = cpu_ui.children[2]
+  local bar = cpu_ui.children[3].children[1]
 
 	local _, cpu_timer = watch(
 		[[sh -c "
@@ -68,35 +69,28 @@ local function cpu()
 		"]],
 		5,
 		function(_, stdout)
-			local cpu_idle = stdout
-			cpu_idle = string.gsub(cpu_idle, "^%s*(.-)%s*$", "%1")
+			local cpu_idle  = string.gsub(stdout, "^%s*(.-)%s*$", "%1")
       local cpu_value = 100 - tonumber(cpu_idle)
+      local mkup = ui.colorize(cpu_value.."%", beautiful.fg_0)
+
       bar.value = cpu_value
-      local markup = colorize(cpu_value.."%", beautiful.ctrl_fg)
-      percent:set_markup_silently(markup)
+      per:set_markup_silently(mkup)
+
 			collectgarbage("collect")
 		end
 	)
 
-  control:connect_signal("newstate::opened", function()
-    if not cpu_timer.started then
-      cpu_timer:start()
-    end
-  end)
-
-  control:connect_signal("newstate::closed", function()
-    cpu_timer:stop()
-  end)
-
-  return ui
+  return cpu_ui, cpu_timer
 end
+
 
 -- █▀█ ▄▀█ █▀▄▀█ 
 -- █▀▄ █▀█ █░▀░█ 
+
 local function ram()
-  local ui = create_stats_ui("ram", beautiful.ctrl_ram_accent)
-  local percent = ui.children[2]
-  local bar = ui.children[3].children[1]
+  local ram_ui = create_stats_ui("ram")
+  local per = ram_ui.children[2]
+  local bar = ram_ui.children[3].children[1]
 
   local _, ram_timer = watch(
 		[[sh -c "
@@ -104,70 +98,71 @@ local function ram()
 		"]],
 		20,
 		function(_, stdout)
-			local available = stdout:match("(.*)@@")
+			local avail = stdout:match("(.*)@@")
 			local total = stdout:match("@@(.*)@")
-			local used = tonumber(total) - tonumber(available)
-			local used_ram_percentage = (used / total) * 100
-      used_ram_percentage = math.floor(used_ram_percentage)
-      bar.value = used_ram_percentage
-      local markup = colorize(used_ram_percentage.."%", beautiful.ctrl_fg)
-      percent:set_markup_silently(markup)
+			local used  = tonumber(total) - tonumber(avail)
+			local used_per = math.floor((used / total) * 100)
+      local mkup  = ui.colorize(used_per .."%", beautiful.fg_0)
+
+      bar.value = used_per
+      per:set_markup_silently(mkup)
+
 			collectgarbage("collect")
 		end
 	)
 
-  control:connect_signal("newstate::opened", function()
-    if not ram_timer.started then
-      ram_timer:start()
-    end
-  end)
-
-  control:connect_signal("newstate::closed", function()
-    ram_timer:stop()
-  end)
-
-  return ui
+  return ram_ui, ram_timer
 end
 
--- █▀▄ █ █▀ █▄▀ 
--- █▄▀ █ ▄█ █░█ 
+
+-- █▀▄ █ █▀ █▄▀
+-- █▄▀ █ ▄█ █░█
+
 local function disk()
-  local ui = create_stats_ui("hdd", beautiful.ctrl_hdd_accent)
-  local percent = ui.children[2]
-  local bar = ui.children[3].children[1]
+  local disk_ui = create_stats_ui("hdd")
+  local per = disk_ui.children[2]
+  local bar = disk_ui.children[3].children[1]
 
   -- Update every 10 minutes
   local cmd = [[bash -c "df -h /home|grep '^/' | awk '{print $5}'"]]
 	local _, disk_timer = watch(cmd, 600, function(_, stdout)
-		local space_consumed = stdout:match("(%d+)")
-    bar.value = tonumber(space_consumed)
-    local markup = colorize(space_consumed.."%", beautiful.ctrl_fg)
-    percent:set_markup_silently(markup)
+		local space_used = tonumber(stdout:match("(%d+)"))
+    local mkup = ui.colorize(space_used.."%", beautiful.ctrl_fg)
+
+    bar.value = space_used
+    per:set_markup_silently(mkup)
+
 		collectgarbage("collect")
 	end)
 
-  control:connect_signal("newstate::opened", function()
-    if not disk_timer.started then
-      disk_timer:start()
-    end
-  end)
-
-  control:connect_signal("newstate::closed", function()
-    disk_timer:stop()
-  end)
-
-  return ui
+  return disk_ui, disk_timer
 end
+
+local cpu_ui, cpu_timer = cpu()
+local ram_ui, ram_timer = ram()
+local ssd_ui, ssd_timer = disk()
 
 local widget = wibox.widget({
   {
-    cpu(),
-    ram(),
-    disk(),
+    cpu_ui,
+    ram_ui,
+    ssd_ui,
     spacing = dpi(10),
-    layout = wibox.layout.fixed.vertical,
+    layout  = wibox.layout.fixed.vertical,
   },
   widget = wibox.container.place,
 })
+
+control:connect_signal("setstate::open", function()
+  cpu_timer:start()
+  ram_timer:start()
+  ssd_timer:start()
+end)
+
+control:connect_signal("setstate::close", function()
+  cpu_timer:stop()
+  ram_timer:stop()
+  ssd_timer:stop()
+end)
 
 return widget

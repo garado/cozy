@@ -2,70 +2,66 @@
 -- █▀▀ █▀▀ ▀█▀ █▀▀ █░█ 
 -- █▀░ ██▄ ░█░ █▄▄ █▀█ 
 
-local awful = require("awful")
 local beautiful = require("beautiful")
-local helpers = require("helpers")
-local gfs = require("gears.filesystem")
-local wibox = require("wibox")
 local xresources = require("beautiful.xresources")
-local dpi = xresources.apply_dpi
+local dpi   = xresources.apply_dpi
+local awful = require("awful")
+local ui    = require("helpers.ui")
+local gfs   = require("gears.filesystem")
+local wibox = require("wibox")
 
--- Base widget to append to
-local widget = wibox.widget({
-  {
-    spacing = dpi(2),
-    layout = wibox.layout.fixed.vertical,
-  },
-  widget = wibox.container.place,
+local CFG = gfs.get_configuration_dir()
+
+local fetchlist = wibox.widget({
+  spacing = dpi(2),
+  layout  = wibox.layout.fixed.vertical,
 })
 
--- Make output look pretty
-local function create_entry(title, value)
-  -- Make things pretty
-  local colorized_title = helpers.ui.colorize_text(title .. " " , beautiful.ctrl_fetch_accent)
-  local colorized_value = helpers.ui.colorize_text(value, beautiful.ctrl_fetch_value)
-  local entry = wibox.widget({
-    {
-      markup = colorized_title,
-      widget = wibox.widget.textbox,
-      forced_width = dpi(100),
-      align = "right",
-      valign = "top",
-    },
-    {
-      markup = colorized_value,
-      widget = wibox.widget.textbox,
-      forced_width = dpi(100),
-      align = "left",
-      valign = "top",
-    },
-    layout = wibox.layout.flex.horizontal,
-  })
+local function create_entry(_title, _value)
+  local title = ui.colorize(_title .. " " , beautiful.primary_0)
+  local value = ui.colorize(_value, beautiful.fg_0)
 
-  -- Insert into widget
-  widget.children[1]:add(entry)
+  return wibox.widget({
+    {
+      forced_width = dpi(100),
+      font   = beautiful.font_reg_s,
+      markup = title,
+      align  = "right",
+      valign = "top",
+      widget = wibox.widget.textbox,
+    },
+    {
+      forced_width = dpi(100),
+      font   = beautiful.font_reg_s,
+      markup = value,
+      align  = "left",
+      valign = "top",
+      widget = wibox.widget.textbox,
+    },
+    spacing = dpi(5),
+    layout  = wibox.layout.flex.horizontal,
+  })
 end
 
--- extract data from script stdout
+-- Extract data from script stdout
 local function extract_entry(out, name)
   local val = out:match(name .. ":(.-)\n")
   if not val then return end
   val = string.gsub(val, val .. ":", "")
   val = string.lower(val)
-  create_entry(name, val)
+  local entry = create_entry(name, val)
+  fetchlist:add(entry)
 end
 
-local function create_fetch()
-  local cfg = gfs.get_configuration_dir()
-  local script = cfg .. "utils/dash/fetch"
-  awful.spawn.easy_async_with_shell(script, function(stdout)
-    extract_entry(stdout, "os")
-    extract_entry(stdout, "host")
-    extract_entry(stdout, "wm")
-    extract_entry(stdout, "pkg")
-  end)
-end
+local script = CFG .. "utils/dash/fetch"
+awful.spawn.easy_async_with_shell(script, function(stdout)
+  extract_entry(stdout, "os")
+  extract_entry(stdout, "host")
+  extract_entry(stdout, "wm")
+  extract_entry(stdout, "pkg")
+end)
 
-create_fetch()
-
-return widget
+return wibox.widget({
+  fetchlist,
+  widget = wibox.container.place,
+})

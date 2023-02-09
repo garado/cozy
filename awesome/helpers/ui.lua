@@ -2,13 +2,16 @@
 -- █░█ █   █░█ █▀▀ █░░ █▀█ █▀▀ █▀█ █▀
 -- █▄█ █   █▀█ ██▄ █▄▄ █▀▀ ██▄ █▀▄ ▄█
 
-local wibox = require("wibox")
-local gears = require("gears")
+local wibox  = require("wibox")
+local gears  = require("gears")
 local gshape = require("gears.shape")
-local beautiful = require("beautiful")
+local naughty    = require("naughty")
+local beautiful  = require("beautiful")
 local xresources = require("beautiful.xresources")
-local dpi = xresources.apply_dpi
+local dpi  = xresources.apply_dpi
 local capi = { mouse = mouse }
+
+local control = require("core.cozy.control")
 
 local _ui = {}
 
@@ -65,9 +68,9 @@ end
 
 function _ui.create_dash_widget_header(text)
   return wibox.widget({
-    markup = _ui.colorize_text(text, beautiful.dash_header_fg),
-    font = beautiful.alt_large_font,
-    align = "center",
+    markup = _ui.colorize_text(text, beautiful.primary_0),
+    font   = beautiful.font_med_m,
+    align  = "center",
     valign = "center",
     widget = wibox.widget.textbox,
   })
@@ -96,6 +99,7 @@ function _ui.horizontal_pad(width)
 end
 
 function _ui.rrect(radius)
+  radius = radius or beautiful.ui_border_radius
 	return function(cr, width, height)
 		gshape.rounded_rect(cr, width, height, radius)
 	end
@@ -121,14 +125,15 @@ end
 
 function _ui.simple_button(args)
   local text = args.text
-  local fg   = args.fg or beautiful.fg
-  local font = args.font or beautiful.base_small_font
-  local width  = args.width
-  local height = args.height
-  local bg   = args.bg or beautiful.red
+  local fg   = args.fg or beautiful.fg_0
+  local font = args.font or beautiful.font_reg_s
+  local bg   = args.bg or beautiful.bg_3
+  local shape   = args.shape
+  local width   = args.width
+  local height  = args.height
   local margins = args.margins or dpi(6)
 
-  return wibox.widget({
+  local button = wibox.widget({
     {
       {
         {
@@ -144,12 +149,59 @@ function _ui.simple_button(args)
       },
       forced_width  = width,
       forced_height = height,
-      shape  = gears.shape.rounded_rect,
+      shape  = shape or gears.shape.rounded_rect,
       bg     = bg,
       widget = wibox.container.background,
     },
     widget = wibox.container.place,
+    ------
+    get_bg_wibox = function(self)
+      return self.children[1]
+    end,
+    get_text_wibox = function(self)
+      return self.children[1].children[1].children[1]
+    end,
   })
+
+  local nav_button = require("modules.keynav").navitem.background({
+    widget  = button:get_bg_wibox(),
+    bg_off  = args.bg      or beautiful.bg_3,
+    bg_on   = args.bg_on   or beautiful.bg_6,
+    release = args.release or nil
+  })
+
+  return button, nav_button
 end
+
+function _ui.quick_action(name, icon)
+  local qa = _ui.simple_button({
+    text   = icon,
+    bg     = beautiful.bg_3,
+    width  = dpi(50),
+    height = dpi(50),
+  })
+
+  local nav_qa = require("modules.keynav").navitem.background({
+    widget = qa.children[1],
+    bg_off = beautiful.bg_3,
+    bg_on  = beautiful.bg_4,
+    name   = name,
+    custom_on = function(self)
+      control:emit_signal("qaction::selected", self.name)
+    end,
+  })
+
+  return qa, nav_qa
+end
+
+function _ui.qa_notify(title, msg, timeout)
+  naughty.notification {
+    app_name = "Quick actions",
+    title    = title,
+    message  = msg,
+    timeout  = timeout or 2,
+  }
+end
+
 
 return _ui
