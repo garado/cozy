@@ -76,10 +76,12 @@ require("core.system.task.signals")(task)
 
 function task:reset()
   self.inits_complete = 0
+  self.tags = {}
   self:parse_tags()
 end
 
 function task:new()
+  self.old_task_index = 1
   self.inits_complete = 0
   self.show_waiting = false
   self.tags = {}
