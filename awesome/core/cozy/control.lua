@@ -27,7 +27,7 @@ function control:close()
 end
 
 function control:open()
-  cozy:close_all()
+  cozy:close_all_except("control")
   self:emit_signal("setstate::open")
   self.visible = true
 end

@@ -27,7 +27,7 @@ function launcher:close()
 end
 
 function launcher:open()
-  cozy:close_all()
+  cozy:close_all_except()
   self:emit_signal("setstate::open")
   self.visible = true
 end

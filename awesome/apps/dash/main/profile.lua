@@ -2,16 +2,15 @@
 -- █▀█ █▀█ █▀█ █▀▀ █ █░░ █▀▀
 -- █▀▀ █▀▄ █▄█ █▀░ █ █▄▄ ██▄
 
-local wibox = require("wibox")
-local beautiful = require("beautiful")
+local beautiful  = require("beautiful")
 local xresources = require("beautiful.xresources")
-local dpi = xresources.apply_dpi
-local gears = require("gears")
-local colorize = require("helpers.ui").colorize_text
-local box = require("helpers.ui").create_boxed_widget
 local config = require("cozyconf")
-local dash = require("core.cozy.dash")
-local math = math
+local dpi   = xresources.apply_dpi
+local wibox = require("wibox")
+local gears = require("gears")
+local ui    = require("helpers.ui")
+local dash  = require("core.cozy.dash")
+local math  = math
 
 local pfp = wibox.widget({
   {
@@ -31,27 +30,26 @@ local pfp = wibox.widget({
 })
 
 local name = wibox.widget({
+  markup  = ui.colorize(config.display_name or "Display Name", beautiful.primary_0),
   align   = "center",
   valign  = "center",
-  font    = beautiful.base_large_font,
-  markup  = colorize(config.display_name or "Display Name", beautiful.prof_name_fg),
+  font    = beautiful.font_reg_l,
   widget  = wibox.widget.textbox,
 })
 
 local title = wibox.widget({
-  font    = beautiful.base_small_font,
-  markup  = colorize("Uses Arch, btw", beautiful.fg),
+  markup  = ui.colorize("Uses Arch, btw", beautiful.fg_0),
+  font    = beautiful.font_reg_s,
   align   = "center",
   valign  = "center",
   widget  = wibox.widget.textbox,
 })
 
 -- New title every time you open dash
--- BUG: this signal isn't being emitted properly...
 dash:connect_signal("setstate::close", function()
-  local titles_list = config.titles or { "Linux enthusiast" }
+  local titles_list  = config.titles or { "Linux enthusiast" }
   local random_title = titles_list[math.random(#titles_list)]
-  title:set_markup(colorize(random_title, beautiful.fg))
+  title:set_markup(ui.colorize(random_title, beautiful.fg_0))
 end)
 
 local profile = wibox.widget({
@@ -69,4 +67,4 @@ local profile = wibox.widget({
   widget = wibox.container.place,
 })
 
-return box(profile, dpi(400), dpi(180), beautiful.dash_bg)
+return ui.box(profile, dpi(400), dpi(200), beautiful.dash_bg)

@@ -27,7 +27,7 @@ function dash:close()
 end
 
 function dash:open()
-  cozy:close_all()
+  cozy:close_all_except("dash")
   self:emit_signal("setstate::open")
   self.visible = true
 end

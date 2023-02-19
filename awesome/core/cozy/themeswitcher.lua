@@ -37,7 +37,7 @@ function themeswitcher:close()
 end
 
 function themeswitcher:open()
-  cozy:close_all()
+  cozy:close_all_except("themeswitcher")
   self:emit_signal("setstate::open")
   self.visible = true
 end

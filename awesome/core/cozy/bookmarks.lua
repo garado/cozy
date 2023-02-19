@@ -57,7 +57,7 @@ function bookmarks:close()
 end
 
 function bookmarks:open()
-  cozy:close_all()
+  cozy:close_all_except("bookmarks")
   self:emit_signal("setstate::open")
   self.visible = true
 end
