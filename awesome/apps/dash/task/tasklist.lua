@@ -8,11 +8,12 @@ local xresources  = require("beautiful.xresources")
 local gears       = require("gears")
 local keynav      = require("modules.keynav")
 local colorize    = require("helpers.ui").colorize_text
+local helpers     = require("helpers")
 local format_due_date = require("helpers.dash").format_due_date
 local dpi   = xresources.apply_dpi
 local task  = require("core.system.task")
 
-local MAX_TASKS_SHOWN = 21
+local MAX_TASKS_SHOWN = 19
 local MAX_TASKLIST_HEIGHT = dpi(580)
 
 local first_position_index = 1
@@ -29,7 +30,7 @@ local function total_overflow()
 end
 
 local tasklist = wibox.widget({
-  spacing = dpi(8),
+  spacing = dpi(11),
   layout = wibox.layout.fixed.vertical,
 })
 
@@ -38,7 +39,7 @@ local scrollbar = wibox.widget({
   {
     id            = "bar",
     value         = 0,
-    forced_height = dpi(5), -- since it's rotated, this is width
+    forced_height = dpi(3), -- since it's rotated, this is width
     bar_color     = beautiful.task_scrollbar_bg,
     handle_color  = beautiful.task_scrollbar_fg,
     handle_border_width = 0,
@@ -60,7 +61,9 @@ local tasklist_widget = wibox.widget({
   {
     scrollbar_cont,
     tasklist,
-    layout = wibox.layout.align.horizontal,
+    spacing = dpi(7),
+    fill_space = true,
+    layout  = wibox.layout.fixed.horizontal,
   },
   height = MAX_TASKLIST_HEIGHT,
   widget = wibox.container.constraint,
@@ -76,52 +79,59 @@ local nav_tasklist = keynav.area({
   circular = true
 })
 
---- Creates a single task wibox.
-local function create_task_wibox(task_table)
+--- Creates wibox and navitem for a single task.
+local function create_task(task_table, index)
   local desc  = task_table["description"]
   local due   = task_table["due"] or ""
   local start = task_table["start"]
   local wait  = task_table["wait"]
 
+  local wait_passed
+  if wait then
+    local wait_ts = helpers.dash.ts_str_to_ts(wait)
+    local now_ts = os.time()
+    wait_passed = wait_ts < now_ts
+  end
+
   desc = desc:gsub("%^l", string.upper)
-  local taskname_color = (start and beautiful.green) or (wait and beautiful.fg_sub) or beautiful.fg
+  local taskname_color = (start and beautiful.green) or ((wait and not wait_passed) and beautiful.fg_1) or beautiful.fg_0
   local taskname = wibox.widget({
-    markup = colorize(desc, taskname_color),
-    font = beautiful.base_small_font,
     ellipsize = "end",
-    widget = wibox.widget.textbox,
+    markup  = colorize(desc, taskname_color),
+    font    = beautiful.font_reg_s,
+    widget  = wibox.widget.textbox,
   })
 
   local due_text = format_due_date(due)
-  local due_color = task_table["urgency"] > 7 and beautiful.red or beautiful.fg_sub
+  local due_color = task_table["urgency"] > 7 and beautiful.red or beautiful.fg_1
   local due_ = wibox.widget({
     markup = colorize(due_text, due_color),
-    font   = beautiful.base_small_font,
+    font   = beautiful.font_reg_s,
     halign = "right",
     align  = "center",
     widget = wibox.widget.textbox,
   })
 
-  return wibox.widget({
+  local task_wibox = wibox.widget({
     taskname,
     nil,
     due_,
     forced_height = dpi(20),
     layout = wibox.layout.align.horizontal,
   })
-end
 
-local function create_task_nav(task_wibox, task_table, index)
-  return keynav.navitem.textbox({
+  local task_nav = keynav.navitem.textbox({
     widget = task_wibox.children[1], -- highlight description only
     index  = index,
-    fg_off = (task_table["start"] and beautiful.green)
-      or (task_table["wait"] and beautiful.fg_sub) or beautiful.fg,
+    fg_off = (start and beautiful.green)
+      or ((wait and not wait_passed) and beautiful.fg_1) or beautiful.fg_0,
     custom_on = function(self)
       task:set_focused_task(task_table, self.index)
       task:emit_signal("selected::task")
     end,
   })
+
+  return task_wibox, task_nav
 end
 
 --- note from a month later: dont really understand this anymore lol but it works
@@ -210,11 +220,17 @@ task:connect_signal("tasklist::update", function(_, tag, project)
 
   local json_tasklist = task.tags[tag].projects[project].tasks
   for i = 1, #json_tasklist do
-    local task_wibox = create_task_wibox(json_tasklist[i])
-    local ntask = create_task_nav(task_wibox, json_tasklist[i], i)
+    local task_wibox, ntask = create_task(json_tasklist[i], i)
+    -- local ntask = create_task_nav(task_wibox, json_tasklist[i], i)
 
-    if json_tasklist[i]["wait"] and not task.show_waiting then
-      goto continue
+    -- If a task has a wait date make sure it's on or after the wait date
+    -- before displaying
+    if json_tasklist[i]["wait"] then
+      local wait_ts = helpers.dash.ts_str_to_ts(json_tasklist[i]["wait"])
+      local now_ts = os.time()
+      if not (wait_ts < now_ts) and not task.show_waiting then
+        goto update_continue
+      end
     end
 
     nav_tasklist:append(ntask)
@@ -224,7 +240,7 @@ task:connect_signal("tasklist::update", function(_, tag, project)
       tasklist:add(task_wibox)
     end
 
-    ::continue::
+    ::update_continue::
   end
 
   -- Scrollbar UI
@@ -253,7 +269,7 @@ task:connect_signal("selected::task", function()
 
   local last_position_index = first_position_index + MAX_TASKS_SHOWN - 1
   local index     = task.task_index
-  local old_index = task.old_task_index
+  local old_index = task.old_task_index or 1
   local gap = math.abs(index - old_index)
   local num_pending_tasks = #task.tags[task.focused_tag].projects[task.focused_project].tasks -- ew
 

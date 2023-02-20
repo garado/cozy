@@ -8,6 +8,19 @@ local ui = require("helpers.ui")
 
 local _dash = {}
 
+function _dash.ts_str_to_ts(str)
+  local pattern = "(%d%d%d%d)(%d%d)(%d%d)T(%d%d)(%d%d)(%d%d)Z"
+  local xyear, xmon, xday, xhr, xmin, xsec = str:match(pattern)
+  local ts = os.time({
+    year = xyear, month = xmon, day = xday,
+    hour = xhr, min = xmin, sec = xsec })
+
+  -- Account for timezone (america/los_angeles: -8 hours)
+  ts = ts - (8 * 60 * 60)
+
+  return ts
+end
+
 function _dash.format_due_date(due)
   if not due or due == "" then return "no due date" end
 
@@ -67,7 +80,7 @@ end
 function _dash.widget_header(text)
   return wibox.widget({
     markup = ui.colorize_text(text, beautiful.dash_header_fg),
-    font = beautiful.alt_large_font,
+    font = beautiful.font_reg_l,
     align = "center",
     valign = "center",
     widget = wibox.widget.textbox,
