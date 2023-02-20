@@ -21,7 +21,7 @@ opt.hlsearch = true
 
 -- Line numbers
 opt.number = true
-opt.relativenumber = true
+-- opt.relativenumber = true
 
 -- Enable move cursor with mouse
 opt.mouse = "a"

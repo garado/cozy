@@ -5,7 +5,7 @@
 local present, nvim_tree = pcall(require, "nvim-tree")
 if not present then return end
 
-nvim_tree.setup {
+nvim_tree.setup({
   filters = {
     dotfiles = false,
   },
@@ -46,10 +46,10 @@ nvim_tree.setup {
 
     icons = {
       show = {
+        git = false,
         file = true,
         folder = true,
         folder_arrow = true,
-        git = false,
       },
 
       glyphs = {
@@ -77,4 +77,4 @@ nvim_tree.setup {
       },
     },
   },
-}
+})

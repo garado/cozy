@@ -8,6 +8,7 @@
 set nocompatible
 filetype plugin on
 syntax on
+let g:vimwiki_global_ext = 1
 
 " Vault settings
 let vault = {}
@@ -35,15 +36,6 @@ let vault.nested_syntaxes = { 'lua': 'lua', 'sh': 'bash', 'c': 'c', 'python': 'p
 let g:vimwiki_list = [ vault, cozy ]
 let g:vimwiki_toc_header = 'contents'
 
-" Define custom header colors
-let g:vimwiki_hl_headers = 1
-hi VimwikiHeader1 guifg=#bf616a
-hi VimwikiHeader2 guifg=#d08770
-hi VimwikiHeader3 guifg=#ebcb8b
-hi VimwikiHeader4 guifg=#a3be8c
-hi VimwikiHeader5 guifg=#b48ead
-hi VimwikiHeader6 guifg=#8fbcbb
-
 " Source other files
 let vimwiki_cfg_dir = '$HOME/.config/nvim/lua/plugins/config/vimwiki/'
 let autoheader = vimwiki_cfg_dir . 'autoheader.vim'
@@ -55,4 +47,3 @@ exe 'source ' . autoheader
 exe 'source ' . autocommit
 exe 'source ' . blankline
 exe 'source ' . links
-

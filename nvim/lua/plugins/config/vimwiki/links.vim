@@ -5,7 +5,6 @@
 " Custom link handler
 
 function! HandlePdf(link)
-
     " Use Vim to open ext files with the 'vfile:' scheme
     "if link =~# '^vfile:'
     "  let link = link[1:]
@@ -33,7 +32,7 @@ function! HandlePdf(link)
       return 0
     else
       exe 'edit ' . fnameescape(link_infos.filename)
-      exe 'bd' . buf
+      exe 'bd ' . buf
       let vimwiki_prev_link = [vimwiki#path#current_wiki_file(), getpos('.')]
       return 1
     endif
