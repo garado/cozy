@@ -17,9 +17,9 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- List of plugins is spread throughout a bunch of files
--- Crush them together then pass them to lazy
+-- Concatenate them, then pass the resulting plugin table to lazy
 
-local function crush(t1, t2)
+local function concat(t1, t2)
   for i = 1, #t2 do
     t1[#t1+1] = t2[i]
   end
@@ -36,7 +36,7 @@ local plugin_files = {
 local plugins = {}
 
 for i = 1, #plugin_files do
-  crush(plugins, plugin_files[i])
+  concat(plugins, plugin_files[i])
 end
 
 require("lazy").setup{plugins}

@@ -37,7 +37,7 @@ let g:vimwiki_list = [ vault, cozy ]
 let g:vimwiki_toc_header = 'contents'
 
 " Source other files
-let vimwiki_cfg_dir = '$HOME/.config/nvim/lua/plugins/config/vimwiki/'
+let vimwiki_cfg_dir = '$HOME/.config/nvim/lua/config/vimwiki/'
 let autoheader = vimwiki_cfg_dir . 'autoheader.vim'
 let links = vimwiki_cfg_dir . 'links.vim'
 let autocommit = vimwiki_cfg_dir . 'autocommit.vim'

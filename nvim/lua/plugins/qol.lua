@@ -8,7 +8,7 @@ return {
   {
     "folke/which-key.nvim",
     config = function()
-      require('plugins.config.which-key')
+      require('config.which-key')
     end,
   },
 
@@ -24,41 +24,42 @@ return {
   "hrsh7th/cmp-buffer",
   "hrsh7th/cmp-path",
   "hrsh7th/cmp-cmdline",
+  "saadparwaiz1/cmp_luasnip",
   {
     "hrsh7th/nvim-cmp",
     event = "InsertEnter",
     config = function()
-      require("plugins.config.cmp")
+      require("config.cmp")
     end
   },
 
   -- Snippets
   {
-    "norcalli/snippets.nvim",
-    init = function()
-      require("plugins.config.snippets")
-    end,
-  },
-
-  {
 	  "L3MON4D3/LuaSnip",
 	  version = "<CurrentMajor>.*",
 	  build = "make install_jsregexp",
+    dependencies = "nvim-cmp",
     config = function()
-      require("luasnip.loaders.from_vscode").lazy_load { paths = vim.g.luasnippets_path or "" }
+      local ls = require("luasnip")
+      require("luasnip.loaders.from_vscode").lazy_load({ paths = vim.g.luasnippets_path or "" })
       require("luasnip.loaders.from_vscode").lazy_load()
+      require("config.luasnip")
 
       vim.api.nvim_create_autocmd("InsertLeave", {
         callback = function()
-          if
-            require("luasnip").session.current_nodes[vim.api.nvim_get_current_buf()]
-            and not require("luasnip").session.jump_active
+          if ls.session.current_nodes[vim.api.nvim_get_current_buf()]
+            and not ls.session.jump_active
           then
-            require("luasnip").unlink_current()
+            ls.unlink_current()
           end
         end,
       })
     end,
+  },
+
+  {
+    "rafamadriz/friendly-snippets",
+    dependencies = "L3MON4D3/LuaSnip",
   },
 
   -- Automatically completes braces, parents, etc
@@ -85,14 +86,14 @@ return {
   -- jk, jj to escape (with timeout)
   {
     "max397574/better-escape.nvim",
-    config = require("plugins.config.better_escape")
+    config = function() require("config.better_escape") end
   },
 
   -- Easier commenting
   {
     "numToStr/Comment.nvim",
     config = function()
-      require("plugins.config.comment")
+      require("config.comment")
     end
   },
 
@@ -101,7 +102,7 @@ return {
     "pavanbhat1999/figlet.nvim",
 		dependencies = "numToStr/Comment.nvim",
     config = function()
-      require("plugins.config.figlet")
+      require("config.figlet")
     end
   },
 }

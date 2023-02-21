@@ -25,7 +25,7 @@ return {
   {
    "nvim-treesitter/nvim-treesitter",
    config = function()
-     require("plugins.config.treesitter")
+     require("config.treesitter")
    end,
    build = function()
     local ts_update = require("nvim-treesitter.install").update({ with_sync = true })
@@ -36,7 +36,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     config = function()
-      require("plugins.config.nvim-lsp")
+      require("config.nvim-lsp")
     end
   },
 }

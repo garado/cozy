@@ -8,7 +8,7 @@ return {
   {
     'lewis6991/gitsigns.nvim',
     init = function()
-      require("plugins.config.gitsigns")
+      require("config.gitsigns")
     end,
   },
 
@@ -40,7 +40,7 @@ return {
   {
     "nvim-tree/nvim-web-devicons",
     config = function()
-      require("plugins.config.nvim-web-devicons")
+      require("config.nvim-web-devicons")
     end,
   },
 
@@ -49,7 +49,7 @@ return {
     lazy = false,
     dependencies = "nvim-web-devicons",
     config = function()
-      require("plugins.config.barbar")
+      require("config.barbar")
     end
   },
 
@@ -65,7 +65,7 @@ return {
   {
     "lukas-reineke/indent-blankline.nvim",
     config = function()
-      require("plugins.config.indent-blankline")
+      require("config.indent-blankline")
     end
   },
 
@@ -75,7 +75,7 @@ return {
     version = "nightly",
     dependencies = "nvim-tree/nvim-web-devicons",
     config = function()
-      require("plugins.config.nvim-tree")
+      require("config.nvim-tree")
     end,
   },
 
@@ -84,7 +84,7 @@ return {
     "nvim-lualine/lualine.nvim",
     lazy = false,
     config = function()
-      require("plugins.config.lualine")
+      require("config.lualine")
     end,
     dependencies = {
       "nvim-tree/nvim-web-devicons",
