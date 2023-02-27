@@ -5,43 +5,28 @@
 -- Handles backend for bookmarks applet.
 
 local cozy    = require("core.cozy.cozy")
-local config  = require("cozyconf")
 local gobject = require("gears.object")
-local json    = require("modules.json")
 local gtable  = require("gears.table")
-local awful   = require("awful")
+local marks   = require("cozyconf.bookmarks")
 
-local bookmarks = { }
+local bookmarks = {}
 local instance = nil
 
-local EMPTY_JSON = "[\n]\n"
+---------------------------
 
-function bookmarks:read()
-  self.data = {}
-
-  local path = config.bookmarks.path
-  local cmd = "cat \"" .. path .. "\""
-  awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    if stdout == EMPTY_JSON or stdout == "" then return end
-    self.data = json.decode(stdout)
-
-    -- sort categories alphabetically
-    self.catnames = {}
-    for cat in pairs(self.data) do
-      table.insert(self.catnames, cat)
+function bookmarks:find_links(t)
+  for _, v in pairs(t) do
+    if type(v) == "table" then
+      self:find_links(v)
     end
-    table.sort(self.catnames, function(a, b)
-      return a < b
-    end)
 
-    self:emit_signal("ready::json")
-  end)
+    if v.link then
+      self.data[v.title] = { v.link }
+    end
+  end
 end
 
-function bookmarks:write()
-end
-
-----------------
+---------------------------
 
 function bookmarks:toggle()
   if self.visible then
@@ -64,7 +49,14 @@ end
 
 function bookmarks:new()
   self.visible = false
-  self:read()
+  self.data = {}
+  self.curmatches = {}
+
+  self.LINK = 1
+  self.NAVITEM = 2
+  self.WIBOX = 3
+
+  self:find_links(marks)
 end
 
 local function new()
