@@ -52,7 +52,7 @@ end
 local function create_stats_ui_textbox(label_text)
   return wibox.widget({
     {
-      markup = colorize(label_text, beautiful.fg),
+      markup = colorize(label_text, beautiful.fg_0),
       valign = "center",
       align = "left",
       widget = wibox.widget.textbox,
@@ -82,8 +82,8 @@ local avg_week = create_stats_ui_textbox("Average hours/week")
 local stats_cont = wibox.widget({
   {
     wibox.widget({
-      markup = colorize("Statistics", beautiful.fg),
-      font   = beautiful.alt_med_font,
+      markup = colorize("Statistics", beautiful.fg_0),
+      font   = beautiful.font_reg_m,
       align  = "center",
       valign = "center",
       widget = wibox.widget.textbox,
@@ -100,10 +100,10 @@ local stats_cont = wibox.widget({
 
 -- time:connect_signal("ready::hours_by_day", function(_)
 --   local total_hours_, highest_day_, highest_hours_ = get_stats(data)
---   highest_day.children[2]:set_markup_silently(colorize(highest_day_, beautiful.fg_sub))
---   total_hours.children[2]:set_markup_silently(colorize(total_hours_, beautiful.fg_sub))
---   most_hours_worked.children[2]:set_markup_silently(colorize(highest_hours_, beautiful.fg_sub))
---   avg_week.children[2]:set_markup_silently(colorize(round(total_hours_ / 7, 2), beautiful.fg_sub))
+--   highest_day.children[2]:set_markup_silently(colorize(highest_day_, beautiful.fg_1))
+--   total_hours.children[2]:set_markup_silently(colorize(total_hours_, beautiful.fg_1))
+--   most_hours_worked.children[2]:set_markup_silently(colorize(highest_hours_, beautiful.fg_1))
+--   avg_week.children[2]:set_markup_silently(colorize(round(total_hours_ / 7, 2), beautiful.fg_1))
 -- end)
 
 return box(stats_cont, dpi(300), dpi(500), beautiful.dash_widget_bg)

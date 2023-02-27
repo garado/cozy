@@ -24,20 +24,22 @@ local nav_weekview = keynav.area({
 
 -- Module-level variables 
 
--- TODO make these config options
+-- TODO: make these config options
 local DAYS_TO_DISPLAY = 7
 local START_HOUR  = 8
 local END_HOUR    = 22
 
-local DAYCOL_SPACING = dpi(6)
-local HOUR_HEIGHT = dpi(45)  -- Height of an hour row
-local DAYCOL_HEADER_HEIGHT = dpi(40)
-local DAY_HEIGHT  = HOUR_HEIGHT * (END_HOUR - START_HOUR)
-local DAY_WIDTH   = dpi(165) -- Width of a day column
+local HOUR_HEIGHT      = dpi(45)  -- Height of an hour row
 local HOUR_LABEL_WIDTH = dpi(70)
-local EVENTBOX_WIDTH = DAY_WIDTH - dpi(10)
-local ALLDAY_HEIGHT = dpi(20)
-local ALLDAY_WIDTH = EVENTBOX_WIDTH
+
+local DAYCOL_SPACING = dpi(6)
+local DAYCOL_HEADER_HEIGHT = dpi(40)
+local DAYCOL_GRIDLINE_MARGIN = dpi(10)
+local DAYCOL_HEIGHT  = HOUR_HEIGHT * (END_HOUR - START_HOUR)
+local DAYCOL_WIDTH   = dpi(165) -- Width of a day column
+
+local EVENTBOX_WIDTH = DAYCOL_WIDTH - dpi(10)
+local EVENTBOX_VERT_MARGIN = dpi(2)
 
 local SECONDS_IN_DAY = 24 * 60 * 60
 
@@ -64,7 +66,7 @@ end
 -- @param start_time  A floating point number 0-23.99
 -- @param end_time    A floating point number 0-23.99
 local function calc_event_height(start_time, end_time)
-  return (end_time - start_time) * HOUR_HEIGHT
+  return ((end_time - start_time) * HOUR_HEIGHT) - EVENTBOX_VERT_MARGIN
 end
 
 --- Convert a time string HH:MM to an integer 0-23.99.
@@ -116,7 +118,7 @@ local ui_timelabels = wibox.widget({
 -- Underlying gridlines
 local ui_gridlines = wibox.widget({
   forced_height = HOUR_HEIGHT * END_HOUR - START_HOUR,
-  forced_width  = HOUR_LABEL_WIDTH + (DAYS_TO_DISPLAY * DAY_WIDTH),
+  forced_width  = HOUR_LABEL_WIDTH + (DAYS_TO_DISPLAY * DAYCOL_WIDTH),
   layout = wibox.layout.manual,
   -----
   init = function(self)
@@ -130,7 +132,7 @@ local ui_gridlines = wibox.widget({
     -- Add vertical gridlines
     for i = 1, DAYS_TO_DISPLAY, 1 do
       local line = self.vertical_gridline()
-      line.point.x = (i * DAY_WIDTH) + (i * DAYCOL_SPACING)
+      line.point.x = (i * DAYCOL_WIDTH) + (i * DAYCOL_SPACING)
       self:add(line)
     end
   end,
@@ -139,7 +141,7 @@ local ui_gridlines = wibox.widget({
     return wibox.widget({
       bg = beautiful.bg_1,
       forced_height = dpi(1),
-      forced_width  = HOUR_LABEL_WIDTH + (DAYS_TO_DISPLAY * DAY_WIDTH),
+      forced_width  = HOUR_LABEL_WIDTH + (DAYS_TO_DISPLAY * DAYCOL_WIDTH),
       widget = wibox.container.background,
       point = { x = 0, y = 0 },
     })
@@ -160,7 +162,7 @@ local ui_gridlines = wibox.widget({
 local ui_nowline = wibox.widget({
   {
     forced_height = dpi(2),
-    forced_width  = DAY_WIDTH,
+    forced_width  = DAYCOL_WIDTH,
     bg     = beautiful.red,
     widget = wibox.container.background,
     point  = { x = HOUR_LABEL_WIDTH + nowline_x_offset, y = 0 },
@@ -199,7 +201,7 @@ local function ui_create_eventbox(event, num_overlaps)
     { -- Title
       id     = "title",
       markup = ui.colorize(title, beautiful.fg_0),
-      font   = beautiful.font_bold_xs,
+      font   = beautiful.font_med_xs,
       widget = wibox.widget.textbox,
     },
     { -- Times
@@ -257,7 +259,7 @@ local function ui_create_eventbox(event, num_overlaps)
   local nav_ebox = keynav.navitem.background({
     widget = ebox,
     bg_off = event_bg,
-    bg_on  = beautiful.bg_1,
+    bg_on  = beautiful.bg_4,
   })
 
   return ebox, nav_ebox
@@ -274,8 +276,8 @@ local ui_all_daycolumns = wibox.widget({
 -- @param events Table of event data from gcalcli.
 local function ui_create_daycolumn(events)
   local daycol = wibox.widget({
-    forced_width  = DAY_WIDTH,
-    forced_height = DAY_HEIGHT,
+    forced_width  = DAYCOL_WIDTH,
+    forced_height = DAYCOL_HEIGHT,
     layout = wibox.layout.manual,
   })
 
@@ -315,14 +317,14 @@ end
 local ui_final = wibox.widget({
   {
     ui_gridlines,
-    top    = DAYCOL_HEADER_HEIGHT + ALLDAY_HEIGHT,
+    top    = DAYCOL_HEADER_HEIGHT + DAYCOL_GRIDLINE_MARGIN,
     left   = HOUR_LABEL_WIDTH - dpi(5),
     widget = wibox.container.margin,
   },
   {
     {
       ui_timelabels,
-      top    = DAYCOL_HEADER_HEIGHT + ALLDAY_HEIGHT,
+      top    = DAYCOL_HEADER_HEIGHT + DAYCOL_GRIDLINE_MARGIN,
       widget = wibox.container.margin,
     },
     ui_all_daycolumns,
@@ -330,7 +332,7 @@ local ui_final = wibox.widget({
   },
   {
     ui_nowline,
-    top    = DAYCOL_HEADER_HEIGHT + ALLDAY_HEIGHT,
+    top    = DAYCOL_HEADER_HEIGHT + DAYCOL_GRIDLINE_MARGIN,
     widget = wibox.container.margin,
   },
   layout = wibox.layout.stack,
@@ -339,15 +341,19 @@ local ui_final = wibox.widget({
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄
 -- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀
 
+-- Draw everything once data is ready
 cal:connect_signal("ready::weekview", function()
+  -- Reset
+  ui_all_daycolumns:reset()
+  nav_weekview:reset()
+
   local this_time = os.time()
-  local today = os.date("%d")
 
   -- Start from Sunday if specified in config
   if not config.agenda.weekview_start_from_today then
     local weekday = tonumber(os.date("%w")) -- a number 0-6
     this_time = this_time - (weekday * SECONDS_IN_DAY)
-    nowline_x_offset = (weekday * DAY_WIDTH) + (weekday * DAYCOL_SPACING)
+    nowline_x_offset = (weekday * DAYCOL_WIDTH) + (weekday * DAYCOL_SPACING)
   end
 
   -- Once all events are ready, create daycolumns
@@ -371,8 +377,8 @@ cal:connect_signal("ready::weekview", function()
         font   = beautiful.font_bold_m,
         widget = wibox.widget.textbox,
       },
-      forced_height = DAYCOL_HEADER_HEIGHT,
-      forced_width  = DAY_WIDTH,
+      forced_height = DAYCOL_HEADER_HEIGHT + DAYCOL_GRIDLINE_MARGIN,
+      forced_width  = DAYCOL_WIDTH,
       layout = wibox.layout.fixed.vertical,
     })
 
@@ -383,7 +389,7 @@ cal:connect_signal("ready::weekview", function()
     ui_all_daycolumns:add(wibox.widget({
       dcol_header,
       dcol,
-      forced_width = DAY_WIDTH,
+      forced_width = DAYCOL_WIDTH,
       layout = wibox.layout.fixed.vertical,
     }))
 

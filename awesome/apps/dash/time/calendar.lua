@@ -74,8 +74,8 @@ local function create_week_label()
 
   for i = 1, 7, 1 do
     local label = wibox.widget({
-      markup    = colorize(labels[i], beautiful.fg),
-      font      = beautiful.base_small_font,
+      markup    = colorize(labels[i], beautiful.fg_0),
+      font      = beautiful.font_reg_s,
       forced_width = dpi(35),
       align     = "center",
       valign    = "center",
@@ -96,13 +96,13 @@ local function _create_day(date, valid)
   --   heat_color = heat(accent, hours)
   -- end
 
-  local fg = valid > 0 and beautiful.fg or beautiful.fg_sub
+  local fg = valid > 0 and beautiful.fg_0 or beautiful.fg_1
 
   local day = wibox.widget({
     {
       -- Date
       markup  = colorize(date, fg),
-      font    = beautiful.base_small_font,
+      font    = beautiful.font_reg_s,
       align   = "center",
       valign  = "center",
       widget  = wibox.widget.textbox,
@@ -183,8 +183,8 @@ local _thisyear = os.date("%Y")
 local month = create_month_widget(_thismonth, _thisyear)
 
 local month_label = wibox.widget({
-  markup  = colorize(os.date("%B %Y"), beautiful.fg),
-  font    = beautiful.base_small_font,
+  markup  = colorize(os.date("%B %Y"), beautiful.fg_0),
+  font    = beautiful.font_reg_s,
   align   = "center",
   valign  = "center",
   widget  = wibox.widget.textbox,
@@ -201,7 +201,7 @@ local calendar = wibox.widget({
   widget = wibox.container.place,
 })
 
-calendar = box(calendar, dpi(450), dpi(420), beautiful.dash_widget_bg)
+calendar = box(calendar, dpi(430), dpi(400), beautiful.dash_widget_bg)
 
 time:connect_signal("ready::hours_by_day", function(_)
   for date, hours in ipairs(time.days) do

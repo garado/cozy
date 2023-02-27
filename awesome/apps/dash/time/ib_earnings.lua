@@ -32,11 +32,13 @@ local function create_earnings_estimate(job)
     {
       markup = ui.colorize(todaytext, beautiful.fg_0),
       align  = "center",
+      font   = beautiful.font_reg_s,
       widget = wibox.widget.textbox,
     },
     {
       markup = ui.colorize(pptext, beautiful.fg_0),
       align  = "center",
+      font   = beautiful.font_reg_s,
       widget = wibox.widget.textbox,
     },
     spacing = dpi(5),

@@ -41,7 +41,7 @@ return function(s)
     {
       forced_height = dpi(3),
       forced_width  = dpi(30),
-      bg     = beautiful.main_accent,
+      bg     = beautiful.primary_0,
       widget = wibox.container.background,
     },
     left   = dpi(30*0),
@@ -59,7 +59,7 @@ return function(s)
 				local indicator = wibox.widget({
           {
             markup = colorize(c3.name, beautiful.wibar_fg),
-            font   = beautiful.base_xsmall_font,
+            font   = beautiful.font_reg_xs,
             align  = "center",
             valign = "center",
             widget = wibox.widget.textbox,
@@ -83,7 +83,7 @@ return function(s)
         local tb  = indicator.children[1]
         local num = tonumber(c3.name)
 				if c3.selected then
-          tb:set_markup_silently(colorize(c3.name, beautiful.fg))
+          tb:set_markup_silently(colorize(c3.name, beautiful.fg_0))
           self.newpos  = num
           self.anim:set(num)
           self.lastpos = num
@@ -98,7 +98,7 @@ return function(s)
         local tb  = self.widget.children[1]
         local num = tonumber(c3.name)
 			  if c3.selected then
-          tb:set_markup_silently(colorize(c3.name, beautiful.fg))
+          tb:set_markup_silently(colorize(c3.name, beautiful.fg_0))
           self.newpos  = num
           self.anim:set(num)
           self.lastpos = num

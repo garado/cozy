@@ -29,47 +29,26 @@ local habit_widget
 ---------------------------------
 
 local function create_habit_ui_entry(name, graph_id, frequency)
-  -- local nav_habit = Area({
-  --   name      = name,
-  --   is_row    = true,
-  --   circular  = true,
-  --   row_wrap_vertical = true,
-  -- })
-
   local habit_name = wibox.widget({
-    markup = colorize(name, beautiful.fg),
-    font = beautiful.base_small_font,
-    align = "right",
+    markup = colorize(name, beautiful.fg_0),
+    font   = beautiful.font_reg_s,
+    align  = "right",
     valign = "center",
-    widget = wibox.widget.textbox,
-  })
-
-  local freq = wibox.widget({
-    markup = colorize(frequency, beautiful.hab_freq),
-    font = beautiful.base_small_font,
-    align = "right",
-    valign = "center",
+    forced_height = dpi(30),
+    forced_width  = dpi(125),
     widget = wibox.widget.textbox,
   })
 
   local habit_entry = wibox.widget({
+    habit_name,
     id = graph_id,
-    {
-      {
-        habit_name,
-        freq,
-        forced_width = dpi(125),
-        layout = wibox.layout.fixed.vertical,
-      },
-      widget = wibox.container.place,
-    },
     {
       id = "days",
       spacing = dpi(10),
-      layout = wibox.layout.flex.horizontal,
+      layout  = wibox.layout.flex.horizontal,
     },
     spacing = dpi(20),
-    layout = wibox.layout.fixed.horizontal,
+    layout  = wibox.layout.fixed.horizontal,
   })
 
   local completion = habit_list[graph_id]["completion"]
@@ -108,8 +87,8 @@ local function create_habit_ui_entry(name, graph_id, frequency)
       },
       { -- Overlay text (date)
         markup = colorize(checkbox_text, text_color),
-        font = beautiful.base_small_font,
-        align = "center",
+        font   = beautiful.font_reg_xs,
+        align  = "center",
         valign = "center",
         widget = wibox.widget.textbox,
       },
@@ -136,7 +115,7 @@ local function create_habit_ui_entry(name, graph_id, frequency)
     end)
 
     -- Add individual checkbox to navtree and UI
-    nav_dash_habits:append( Checkbox({ widget = checkbox }) )
+    nav_dash_habits:append( Checkbox({ widget = checkbox.children[1] }) )
     days:add(checkbox)
 
   end -- end for i in days_ago

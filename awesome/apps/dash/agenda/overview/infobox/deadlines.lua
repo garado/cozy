@@ -30,17 +30,19 @@ local tasklist = wibox.widget({
 -- @param due Task due date.
 local function create_task(desc, due)
   local desc_wibox = wibox.widget({
-    markup = colorize(desc, beautiful.fg_0),
-    align = "left",
-    ellipsize = "end",
+    ellipsize    = "end",
     forced_width = dpi(290),
+    markup = colorize(desc, beautiful.fg_0),
+    font   = beautiful.font_reg_s,
+    align  = "left",
     widget = wibox.widget.textbox,
   })
 
   local formatted_due_date = format_due_date(due)
   local due_wibox = wibox.widget({
     markup = colorize(formatted_due_date, beautiful.task_due_fg),
-    align = "right",
+    font   = beautiful.font_reg_s,
+    align  = "right",
     widget = wibox.widget.textbox,
   })
 
@@ -75,7 +77,7 @@ generate_tasklist()
 local widget = wibox.widget({
   wibox.widget({
     markup  = colorize("Due this week", beautiful.fg_0),
-    font    = beautiful.font_reg_l,
+    font    = beautiful.font_reg_m,
     align   = "center",
     valign  = "center",
     widget  = wibox.widget.textbox,

@@ -16,7 +16,7 @@ local task = require("core.system.task")
 -- █▄█ █ 
 
 local project_list = wibox.widget({
-  spacing = dpi(5),
+  spacing = dpi(7),
   layout = wibox.layout.fixed.vertical,
 })
 
@@ -53,9 +53,9 @@ local function create_project_item(tag, project, index)
 
   local textbox = wibox.widget({
     id      = project,
-    markup  = colorize(markup, beautiful.fg),
+    markup  = colorize(markup, beautiful.fg_0),
     align   = "center",
-    font    = beautiful.base_small_font,
+    font    = beautiful.font_reg_s,
     forced_height = dpi(20),
     widget  = wibox.widget.textbox,
   })

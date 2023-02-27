@@ -17,22 +17,27 @@ local journal = require("core.system.journal")
 -- █▄█ █ 
 
 local title_wibox = wibox.widget({
-  font    = beautiful.alt_med_font,
+  font    = beautiful.font_reg_m,
   widget  = wibox.widget.textbox,
 })
 
 local datetime_wibox = wibox.widget({
+  font    = beautiful.font_reg_s,
   widget  = wibox.widget.textbox,
 })
 
 local contents_wibox = wibox.widget({
+  line_spacing_factor = 2.0,
+  justify = true,
   id      = "texbox",
   text    = "placeholder",
+  font    = beautiful.font_reg_s,
   widget  = wibox.widget.textbox,
 })
 
 local tag_subheader = wibox.widget({
-  markup = colorize("Tags", beautiful.main_accent),
+  markup = colorize("Tags", beautiful.primary_0),
+  font   = beautiful.font_reg_s,
   widget = wibox.widget.textbox,
 })
 
@@ -44,13 +49,14 @@ local tag_list = wibox.widget({
     local tag = wibox.widget({
       {
         {
-          markup = colorize(tagtext, beautiful.fg),
+          markup = colorize(tagtext, beautiful.fg_0),
+          font   = beautiful.font_reg_xs,
           widget = wibox.widget.textbox,
         },
         margins = dpi(5),
         widget = wibox.container.margin,
       },
-      bg = beautiful.bg_l2,
+      bg = beautiful.bg_3,
       shape  = gears.shape.rounded_rect,
       widget = wibox.container.background,
     })
@@ -65,10 +71,13 @@ local header_and_contents_container = wibox.widget({
     datetime_wibox,
     layout = wibox.layout.align.horizontal,
   },
-  contents_wibox,
+  {
+    contents_wibox,
+    layout = wibox.layout.fixed.vertical,
+  },
   { -- Separator
     {
-      color = beautiful.bg_l3,
+      color = beautiful.bg_4,
       forced_height = dpi(5),
       widget = wibox.widget.separator,
     },
@@ -81,6 +90,7 @@ local header_and_contents_container = wibox.widget({
     spacing = dpi(10),
     layout  = wibox.layout.fixed.horizontal,
   },
+  forced_width = dpi(2000),
   spacing = dpi(5),
   layout = wibox.layout.fixed.vertical,
   visible = false,
@@ -93,7 +103,7 @@ local contents_container = wibox.widget({
       margins = dpi(15),
       widget  = wibox.container.margin,
     },
-    forced_width = dpi(1000),
+    forced_width = dpi(2000),
     bg      = beautiful.dash_widget_bg,
     shape   = gears.shape.rounded_rect,
     widget  = wibox.container.background,
@@ -111,7 +121,7 @@ local function create_taglist(stdout)
   local new_stdout = stdout
 
   for tag in string.gmatch(stdout, "@[%a%d]+") do
-    local colortag = colorize(tag, beautiful.main_accent)
+    local colortag = colorize(tag, beautiful.primary_0)
     new_stdout = new_stdout:gsub(tag, colortag)
     tag_list:add_tag(tag)
   end
@@ -124,13 +134,13 @@ local function update_contents(title, date, time, stdout)
   local new_stdout = create_taglist(stdout)
 
   local markup
-  markup = colorize(title, beautiful.main_accent)
+  markup = colorize(title, beautiful.primary_0)
   title_wibox:set_markup_silently(markup)
 
-  markup = colorize(time .. " " .. date, beautiful.main_accent)
+  markup = colorize(time .. " " .. date, beautiful.primary_0)
   datetime_wibox:set_markup_silently(markup)
 
-  contents_wibox:set_markup_silently(colorize(new_stdout, beautiful.fg))
+  contents_wibox:set_markup_silently(colorize(new_stdout, beautiful.fg_0))
 end
 
 journal:connect_signal("lock", function()

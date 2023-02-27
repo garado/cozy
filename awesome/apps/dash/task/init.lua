@@ -13,7 +13,7 @@ local keynav = require("modules.keynav")
 local ui = require("helpers.ui")
 
 local tag_list, nav_tags = require(... .. ".tags")()
-local project_list, nav_projects = require(... .. ".projects")()
+local projects, nav_projects = require(... .. ".projects")()
 local tasklist, nav_tasklist = require(... .. ".tasklist")()
 local header = require(... .. ".header")
 local prompt = require(... .. ".prompt")
@@ -41,18 +41,20 @@ end)
 
 local sidebar = wibox.widget({
   {
-    markup = ui.colorize("Taskwarrior", beautiful.fg),
-    font   = beautiful.alt_xlarge_font,
+    markup = ui.colorize("Taskwarrior", beautiful.fg_0),
+    font   = beautiful.font_med_l,
     align  = "center",
     valign = "center",
     widget = wibox.widget.textbox,
   },
   tag_list,
-  project_list,
+  projects,
+  inner_fill_strategy = "justify",
+  forced_height = dpi(1000),
   forced_width = dpi(310),
-  fill_space = true,
-  layout = wibox.layout.fixed.vertical,
+  layout       = wibox.layout.ratio.vertical,
 })
+sidebar:adjust_ratio(2, 0.1, 0.47, 0.43)
 
 local main_contents = wibox.widget({
   {
@@ -68,6 +70,7 @@ local main_contents = wibox.widget({
     right   = dpi(25),
     widget  = wibox.container.margin,
   },
+  forced_width = dpi(1000),
   bg     = beautiful.dash_widget_bg,
   shape  = gears.shape.rounded_rect,
   widget = wibox.container.background,
@@ -85,7 +88,6 @@ local tasks_dashboard = wibox.widget({
       prompt,
       layout = wibox.layout.fixed.vertical,
     },
-    fill_space = true,
     spacing = dpi(10),
     layout  = wibox.layout.fixed.horizontal,
   },

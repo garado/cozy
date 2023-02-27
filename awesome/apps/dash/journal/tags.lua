@@ -20,10 +20,10 @@ local taglist = wibox.widget({
 
 local widget = wibox.widget({
   {
-    markup = colorize("Tags", beautiful.fg),
+    markup = colorize("Tags", beautiful.fg_0),
     align  = "center",
     valign = "center",
-    font   = beautiful.alt_large_font,
+    font   = beautiful.font_reg_m,
     widget = wibox.widget.textbox,
   },
   {
@@ -39,10 +39,10 @@ local container = box(widget, dpi(0), dpi(1000), beautiful.dash_widget_bg)
 local function create_tag(tag, count)
   local counttext = '(' .. count .. ')'
   local tagbox = wibox.widget({
-    markup = colorize(tag .. ' ' .. counttext, beautiful.fg),
+    markup = colorize(tag .. ' ' .. counttext, beautiful.fg_0),
     align  = "center",
     valign = "center",
-    font   = beautiful.base_small_font,
+    font   = beautiful.font_reg_s,
     widget = wibox.widget.textbox,
   })
 

@@ -27,14 +27,14 @@ local function create_transaction_entry(date, title, category, amount)
   end
 
   local date_text = wibox.widget({
-    markup = colorize(date, beautiful.fg),
-    font = beautiful.base_small_font,
+    markup = colorize(date, beautiful.fg_0),
+    font = beautiful.font_reg_s,
     widget = wibox.widget.textbox,
   })
 
   local title_text = wibox.widget({
-    markup = colorize(title, beautiful.fg),
-    font = beautiful.base_small_font,
+    markup = colorize(title, beautiful.fg_0),
+    font = beautiful.font_reg_s,
     widget = wibox.widget.textbox,
     ellipsize = "end",
   })
@@ -42,23 +42,21 @@ local function create_transaction_entry(date, title, category, amount)
   local amount_ = "$" .. amount
   amount_ = string.gsub(amount_, "-", "")
   local amount_text = wibox.widget({
+    forced_width = dpi(80),
     markup = colorize(prefix .. amount_, amount_color),
-    font = beautiful.base_small_font,
+    font   = beautiful.font_reg_s,
+    align  = "right",
     widget = wibox.widget.textbox,
-    forced_width = dpi(100),
   })
 
   category = category:gsub("Expenses:", "")
   category = category:gsub("Income:", "")
   local category_text = wibox.widget({
-    {
-      markup = colorize(category, beautiful.fg),
-      widget = wibox.widget.textbox,
-      ellipsize = "end",
-      forced_width = dpi(200),
-    },
-    right = dpi(5),
-    widget = wibox.container.margin,
+    markup = colorize(category, beautiful.fg_0),
+    font   = beautiful.font_reg_s,
+    widget = wibox.widget.textbox,
+    ellipsize = "end",
+    forced_width = dpi(200),
   })
 
   local widget = wibox.widget({
@@ -68,7 +66,7 @@ local function create_transaction_entry(date, title, category, amount)
       category_text,
       title_text,
       forced_height = dpi(20),
-      spacing = dpi(10),
+      spacing = dpi(30),
       layout = wibox.layout.fixed.horizontal,
     },
     margins = dpi(2),

@@ -16,32 +16,32 @@ local task        = require("core.system.task")
 -- █▄█ █ 
 
 local name = wibox.widget({
-  markup = colorize("Project name", beautiful.fg),
-  font   = beautiful.alt_large_font,
+  markup = colorize("Project name", beautiful.fg_0),
+  font   = beautiful.font_reg_l,
   halign = "left",
   valign = "center",
   widget = wibox.widget.textbox,
 })
 
 local subheader = wibox.widget({
-  markup  = colorize("Tag", beautiful.fg),
-  color   = beautiful.fg,
-  font    = beautiful.base_xsmall_font,
+  markup  = colorize("Tag", beautiful.fg_0),
+  color   = beautiful.fg_0,
+  font    = beautiful.font_reg_xs,
   halign  = "left",
   widget = wibox.widget.textbox,
 })
 
 local percent_completion = wibox.widget({
-  markup = colorize("0%", beautiful.fg),
-  font   = beautiful.alt_large_font,
+  markup = colorize("0%", beautiful.fg_0),
+  font   = beautiful.font_reg_l,
   halign = "right",
   valign = "center",
   widget = wibox.widget.textbox,
 })
 
 local progress_bar = wibox.widget({
-  color = beautiful.fg,
-  background_color = beautiful.bg_l3,
+  color = beautiful.fg_0,
+  background_color = beautiful.bg_4,
   value = 0,
   max_value = 100,
   border_width = dpi(0),
@@ -68,14 +68,15 @@ local tasklist_header = wibox.widget({
     {
       name,
       subheader,
-      layout = wibox.layout.fixed.vertical
+      spacing = dpi(3),
+      layout  = wibox.layout.fixed.vertical
     },
     nil,
     percent_completion,
     layout = wibox.layout.align.horizontal,
   },
   progress_bar,
-  spacing = dpi(5),
+  spacing = dpi(8),
   layout = wibox.layout.fixed.vertical
 })
 
@@ -107,7 +108,7 @@ task:connect_signal("header::update", function(_, tag, project)
   else
     text = text .. " (WAIT HIDDEN)"
   end
-  local markup  = colorize(text, beautiful.fg)
+  local markup  = colorize(text, beautiful.fg_0)
   subheader:set_markup_silently(markup)
 
   -- Progress bar
@@ -116,7 +117,7 @@ task:connect_signal("header::update", function(_, tag, project)
   progress_bar.color = accent
 
   -- Completion percentage
-  markup = colorize(percent.."%", beautiful.fg)
+  markup = colorize(percent.."%", beautiful.fg_0)
   percent_completion:set_markup_silently(markup)
 end)
 

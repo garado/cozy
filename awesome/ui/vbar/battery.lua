@@ -7,13 +7,13 @@ local beautiful = require("beautiful")
 local colorize  = require("helpers.ui").colorize_text
 require("signal.battery")
 
-local charging_color  = beautiful.wibar_bat_grn
-local low_color       = beautiful.wibar_bat_red
-local normal_color    = beautiful.wibar_bat_nrml
+local charging_color  = beautiful.green
+local low_color       = beautiful.red
+local normal_color    = beautiful.wibar_fg
 
 local percentage = wibox.widget({
   markup  = "50",
-  font    = beautiful.alt_xsmall_font,
+  font    = beautiful.font_reg_xs,
   align   = "center",
   valign  = "center",
   widget  = wibox.widget.textbox,

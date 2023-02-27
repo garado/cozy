@@ -28,16 +28,16 @@ local timew_widget
 -- Subsections used: current session, working on, total today
 local function create_ui_subsection(header, text, text_size)
   local _header = wibox.widget({
-    markup = colorize(header, beautiful.timew_header_fg),
-    font   = beautiful.base_small_font,
+    markup = colorize(string.upper(header), beautiful.timew_header_fg),
+    font   = beautiful.font_reg_xs,
     valign = "center",
     align  = "center",
     widget = wibox.widget.textbox,
   })
 
   local _text = wibox.widget({
-    markup = colorize(text, beautiful.fg),
-    font   = beautiful.alt_font_name .. text_size,
+    markup = colorize(text, beautiful.fg_0),
+    font   = beautiful.font_name .. text_size,
     valign = "center",
     align  = "center",
     widget = wibox.widget.textbox,
@@ -49,14 +49,14 @@ local function create_ui_subsection(header, text, text_size)
     layout = wibox.layout.fixed.vertical,
     -------
     set_text = function(self, new_text)
-      self.children[2]:set_markup_silently(colorize(new_text, beautiful.fg))
+      self.children[2]:set_markup_silently(colorize(new_text, beautiful.fg_0))
     end
   })
 end
 
-local total_all_tags = create_ui_subsection("TOTAL TODAY", "--", 15)
-local current_time   = create_ui_subsection("CURRENT SESSION", "--", 30)
-local current_tag    = create_ui_subsection("WORKING ON", "--", 15)
+local total_all_tags = create_ui_subsection("Today", "--", 15)
+local current_time   = create_ui_subsection("Current", "--", 30)
+local current_tag    = create_ui_subsection("Focused", "--", 15)
 
 function total_all_tags:update()
   local cmd = "timew sum | tail -n 2"
@@ -87,7 +87,8 @@ end
 
 local ui_stopped = wibox.widget({
   wibox.widget({
-    markup = colorize("No active time tracking.", beautiful.fg),
+    markup = colorize("No active time tracking.", beautiful.fg_0),
+    font   = beautiful.font_reg_s,
     valign = "center",
     align  = "center",
     widget = wibox.widget.textbox,
@@ -114,7 +115,7 @@ local stop_button = simplebtn({
 
 local nav_stop = navbg({
   widget  = stop_button.children[1],
-  bg_on   = beautiful.bg_l3,
+  bg_on   = beautiful.bg_4,
   bg_off  = beautiful.timew_btn_bg,
   release = function()
     awful.spawn.with_shell("timew stop")
@@ -131,7 +132,7 @@ local ui_started = wibox.widget({
     {
       current_tag,
       total_all_tags,
-      spacing = dpi(20),
+      spacing = dpi(30),
       layout = wibox.layout.fixed.horizontal,
     },
     spacing = dpi(10),

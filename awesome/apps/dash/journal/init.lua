@@ -39,8 +39,8 @@ local nav_journal = area:new({
 
 local sidebar = wibox.widget({
   {
-    markup = colorize("Journal", beautiful.fg),
-    font   = beautiful.alt_large_font,
+    markup = colorize("Journal", beautiful.fg_0),
+    font   = beautiful.font_reg_l,
     align  = "center",
     valign = "center",
     widget = wibox.widget.textbox,

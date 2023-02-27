@@ -14,7 +14,7 @@ local playerctl_daemon = require("signal.playerctl")
 
 local music_text = wibox.widget({
   markup = helpers.ui.colorize_text("Music", beautiful.mus_playing_fg),
-	font = beautiful.base_small_font,
+	font = beautiful.font_reg_s,
   valign = "center",
   widget = wibox.widget.textbox,
 })
@@ -55,7 +55,7 @@ local music_art_filter = wibox.widget({
 
 local music_title = wibox.widget({
   markup = helpers.ui.colorize_text("Nothing playing", beautiful.mus_playing_fg),
-	font = beautiful.base_small_font,
+	font = beautiful.font_reg_s,
 	valign = "center",
 	widget = wibox.widget.textbox,
 })

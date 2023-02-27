@@ -2,41 +2,40 @@
 -- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ 
 -- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ 
 
+local beautiful = require("beautiful")
+local xresources = require("beautiful.xresources")
+local dpi   = xresources.apply_dpi
 local awful = require("awful")
 local gears = require("gears")
 local wibox = require("wibox")
-local beautiful = require("beautiful")
-local xresources = require("beautiful.xresources")
-local dpi = xresources.apply_dpi
-local widgets = require("ui.widgets")
+local ui    = require("helpers.ui")
+
+local keynav = require("modules.keynav")
 local tscore = require("core.cozy.themeswitcher")
+
+local widgets = require("ui.widgets")
 local vpad = require("helpers.ui").vertical_pad
 local colorize = require("helpers.ui").colorize_text
 
-local keynav = require("modules.keynav")
-local Area = keynav.area
-local Navigator = keynav.navigator
-
 local Elevated = require("modules.keynav.navitem").Elevated
-local simplebtn = require("helpers.ui").simple_button
-local navbg = require("modules.keynav.navitem").Background
 
-------------------------------------------
+-------------------
 
--- Setup for keyboard navigation
-local nav_themes  = Area({ name = "nav_themes" })
+local nav_themes  = keynav.area({
+  name = "nav_themes"
+})
 
-local nav_styles  = Area({
-  name = "nav_styles",
+local nav_styles = keynav.area({
+  name   = "nav_styles",
   is_row = true
 })
 
-local nav_actions = Area({
-  name = "nav_actions",
+local nav_actions = keynav.area({
+  name   = "nav_actions",
   is_row = true
 })
 
-local navigator, nav_root = Navigator({
+local navigator, nav_root = keynav.navigator({
   root_children = { nav_themes }
 })
 
@@ -48,25 +47,26 @@ local create_style_buttons
 
 ------------------------------------------
 
--- █░█ █    █▀▀ █░█ █▄░█ █▀▀ ▀█▀ █ █▀█ █▄░█ █▀ 
--- █▄█ █    █▀░ █▄█ █░▀█ █▄▄ ░█░ █ █▄█ █░▀█ ▄█ 
-
 --- Update UI to reflect newly selected theme.
 -- @param theme The name of the theme selected.
 local function select_new_theme(theme)
-  local markup = colorize("Selected: " , beautiful.fg)
+  local markup = ui.colorize("Selected: " , beautiful.fg_0)
   theme_sel_textbox:set_markup_silently(markup)
 
-  local theme_markup = colorize(theme, beautiful.fg)
+  local theme_markup = ui.colorize(theme, beautiful.fg_0)
   theme_name_textbox:set_markup_silently(theme_markup)
 
   styles.visible = true
   create_style_buttons(theme)
 end
 
+--- Update UI to reflect newly selected style
+local function select_new_style(style)
+end
+
 --- Reset theme switcher UI back to default state.
 local function reset_theme_switcher()
-  local markup = colorize("Current: " , beautiful.fg)
+  local markup = ui.colorize("Current: " , beautiful.fg_0)
   theme_sel_textbox:set_markup_silently(markup)
   action_buttons.visible = false
   styles.visible = false
@@ -80,46 +80,46 @@ end
 -- █░█ █▀▀ ▄▀█ █▀▄ █▀▀ █▀█ █▀ 
 -- █▀█ ██▄ █▀█ █▄▀ ██▄ █▀▄ ▄█ 
 
-local function create_themeswitch_header(text)
-  return wibox.widget({
-    markup = colorize(text, beautiful.switcher_header_fg),
-    align = "center",
-    valign = "center",
-    widget = wibox.widget.textbox,
-  })
-end
+local themes_header = wibox.widget({
+  markup = colorize("Themes", beautiful.primary_0),
+  font   = beautiful.font_med_s,
+  align  = "center",
+  widget = wibox.widget.textbox,
+})
+
+local styles_header = wibox.widget({
+  markup = colorize("Styles", beautiful.primary_0),
+  font   = beautiful.font_med_s,
+  align  = "center",
+  widget = wibox.widget.textbox,
+})
 
 -- █▄▄ █░█ ▀█▀ ▀█▀ █▀█ █▄░█ █▀ 
 -- █▄█ █▄█ ░█░ ░█░ █▄█ █░▀█ ▄█ 
 
 --- Create a single theme button
 local function create_theme_button(themename)
-  local themebtn = simplebtn({
-    text  = themename,
-    bg    = beautiful.switcher_opt_btn_bg,
+  local btn, nav_btn = ui.simple_button({
+    text   = themename,
+    font   = beautiful.font_reg_s,
+    bg     = beautiful.bg_3,
+    bg_on  = beautiful.bg_5,
     height = dpi(40),
     width  = dpi(200),
+    release = function()
+      nav_styles:remove_all_items()
+      tscore.selected_theme = themename
+      tscore.selected_style = ""
+      theme_style_textbox:set_markup_silently("", beautiful.fg_0)
+      select_new_theme(themename)
+    end,
   })
 
-  local nav_themebtn = navbg({
-    widget = themebtn.children[1],
-    bg_on  = beautiful.bg_l3,
-    bg_off = beautiful.switcher_opt_btn_bg,
-  })
-
-  function nav_themebtn:release()
-    nav_styles:remove_all_items()
-    tscore.selected_theme = themename
-    tscore.selected_style = ""
-    theme_style_textbox:set_markup_silently("", beautiful.fg)
-    select_new_theme(themename)
-  end
-
-  nav_themes:append(nav_themebtn)
+  nav_themes:append(nav_btn)
 
   return wibox.widget({
     {
-      themebtn,
+      btn,
       forced_width = dpi(200),
       widget = wibox.container.background,
     },
@@ -127,37 +127,34 @@ local function create_theme_button(themename)
   })
 end
 
--- Creates all style buttons for a given theme
-function create_style_buttons(theme)
-  local function create_style_button(style)
-    local style_button = widgets.button.text.normal({
-      text = style,
-      text_normal_bg = beautiful.fg,
-      normal_bg = beautiful.switcher_opt_btn_bg,
-      animate_size = false,
-      size = 12,
-      on_release = function()
-        tscore.selected_style = style
-        action_buttons.visible = true
-        if not nav_root:contains(nav_actions) then
-          nav_root:append(nav_actions)
-        end
+local function create_style_button(style)
+  local btn, nav_btn = ui.simple_button({
+    text   = style,
+    font   = beautiful.font_reg_s,
+    bg     = beautiful.bg_3,
+    bg_on  = beautiful.bg_5,
+    height = dpi(40),
+    width  = dpi(100),
+    release = function()
+      tscore.selected_style = style
+      action_buttons.visible = true
+      if not nav_root:contains(nav_actions) then
+        nav_root:append(nav_actions)
       end
-    })
+      -- select_new_style(style)
+    end,
+  })
 
-    nav_styles:append(Elevated({ widget = style_button}))
+  return btn, nav_btn
+end
 
-    return wibox.widget ({
-      style_button,
-      widget = wibox.container.place,
-    })
-  end
-
+function create_style_buttons(theme)
   style_buttons:reset()
   local _styles = tscore.themes[theme]
   for i = 1, #_styles do
-    local sbutton = create_style_button(_styles[i])
-    style_buttons:add(sbutton)
+    local btn, nav_btn = create_style_button(_styles[i])
+    style_buttons:add(btn)
+    nav_styles:add(nav_btn)
   end
 
   if not nav_root:contains(nav_styles) then
@@ -165,33 +162,26 @@ function create_style_buttons(theme)
   end
 end
 
-local apply_button = wibox.widget({
-  widgets.button.text.normal({
-    text = "Apply",
-    text_normal_bg = beautiful.fg,
-    normal_bg = beautiful.switcher_act_btn_bg,
-    animate_size = false,
-    size = 10,
-    on_release = function()
-      tscore:apply_selected_theme()
-    end
-  }),
-  widget = wibox.container.place,
+local apply_btn, nav_apply = ui.simple_button({
+  text    = "Apply",
+  bg      = beautiful.bg_1,
+  bg_off  = beautiful.bg_3,
+  release = function()
+    tscore:apply_selected_theme()
+  end
 })
 
-local cancel_button = wibox.widget({
-  widgets.button.text.normal({
-    text = "Cancel",
-    text_normal_bg = beautiful.fg,
-    normal_bg = beautiful.switcher_act_btn_bg,
-    animate_size = false,
-    size = 10,
-    on_release = function()
-      reset_theme_switcher()
-    end,
-  }),
-  widget = wibox.container.place,
+local cancel_btn, nav_cancel = ui.simple_button({
+  text    = "Cancel",
+  bg      = beautiful.bg_1,
+  bg_off  = beautiful.bg_3,
+  release = function()
+    reset_theme_switcher()
+  end
 })
+
+nav_actions:add(nav_apply)
+nav_actions:add(nav_cancel)
 
 -- █▄▄ █░█ ▀█▀ ▀█▀ █▀█ █▄░█    █▀▀ █▀█ █▄░█ ▀█▀ ▄▀█ █ █▄░█ █▀▀ █▀█ █▀
 -- █▄█ █▄█ ░█░ ░█░ █▄█ █░▀█    █▄▄ █▄█ █░▀█ ░█░ █▀█ █ █░▀█ ██▄ █▀▄ ▄█
@@ -209,8 +199,8 @@ style_buttons = wibox.widget({
 
 action_buttons = wibox.widget({
   {
-    apply_button,
-    cancel_button,
+    apply_btn,
+    cancel_btn,
     forced_height = dpi(50),
     spacing = dpi(15),
     layout = wibox.layout.fixed.horizontal,
@@ -218,8 +208,6 @@ action_buttons = wibox.widget({
   visible = false,
   widget = wibox.container.place,
 })
-nav_actions:append(Elevated({ widget = apply_button.children[1]}))
-nav_actions:append(Elevated({ widget = cancel_button.children[1]}))
 
 ------------------------------------------
 
@@ -231,7 +219,7 @@ nav_actions:append(Elevated({ widget = cancel_button.children[1]}))
 styles = wibox.widget({
   {
     vpad(dpi(10)),
-    create_themeswitch_header("Styles"),
+    styles_header,
     style_buttons,
     vpad(dpi(10)),
     spacing = dpi(10),
@@ -243,7 +231,7 @@ styles = wibox.widget({
 
 local themes = wibox.widget({
   {
-    create_themeswitch_header("Themes"),
+    themes_header,
     theme_buttons,
     spacing = dpi(10),
     layout = wibox.layout.fixed.vertical,
@@ -255,22 +243,24 @@ local themes = wibox.widget({
 -- Shows you the current theme and style if you haven't selected anything
 -- Or the selected theme and style if you have
 current_selections = wibox.widget({
-  wibox.widget ({
+  {
     -- "Current:" or "Selected:"
-    markup = colorize("Current: ", beautiful.fg),
-    font = beautiful.font_name .. "Bold",
+    markup = colorize("Current: ", beautiful.fg_0),
+    font   = beautiful.font_med_s,
     widget = wibox.widget.textbox,
-  }),
-  wibox.widget ({
-    markup = colorize(tscore.applied_theme, beautiful.fg),
-    id = "theme_name",
+  },
+  {
+    markup = colorize(tscore.applied_theme, beautiful.fg_0),
+    font   = beautiful.font_reg_s,
+    id     = "theme_name",
     widget = wibox.widget.textbox,
-  }),
-  wibox.widget ({
-    markup = colorize(" (" .. tscore.applied_style .. ")", beautiful.fg),
-    id = "theme_style",
+  },
+  {
+    markup = colorize(" (" .. tscore.applied_style .. ")", beautiful.fg_0),
+    font   = beautiful.font_reg_s,
+    id     = "theme_style",
     widget = wibox.widget.textbox,
-  }),
+  },
   forced_height = dpi(50),
   layout = wibox.layout.fixed.horizontal,
 })
@@ -288,21 +278,6 @@ local selections_and_actions = wibox.widget({
   widget = wibox.container.place,
 })
 
-local theme_switcher_contents = wibox.widget({
-  {
-    themes,
-    styles,
-    {
-      selections_and_actions,
-      bg = beautiful.switcher_lowbar_bg,
-      widget = wibox.container.background,
-    },
-    layout = wibox.layout.fixed.vertical,
-  },
-  widget = wibox.container.background,
-  bg = beautiful.switcher_bg,
-})
-
 local theme_switcher_width = dpi(350)
 local theme_switcher = awful.popup ({
   type = "popup_menu",
@@ -313,7 +288,20 @@ local theme_switcher = awful.popup ({
   shape = gears.shape.rect,
   ontop = true,
   visible = false,
-  widget = theme_switcher_contents,
+  widget = wibox.widget({
+    {
+      themes,
+      styles,
+      {
+        selections_and_actions,
+        bg     = beautiful.bg_0,
+        widget = wibox.container.background,
+      },
+      layout = wibox.layout.fixed.vertical,
+    },
+    widget = wibox.container.background,
+    bg = beautiful.switcher_bg,
+  })
 })
 
 -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 

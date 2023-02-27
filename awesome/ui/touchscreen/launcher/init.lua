@@ -38,10 +38,10 @@ local function create_app_icon(appname)
     {
       {
         {
-          markup = ui.colorize(appname, beautiful.fg),
+          markup = ui.colorize(appname, beautiful.fg_0),
           align  = "center",
           valign = "center",
-          font   = beautiful.base_small_font,
+          font   = beautiful.font_reg_s,
           widget = wibox.widget.textbox,
         },
         widget = wibox.container.place,
@@ -49,7 +49,7 @@ local function create_app_icon(appname)
       margins = dpi(15),
       widget  = wibox.container.margin,
     },
-    bg     = beautiful.bg_l2,
+    bg     = beautiful.bg_3,
     widget = wibox.container.background,
     ----
     buttons = buttons,
@@ -69,8 +69,8 @@ local closebtn = wibox.widget({
   {
     {
       {
-        markup = ui.colorize("", beautiful.fg),
-        font   = beautiful.base_small_font,
+        markup = ui.colorize("", beautiful.fg_0),
+        font   = beautiful.font_reg_s,
         align  = "center",
         valign = "center",
         widget = wibox.widget.textbox,

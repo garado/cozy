@@ -23,26 +23,26 @@ journal.is_locked = true
 local prompt_textbox = wibox.widget({
   align   = "center",
   valign  = "center",
-  font    = beautiful.base_small_font,
+  font    = beautiful.font_reg_s,
   widget  = wibox.widget.textbox,
 })
 
 -- Obscure password text as user is typing
 prompt_textbox:connect_signal("widget::redraw_needed", function(self)
   local text = self.text:gsub("[%a%d]", "*")
-  self:set_markup_silently(colorize(text, beautiful.main_accent))
+  self:set_markup_silently(colorize(text, beautiful.primary_0))
 end)
 
 local header = wibox.widget({
-  markup = colorize(" Log is locked", beautiful.fg),
-  font   = beautiful.alt_large_font,
+  markup = colorize(" Log is locked", beautiful.fg_0),
+  font   = beautiful.font_reg_l,
   align  = "center",
   valign = "center",
   widget = wibox.widget.textbox,
 })
 
 local subheader = wibox.widget({
-  markup = colorize("Enter passcode to proceed", beautiful.fg),
+  markup = colorize("Enter passcode to proceed", beautiful.fg_0),
   font   = beautiful.base_med_font,
   align  = "center",
   valign = "center",
@@ -56,7 +56,7 @@ local widget = wibox.widget({
     {
       {
         wibox.widget({
-          markup = colorize("Password: ", beautiful.fg),
+          markup = colorize("Password: ", beautiful.fg_0),
           widget = wibox.widget.textbox,
         }),
         prompt_textbox,
@@ -83,11 +83,11 @@ local widget = wibox.widget({
 -- @param text The initial textbox text.
 local function password_input()
   awful.prompt.run {
-    font         = beautiful.base_small_font,
-    fg           = beautiful.fg,
+    font         = beautiful.font_reg_s,
+    fg           = beautiful.fg_0,
     bg           = beautiful.task_prompt_textbg,
     shape        = gears.shape.rounded_rect,
-    bg_cursor    = beautiful.main_accent,
+    bg_cursor    = beautiful.primary_0,
     textbox      = prompt_textbox,
     exe_callback = function(input)
       if not input or #input == 0 then return end
@@ -97,7 +97,7 @@ local function password_input()
 end
 
 local function lock()
-  local markup = colorize(" Locked", beautiful.fg)
+  local markup = colorize(" Locked", beautiful.fg_0)
   header:set_markup_silently(markup)
 end
 

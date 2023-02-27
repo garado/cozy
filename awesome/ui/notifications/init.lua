@@ -55,8 +55,8 @@ end)
 
 naughty.connect_signal("request::display", function(n)
   local accent_color = beautiful.random_accent_color()
-  n.font = beautiful.base_small_font
-  n.fg = beautiful.fg
+  n.font = beautiful.font_reg_s
+  n.fg = beautiful.fg_0
 
 	--- table of icons
 	local app_icons = {
@@ -102,8 +102,8 @@ naughty.connect_signal("request::display", function(n)
 
   local title = wibox.widget({
     {
-      markup = colorize(n.title, beautiful.fg),
-      font   = beautiful.base_small_font,
+      markup = colorize(n.title, beautiful.fg_0),
+      font   = beautiful.font_reg_s,
       widget = wibox.widget.textbox,
     },
     step_function = wibox.container.scroll.step_functions.waiting_nonlinear_back_and_forth,
@@ -120,8 +120,8 @@ naughty.connect_signal("request::display", function(n)
   else
     message = wibox.widget({
       wibox.widget({
-        markup  = colorize(n.message, beautiful.fg),
-        font    = beautiful.base_small_font,
+        markup  = colorize(n.message, beautiful.fg_0),
+        font    = beautiful.font_reg_s,
         widget  = wibox.widget.textbox,
       }),
       step_function = wibox.container.scroll.step_functions.waiting_nonlinear_back_and_forth,
@@ -150,7 +150,7 @@ naughty.connect_signal("request::display", function(n)
 				{
 					{
 						id = "text_role",
-						font = beautiful.base_xsmall_font,
+						font = beautiful.font_reg_xs,
 						widget = wibox.widget.textbox,
 					},
 					left = dpi(6),
@@ -173,7 +173,7 @@ naughty.connect_signal("request::display", function(n)
 
   local app_name = wibox.widget({
     markup = colorize(string.upper(n.app_name), accent_color),
-    font   = beautiful.base_xsmall_font,
+    font   = beautiful.font_reg_xs,
     widget = wibox.widget.textbox,
   })
 

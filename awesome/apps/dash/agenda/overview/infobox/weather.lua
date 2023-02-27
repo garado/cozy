@@ -26,7 +26,7 @@ if cozyconf_valid then
     time_format_12h = true,
     units = 'imperial',
     both_units_widget = false,
-    font_name = beautiful.base_font_name,
+    font_name = beautiful.font_name,
     icons = 'pixels',
     icons_extension = '.png',
     show_daily_forecast = true,
@@ -46,9 +46,9 @@ end
 local widget = wibox.widget({
   wibox.widget({
     markup = colorize("Weekly Forecast", beautiful.fg_0),
-    align = "center",
+    align  = "center",
     valign = "center",
-    font = beautiful.font_reg_l,
+    font   = beautiful.font_reg_m,
     widget = wibox.widget.textbox,
   }),
   {

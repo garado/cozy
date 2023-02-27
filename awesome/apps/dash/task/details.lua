@@ -38,10 +38,10 @@ local entries_fancy = {
 --- Creates wibox showing annotation data.
 local function annotations()
   local label = wibox.widget({
-    markup = colorize("Annotations", beautiful.fg),
+    markup = colorize("Annotations", beautiful.fg_0),
     align  = "start",
     valign = "top",
-    font   =  beautiful.base_small_font,
+    font   =  beautiful.font_reg_s,
     forced_width = dpi(120),
     widget = wibox.widget.textbox,
   })
@@ -59,7 +59,7 @@ local function annotations()
     -------
     add_anno = function(self, i)
       local box = wibox.widget({
-        markup = colorize(i .. '. ' .. annos[i]["description"], beautiful.fg),
+        markup = colorize(i .. '. ' .. annos[i]["description"], beautiful.fg_0),
         widget = wibox.widget.textbox,
       })
       self.children[2]:add(box)
@@ -83,18 +83,18 @@ local function entry(index)
 
   return wibox.widget({
     {
-      markup = colorize(field_display_text, beautiful.fg),
+      markup = colorize(field_display_text, beautiful.fg_0),
       align  = "start",
       valign = "top",
-      font   =  beautiful.base_small_font,
+      font   =  beautiful.font_reg_s,
       forced_width = dpi(120),
       widget = wibox.widget.textbox,
     },
     {
-      markup = colorize(text, beautiful.fg),
+      markup = colorize(text, beautiful.fg_0),
       align  = "start",
       valign = "top",
-      font   =  beautiful.base_small_font,
+      font   =  beautiful.font_reg_s,
       widget = wibox.widget.textbox,
     },
     spacing = dpi(15),
@@ -105,13 +105,13 @@ end
 
 local title = wibox.widget({
   {
-    markup = colorize("Task details", beautiful.fg),
-    font   = beautiful.base_small_font,
+    markup = colorize("Task details", beautiful.fg_0),
+    font   = beautiful.font_reg_s,
     widget = wibox.widget.textbox,
   },
   {
-    markup = colorize("----------------", beautiful.fg),
-    font   = beautiful.base_small_font,
+    markup = colorize("----------------", beautiful.fg_0),
+    font   = beautiful.font_reg_s,
     widget = wibox.widget.textbox,
   },
   spacing = dpi(2),

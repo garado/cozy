@@ -25,8 +25,9 @@ local function widget()
 
   local task_list = wibox.widget({
     wibox.widget({
-      markup = colorize("No tasks found", beautiful.fg),
-      align = "center",
+      markup = colorize("No tasks found", beautiful.fg_0),
+      font   = beautiful.font_reg_s,
+      align  = "center",
       valign = "center",
       widget = wibox.widget.textbox,
     }),
@@ -86,23 +87,25 @@ local function widget()
     end
 
     -- more urgent tasks should be red
-    local desc_color = beautiful.fg
+    local desc_color = beautiful.fg_0
     if urg > 7 then
       desc_color = beautiful.red
     end
 
     -- assemble widget
     local description = wibox.widget({
-      markup = colorize(desc, desc_color),
-      align = "left",
-      widget = wibox.widget.textbox,
-      ellipsize = "end",
       forced_width = dpi(360),
+      markup    = colorize(desc, desc_color),
+      font      = beautiful.font_reg_s,
+      align     = "left",
+      ellipsize = "end",
+      widget    = wibox.widget.textbox,
     })
 
     local due_ = wibox.widget({
       markup = colorize(due_date_text, beautiful.task_due_fg),
-      align = "right",
+      align  = "right",
+      font   = beautiful.font_reg_s,
       widget = wibox.widget.textbox,
     })
 

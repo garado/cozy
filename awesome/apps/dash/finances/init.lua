@@ -24,12 +24,8 @@ local nav_finances = area({
 
 local widget = wibox.widget({
   { -- Left side
-    {
-      balances[2],
-      balances[3],
-      layout = wibox.layout.flex.horizontal,
-    },
-    actions,
+    balances,
+    -- actions,
     budget,
     forced_width = dpi(420),
     layout = wibox.layout.fixed.vertical,

@@ -17,14 +17,14 @@ local task = require("core.system.task")
 -- █▄█ █ 
 
 local tag_list = wibox.widget({
-  spacing = dpi(5),
+  spacing = dpi(7),
   layout = wibox.layout.fixed.vertical,
 })
 
 local widget = wibox.widget({
   wheader("Tags"),
   tag_list,
-  spacing = dpi(10),
+  spacing = dpi(8),
   forced_width = dpi(150),
   fill_space = false,
   layout = wibox.layout.fixed.vertical,
@@ -53,9 +53,9 @@ local nav_tags = keynav.area({
 local function create_tag_item(tag)
   local tag_wibox = wibox.widget({
     id      = tag,
-    markup  = colorize(tag, beautiful.fg),
+    markup  = colorize(tag, beautiful.fg_0),
     align   = "center",
-    font    = beautiful.base_small_font,
+    font    = beautiful.font_reg_s,
     widget  = wibox.widget.textbox,
     forced_height = dpi(20),
   })

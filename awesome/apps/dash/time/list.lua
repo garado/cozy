@@ -31,37 +31,42 @@ local function ui_create_entry(session_data)
   local start_ts = datestr_to_ts(session_data["start"])
 
   local id = wibox.widget({
-    markup = colorize("@" .. session_data["id"], beautiful.fg),
     forced_width = dpi(40),
+    markup = colorize("@" .. session_data["id"], beautiful.fg_0),
+    font   = beautiful.font_reg_s,
     widget = wibox.widget.textbox,
   })
 
   local tag_text = session_data["tags"][1]
   local tag_color = time:tag_color(tag_text)
   local tags = wibox.widget({
-    markup = colorize(tag_text, tag_color),
     forced_width = dpi(100),
+    markup = colorize(tag_text, tag_color),
+    font   = beautiful.font_reg_s,
     widget = wibox.widget.textbox,
   })
 
   local anno = wibox.widget({
-    markup = colorize(session_data["annotation"] or "-", beautiful.fg),
     forced_width = dpi(350),
-    ellipsize = "end",
+    ellipsize    = "end",
+    markup = colorize(session_data["annotation"] or "-", beautiful.fg_0),
+    font   = beautiful.font_reg_s,
     widget = wibox.widget.textbox,
   })
 
   local date_text = os.date("%a %m/%d", start_ts)
   local date = wibox.widget({
-    markup = colorize(date_text, beautiful.fg),
     forced_width = dpi(120),
+    markup = colorize(date_text, beautiful.fg_0),
+    font   = beautiful.font_reg_s,
     widget = wibox.widget.textbox,
   })
 
   local duration_text = (session_data["duration"] and session_data["duration"] .. "h") or "-"
   local duration = wibox.widget ({
-    markup = colorize(duration_text, beautiful.fg),
     forced_width = dpi(100),
+    markup = colorize(duration_text, beautiful.fg_0),
+    font   = beautiful.font_reg_s,
     align  = "right",
     widget = wibox.widget.textbox,
   })
@@ -112,15 +117,15 @@ end
 local header = wibox.widget({
   {
     {
-      markup = colorize("Recent Sessions", beautiful.fg),
+      markup = colorize("Recent Sessions", beautiful.fg_0),
       valign = "center",
       halign = "center",
-      font   = beautiful.alt_large_font,
+      font   = beautiful.font_reg_l,
       widget = wibox.widget.textbox,
     },
     widget = wibox.container.place,
   },
-  bottom = dpi(5),
+  bottom = dpi(15),
   widget = wibox.container.margin,
 })
 

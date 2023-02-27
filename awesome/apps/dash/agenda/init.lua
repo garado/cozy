@@ -2,11 +2,13 @@
 -- █▀▄ ▄▀█ █▀ █░█ ▀    ▄▀█ █▀▀ █▀▀ █▄░█ █▀▄ ▄▀█ 
 -- █▄▀ █▀█ ▄█ █▀█ ▄    █▀█ █▄█ ██▄ █░▀█ █▄▀ █▀█ 
 
-local wibox = require("wibox")
 local xresources = require("beautiful.xresources")
-local dpi   = xresources.apply_dpi
-local area  = require("modules.keynav.area")
-local dash  = require("core.cozy.dash")
+local dpi    = xresources.apply_dpi
+local wibox  = require("wibox")
+local keynav = require("modules.keynav")
+local dash   = require("core.cozy.dash")
+local agenda = require("core.system.cal")
+local cpcore = require("core.cozy.calpopup")
 
 local header, nav_viewselect = require(... .. ".header")()
 local weekview, nav_weekview = require(... .. ".weekview")()
@@ -16,7 +18,6 @@ local OVERVIEW = 1
 local WEEKVIEW = 2
 local tab_content = { overview, weekview }
 local tab_nav     = { nav_overview, nav_weekview }
-local tab_names   = { "nav_overview", "nav_weekview" }
 local current_tab = "overview"
 
 local main_contents = wibox.widget({
@@ -34,18 +35,32 @@ local main_contents = wibox.widget({
   end
 })
 
-local nav_agenda = area({
+local nav_agenda
+nav_agenda = keynav.area({
   name = "nav_agenda",
   children = {
     nav_viewselect,
     nav_overview,
   },
+  keys = {
+    ["R"] = function()
+      agenda:execute_request("refresh")
+    end,
+    -- ["A"] = function()
+    --   nav_agenda.nav:stop()
+    --   cpcore:open()
+    -- end,
+  }
 })
 
 local function set_nav(tab_idx)
   nav_agenda:remove_item(nav_agenda.items[2])
   nav_agenda:append(tab_nav[tab_idx])
 end
+
+
+-- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
+-- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
 
 dash:connect_signal("agenda::view_selected", function(_, view)
   if view == current_tab then return end
@@ -56,6 +71,13 @@ dash:connect_signal("agenda::view_selected", function(_, view)
   else
     main_contents:set_tab(WEEKVIEW)
     set_nav(WEEKVIEW)
+  end
+end)
+
+-- Turn on dashboard navigator again when calpopup closes
+cpcore:connect_signal("setstate::close", function()
+  if nav_agenda.nav then
+    nav_agenda.nav:start()
   end
 end)
 

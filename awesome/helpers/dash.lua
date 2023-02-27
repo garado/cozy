@@ -23,17 +23,7 @@ end
 
 function _dash.format_due_date(due)
   if not due or due == "" then return "no due date" end
-
-  -- taskwarrior returns due date as string
-  -- convert that to a lua timestamp
-  local pattern = "(%d%d%d%d)(%d%d)(%d%d)T(%d%d)(%d%d)(%d%d)Z"
-  local xyear, xmon, xday, xhr, xmin, xsec = due:match(pattern)
-  local ts = os.time({
-    year = xyear, month = xmon, day = xday,
-    hour = xhr, min = xmin, sec = xsec })
-
-  -- account for timezone (america/los_angeles: -8 hours)
-  ts = ts - (8 * 60 * 60)
+  local ts = _dash.ts_str_to_ts(due)
 
   -- turn timestamp into human-readable format
   local now = os.time()
@@ -80,15 +70,15 @@ end
 function _dash.widget_header(text)
   return wibox.widget({
     markup = ui.colorize_text(text, beautiful.dash_header_fg),
-    font = beautiful.font_reg_l,
-    align = "center",
+    font   = beautiful.font_reg_l,
+    align  = "center",
     valign = "center",
     widget = wibox.widget.textbox,
   })
 end
 
-function _dash.round(num, numDecimalPlaces)
-  local mult = 10^(numDecimalPlaces or 0)
+function _dash.round(num, num_decimal_places)
+  local mult = 10^(num_decimal_places or 0)
   return math.floor(num * mult + 0.5) / mult
 end
 

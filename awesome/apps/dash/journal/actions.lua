@@ -14,7 +14,7 @@ local navbtn = keynav.navitem.simplebutton
 local function create_button(text)
   local btn = simplebtn({
     text = text,
-    font = beautiful.base_small_font,
+    font = beautiful.font_reg_s,
     bg   = beautiful.cash_action_btn,
     margins = {
       left   = dpi(15),

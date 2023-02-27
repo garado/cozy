@@ -10,7 +10,7 @@ local box = require("helpers.ui").create_boxed_widget
 
 local time = wibox.widget({
   format  = "%l:%M %p",
-  font    = beautiful.alt_large_font,
+  font    = beautiful.font_reg_xl,
   align   = "center",
   valign  = "center",
   widget  = wibox.widget.textclock
@@ -18,11 +18,11 @@ local time = wibox.widget({
 
 local time_color = wibox.container.background()
 time_color:set_widget(time)
-time_color:set_fg(beautiful.fg)
+time_color:set_fg(beautiful.fg_0)
 
 local date = wibox.widget({
   format  = "%A %B %d",
-  font    = beautiful.base_small_font,
+  font    = beautiful.font_reg_s,
   align   = "center",
   valign  = "center",
   widget  = wibox.widget.textclock

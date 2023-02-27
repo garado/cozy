@@ -23,7 +23,7 @@ local goals = wibox.widget({
 local widget = wibox.widget({
   {
     markup = colorize("Weekly Goals", beautiful.fg_0),
-    font   = beautiful.font_reg_l,
+    font   = beautiful.font_reg_m,
     align  = "center",
     valign = "center",
     widget = wibox.widget.textbox,

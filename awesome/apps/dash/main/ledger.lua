@@ -32,7 +32,7 @@ local color_palette = beautiful.cash_arccolors
 -- @return A textbox widget to be added to the legend wibox
 local function create_legend_entry(text, amount, color)
   local circle = colorize(" ", color)
-  local label  = colorize(text, beautiful.fg)
+  local label  = colorize(text, beautiful.fg_0)
   local amt    = colorize(" — $" .. amount, beautiful.cash_alttext_fg)
 
   local legend_entry = wibox.widget({
@@ -127,23 +127,23 @@ end -- end create_chart_sections
 -- @param ledger_cmd   command that produces the necessary data
 local function create_account_displays(header_text)
   local header = wibox.widget({
-    markup = colorize(header_text, beautiful.cash_acct_name),
+    markup = colorize(header_text, beautiful.fg_0),
     widget = wibox.widget.textbox,
-    font = beautiful.base_small_font,
-    align = "center",
+    font   = beautiful.font_reg_xs,
+    align  = "center",
     valign = "center",
   })
 
   local balance = wibox.widget({
     id     = "balance",
-    markup = colorize("$0.00", beautiful.fg),
-    font   = beautiful.base_small_font,
+    markup = colorize("$0.00", beautiful.fg_0),
+    font   = beautiful.font_reg_s,
     align  = "center",
     valign = "center",
     widget = wibox.widget.textbox,
   })
 
-  local widget = wibox.widget({
+  return wibox.widget({
     {
       header,
       balance,
@@ -152,8 +152,6 @@ local function create_account_displays(header_text)
     },
     widget = wibox.container.place,
   })
-
-  return widget
 end
 
 -----------------------------
@@ -170,7 +168,7 @@ chart = wibox.widget({
   {
     {
       id = "text",
-      font = beautiful.alt_small_font,
+      font = beautiful.font_reg_s,
       align = "center",
       valign = "center",
       widget = wibox.widget.textbox,
@@ -220,10 +218,10 @@ local bottom_yes_spent = wibox.widget({
 -- Otherwise show this placeholder
 local bottom_no_spent = wibox.widget({
   {
-    markup = colorize("Nothing spent this month.", beautiful.fg),
+    markup = colorize("Nothing spent this month.", beautiful.fg_0),
     align  = "center",
     valign = "center",
-    font   = beautiful.base_small_font,
+    font   = beautiful.font_reg_s,
     widget = wibox.widget.textbox,
   },
   widget = wibox.container.place,
@@ -266,7 +264,7 @@ ledger:connect_signal("update::month", function()
     create_chart_sections(entries, total)
     create_legend(entries)
 
-    local markup = colorize("$" .. total, beautiful.fg)
+    local markup = colorize("$" .. total, beautiful.fg_0)
     local spent = total_spent.children[1].children[2]
     spent:set_markup_silently(markup)
     bottom:set(2, bottom_yes_spent)
@@ -279,13 +277,13 @@ ledger:connect_signal("update::balances", function()
   local savings_value   = ledger.savings  or "$--.--"
 
   local checking = checking_bal.children[1].children[2]
-  checking:set_markup_silently(colorize(checking_value, beautiful.fg))
+  checking:set_markup_silently(colorize(checking_value, beautiful.fg_0))
 
   local savings = savings_bal.children[1].children[2]
-  savings:set_markup_silently(colorize(savings_value, beautiful.fg))
+  savings:set_markup_silently(colorize(savings_value, beautiful.fg_0))
 
   -- local total = total_bal.children[1].children[2]
-  -- total:set_markup_silently(colorize(total_value, beautiful.fg))
+  -- total:set_markup_silently(colorize(total_value, beautiful.fg_0))
 end)
 
 return box(widget, dpi(0), dpi(350), beautiful.dash_widget_bg)

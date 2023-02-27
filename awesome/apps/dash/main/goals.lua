@@ -13,8 +13,8 @@ local config = require("cozyconf")
 
 local function create_goal(text)
   return wibox.widget({
-    markup = colorize(text, beautiful.fg),
-    font   = beautiful.base_small_font,
+    markup = colorize(text, beautiful.fg_0),
+    font   = beautiful.font_reg_s,
     widget = wibox.widget.textbox,
     align  = "center",
     valign = "center",

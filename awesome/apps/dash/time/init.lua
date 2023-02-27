@@ -7,29 +7,40 @@
 local wibox = require("wibox")
 local beautiful = require("beautiful")
 local dpi = beautiful.xresources.apply_dpi
-local colorize  = require("helpers.ui").colorize_text
+local ui     = require("helpers.ui")
+local keynav = require("modules.keynav")
 
 -- local cal, nav_cal = require(... .. ".time.calendar")()
-local cal   = require(... .. ".calendar")
-local list  = require(... .. ".list")
-local tags  = require(... .. ".tags")
-local stats = require(... .. ".stats")
+local cal     = require(... .. ".calendar")
+local list    = require(... .. ".list")
+local infobox, nav_infobox = require(... .. ".infobox")()
 
-local time_dash = wibox.widget({
+local nav_timewarrior = keynav.area({
+  name = "agenda",
+  children = {
+    nav_infobox,
+  },
+})
+
+-- local tags  = require(... .. ".tags")
+-- local stats = require(... .. ".stats")
+
+
+local timewarrior = wibox.widget({
   {
     {
       {
-        markup = colorize("Timewarrior", beautiful.fg),
+        markup = ui.colorize("Timewarrior", beautiful.fg_0),
         align  = "center",
         valign = "center",
-        font   = beautiful.alt_xlarge_font,
+        font   = beautiful.font_med_l,
         widget = wibox.widget.textbox,
       },
       top    = dpi(10),
       widget = wibox.container.margin,
     },
     cal,
-    stats,
+    infobox,
     layout = wibox.layout.fixed.vertical,
   },
   list,
@@ -37,5 +48,5 @@ local time_dash = wibox.widget({
 })
 
 return function()
-  return time_dash
+  return timewarrior, nav_timewarrior
 end

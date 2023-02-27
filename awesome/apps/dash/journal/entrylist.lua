@@ -21,10 +21,10 @@ local nav_entrylist = keynav.area({ name = "entrylist" })
 -- █▄█ █ 
 
 local ui_header = wibox.widget({
-  markup = colorize("Entries", beautiful.fg),
+  markup = colorize("Entries", beautiful.fg_0),
   align  = "center",
   valign = "center",
-  font   = beautiful.alt_med_font,
+  font   = beautiful.font_reg_m,
   widget = wibox.widget.textbox,
   ----
   update = function(self, tag)
@@ -32,7 +32,7 @@ local ui_header = wibox.widget({
     if tag then
       text = text .. " tagged '" .. tag .. "'"
     end
-    self:set_markup_silently(colorize(text, beautiful.fg))
+    self:set_markup_silently(colorize(text, beautiful.fg_0))
   end,
 })
 
@@ -59,7 +59,8 @@ local ui_entrylist_container = box(
 
 local function create_entry_list_item(title, date, index)
   local entry = wibox.widget({
-    markup = colorize(date .. " " .. title, beautiful.fg),
+    markup = colorize(date .. " " .. title, beautiful.fg_0),
+    font   = beautiful.font_reg_s,
     align  = "left",
     valign = "center",
     ellipsize = "right",

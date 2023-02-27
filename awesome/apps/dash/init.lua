@@ -8,6 +8,7 @@ local wibox = require("wibox")
 local beautiful = require("beautiful")
 local xresources = require("beautiful.xresources")
 local dpi = xresources.apply_dpi
+local cpcore   = require("core.cozy.calpopup")
 local dashcore = require("core.cozy.dash")
 local colorize = require("helpers.ui").colorize_text
 local keynav   = require("modules.keynav")
@@ -33,19 +34,16 @@ local main,   nav_main     = require(... .. ".main")()
 local tasks,  nav_tasks    = require(... .. ".task")()
 local agenda, nav_agenda   = require(... .. ".agenda")()
 local cash,   nav_cash     = require(... .. ".finances")()
-local time                 = require(... .. ".time")()
+local time,   nav_time     = require(... .. ".time")()
 local journal, nav_journal = require(... .. ".journal")()
---   local time,   nav_time    = require(... .. ".time")()
 
-local tablist   = { main,     tasks,      agenda,     cash,     time,   journal     }
-local tabnames  = { "main",   "tasks",    "agenda",   "cash",   "time", "journal"   }
-local tab_icons = { "",      "",        "",        "",      "",    ""         }
-local navitems  = { nav_main, nav_tasks,  nav_agenda, nav_cash, nil,    nav_journal }
-
-
+local tablist   = { main,     tasks,      agenda,     cash,     time,     journal     }
+local tabnames  = { "main",   "tasks",    "agenda",   "cash",   "time",   "journal"   }
+local tab_icons = { "",      "",        "",        "",      "",      ""         }
+local navitems  = { nav_main, nav_tasks,  nav_agenda, nav_cash, nav_time, nav_journal }
 
 --- Display a specific tab on the dashboard
--- @param i The tab number.
+-- @param i   Index of tab to switch to.
 function switch_tab(i)
   -- If trying to switch to the currently selected tab, do nothing
   if navitems[i] and nav_root:contains(navitems[i]) then return end
@@ -70,7 +68,9 @@ function switch_tab(i)
 
   navigator.curr_area = navigator.root
 
+  -- TODO remove tabswitch replace with tab::changed
   dashcore:emit_signal("tabswitch", tabnames[i])
+  dashcore:emit_signal("tab::changed", tabnames[i])
 end
 
 
@@ -87,7 +87,7 @@ local pfp = wibox.widget({
         forced_width  = dpi(28),
         widget = wibox.widget.imagebox,
       },
-      bg     = beautiful.main_accent,
+      bg     = beautiful.primary_0,
       shape  = gears.shape.circle,
       widget = wibox.container.background,
     },
@@ -100,10 +100,10 @@ local pfp = wibox.widget({
 local distro = wibox.widget({
   {
     {
-      markup = colorize(config.distro_icon, beautiful.main_accent),
+      markup = colorize(config.distro_icon, beautiful.primary_0),
       align  = "center",
       valign = "center",
-      font   = beautiful.base_small_font,
+      font   = beautiful.font_reg_s,
       widget = wibox.widget.textbox,
     },
     widget = wibox.container.place,
@@ -134,11 +134,11 @@ for i = 1, #tab_icons do
   local tab = wibox.widget({
     { -- bg + icon
       {
-        markup = colorize(tab_icons[i], beautiful.fg),
+        markup = colorize(tab_icons[i], beautiful.fg_0),
         align  = "center",
         valign = "center",
         forced_height = dpi(60),
-        font   = beautiful.base_small_font,
+        font   = beautiful.font_reg_s,
         widget = wibox.widget.textbox,
       },
       id = "bg",
@@ -147,7 +147,7 @@ for i = 1, #tab_icons do
     { -- vbar
       {
         forced_width = dpi(2),
-        -- bg     = beautiful.fg,
+        -- bg     = beautiful.fg_0,
         widget = wibox.container.background,
       },
       id     = "vbar",
@@ -155,21 +155,24 @@ for i = 1, #tab_icons do
       widget = wibox.container.margin,
     },
     layout = wibox.layout.stack,
+    -------
+    select_on = function(self)
+      local vbar = self:get_children_by_id("vbar")[1].children[1]
+      local bg   = self:get_children_by_id("bg")[1]
+      local icon = bg.children[1]
+      vbar.bg = beautiful.fg_0
+      bg.bg   = beautiful.bg_3
+      icon:set_markup_silently(colorize(tab_icons[i], beautiful.fg_0))
+    end,
+    select_off = function(self)
+      local vbar = self:get_children_by_id("vbar")[1].children[1]
+      local bg   = self:get_children_by_id("bg")[1]
+      local icon = bg.children[1]
+      vbar.bg = nil
+      bg.bg   = nil
+      icon:set_markup_silently(colorize(tab_icons[i], beautiful.bg_6))
+    end
   })
-
-  function tab:select_on()
-    local vbar = tab:get_children_by_id("vbar")[1].children[1]
-    local bg = tab:get_children_by_id("bg")[1]
-    vbar.bg = beautiful.fg
-    bg.bg   = beautiful.bg_l2
-  end
-
-  function tab:select_off()
-    local vbar = tab:get_children_by_id("vbar")[1].children[1]
-    local bg   = tab:get_children_by_id("bg")[1]
-    vbar.bg = nil
-    bg.bg   = nil
-  end
 
   tabs:add(tab)
 end
@@ -231,10 +234,9 @@ dashcore:connect_signal("setstate::open", function()
 end)
 
 dashcore:connect_signal("setstate::close", function()
-  dash.visible = false
   navigator:stop()
+  dash.visible = false
   dashcore:emit_signal("newstate::closed")
 end)
-
 
 return function(_) return dash end

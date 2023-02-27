@@ -6,11 +6,11 @@
 
 local beautiful   = require("beautiful")
 local xresources  = require("beautiful.xresources")
+local dpi   = xresources.apply_dpi
 local gears = require("gears")
 local wibox = require("wibox")
 local awful = require("awful")
-local dpi   = xresources.apply_dpi
-local pango_bold  = require("helpers.core").pango_bold
+local core  = require("helpers.core")
 
 local task = require("core.system.task")
 
@@ -19,13 +19,13 @@ local task = require("core.system.task")
 -- █▄█ █ 
 
 local prompt_textbox = wibox.widget({
-  font = beautiful.base_small_font,
+  font   = beautiful.font_reg_s,
   widget = wibox.widget.textbox,
 })
 
 local prompt_textbox_colorized = wibox.container.background()
 prompt_textbox_colorized:set_widget(prompt_textbox)
-prompt_textbox_colorized:set_fg(beautiful.fg)
+prompt_textbox_colorized:set_fg(beautiful.fg_0)
 
 
 -- █▀▀ █▀█ █▀▄▀█ █▀█ █░░ █▀▀ ▀█▀ █ █▀█ █▄░█ █▀ 
@@ -79,16 +79,16 @@ end
 -- @param text The initial textbox text.
 local function task_input(type, prompt, text)
   local comp_callback   = get_completion_callback(type)
-  local default_prompt  = pango_bold(type..": ", beautiful.fg)
+  local default_prompt  = core.pango_bold(type..": ", beautiful.fg_0)
 
   awful.prompt.run {
-    font         = beautiful.base_small_font,
+    font         = beautiful.font_reg_s,
     prompt       = prompt or default_prompt,
     text         = text or "",
-    fg           = beautiful.fg,
+    fg           = beautiful.fg_0,
     bg           = beautiful.task_prompt_textbg,
     shape        = gears.shape.rounded_rect,
-    bg_cursor    = beautiful.main_accent,
+    bg_cursor    = beautiful.primary_0,
     textbox      = prompt_textbox,
     exe_callback = function(input)
       if not input or #input == 0 then
@@ -128,7 +128,7 @@ task:connect_signal("input::request", function(_, type)
     ["mod_name"]  = task.focused_task["description"]
   }
 
-  local prompt  = (prompt_options[type] and pango_bold(prompt_options[type], beautiful.fg)) or ""
+  local prompt  = (prompt_options[type] and core.pango_bold(prompt_options[type], beautiful.fg_0)) or ""
   local text    = text_options[type] or ""
 
   -- Modify and Start take no textbox input - they just execute

@@ -10,10 +10,10 @@ local beautiful = require("beautiful")
 -- Arch logo
 return wibox.widget({
   {
-    markup = colorize("", beautiful.main_accent),
+    markup = colorize("", beautiful.primary_0),
     valign = "center",
     align  = "center",
-    font   = beautiful.base_xsmall_font,
+    font   = beautiful.font_reg_xs,
     widget = wibox.widget.textbox,
   },
   widget = wibox.container.place,
@@ -29,7 +29,7 @@ return wibox.widget({
 --       resize = true,
 --       widget = wibox.widget.imagebox,
 --     },
---     bg     = beautiful.main_accent,
+--     bg     = beautiful.primary_0,
 --     shape  = gears.shape.circle,
 --     widget = wibox.container.background,
 --   },

@@ -15,7 +15,7 @@ bmcore.completion = {}
 
 local function create_header(text, i)
   return wibox.widget({
-    font   = beautiful.altfont_bold_m,
+    font   = beautiful.altfont_reg_m,
     markup = ui.colorize_text(text, beautiful.accents[i]),
     align  = "left",
     widget = wibox.widget.textbox,

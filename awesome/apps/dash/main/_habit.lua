@@ -136,7 +136,7 @@ local function create_habit_ui_entry(name, graph_id, frequency)
   })
 
   local habit_name = wibox.widget({
-    markup = colorize(name, beautiful.fg),
+    markup = colorize(name, beautiful.fg_0),
     font = beautiful.font_name .. "12",
     align = "right",
     valign = "center",

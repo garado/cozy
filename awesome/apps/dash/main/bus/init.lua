@@ -23,6 +23,8 @@ local bus = wibox.widget({
   widget = wibox.container.place,
 })
 
+local bus_cont = ui.box(bus, dpi(300), dpi(600), beautiful.dash_widget_bg)
+
 local nav_bus = keynav.area({
   name     = "bus",
   circular = true,
@@ -38,5 +40,5 @@ buscore:connect_signal("view::switch", function(_, view)
 end)
 
 return function()
-  return ui.box(bus, dpi(300), dpi(600), beautiful.dash_widget_bg), nav_bus
+  return bus_cont, nav_bus
 end

@@ -2,15 +2,14 @@
 -- █░░ ▄▀█ █▄█ █▀█ █░█ ▀█▀    █░░ █ █▀ ▀█▀ 
 -- █▄▄ █▀█ ░█░ █▄█ █▄█ ░█░    █▄▄ █ ▄█ ░█░ 
 
--- Custom layoutlist because the default doesn't have enough customizations options
--- for me.
+-- Custom layoutlist switcher (just a prettier version of the default)
 
+local beautiful = require("beautiful")
+local dpi   = require("beautiful.xresources").apply_dpi
 local awful = require("awful")
 local gears = require("gears")
 local wibox = require("wibox")
-local beautiful = require("beautiful")
-local colorize = require("helpers.ui").colorize_text
-local dpi = require("beautiful.xresources").apply_dpi
+local ui    = require("helpers.ui")
 
 return function()
  local ll = awful.widget.layoutlist {
@@ -22,27 +21,26 @@ return function()
     widget_template = {
       {
         {
-          id            = 'icon_role',
           forced_height = dpi(30),
           forced_width  = dpi(30),
-          widget        = wibox.widget.imagebox,
+          id     = 'icon_role',
+          widget = wibox.widget.imagebox,
         },
         margins = dpi(5),
         widget  = wibox.container.margin,
       },
-      id              = 'background_role',
-      bg              = beautiful.layout_bg,
       forced_width    = dpi(35),
       forced_height   = dpi(35),
-      shape           = gears.shape.rounded_rect,
-      widget          = wibox.container.background,
+      bg     = beautiful.bg_0,
+      shape  = gears.shape.rounded_rect,
+      widget = wibox.container.background,
     },
   }
 
   local title = wibox.widget({
-    markup = colorize("Layout name", beautiful.fg),
-    font = beautiful.font_name .. "15",
-    align = "center",
+    markup = ui.colorize("Layout name", beautiful.fg_0),
+    font   = beautiful.font_reg_s,
+    align  = "center",
     valign = "center",
     widget = wibox.widget.textbox,
   })
@@ -61,22 +59,23 @@ return function()
         },
         widget = wibox.container.place,
       },
-      margin = dpi(20),
       forced_height = dpi(80),
       forced_width = dpi(250),
+      margin = dpi(20),
       widget = wibox.container.margin,
     },
     border_color = beautiful.border_color,
     placement    = awful.placement.centered,
-    ontop        = true,
-    visible      = false,
-    shape        = gears.shape.rounded_rect,
-    type         = "splash"
+    ontop   = true,
+    visible = false,
+    bg      = beautiful.bg_0,
+    shape   = gears.shape.rounded_rect,
+    type    = "splash"
   }
 
   local function set_title()
     local lname = awful.layout.get()["name"]
-    title:set_markup_silently(colorize(lname, beautiful.fg))
+    title:set_markup_silently(ui.colorize(lname, beautiful.fg_0))
   end
 
   local function set_icon_color(index, color)
@@ -98,11 +97,12 @@ return function()
     local layout, index = gears.table.cycle_value(ll.layouts, ll.current_layout, iter)
     awful.layout.set(layout)
     set_title()
-    set_icon_color(index, beautiful.main_accent)
+    set_icon_color(index, beautiful.primary_0)
   end
 
   -- █▄▀ █▀▀ █▄█ █▀▀ █▀█ ▄▀█ █▄▄ █▄▄ █▀▀ █▀█ 
   -- █░█ ██▄ ░█░ █▄█ █▀▄ █▀█ █▄█ █▄█ ██▄ █▀▄ 
+
   local mod = "Mod4"
   local first_keypress = true
   awful.keygrabber {

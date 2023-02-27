@@ -10,18 +10,33 @@ local dpi = xresources.apply_dpi
 
 local clock      = require(... .. ".clock")
 local battery    = require(... .. ".battery")
-local volume     = require(... .. ".volume")
-local brightness = require(... .. ".brightness")
+-- local volume     = require(... .. ".volume")
+-- local brightness = require(... .. ".brightness")
 local taglist = require(... .. ".taglist")
-local git     = require(... .. ".git_backup")
+-- local git     = require(... .. ".git_backup")
 local notif   = require(... .. ".notif")
-local app_launcher = require(... .. ".app_launcher")
-local launchers = require(... .. ".launchers")
+-- local app_launcher = require(... .. ".app_launcher")
+-- local launchers = require(... .. ".launchers")
 local timew     = require(... .. ".timew")
 local logo    = require(... .. ".logo")
+local layout = require(... .. ".layout")
 
 -- local systray = require(... .. ".systray")
--- local layout, layout_popup = require(... .. ".layout")()
+
+local top_vbar = wibox.widget({
+  logo,
+  layout = wibox.layout.fixed.vertical,
+})
+
+local bottom_vbar = wibox.widget({
+  timew,
+  layout,
+  notif,
+  battery,
+  clock,
+  spacing = dpi(10),
+  layout = wibox.layout.fixed.vertical,
+})
 
 return function(s)
   s.bar = awful.popup({
@@ -36,40 +51,20 @@ return function(s)
       {
         {
           { -- Top
-            {
-              logo,
-              -- app_launcher,
-              -- launchers[1],
-              -- launchers[2],
-              -- launchers[3],
-              -- git,
-              layout = wibox.layout.fixed.vertical,
-            },
+            top_vbar,
             top = dpi(8),
             widget = wibox.container.margin,
           },
           taglist(s), -- Middle
           { -- Bottom
-            {
-              timew,
-              brightness,
-              volume,
-              notif,
-              -- layout,
-              battery,
-              clock,
-              --systray,
-              spacing = dpi(10),
-              layout = wibox.layout.fixed.vertical,
-            },
+            bottom_vbar,
             bottom = dpi(6),
             widget = wibox.container.margin,
           },
           layout = wibox.layout.align.vertical,
           expand = "none",
         },
-        left    = dpi(3),
-        right   = dpi(3),
+        margins = dpi(3),
         widget  = wibox.container.margin,
       },
       bg      = beautiful.wibar_bg,

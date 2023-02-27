@@ -2,19 +2,20 @@
 -- █▀▀ ▄▀█ █░░ █▀▀ █▄░█ █▀▄ ▄▀█ █▀█ 
 -- █▄▄ █▀█ █▄▄ ██▄ █░▀█ █▄▀ █▀█ █▀▄ 
 
--- Interactive calendar
--- TODO add deadlines
+-- Interactive calendar for calpopup
 
-local wibox = require("wibox")
+local beautiful  = require("beautiful")
 local xresources = require("beautiful.xresources")
-local beautiful = require("beautiful")
-local dpi = xresources.apply_dpi
+local dpi    = xresources.apply_dpi
+local wibox  = require("wibox")
+local gears  = require("gears")
+local keynav = require("modules.keynav")
+
 local area = require("modules.keynav.area")
 local navbase = require("modules.keynav.navitem").Base
 local navbg = require("modules.keynav.navitem").Background
-local gears = require("gears")
 local cal = require("core.system.cal")
-local dash = require("core.cozy.dash")
+local cpcore = require("core.cozy.calpopup")
 
 local box = require("helpers.ui").create_boxed_widget
 local colorize = require("helpers.ui").colorize_text
@@ -247,7 +248,7 @@ calendar = wibox.widget({
   month_label,
   create_week_label(),
   spacing = dpi(20),
-  layout = wibox.layout.fixed.vertical,
+  layout  = wibox.layout.fixed.vertical,
 })
 
 function calendar:get_daybox(idx)
@@ -283,7 +284,7 @@ function calendar:iter_month(dir)
     newmonth = 1
     newyear  = self.year + 1
   end
-  dash:emit_signal("agenda::calendar::redraw", newmonth, newyear)
+  cpcore:emit_signal("agenda::calendar::redraw", newmonth, newyear)
 end
 
 function calendar:jump_to_today()
@@ -300,7 +301,7 @@ local calendar_container = wibox.widget({
 local final_widget = box(calendar_container, dpi(430), dpi(420), beautiful.dash_widget_bg)
 nav_cal.widget = navbg({ widget = final_widget.children[1] })
 
-dash:connect_signal("agenda::calendar::redraw", function(_, month, year)
+cpcore:connect_signal("agenda::calendar::redraw", function(_, month, year)
   calendar:update(month, year)
 end)
 

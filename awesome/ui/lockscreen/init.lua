@@ -24,10 +24,10 @@ local enter_input, lockscreen
 -- █ █░▀█ █▀▀ █▄█ ░█░    █▄█ █ 
 
 local title = wibox.widget({
-  markup = ui.colorize("Enter Passcode", beautiful.fg),
+  markup = ui.colorize("Enter Passcode", beautiful.fg_0),
   align  = "center",
   valign = "center",
-  font   = beautiful.base_small_font,
+  font   = beautiful.font_reg_s,
   widget = wibox.widget.textbox,
 })
 
@@ -79,15 +79,15 @@ local function add_pinbutton (num, field)
   return {
     {
       {
-        markup = ui.colorize(num, beautiful.fg),
-        font   = beautiful.base_small_font,
+        markup = ui.colorize(num, beautiful.fg_0),
+        font   = beautiful.font_reg_s,
         align  = "center",
         valign = "center",
         widget = wibox.widget.textbox,
       },
       forced_height = dpi(50),
       forced_width  = dpi(50),
-      bg     = beautiful.bg_l2,
+      bg     = beautiful.bg_3,
       shape  = gears.shape.circle,
       layout = wibox.container.background,
     },
@@ -132,7 +132,7 @@ local pfp = wibox.widget({
       forced_width  = dpi(130),
       layout = wibox.widget.imagebox,
     },
-    bg     = beautiful.main_accent,
+    bg     = beautiful.primary_0,
     shape  = gears.shape.circle,
     widget = wibox.container.background,
   },

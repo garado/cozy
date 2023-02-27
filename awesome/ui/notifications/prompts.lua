@@ -22,14 +22,14 @@ local config = require("cozyconf")
 -- Triggers 2x per hour between 4-11pm if I haven't written
 -- Note: this requires jrnl to be installed (pacman -S jrnl)
 local journal_yes = naughty.action { 
-  name = helpers.ui.colorize_text("Yes", beautiful.fg)
+  name = helpers.ui.colorize_text("Yes", beautiful.fg_0)
 }
 journal_yes:connect_signal("invoked", function()
   awful.spawn.easy_async_with_shell("alacritty -e jrnl", function() end)
 end)
 
 local journal_no = naughty.action {
-  name = helpers.ui.colorize_text("No", beautiful.fg),
+  name = helpers.ui.colorize_text("No", beautiful.fg_0),
 }
 journal_no:connect_signal("invoked", function()
   naughty.notification {
@@ -66,7 +66,7 @@ end)
 -- Makes sure I'm going to bed on time
 -- Cronjob triggers this every half hour between 12am-5am
 local sleep_yes = naughty.action { 
-  name = helpers.ui.colorize_text("Okay.", beautiful.fg) 
+  name = helpers.ui.colorize_text("Okay.", beautiful.fg_0) 
 }
 sleep_yes:connect_signal("invoked", function()
   naughty.notification {
@@ -78,14 +78,14 @@ sleep_yes:connect_signal("invoked", function()
 end)
 
 local sleep_no = naughty.action { 
-  name = helpers.ui.colorize_text("Nah.", beautiful.fg) 
+  name = helpers.ui.colorize_text("Nah.", beautiful.fg_0) 
 }
 sleep_no:connect_signal("invoked", function()
   naughty.notification {
     app_name = "Health",
     title = "You decide not to sleep.",
     message = "You will regret this in the\nmorning.",
-    fg = beautiful.fg_urgent,
+    fg = beautiful.fg_0_urgent,
     timeout = 0,
   }
 end)
@@ -106,7 +106,7 @@ end)
 -- Checks if I've updated my ledger today
 -- Every 3 hours
 local ledger_yes = naughty.action { 
-  name = helpers.ui.colorize_text("Yes", beautiful.fg) 
+  name = helpers.ui.colorize_text("Yes", beautiful.fg_0) 
 }
 
 ledger_yes:connect_signal("invoked", function()
@@ -123,7 +123,7 @@ ledger_yes:connect_signal("invoked", function()
 end)
 
 local ledger_no = naughty.action {
-  name = helpers.ui.colorize_text("No", beautiful.fg),
+  name = helpers.ui.colorize_text("No", beautiful.fg_0),
 }
 
 awesome.connect_signal("habit::ledger_check", function()

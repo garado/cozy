@@ -58,8 +58,8 @@ return function(s)
 			create_callback = function(self, c3, _)
 				local indicator = wibox.widget({
 					{
-            markup = colorize("-", beautiful.fg),
-            font   = beautiful.alt_xsmall_font,
+            markup = colorize("-", beautiful.fg_0),
+            font   = beautiful.font_reg_xs,
             align  = "center",
             valign = "center",
             widget = wibox.widget.textbox,

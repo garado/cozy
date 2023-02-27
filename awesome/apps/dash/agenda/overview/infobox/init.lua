@@ -65,10 +65,10 @@ local infobox = wibox.widget({
       forced_height = dpi(250),
       widget = wibox.container.place,
     },
-    wibox.widget({
+    {
       indicators,
       widget = wibox.container.place,
-    }),
+    },
     layout = wibox.layout.fixed.vertical,
   },
   margins = dpi(5),

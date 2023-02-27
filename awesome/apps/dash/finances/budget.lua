@@ -33,7 +33,7 @@ local function create_bar(category, spent, budgeted, color)
 
   local text_color
   if spent < budgeted then
-    text_color = beautiful.fg
+    text_color = beautiful.fg_0
   else
     text_color = beautiful.red
   end
@@ -43,7 +43,7 @@ local function create_bar(category, spent, budgeted, color)
     valign = "center",
     ellipsize = "end",
     markup = colorize(category, text_color),
-    font = beautiful.alt_small_font,
+    font = beautiful.font_reg_s,
     widget = wibox.widget.textbox,
   })
 
@@ -54,7 +54,7 @@ local function create_bar(category, spent, budgeted, color)
     align = "end",
     valign = "center",
     ellipsize = "end",
-    font = beautiful.alt_small_font,
+    font = beautiful.font_reg_s,
     markup = colorize(label_text, text_color),
     widget = wibox.widget.textbox,
   })
@@ -106,5 +106,5 @@ ledger:connect_signal("update::budget", function(_)
   create_bars(ledger.budget)
 end)
 
-return box(widget, dpi(0), dpi(600), beautiful.dash_widget_bg)
+return box(widget, dpi(0), dpi(500), beautiful.dash_widget_bg)
 
