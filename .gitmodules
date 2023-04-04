@@ -1,15 +1,9 @@
 [submodule "awesome/modules/keynav"]
 	path = awesome/modules/keynav
-	url = git@github.com:garado/awesome-keynav.git
+	url = https://github.com/garado/awesome-keynav.git
 [submodule "awesome/modules/bling"]
 	path = awesome/modules/bling
 	url = https://github.com/garado/bling.git
 [submodule "awesome/modules/fzy-lua"]
 	path = awesome/modules/fzy-lua
-	url = git@github.com:swarn/fzy-lua.git
-[submodule "awesome/modules/awesome-widgets"]
-	path = awesome/modules/awesome-widgets
-	url = git@github.com:garado/awesome-widgets.git
-[submodule "awesome/modules/awesome-keyboard-nav"]
-	path = awesome/modules/awesome-keyboard-nav
-	url = git@github.com:garado/awesome-keyboard-nav.git
+	url = https://github.com/swarn/fzy-lua.git	
