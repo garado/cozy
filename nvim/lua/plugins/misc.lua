@@ -29,6 +29,11 @@ return {
   },
 
   {
+    'samsaga2/vim-z80',
+    ft = {"s"}
+  },
+
+  {
     "lervag/vimtex",
     ft = "tex",
     config = function()
@@ -38,4 +43,7 @@ return {
 
   -- Show Neovim in Discord
   "andweeb/presence.nvim",
+
+  -- Venn diagrams
+  "jbyuki/venn.nvim",
 }

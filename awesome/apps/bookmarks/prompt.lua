@@ -8,9 +8,10 @@ local dpi   = xresources.apply_dpi
 local awful = require("awful")
 local wibox = require("wibox")
 local ui    = require("helpers.ui")
-local bmcore = require("core.cozy.bookmarks")
+local bm = require("core.cozy.bookmarks")
 local bmarks = require("cozyconf.bookmarks")
 local fzy = require("modules.fzy_lua")
+local completion = require("apps.bookmarks.fzf-completion")
 
 -- █░█ █ 
 -- █▄█ █ 
@@ -40,55 +41,90 @@ prompt_color:set_fg(beautiful.fg_0)
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄ 
 -- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀ 
 
--- returns just the titles
+-- Iterate through bookmarks and create list of titles
 local function find_titles(t, res)
   if not res then res = {} end
-  for _, v in pairs(t) do
-    if type(v) == "table" then
-      find_titles(v, res)
-    end
-
-    if v.title then
-      res[#res+1] = v.title
+  for _, links in pairs(t) do
+    for i = 1, #links do
+      res[#res+1] = links[i][bm._TITLE]
     end
   end
   return res
 end
 
-local function title_completion(command_before_comp, cur_pos_before_comp, ncomp)
-  local titles = find_titles(bmarks)
-  return awful.completion.generic(command_before_comp, cur_pos_before_comp, ncomp, titles)
+-- Tab completion function
+local function tab_complete(command_before_comp, cur_pos_before_comp, ncomp)
+  return completion.fzf(command_before_comp, cur_pos_before_comp, ncomp, bm.titles)
+end
+
+-- Function to execute whenever the prompt input changes
+-- Fuzzy-finds and highlights possible matches
+local function changed_callback(command)
+  bm.curmatches = fzy.filter(command, bm.titles)
+
+  if command == "" then
+    bm.content:set_all_fg(beautiful.fg_0)
+    return
+  else
+    bm.content:set_all_fg(beautiful.bg_5)
+  end
+
+  for i = 1, #bm.curmatches do
+
+    local title = bm.titles[bm.curmatches[i][1]]
+    for _, links in pairs(bmarks) do
+      for j = 1, #links do
+        if links[j][bm._TITLE] == title then
+          links[j][bm._WIBOX]:set_fg(beautiful.fg_0)
+          goto continue
+        end
+      end
+      ::continue::
+    end
+
+  end
+
+end
+
+-- Function to execute when pressing Enter on prompt
+local function exe_callback(input)
+  for _, links in pairs(bmarks) do
+    for i = 1, #links do
+      if links[i][bm._TITLE] == input then
+        local link = links[i][bm._LINK]
+        local cmd = 'xdg-open "'.. link ..'"'
+        awful.spawn.easy_async_with_shell(cmd, function() end)
+        bm:close()
+        break
+      end
+    end
+  end
 end
 
 -- Start prompt
 local function promptme()
-  bmcore.titles = find_titles(bmarks)
+  bm.content:set_all_fg(beautiful.fg_0)
+  bm.titles = find_titles(bmarks)
   awful.prompt.run {
     textbox = prompt_textbox,
     fg      = beautiful.fg_0,
     font    = beautiful.altfont_reg_s,
     bg_cursor = beautiful.primary_0,
-    changed_callback = function(command)
-      bmcore.curmatches = fzy.filter(command, bmcore.titles)
-      for _, data in pairs(bmcore.data) do
-        data[bmcore.WIBOX]:set_fg(beautiful.bg_5)
+    exe_callback = exe_callback,
+    completion_callback = tab_complete,
+    keypressed_callback = function(_, key, command)
+      if key == "Escape" then
+        bm:close()
       end
 
-      for i = 1, #bmcore.curmatches do
-        local title = bmcore.titles[bmcore.curmatches[i][1]]
-        bmcore.data[title][bmcore.WIBOX]:set_fg(beautiful.fg_0)
+      if key ~= "Tab" and key ~= "Shift_R" then
+        changed_callback(command)
       end
-    end,
-    completion_callback = title_completion,
-    exe_callback = function(input)
-      local cmd = 'xdg-open "'.. bmcore.data[input][bmcore.LINK] ..'"'
-      awful.spawn.easy_async_with_shell(cmd, function() end)
-      bmcore:close()
     end
   }
 end
 
-bmcore:connect_signal("setstate::open", promptme)
+bm:connect_signal("setstate::open", promptme)
 
 return {
   prompt,

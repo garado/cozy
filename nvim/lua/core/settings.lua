@@ -51,6 +51,11 @@ opt.si = true	 -- smart indent
 -- j, k move to next displayed line instead of next physical line
 opt.wrap = true
 
+vim.cmd('nnoremap j gj')
+vim.cmd('nnoremap k gk')
+vim.cmd('vnoremap j gj')
+vim.cmd('vnoremap k gk')
+
 -- Remove ugly squigglies from eob, replace with space
 opt.fillchars = { eob = " " }
 

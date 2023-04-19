@@ -2,16 +2,14 @@
 -- █▄▄ █▀█ █▀█ █▄▀ █▀▄▀█ ▄▀█ █▀█ █▄▀ █▀ 
 -- █▄█ █▄█ █▄█ █░█ █░▀░█ █▀█ █▀▄ █░█ ▄█ 
 
-local awful = require("awful")
-local wibox = require("wibox")
-local beautiful = require("beautiful")
+local beautiful  = require("beautiful")
 local xresources = require("beautiful.xresources")
-local dpi = xresources.apply_dpi
-local bmcore   = require("core.cozy.bookmarks")
-local keynav   = require("modules.keynav")
-local colorize = require("helpers.ui").colorize_text
+local dpi     = xresources.apply_dpi
+local awful   = require("awful")
+local wibox   = require("wibox")
+local bmcore  = require("core.cozy.bookmarks")
 
-local prompt = require(... .. ".prompt")
+local prompt   = require(... .. ".prompt")
 local sections = require(... .. ".sections")
 
 local layout = wibox.widget({
@@ -22,8 +20,8 @@ local layout = wibox.widget({
 })
 
 local bookmarks = awful.popup({
-  minimum_height = dpi(550),
-  maximum_height = dpi(550),
+  minimum_height = dpi(530),
+  maximum_height = dpi(530),
   minimum_width = dpi(980),
   maximum_width = dpi(980),
   placement = awful.placement.centered,
@@ -40,12 +38,10 @@ local bookmarks = awful.popup({
 
 bmcore:connect_signal("setstate::open", function()
   bookmarks.visible = true
-  -- navigator:start()
 end)
 
 bmcore:connect_signal("setstate::close", function()
   bookmarks.visible = false
-  -- navigator:stop()
 end)
 
 return function(_) return bookmarks end

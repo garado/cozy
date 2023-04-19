@@ -11,7 +11,6 @@ local naughty = require("naughty")
 local helpers = require("helpers")
 local menubar = require("menubar")
 local animation = require("modules.animation")
-local widgets = require("ui.widgets")
 local colorize = require("helpers.ui").colorize_text
 
 naughty.persistence_enabled = true
@@ -79,23 +78,19 @@ naughty.connect_signal("request::display", function(n)
 	local icon = wibox.widget({
 		{
 			{
-				{
-					image = n.icon,
-					resize = true,
-					clip_shape = gears.shape.circle,
-					halign = "center",
-					valign = "center",
-					widget = wibox.widget.imagebox,
-				},
-				border_width = dpi(2),
-				border_color = accent_color,
-				shape = gears.shape.circle,
-				widget = wibox.container.background,
+			  image = n.icon,
+			  resize = true,
+			  clip_shape = gears.shape.circle,
+			  halign = "center",
+			  valign = "center",
+			  widget = wibox.widget.imagebox,
 			},
-			strategy = "exact",
-			height = dpi(50),
-			width = dpi(50),
-			widget = wibox.container.constraint,
+      forced_width  = dpi(50),
+      forced_height = dpi(50),
+			border_width = dpi(2),
+			border_color = accent_color,
+			shape = gears.shape.circle,
+			widget = wibox.container.background,
 		},
 		layout = wibox.layout.stack,
 	})
@@ -107,8 +102,8 @@ naughty.connect_signal("request::display", function(n)
       widget = wibox.widget.textbox,
     },
     step_function = wibox.container.scroll.step_functions.waiting_nonlinear_back_and_forth,
-    fps = 60,
-    speed = 75,
+    fps    = 60,
+    speed  = 75,
     widget = wibox.container.scroll.horizontal,
   })
 
@@ -119,14 +114,14 @@ naughty.connect_signal("request::display", function(n)
     message = naughty.widget.message
   else
     message = wibox.widget({
-      wibox.widget({
+      {
         markup  = colorize(n.message, beautiful.fg_0),
         font    = beautiful.font_reg_s,
         widget  = wibox.widget.textbox,
-      }),
+      },
       step_function = wibox.container.scroll.step_functions.waiting_nonlinear_back_and_forth,
-      fps = 60,
-      speed = 100,
+      fps    = 60,
+      speed  = 100,
       widget = wibox.container.scroll.horizontal,
     })
   end
@@ -177,20 +172,6 @@ naughty.connect_signal("request::display", function(n)
     widget = wibox.widget.textbox,
   })
 
-  local dismiss = widgets.button.text.normal({
-    font = beautiful.font,
-    size = 10,
-		paddings = dpi(2),
-		bold = false,
-		text = "",
-    normal_bg = beautiful.notif_dismiss_bg,
-		text_normal_bg = accent_color,
-		animate_size = false,
-		on_release = function()
-			n:destroy(naughty.notification_closed_reason.dismissed_by_user)
-		end,
-	})
-
   local timeout_bar = wibox.widget ({
     widget = wibox.widget.progressbar,
 		forced_height = dpi(3),
@@ -221,7 +202,6 @@ naughty.connect_signal("request::display", function(n)
               {
                 app_name,
                 nil,
-                dismiss,
                 layout = wibox.layout.align.horizontal,
               },
               {

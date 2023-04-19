@@ -54,15 +54,6 @@ return {
   },
 
   {
-    "shaunsingh/nord.nvim",
-    lazy = false,
-    priority = 1000,
-    init = function()
-      vim.cmd("colorscheme nord")
-    end
-  },
-
-  {
     "lukas-reineke/indent-blankline.nvim",
     config = function()
       require("config.indent-blankline")

@@ -28,6 +28,7 @@ end
 
 local plugin_files = {
   require("plugins.core"),
+  require("plugins.themes"),
   require("plugins.ui"),
   require("plugins.qol"),
   require("plugins.misc"),

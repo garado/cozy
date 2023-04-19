@@ -36,6 +36,13 @@ local lsp_flags = {
   debounce_text_changes = 150,
 }
 
+lspconfig.clangd.setup{
+  on_attach = on_attach,
+  lsp_flags = lsp_flags,
+  cmd = {"clangd"},
+  filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
+}
+
 lspconfig.lua_ls.setup {
   on_attach = on_attach,
   lsp_flags = lsp_flags,
