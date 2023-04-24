@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# █▀▀ █▀▀ ▀█▀ █▀▀ █░█    █▀█ ▄▀█ █▄░█ █▀▀ █▀▀ 
+# █▀░ ██▄ ░█░ █▄▄ █▀█    █▀▄ █▀█ █░▀█ █▄█ ██▄ 
+
+# Fetch events from a range of dates from the cache file
+# Date format is 
+
+FILE=$1
+STARTDATE=$2
+ENDDATE=$3
+
+awk -F, ' BEGIN { "echo '$STARTDATE'" | getline a; "echo '$ENDDATE'" | getline b } \
+  { if ( $0>a && $0<b ) { print $0 }} ' $FILE

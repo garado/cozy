@@ -56,6 +56,12 @@ function bookmarks:new()
   self.NAVITEM = 2
   self.WIBOX = 3
 
+  -- Enum for accessing bookmarks config data
+  self._TITLE = 1
+  self._LINK  = 2
+  self._ICON  = 3
+  self._WIBOX = 4
+
   self:find_links(marks)
 end
 

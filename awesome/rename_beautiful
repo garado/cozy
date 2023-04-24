@@ -1,0 +1,37 @@
+#!/bin/bash
+
+dir=$(pwd)
+
+read -p "Renaming... Press enter to continue"
+
+one="beautiful.bg_l0"
+two="beautiful.bg_1"
+grep -rli "$one" * | xargs -i@ sed -i "s/$one/$two/g" @
+
+one="beautiful.bg_l1"
+two="beautiful.bg_2"
+grep -rli "$one" * | xargs -i@ sed -i "s/$one/$two/g" @
+
+one="beautiful.bg_l2"
+two="beautiful.bg_3"
+grep -rli "$one" * | xargs -i@ sed -i "s/$one/$two/g" @
+
+one="beautiful.bg_l3"
+two="beautiful.bg_4"
+grep -rli "$one" * | xargs -i@ sed -i "s/$one/$two/g" @
+
+one="beautiful.main_accent"
+two="beautiful.primary_0"
+grep -rli "$one" * | xargs -i@ sed -i "s/$one/$two/g" @
+
+one="beautiful.fg"
+two="beautiful.fg_0"
+grep -rli "$one" * | xargs -i@ sed -i "s/$one/$two/g" @
+
+one="beautiful.fg_sub"
+two="beautiful.fg_1"
+grep -rli "$one" * | xargs -i@ sed -i "s/$one/$two/g" @
+
+one="beautiful.fg_alt"
+two="beautiful.fg_2"
+grep -rli "$one" * | xargs -i@ sed -i "s/$one/$two/g" @

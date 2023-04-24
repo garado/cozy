@@ -75,11 +75,11 @@ dash:connect_signal("agenda::view_selected", function(_, view)
 end)
 
 -- Turn on dashboard navigator again when calpopup closes
-cpcore:connect_signal("setstate::close", function()
-  if nav_agenda.nav then
-    nav_agenda.nav:start()
-  end
-end)
+-- cpcore:connect_signal("setstate::close", function()
+--   if nav_agenda.nav then
+--     nav_agenda.nav:start()
+--   end
+-- end)
 
 return function()
   return main_contents, nav_agenda

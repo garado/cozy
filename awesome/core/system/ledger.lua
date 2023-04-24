@@ -5,24 +5,38 @@
 -- For interfacing with Ledger and interacting with Ledger files.
 
 local gobject = require("gears.object")
-local gtable = require("gears.table")
-local awful = require("awful")
-local config = require("cozyconf")
-local core = require("helpers.core")
+local gtable  = require("gears.table")
+local awful   = require("awful")
+local config  = require("cozyconf")
+local core    = require("helpers.core")
+local naughty = require("naughty")
 local ledger_file = config.ledger.ledger_file
 local budget_file = config.ledger.budget_file
 
-local ledger = { }
+local ledger = {}
 local instance = nil
 
----------------------------------------------------------------------
+local MAX_TRANSACTIONS_SHOWN = 25
 
--- TODO: add error checking for improperly formatted ledger entries
+function ledger:send_error(stderr)
+  if self.error_notif_sent then return end
+  self.error_notif_sent = true
+
+  naughty.notification {
+    app_name = "Dashboard",
+    title    = "Error when parsing ledger file",
+    message  = "Cozy could not load data from ledger",
+  }
+end
 
 --- Call Ledger command to get account balances.
 function ledger:parse_account_balances()
   local cmd = "ledger -f " .. ledger_file .. " balance checking savings --no-total"
-  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+  awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
+    if stderr ~= "" then
+      self:send_error(stderr)
+      return
+    end
 
     local lines = core.split("\r\n", stdout)
     for i = 1, #lines do
@@ -44,18 +58,21 @@ function ledger:parse_account_balances()
     end
 
     self:emit_signal("update::balances")
+    self:parse_start_of_month_balance()
 
   end) -- end async
 end -- end get_account_balances
 
 --- Call Ledger command to get most recent transactions.
 -- The Ledger command returns CSV.
--- @param amt The number of transactions to grab (default 10)
-function ledger:parse_recent_transactions(amt)
-  if not amt then amt = 20 end
+function ledger:parse_recent_transactions()
+  local cmd = "ledger -f " .. ledger_file .. " csv expenses reimbursements income | head -" .. MAX_TRANSACTIONS_SHOWN
+  awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
+    if stderr ~= "" then
+      self:send_error(stderr)
+      return
+    end
 
-  local cmd = "ledger -f " .. ledger_file .. " csv expenses reimbursements income | head -" .. amt
-  awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local transactions = {}
 
     -- Iterate over lines
@@ -88,6 +105,19 @@ function ledger:parse_recent_transactions(amt)
     self:emit_signal("update::transactions")
   end)
 end
+
+--- Get account balances at the end of last month
+-- This information is used when calculating percent change
+function ledger:parse_start_of_month_balance()
+  -- The -e flag shows all transactions before the specified date
+  local first = os.date("%Y-%m-01")
+  local cmd = "ledger -f " .. ledger_file .. " bal -e " .. first .. " | grep Assets"
+  awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
+    self.start_of_month_balance = string.gsub(stdout, "[^0-9.]", "")
+    self:emit_signal("update::percentdiff")
+  end)
+ end
+
 
 --- Call Ledger command to get information on how much was spent this month
 -- per category.
@@ -155,7 +185,11 @@ function ledger:parse_budget(month)
   local format = " budget --budget-format '%A,%T\n'"
   local begin = " --begin " .. (month or os.date("%Y/%m/01"))
   local cmd = "ledger " .. files .. begin .. format .. " --no-total"
-  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+  awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
+    if stderr ~= "" then
+      self:send_error(stderr)
+      return
+    end
 
     local budget_entries  = {}
     local total_spent     = 0
@@ -267,18 +301,16 @@ end
 
 ---------------------------------------------------------------------
 
-function ledger:new()
+function ledger:reload()
   self:parse_account_balances()
   self:parse_recent_transactions()
   self:parse_transactions_this_month()
   self:parse_budget()
 end
 
-function ledger:reload()
-  self:parse_account_balances()
-  self:parse_recent_transactions()
-  self:parse_transactions_this_month()
-  self:parse_budget()
+function ledger:new()
+  self.error_notif_sent = false
+  self:reload()
 end
 
 local function new()

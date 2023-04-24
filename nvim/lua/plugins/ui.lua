@@ -88,5 +88,16 @@ return {
     dependencies = {
       "nvim-lua/plenary.nvim"
     },
+    config = function()
+      require("telescope").setup {
+        defaults = {
+          file_ignore_patterns = {
+            "%.png",
+            "%.jpg",
+            "%.jpeg",
+          }
+        }
+      }
+  end,
   },
 }

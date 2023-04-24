@@ -7,6 +7,7 @@
 -- @author Pavel Makhov
 -- @copyright 2020 Pavel Makhov
 -- Modified by Alexis G.
+
 -------------------------------------------------
 
 local awful = require("awful")
@@ -14,7 +15,6 @@ local naughty = require("naughty")
 local wibox = require("wibox")
 local gears = require("gears")
 local beautiful = require("beautiful")
-local widget_themes = require("modules.github-contributions-widget.themes")
 
 local GET_CONTRIBUTIONS_CMD = [[bash -c "curl -s https://github-contributions.vercel.app/api/v1/%s]]
   .. [[ | jq -r '[.contributions[] ]]
@@ -41,16 +41,17 @@ local function worker(user_args)
   local args = user_args or {}
   local username = args.username or 'garado'
   local days = args.days or 130
-  local color_of_empty_cells = args.color_of_empty_cells
+  local color_of_empty_cells = args.color_of_empty_cells or beautiful.bg_0
   local with_border = args.with_border
   local margin_top = args.margin_top or 0
-  local theme = beautiful.gradient or widget_themes["default"]
+  -- local theme = beautiful.gradient or widget_themes["default"]
+  local theme = beautiful.gradient
   local square_size = args.square_size or 15
   local border_width = args.border_width or 3
 
   if theme == nil then
     show_warning('Theme does not exist')
-    theme = 'standard'
+    return
   end
 
   if with_border == nil then with_border = true end

@@ -39,6 +39,8 @@ ruled.client.connect_signal("request::rules", function()
         "Nm-connection-editor",
         "qBittorrent",
         "mpv",
+        "gnuplot_qt",
+        "zoom",
       },
       role = {
         "GtkFileChooserDialog",

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+old=$1
+new=$2
+dir=$(pwd)
+
+read -p "Replacing all instances of $old with $new within directory $dir. Continue?"
+grep -rli "$1" * | xargs -i@ sed -i "s/$1/$2/g" @

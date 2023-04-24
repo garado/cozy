@@ -1,3 +1,0 @@
-return {
-  nlnd = require(... .. ".nlnd")
-}

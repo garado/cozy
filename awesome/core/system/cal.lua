@@ -9,6 +9,7 @@ local gtable  = require("gears.table")
 local gfs     = require("gears.filesystem")
 local awful   = require("awful")
 local core    = require("helpers.core")
+local naughty = require("naughty")
 
 local agenda = { }
 local instance = nil
@@ -61,10 +62,20 @@ function agenda:check_cache_empty()
   end)
 end
 
+function agenda:prompt_update_cache()
+  naughty.notify {
+    app_name = "gcalcli",
+    title    = "Reauthentication required",
+    message  = "Open browser to reauthenticate gcalcli?"
+  }
+end
+
 --- Use gcalcli cmd to write the last 5 months and next 5 months of data to cache
+-- TODO: Error checking here for if reauthentication is required
 function agenda:update_cache()
+  -- local ERR_MSG = ""
   local cmd = "gcalcli agenda '5 months ago' '5 months' --details location --tsv > " .. CACHE_PATH
-  awful.spawn.easy_async_with_shell(cmd, function(_)
+  awful.spawn.easy_async_with_shell(cmd, function()
     self:emit_signal("cache::updated")
     self:emit_signal("cache::not_empty")
   end)
@@ -157,7 +168,7 @@ function agenda:fetch_anchored_daterange(anchor, days_before, days_after)
       end
 
       -- Insert into database
-      -- TODO: optimize this, not sure how performant this is
+      -- TODO: maybe optimize this, not sure how performant this is
       local year, month, date = date_to_fields(event[self.START_DATE])
       if not self.events[year] then self.events[year] = {} end
       if not self.events[year][month] then self.events[year][month] = {} end
@@ -354,6 +365,14 @@ end
 
 ---------------------------------------------------------------------
 
+function agenda:get_events(y, m, d)
+  if self.events[y] and self.events[y][m] and self.events[y][m][d] then
+    return self.events[y][m][d]
+  else
+    return nil
+  end
+end
+
 function agenda:get_num_events(month, date)
   if not self.events[month] then return 0 end
   if not self.events[month][date] then return 0 end
@@ -376,15 +395,11 @@ function agenda:new()
   self:check_cache_empty()
 
   self:connect_signal("cache::not_empty", function()
-    -- self:fetch_month()
-    -- self:fetch_upcoming()
+    self.events = {}
     self:fetch_anchored_daterange(nil, 7, 7)
   end)
 
-  --- BUG: issues when directly setting execute_request as callback
-  self:connect_signal("input::complete", function(_, type, input)
-    self:execute_request(_, type, input)
-  end)
+  self:connect_signal("input::complete", self.execute_request)
 
   self:connect_signal("selected::date", function(_, date)
     self:selected_date(date)

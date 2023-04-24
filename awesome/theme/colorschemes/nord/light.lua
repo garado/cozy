@@ -3,67 +3,85 @@
 -- █░▀█ █▄█ █▀▄ █▄▀    █▄▄ █ █▄█ █▀█ ░█░ 
 
 local gfs = require("gears.filesystem")
-local colorscheme = {
-  colors = {},
-  override = {},
-  switcher = {},
-  wall_path = nil,
-}
+local colors    = {}
+local override  = {}
+local switcher  = {}
 
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
-local awesome_cfg = gfs.get_configuration_dir()
-colorscheme.wall_path = awesome_cfg .. "theme/colorschemes/nord/light.jpg"
+
+local theme_dir = gfs.get_configuration_dir() .. "theme/colorschemes/nord/"
+local wall_path = theme_dir .. "light.png"
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
-colorscheme.colors.accents = {
-  "#8fbcbb",
-  "#88c0d0",
+
+colors.accents = {
+  "#729696",
+  "#6d99a6",
   "#81a1c1",
   "#5e81ac",
   "#bf616a",
   "#b46b54",
   "#c18401",
-  "#a3be8c",
-  "#b48ead",
+  "#75905e",
+  "#9e6d95",
 }
 
-colorscheme.colors.bg_d0   = "#dee4ef"
-colorscheme.colors.bg      = "#d8dee9"
-colorscheme.colors.bg_l0   = "#ced4df"
-colorscheme.colors.bg_l1   = "#bac0cb"
-colorscheme.colors.bg_l2   = "#b0b6c1"
-colorscheme.colors.bg_l3   = "#a1a7b2"
-colorscheme.colors.fg      = "#2e3440"
-colorscheme.colors.fg_sub  = "#4c566a"
-colorscheme.colors.fg_alt  = "#6e788f"
+-- For dark themes, 0 is darkest
+-- For light themes, 0 is lightest
+colors.bg_0 = "#d8dee9"
+colors.bg_1 = "#c7ceda"
+colors.bg_2 = "#b7becb"
+colors.bg_3 = "#a7aebd"
+colors.bg_4 = "#979fae"
+colors.bg_5 = "#8790a0"
+colors.bg_6 = "#788192"
 
-colorscheme.colors.main_accent = "#6181a1"
-colorscheme.colors.red         = "#bf616a"
-colorscheme.colors.green       = "#75905e"
-colorscheme.colors.yellow      = "#ebcb8b"
-colorscheme.colors.transparent = "#ffffff00"
+-- colors.bg_0   = "#d8dee9"
+-- colors.bg_1   = "#ced4df"
+-- colors.bg_2   = "#bac0cb"
+-- colors.bg_3   = "#b0b6c1"
+-- colors.bg_4   = "#a1a7b2"
+-- colors.bg_5   = "#a1a7b2"
 
-colorscheme.colors.gradient = { -- needs work
-  [0] = "#bac0cb",
-  [1] = "#b0b6c1",
-  [2] = "#4c566a",
-  [3] = "#4d6688",
-  [4] = "#5e81ac",
-}
+colors.fg_0 = "#2e3440"
+colors.fg_1 = "#3a4659"
+colors.fg_2 = "#455874"
+
+colors.primary_0 = "#5e81ac"
+colors.primary_1 = "#506c91"
+colors.primary_2 = "#455874"
+colors.primary_3 = "#384458"
+colors.primary_4 = "#2a313d"
+
+colors.red         = "#bf616a"
+colors.green       = "#75905e"
+colors.yellow      = "#ebcb8b"
+
+colors.transparent = "#ffffff00"
 
 -- █▀█ █░█ █▀▀ █▀█ █▀█ █ █▀▄ █▀▀ 
 -- █▄█ ▀▄▀ ██▄ █▀▄ █▀▄ █ █▄▀ ██▄ 
-colorscheme.override.wibar_focused  = "#6181a1"
-colorscheme.override.wibar_occupied = "#2e3440"
+
+override.wibar_focused  = "#5e81ac"
+override.wibar_occupied = "#eceff4"
+override.wibar_empty    = "#4c566a"
+override.wibar_bg       = "#292f3c"
+override.wibar_fg       = "#eceff4"
 
 -- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ 
 -- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ 
-colorscheme.switcher.kitty   = "Nord Light"
-colorscheme.switcher.nvchad  = "onenord_light"
-colorscheme.switcher.gtk     = "Graphite-Light-nord"
-colorscheme.switcher.zathura = "nord_light"
-colorscheme.switcher.firefox = "nord-light"
 
-return colorscheme
+switcher.kitty   = "Nord Light"
+switcher.nvchad  = "onenord_light"
+switcher.gtk     = "Graphite-Light-nord"
+switcher.zathura = "nord_light"
+switcher.firefox = "nord-light"
+
+return {
+  colors    = colors,
+  override  = override,
+  switcher  = switcher,
+  wall_path = wall_path,
+}

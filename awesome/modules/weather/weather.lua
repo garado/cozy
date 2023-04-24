@@ -165,7 +165,7 @@ local function worker(user_args)
       },
       { -- Description
         id     = 'text',
-        font   = beautiful.base_xsmall_font,
+        font   = beautiful.font_reg_xs,
         align  = 'start',
         widget = wibox.widget.textbox,
       },
@@ -182,7 +182,7 @@ local function worker(user_args)
       local textbox = self:get_children_by_id('text')[1]
       local text = LCLE.feels_like .. gen_temperature_str(weather.feels_like, '%.0f', false, units)
         .. ' in Santa\nCruz with ' .. weather.weather[1].description
-      textbox:set_markup_silently(colorize(text, beautiful.fg))
+      textbox:set_markup_silently(colorize(text, beautiful.fg_0))
     end
   }
 
@@ -196,9 +196,9 @@ local function worker(user_args)
         if i > 5 then break end
         local day_forecast = wibox.widget {
           {
-            markup = colorize(os.date('%a', tonumber(day.dt) + tonumber(timezone_offset)), beautiful.fg),
+            markup = colorize(os.date('%a', tonumber(day.dt) + tonumber(timezone_offset)), beautiful.fg_0),
             align = 'center',
-            font = beautiful.base_small_font,
+            font = beautiful.font_reg_s,
             widget = wibox.widget.textbox
           },
           {
@@ -214,7 +214,7 @@ local function worker(user_args)
               layout = wibox.container.place
             },
             {
-              markup = colorize(day.weather[1].description, beautiful.fg),
+              markup = colorize(day.weather[1].description, beautiful.fg_0),
               font = font_name .. ' 8',
               align = 'center',
               forced_height = 50,
@@ -225,15 +225,15 @@ local function worker(user_args)
           },
           {
             {
-              markup = colorize(gen_temperature_str(day.temp.day, '%.0f', false, units), beautiful.fg),
+              markup = colorize(gen_temperature_str(day.temp.day, '%.0f', false, units), beautiful.fg_0),
               align = 'center',
-              font = beautiful.base_xsmall_font,
+              font = beautiful.font_reg_xs,
               widget = wibox.widget.textbox
             },
             {
-              markup = colorize(gen_temperature_str(day.temp.night, '%.0f', false, units), beautiful.fg),
+              markup = colorize(gen_temperature_str(day.temp.night, '%.0f', false, units), beautiful.fg_0),
               align = 'center',
-              font = beautiful.base_xsmall_font,
+              font = beautiful.font_reg_xs,
               widget = wibox.widget.textbox
             },
             layout = wibox.layout.fixed.vertical

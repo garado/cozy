@@ -27,20 +27,25 @@ local navigator, nav_root = keynav.navigator({
     ["4"] = function() switch_tab(4) end,
     ["5"] = function() switch_tab(5) end,
     ["6"] = function() switch_tab(6) end,
+    ["7"] = function() switch_tab(7) end,
+  },
+  ctrl_keys = {
+    ["1"] = function() print("yea") end,
   }
 })
 
-local main,   nav_main     = require(... .. ".main")()
-local tasks,  nav_tasks    = require(... .. ".task")()
-local agenda, nav_agenda   = require(... .. ".agenda")()
-local cash,   nav_cash     = require(... .. ".finances")()
-local time,   nav_time     = require(... .. ".time")()
-local journal, nav_journal = require(... .. ".journal")()
+local main,   nav_main       = require(... .. ".main")()
+local tasks,  nav_tasks      = require(... .. ".task")()
+local agenda, nav_agenda     = require(... .. ".agenda")()
+local cash,   nav_cash       = require(... .. ".finances")()
+local time,   nav_time       = require(... .. ".time")()
+local journal, nav_journal   = require(... .. ".journal")()
+local settings, nav_settings = require(... .. ".settings")()
 
-local tablist   = { main,     tasks,      agenda,     cash,     time,     journal     }
-local tabnames  = { "main",   "tasks",    "agenda",   "cash",   "time",   "journal"   }
-local tab_icons = { "",      "",        "",        "",      "",      ""         }
-local navitems  = { nav_main, nav_tasks,  nav_agenda, nav_cash, nav_time, nav_journal }
+local tablist   = { main,     tasks,      agenda,     cash,     time,     journal,     settings,     }
+local tabnames  = { "main",   "tasks",    "agenda",   "cash",   "time",   "journal",   "settings",   }
+local tab_icons = { "",      "",        "",        "",      "",      "",         "",          }
+local navitems  = { nav_main, nav_tasks,  nav_agenda, nav_cash, nav_time, nav_journal, nav_settings, }
 
 --- Display a specific tab on the dashboard
 -- @param i   Index of tab to switch to.

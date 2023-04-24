@@ -45,7 +45,7 @@ local alt_weights = {
 local alt_sizes = {
   xs = 9,
   s  = 12,
-  m  = 16,
+  m  = 14,
   l  = 22,
   xl = 28,
 }

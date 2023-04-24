@@ -1,23 +1,21 @@
 
 -- █▄░█ █▀█ █▀█ █▀▄   █▀▄ ▄▀█ █▀█ █▄▀
 -- █░▀█ █▄█ █▀▄ █▄▀   █▄▀ █▀█ █▀▄ █░█
-local gfs = require("gears.filesystem")
-local colorscheme = {
-  colors = {},
-  override = {},
-  switcher = {},
-  wall_path = nil,
-}
+
+local gfs      = require("gears.filesystem")
+local colors   = {}
+local override = {}
+local switcher = {}
 
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
 local awesome_cfg = gfs.get_configuration_dir()
--- colorscheme.wall_path = awesome_cfg .. "theme/assets/walls/nord_dark.jpeg"
-colorscheme.wall_path = awesome_cfg .. "theme/colorschemes/nord/dark.png"
+local wall_path = awesome_cfg .. "theme/colorschemes/nord/japan_01.png"
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
-colorscheme.colors.accents = {
+
+colors.accents = {
   "#8fbcbb",
   "#88c0d0",
   "#81a1c1",
@@ -29,43 +27,53 @@ colorscheme.colors.accents = {
   "#b48ead",
 }
 
-colorscheme.colors.bg_d0   = "#1a1e26"
-colorscheme.colors.bg      = "#20242c"
-colorscheme.colors.bg_l0   = "#272c36"
-colorscheme.colors.bg_l1   = "#2e3440"
-colorscheme.colors.bg_l2   = "#3b4252"
-colorscheme.colors.bg_l3   = "#434c5e"
-colorscheme.colors.fg      = "#d8dee9"
-colorscheme.colors.fg_sub  = "#606a7e"
-colorscheme.colors.fg_alt  = "#4d5668"
+colors.bg_0 = "#222732"
+colors.bg_1 = "#262c38"
+colors.bg_2 = "#2b313e"
+colors.bg_3 = "#2f3644"
+colors.bg_4 = "#343b4a"
+colors.bg_5 = "#394050"
+colors.bg_6 = "#3d4657"
+colors.bg_7 = "#424b5d"
+colors.bg_8 = "#475063"
+colors.bg_9 = "#4c566a"
 
-colorscheme.colors.main_accent = "#5e81ac"
-colorscheme.colors.red         = "#bf616a"
-colorscheme.colors.green       = "#a3be8c"
-colorscheme.colors.yellow      = "#ebcb8b"
-colorscheme.colors.purple      = "#b48ead"
-colorscheme.colors.transparent = "#ffffff00"
 
-colorscheme.colors.gradient = {
-  [0] = "#20242c",
-  [1] = "#2b3444",
-  [2] = "#3c4c65",
-  [3] = "#4d6688",
-  [4] = "#5e81ac",
-}
+colors.fg_0 = "#d8dee9"
+colors.fg_1 = "#8897b3"
+colors.fg_2 = "#647594"
+
+-- Gradient from primary (main accent) color to bg_2
+-- Use https://colordesigner.io/gradient-generator (with mode HSL)
+colors.primary_0 = "#5e81ac"
+colors.primary_1 = "#506c91"
+colors.primary_2 = "#455874"
+colors.primary_3 = "#384458"
+colors.primary_4 = "#2a313d"
+
+colors.red     = "#bf616a"
+colors.green   = "#a3be8c"
+colors.yellow  = "#ebcb8b"
 
 -- █▀█ █░█ █▀▀ █▀█ █▀█ █ █▀▄ █▀▀ 
 -- █▄█ ▀▄▀ ██▄ █▀▄ █▀▄ █ █▄▀ ██▄ 
-colorscheme.override.wibar_occupied = "#d8dee9"
+
+override.wibar_occupied = colors.fg_0
 
 -- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ 
 -- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ 
-colorscheme.switcher.kitty   = "Nord"
-colorscheme.switcher.nvchad  = "nord"
-colorscheme.switcher.gtk     = "Nordic"
-colorscheme.switcher.zathura = "nord_dark"
-colorscheme.switcher.rofi    = "nord-dark"
-colorscheme.switcher.firefox = "nord-dark"
-colorscheme.switcher.start   = "nord-dark"
 
-return colorscheme
+switcher.kitty   = "Nord"
+switcher.nvchad  = "nord"
+switcher.gtk     = "Nordic"
+switcher.zathura = "nord_dark"
+switcher.rofi    = "nord-dark"
+switcher.firefox = "nord-dark"
+switcher.start   = "nord-dark"
+
+return {
+  colors    = colors,
+  switcher  = switcher,
+  override  = override,
+  wall_path = wall_path,
+}

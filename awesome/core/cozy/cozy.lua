@@ -6,6 +6,7 @@
 
 local gobject = require("gears.object")
 local gtable  = require("gears.table")
+local awful   = require("awful")
 
 local cozy = {}
 local instance = nil
@@ -16,6 +17,7 @@ function cozy:close_all()
   require("core.cozy.themeswitcher"):close()
   require("core.cozy.bookmarks"):close()
   require("core.cozy.calpopup"):close()
+  awful.keygrabber:stop()
 end
 
 function cozy:close_all_except(except)

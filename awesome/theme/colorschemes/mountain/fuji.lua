@@ -3,22 +3,20 @@
 -- █░▀░█ █▄█ █▄█ █░▀█ ░█░ █▀█ █ █░▀█ ▄  █▀░ █▄█ █▄█ █ 
 
 local gfs = require("gears.filesystem")
-local colorscheme = {
-  colors = {},
-  override = {},
-  switcher = {},
-  wall_path = nil,
-}
+local colors   = {}
+local override = {}
+local switcher = {}
 
 -- █░█░█ ▄▀█ █░░ █░░ 
--- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
-local awesome_cfg = gfs.get_configuration_dir()
-colorscheme.wall_path = awesome_cfg .. "theme/colorschemes/mountain/fuji.png"
+-- ▀▄▀▄▀ █▀█ █▄▄ █▄▄
+
+local theme_dir = gfs.get_configuration_dir() .. "theme/colorschemes/mountain/"
+local wall_path = theme_dir .. "fuji.jpg"
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
 
-colorscheme.colors.accents = {
+colors.accents = {
   "#a39ec4",
   "#c49ec4",
   "#c4c19e",
@@ -29,42 +27,46 @@ colorscheme.colors.accents = {
   "#a5b4cb",
 }
 
-colorscheme.colors.bg      = "#191919"
-colorscheme.colors.bg_l0   = "#222222"
-colorscheme.colors.bg_l1   = "#292929"
-colorscheme.colors.bg_l2   = "#303030"
-colorscheme.colors.bg_l3   = "#3d3d3d"
-colorscheme.colors.fg      = "#f0f0f0"
-colorscheme.colors.fg_alt  = "#4c4c4c"
-colorscheme.colors.fg_sub  = "#767676"
+colors.bg_0 = "#0f0f0f"
+colors.bg_1 = "#141414"
+colors.bg_2 = "#191919"
+colors.bg_3 = "#1d1d1d"
+colors.bg_4 = "#222222"
+colors.bg_5 = "#272727"
+colors.bg_6 = "#2c2c2c"
 
-colorscheme.colors.main_accent = "#8a98ac"
-colorscheme.colors.red         = "#c49ea0"
-colorscheme.colors.green       = "#89ab8a"
-colorscheme.colors.yellow      = "#c4c19e"
-colorscheme.colors.transparent = "#ffffff00"
+colors.fg_0 = "#dedede"
+colors.fg_1 = "#707070"
+colors.fg_2 = "#4c4c4c"
 
-colorscheme.colors.gradient = {
-  [0] = "#191919",
-  [1] = "#333539",
-  [2] = "#4e545d",
-  [3] = "#6b7584",
-  [4] = "#8a98ac",
-}
+colors.primary_0 = "#8a98ac"
+colors.primary_1 = "#6b788a"
+colors.primary_2 = "#525962"
+colors.primary_3 = "#37393c"
+colors.primary_4 = "#191919"
+
+colors.red    = "#c49ea0"
+colors.green  = "#89ab8a"
+colors.yellow = "#c4c19e"
 
 -- █▀█ █░█ █▀▀ █▀█ █▀█ █ █▀▄ █▀▀ 
--- █▄█ ▀▄▀ ██▄ █▀▄ █▀▄ █ █▄▀ ██▄ 
+-- █▄█ ▀▄▀ ██▄ █▀▄ █▀▄ █ █▄▀ ██▄
 
-colorscheme.override.wibar_focused = "#5b6572"
+override.border_color_active = colors.primary_1
 
 -- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ 
 -- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ 
 
-colorscheme.switcher.kitty   = "Mountain Fuji"
-colorscheme.switcher.nvchad  = "mountain"
-colorscheme.switcher.zathura = "mountain_fuji"
-colorscheme.switcher.rofi    = "mountain-fuji"
-colorscheme.switcher.firefox = "mountain-fuji"
-colorscheme.switcher.start   = "mountain-fuji"
+switcher.kitty   = "Mountain Fuji"
+switcher.nvchad  = "mountain"
+switcher.zathura = "mountain_fuji"
+switcher.rofi    = "mountain-fuji"
+switcher.firefox = "mountain-fuji"
+switcher.start   = "mountain-fuji"
 
-return colorscheme
+return {
+  colors   = colors,
+  switcher = switcher,
+  override = override,
+  wall_path = wall_path,
+}

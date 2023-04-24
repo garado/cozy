@@ -397,5 +397,38 @@ ls.add_snippets(nil, {
         }), i(1),
       t({"", "---"})
     }),
+
+    snip({
+      trig = "link",
+      namr = "Markdown link",
+      dscr = "Markdown link",
+    }, {
+      t("["), i(1), t("]("), i(2), t(")"), i(3)
+    }),
+
+    snip({
+      trig = "libmeta",
+      namr = "",
+      dscr = "",
+    }, {
+      t({"---", ""}),
+      t("title: "), i(1),
+      t({"", "sum: "}), i(2),
+      t({"", "library/status:", "- in-progress"}),
+      t({"", "library/genres: ", "- "}), i(3),
+      t({"", "---"}),
+      t({"", "", "# "}), i(4),
+      t({"", ""}), i(5),
+      t({"", "Read: "}), i(6),
+      t({"", "Rating: ", "", "## Notes", "", "## Quotes"}),
+    }),
+
+    snip({
+      trig = "bqtab",
+      namr = "Block quote tab",
+      dscr = "",
+    }, {
+      t("{{<blockquote-tab>}} ")
+    }),
   },
 })

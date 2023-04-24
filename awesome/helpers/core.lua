@@ -51,6 +51,10 @@ function core.print_arr(arr, indentLevel)
   end
 
   for index,value in pairs(arr) do
+    if type(value) == "boolean" then
+      value = value and "true" or "false"
+    end
+
     if type(value) == "table" then
       str = str..indentStr..index..": \n"..core.print_arr(value, (indentLevel + 1))
     else

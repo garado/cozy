@@ -15,6 +15,13 @@ local control = require("core.cozy.control")
 
 local _ui = {}
 
+function _ui.place(child)
+  return wibox.widget({
+    child,
+    widget = wibox.container.place
+  })
+end
+
 -- For dashboard
 -- credit: @rxhyn
 function _ui.create_boxed_widget(widget_to_be_boxed, width, height, bg_color)

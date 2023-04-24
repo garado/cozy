@@ -13,13 +13,13 @@ local keynav = require("modules.keynav")
 -- local cal, nav_cal = require(... .. ".time.calendar")()
 local cal     = require(... .. ".calendar")
 local list    = require(... .. ".list")
-local infobox, nav_infobox = require(... .. ".infobox")()
+-- local infobox, nav_infobox = require(... .. ".infobox")()
 
 local nav_timewarrior = keynav.area({
   name = "agenda",
-  children = {
-    nav_infobox,
-  },
+  -- children = {
+  --   nav_infobox,
+  -- },
 })
 
 -- local tags  = require(... .. ".tags")
@@ -48,5 +48,5 @@ local timewarrior = wibox.widget({
 })
 
 return function()
-  return timewarrior, nav_timewarrior
+  return timewarrior, nil
 end

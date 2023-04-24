@@ -16,12 +16,17 @@
 <h2>Dashboard</h2>
 
 <p>
-  The dashboard is a collection of graphical interfaces for several command-line applications, including <a href="https://github.com/ledger/" target="_blank">ledger</a>, <a href="https://taskwarrior.org/" target="_blank">taskwarrior</a>, <a href="https://timewarrior.net" target="_blank">timewarrior</a>, and <a href="https://github.com/insanum/gcalcli" target="_blank">gcalcli</a>.
+  The dashboard is a collection of graphical interfaces for several command-line applications including <a href="https://github.com/ledger/" target="_blank">ledger</a>, <a href="https://taskwarrior.org/" target="_blank">taskwarrior</a>, <a href="https://timewarrior.net" target="_blank">timewarrior</a>, and <a href="https://github.com/insanum/gcalcli" target="_blank">gcalcli</a>.
 </p>
 
 <p>
   The dashboard (as well as every other popup) is fully keyboard navigable with Vim-like keybinds using a custom navigation library.
 </p>
+
+| Keybind                  | Action           |
+| -------                  | ------           |
+| <kbd>super + j</kbd>     | Toggle dashboard |
+| <kbd>numkeys (1-6)</kbd> | Change tabs      |
 
 <h4>Main tab</h4>
 <p align="center">
@@ -177,4 +182,5 @@ I've spent a lot of time tweaking this setup to be just the way I like it, so no
 <li><a href="https://github.com/adi1090x/rofi" target="_blank">adi1090x</a> for rofi theme
 <li><a href="https://github.com/siddhanthrathod/bspwm" target="_blank">siddhanthrathod</a> for picom configuration
 <li><a href="https://github.com/nickclyde/rofi-bluetooth" target="_blank">nick clyde</a> for rofi-bluetooth
+<li><a href="https://github.com/Kasper24/KwesomeDE" target="_blank">kasper24</a> for inspiration on how to write backend for dashboard
 </ul>

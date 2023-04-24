@@ -14,6 +14,11 @@ g.maplocalleader = [[ ]]
 -- Cancel search highlighting with ESC
 keymap("n", "<ESC>", ":nohlsearch<Bar>:echo<CR>", default_opts)
 
+vim.keymap.set('n', '<leader>vv',
+  ":!cd '$HOME/Documents/Vault/content/' ; \
+  :! git add * ; 2&>1;\
+  :! git commit -m 'Autobackup Vault content' 2&>1;\
+  :! git push 2&>1; :echo 'Pushed<CR>' ", { silent = true })
 
 -- █▀█ █░░ █░█ █▀▀ █ █▄░█ █▀
 -- █▀▀ █▄▄ █▄█ █▄█ █ █░▀█ ▄█
@@ -29,6 +34,8 @@ vim.keymap.set('n', '<leader>ff', telescope.find_files, {})
 vim.keymap.set('n', '<leader>fg', telescope.live_grep, {})
 vim.keymap.set('n', '<leader>fb', telescope.buffers, {})
 vim.keymap.set('n', '<leader>fh', telescope.help_tags, {})
+
+vim.keymap.set('n', '<leader>ac', ':setlocal spell!<CR>', {silent = true})
 
 -- Tabs
 vim.keymap.set('n', '<Tab>', ':BufferNext<CR>')

@@ -27,8 +27,9 @@ local datetime_wibox = wibox.widget({
 })
 
 local contents_wibox = wibox.widget({
-  line_spacing_factor = 2.0,
-  justify = true,
+  forced_width = dpi(2000),
+  line_spacing_factor = 1.2,
+  -- justify = true,
   id      = "texbox",
   text    = "placeholder",
   font    = beautiful.font_reg_s,
@@ -73,7 +74,8 @@ local header_and_contents_container = wibox.widget({
   },
   {
     contents_wibox,
-    layout = wibox.layout.fixed.vertical,
+    bg = beautiful.red,
+    widget = wibox.container.background,
   },
   { -- Separator
     {

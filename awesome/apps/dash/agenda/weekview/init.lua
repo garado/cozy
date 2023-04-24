@@ -37,7 +37,6 @@ local DAYCOL_HEADER_HEIGHT = dpi(40)
 local DAYCOL_GRIDLINE_MARGIN = dpi(10)
 local DAYCOL_HEIGHT  = HOUR_HEIGHT * (END_HOUR - START_HOUR)
 local DAYCOL_WIDTH   = dpi(165) -- Width of a day column
-
 local EVENTBOX_WIDTH = DAYCOL_WIDTH - dpi(10)
 local EVENTBOX_VERT_MARGIN = dpi(2)
 
