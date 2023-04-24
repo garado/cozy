@@ -1,6 +1,6 @@
 
--- █▀▀ █▀█ ▀█ █▄█    ▄▀█ █░█░█ █▀▀ █▀ █▀█ █▀▄▀█ █▀▀    █▀▀ █▀█ █▄░█ █▀▀ █ █▀▀ 
--- █▄▄ █▄█ █▄ ░█░    █▀█ ▀▄▀▄▀ ██▄ ▄█ █▄█ █░▀░█ ██▄    █▄▄ █▄█ █░▀█ █▀░ █ █▄█ 
+-- █▀▀ █▀█ ▀█ █▄█ 
+-- █▄▄ █▄█ █▄ ░█░ 
 
 -- by @garado
 -- https://github.com/garado/cozy
@@ -11,7 +11,7 @@ local gears     = require("gears")
 local beautiful = require("beautiful")
 
 local theme_dir = gears.filesystem.get_configuration_dir() .. "theme/"
-beautiful.init(theme_dir .. "theme.lua")
+beautiful.init(theme_dir .. "init.lua")
 
 collectgarbage("setpause", 110)
 collectgarbage("setstepmul", 1000)
@@ -25,7 +25,3 @@ gears.timer({
 })
 
 require("sysconf")
-require("modules")
-require("ui")
-require("apps")
-require("helpers")

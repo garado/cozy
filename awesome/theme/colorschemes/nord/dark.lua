@@ -10,7 +10,7 @@ local switcher = {}
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 
 local awesome_cfg = gfs.get_configuration_dir()
-local wall_path = awesome_cfg .. "theme/colorschemes/nord/japan_01.png"
+local wall_path = awesome_cfg .. "theme/colorschemes/nord/dark.png"
 
 -- █▀▀ █▀█ █░░ █▀█ █▀█ █▀
 -- █▄▄ █▄█ █▄▄ █▄█ █▀▄ ▄█
@@ -59,17 +59,6 @@ colors.yellow  = "#ebcb8b"
 -- █▄█ ▀▄▀ ██▄ █▀▄ █▀▄ █ █▄▀ ██▄ 
 
 override.wibar_occupied = colors.fg_0
-
--- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ 
--- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ 
-
-switcher.kitty   = "Nord"
-switcher.nvchad  = "nord"
-switcher.gtk     = "Nordic"
-switcher.zathura = "nord_dark"
-switcher.rofi    = "nord-dark"
-switcher.firefox = "nord-dark"
-switcher.start   = "nord-dark"
 
 return {
   colors    = colors,

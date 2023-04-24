@@ -4,7 +4,7 @@
 
 local awful = require("awful")
 local ruled = require("ruled")
-local helpers = require("helpers")
+local utils = require("utils")
 
 ruled.client.connect_signal("request::rules", function()
   -- Rules applied to every window
@@ -52,7 +52,7 @@ ruled.client.connect_signal("request::rules", function()
     },
     properties = {
       floating = true,
-      placement = helpers.client.centered_client_placement,
+      placement = awful.placement.centered,
     },
   })
 
@@ -78,7 +78,7 @@ ruled.client.connect_signal("request::rules", function()
     },
     properties = {
       floating = true,
-      placement = helpers.client.centered_client_placement,
+      placement = awful.placement.centered,
     },
   })
 end)

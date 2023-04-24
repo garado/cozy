@@ -1,3 +1,0 @@
-return {
-  dark = require(... .. ".dark")
-}

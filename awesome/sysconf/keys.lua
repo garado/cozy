@@ -11,12 +11,6 @@ local naughty = require("naughty")
 local bling   = require("modules.bling")
 local os = os
 
-local cozy = require("core.cozy.cozy")
-local dash = require("core.cozy.dash")
-local bookmarks = require("core.cozy.bookmarks")
-local control   = require("core.cozy.control")
-local themeswitcher = require("core.cozy.themeswitcher")
-
 local mod   = "Mod4"
 local alt   = "Mod1"
 local ctrl  = "Control"
@@ -85,39 +79,6 @@ awful.keyboard.append_global_keybindings({
   -- Show help
   awful.key({ mod }, "s", hotkeys_popup.show_help,
     { description = "help", group = "Awesome"}),
-
-  -- █▀▀ █▀█ ▀█ █▄█ 
-  -- █▄▄ █▄█ █▄ ░█░ 
-
-  awful.key({ mod }, "h", function()
-    scratchpad:turn_off()
-    awesome.emit_signal("lockscreen::toggle")
-  end, { description = "dash", group = "Cozy" }),
-
-  awful.key({ mod }, "x", function()
-    cozy:close_all()
-    scratchpad:turn_off()
-  end, { description = "close all", group = "Cozy"}),
-
-  awful.key({ mod }, "j", function()
-    scratchpad:turn_off()
-    dash:toggle()
-  end, { description = "dash", group = "Cozy" }),
-
-  awful.key({ mod }, "k", function()
-    scratchpad:turn_off()
-    control:toggle()
-  end, { description = "control center", group = "Cozy" }),
-
-  awful.key({ mod }, "l", function()
-    scratchpad:turn_off()
-    themeswitcher:toggle()
-  end, { description = "theme switcher", group = "Cozy" }),
-
-  awful.key({ mod }, "b", function()
-    scratchpad:turn_off()
-    bookmarks:toggle()
-  end, { description = "bookmarks", group = "Cozy" }),
 
 
   -- █░█ █▀█ ▀█▀ █▄▀ █▀▀ █▄█ █▀
