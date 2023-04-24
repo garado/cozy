@@ -25,3 +25,4 @@ gears.timer({
 })
 
 require("sysconf")
+require("frontend")
