@@ -2,6 +2,8 @@
 -- █▀▀ █▀█ █▀█ █▄░█ ▀█▀ █▀▀ █▄░█ █▀▄ 
 -- █▀░ █▀▄ █▄█ █░▀█ ░█░ ██▄ █░▀█ █▄▀ 
 
+require(... .. ".notifications")
+
 local awful = require("awful")
 
 local bar = require(... .. ".vbar")

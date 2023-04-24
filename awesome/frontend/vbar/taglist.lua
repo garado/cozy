@@ -5,10 +5,9 @@
 local awful = require("awful")
 local gears = require("gears")
 local wibox = require("wibox")
-local colorize    = require("utils.widget").colorize
+local dpi   = require("utils.ui").dpi
+local colorize    = require("utils.ui").colorize
 local beautiful   = require("beautiful")
-local xresources  = require("beautiful.xresources")
-local dpi = xresources.apply_dpi
 
 return function(s)
   -- Mouse + client actions

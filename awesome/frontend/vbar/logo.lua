@@ -1,6 +1,6 @@
 
 local wibox = require("wibox")
-local colorize = require("utils.widget").colorize
+local colorize = require("utils.ui").colorize
 local beautiful = require("beautiful")
 
 -- Arch logo

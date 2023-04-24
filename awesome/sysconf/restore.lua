@@ -119,7 +119,6 @@ local function restore_focus_state(s)
     idx = tonumber(idx)
     for i, t in ipairs(root.tags()) do
       if i == idx then
-        print(i)
         t:view_only()
         return
       end
