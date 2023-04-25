@@ -9,4 +9,4 @@
 	url = git@github.com:garado/awesome-keyboard-nav.git
 [submodule "awesome/modules/bling"]
 	path = awesome/modules/bling
-	url = https://github.com/BlingCorp/bling.git
+	url = git@github.com:garado/bling.git

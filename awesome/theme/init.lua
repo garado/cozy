@@ -25,7 +25,7 @@ if do_theme_integration then
 end
 
 -- Theme-agnostic settings
--- theme.pfp = gears.surface.load_uncached(gfs.get_configuration_dir() .. "theme/assets/pfp.png")
+theme.pfp = gears.surface.load_uncached(gfs.get_configuration_dir() .. "theme/assets/pfp.png")
 
 -- █░█░█ ▄▀█ █░░ █░░ 
 -- ▀▄▀▄▀ █▀█ █▄▄ █▄▄ 

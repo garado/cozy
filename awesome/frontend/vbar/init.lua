@@ -11,6 +11,7 @@ local dpi = xresources.apply_dpi
 local logo = require(... .. ".logo")
 local clock = require(... .. ".clock")
 local taglist = require(... .. ".taglist")
+local battery = require(... .. ".battery")
 
 local top_vbar = wibox.widget({
   logo,
@@ -18,6 +19,7 @@ local top_vbar = wibox.widget({
 })
 
 local bottom_vbar = wibox.widget({
+  battery,
   clock,
   spacing = dpi(10),
   layout = wibox.layout.fixed.vertical,

@@ -270,11 +270,10 @@ ls.add_snippets(nil, {
       dscr = "",
     }, {
       t({"local beautiful  = require(\"beautiful\")", ""}),
-      t({"local xresources = require(\"beautiful.xresources\")", ""}),
-      t({"local dpi   = xresources.apply_dpi", ""}),
+      t({"local ui    = require(\"utils.ui\")", ""}),
+      t({"local dpi   = ui.dpi", ""}),
       t({"local awful = require(\"awful\")", ""}),
       t({"local wibox = require(\"wibox\")", ""}),
-      t({"local ui    = require(\"helpers.ui\")", ""}),
       i(1),
     }),
 

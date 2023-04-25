@@ -5,11 +5,17 @@
 -- Keybindings
 
 local hotkeys_popup = require("awful.hotkeys_popup")
+local beautiful = require("beautiful")
 local awful   = require("awful")
 local apps    = require("sysconf.apps")
 local naughty = require("naughty")
 local bling   = require("modules.bling")
+local rrect   = require("utils.ui").rrect
+local dpi     = require("utils.ui").dpi
 local os = os
+
+local cozy  = require("backend.state.cozy")
+local dash  = require("backend.state.dash")
 
 local mod   = "Mod4"
 local alt   = "Mod1"
@@ -54,6 +60,22 @@ local scratchpad = bling.module.scratchpad {
   reapply = true,
   dont_focus_before_close = true,
 }
+
+local app_launcher = bling.widget.app_launcher({
+  terminal = "kitty",
+  favorites = { "firefox", },
+  search_commands = true,
+  skip_commands = { "thunar" },
+  hide_on_right_clicked_outside = true,
+  hide_on_launch = true,
+  shape = rrect(),
+  app_width = dpi(100),
+  app_height = dpi(100),
+
+  background = beautiful.bg_0,
+  border_color = beautiful.bg_0,
+  prompt_text_color = beautiful.fg_0,
+})
 
 awesome.connect_signal("startup", function()
   scratchpad:turn_off()
@@ -133,6 +155,7 @@ awful.keyboard.append_global_keybindings({
   end, { description = "screenshot (select)", group = "Hotkeys" }),
 
   -- Screenshot and select region
+  -- TODO: Use awful.screenshot instead
   awful.key({ mod, alt }, "s", function()
     local home = os.getenv("HOME")
     local cmd = "scrot " .. home  .. "/Pictures/Screenshots/%b%d::%H%M%S.png --silent 'xclip -selection clipboard -t image/png -i $f'"
@@ -143,6 +166,16 @@ awful.keyboard.append_global_keybindings({
   awful.key({ mod }, "n", function()
     naughty.destroy_all_notifications()
   end, { description = "dismiss notifications", group = "Hotkeys" }),
+
+
+  -- █▀▀ █▀█ ▀█ █▄█
+  -- █▄▄ █▄█ █▄ ░█░
+
+  awful.key({ mod }, "j", function()
+    scratchpad:turn_off()
+    dash:toggle()
+  end, { description = "Open dashboard", group = "Launchers" }),
+
 
   --  █░░ ▄▀█ █░█ █▄░█ █▀▀ █░█ █▀▀ █▀█ █▀
   --  █▄▄ █▀█ █▄█ █░▀█ █▄▄ █▀█ ██▄ █▀▄ ▄█
@@ -158,15 +191,16 @@ awful.keyboard.append_global_keybindings({
     scratchpad:toggle()
   end, { description = "scratchpad", group = "Launchers"}),
 
-  -- Rofi
+  -- App launcher
   awful.key({ alt }, "r", function()
-    awful.spawn(apps.utils.app_launcher)
+    cozy:close_all()
+    app_launcher:toggle()
   end, { description = "app launcher", group = "Launchers" }),
 
-  -- Bluetooth menu
-  awful.key({ alt }, "b", function()
-    awful.spawn(apps.utils.bluetooth)
-  end, { description = "bluetooth", group = "Launchers" }),
+  -- -- Bluetooth menu
+  -- awful.key({ alt }, "b", function()
+  --   awful.spawn(apps.utils.bluetooth)
+  -- end, { description = "bluetooth", group = "Launchers" }),
 })
 
 

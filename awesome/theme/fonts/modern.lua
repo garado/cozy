@@ -20,6 +20,7 @@ local sizes = {
   m  = 16,
   l  = 22,
   xl = 28,
+  xxl = 35,
 }
 
 -- Generate font pairings

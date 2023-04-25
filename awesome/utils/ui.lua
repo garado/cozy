@@ -23,11 +23,11 @@ end
 
 --- Create textbox with my preferred defaults.
 function _ui.textbox(args)
-  return wibox.widget.textbox({
-    markup = args.markup or _ui.colorize("", beautiful.primary_0),
+  return wibox.widget({
+    markup = args.markup or _ui.colorize(args.text or "Default text", args.color or beautiful.fg_0),
     valign = args.valign or "center",
     align  = args.align  or "center",
-    font   = args.font   or beautiful.font_reg_xs,
+    font   = args.font   or beautiful.font_reg_s,
     widget = wibox.widget.textbox,
   })
 end
@@ -48,6 +48,18 @@ function _ui.vpad(height)
 	})
 end
 
+function _ui.place(content, args)
+  args = args or {}
+  return wibox.widget({
+    {
+      content,
+      widget = wibox.container.place,
+    },
+    widget  = wibox.container.margin,
+    margins = args.margins or dpi(5)
+  })
+end
+
 --- Create rounded rectangle.
 function _ui.rrect(radius)
   radius = radius or beautiful.ui_border_radius
@@ -56,5 +68,25 @@ function _ui.rrect(radius)
 	end
 end
 
+--- (Dashboard) Put a box around a widget.
+function _ui.dashbox(content, width, height, bg)
+	return wibox.widget({
+		{
+			{
+				content,
+        margins = dpi(15),
+				widget  = wibox.container.margin,
+			},
+      forced_height = height or nil,
+      forced_width  = width or nil,
+      bg     = bg,
+      shape  = gshape.rounded_rect,
+			widget = wibox.container.background,
+		},
+		margins = dpi(10),
+		color   = "#FF000000",
+		widget  = wibox.container.margin,
+	})
+end
 
 return _ui
