@@ -197,6 +197,11 @@ awful.keyboard.append_global_keybindings({
     app_launcher:toggle()
   end, { description = "app launcher", group = "Launchers" }),
 
+  -- Thunar
+  awful.key({ alt }, "t", function()
+    awful.spawn(apps.default.file_manager)
+  end, { description = "file manager", group = "Launchers" }),
+
   -- -- Bluetooth menu
   -- awful.key({ alt }, "b", function()
   --   awful.spawn(apps.utils.bluetooth)
