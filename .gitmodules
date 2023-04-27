@@ -10,3 +10,6 @@
 [submodule "awesome/modules/bling"]
 	path = awesome/modules/bling
 	url = git@github.com:garado/bling.git
+[submodule "awesome/modules/color"]
+	path = awesome/modules/color
+	url = https://github.com/andOrlando/color.git

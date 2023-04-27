@@ -20,7 +20,8 @@ local config    = require("cozyconf")
 -- █▀ █ █▀▄ █▀▀ █▄▄ ▄▀█ █▀█ 
 -- ▄█ █ █▄▀ ██▄ █▄█ █▀█ █▀▄ 
 
-local main,   nav_main       = require(... .. ".main")()
+local main,     nav_main      = require(... .. ".main")()
+local settings, nav_settings  = require(... .. ".settings")()
 
 local tablist   = { main,     }
 local tabnames  = { "main",   }
@@ -34,7 +35,7 @@ end
 
 local distro_icon = ui.textbox({
   text  = config.distro_icon,
-  color = beautiful.primary_0,
+  color = beautiful.primary[300],
 })
 
 local pfp = wibox.widget({
@@ -45,7 +46,7 @@ local pfp = wibox.widget({
     forced_width  = dpi(28),
     widget = wibox.widget.imagebox,
   },
-  bg     = beautiful.primary_0,
+  bg     = beautiful.primary[300],
   shape  = gears.shape.circle,
   widget = wibox.container.background,
 })
@@ -60,7 +61,7 @@ local tabbar = wibox.widget({
   forced_width  = dpi(50),
   forced_height = dpi(1400),
   shape  = gears.shape.rect,
-  bg     = beautiful.dash_tab_bg,
+  bg     = beautiful.neutral[800],
   widget = wibox.container.background,
 })
 
@@ -73,15 +74,19 @@ local dash = awful.popup({
   maximum_height = dpi(810),
   minimum_width  = dpi(1350),
   maximum_width  = dpi(1350),
-  bg = beautiful.bg_0,
+  bg = beautiful.neutral[900],
   ontop     = true,
   visible   = false,
   placement = awful.placement.centered,
   widget = ({
     tabbar,
     {
-      ui.place(main, { margins = dpi(5) }),
-      widget = wibox.container.place,
+      settings,
+      top = dpi(0),
+      bottom = dpi(5),
+      left = dpi(25),
+      right = dpi(5),
+      widget  = wibox.container.margin,
     },
     layout = wibox.layout.align.horizontal,
   }),

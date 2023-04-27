@@ -6,7 +6,7 @@ local beautiful = require("beautiful")
 -- Arch logo
 return wibox.widget({
   {
-    markup = colorize("", beautiful.primary_0),
+    markup = colorize("", beautiful.primary[300]),
     valign = "center",
     align  = "center",
     font   = beautiful.font_reg_xs,

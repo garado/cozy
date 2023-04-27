@@ -62,9 +62,9 @@ battery_listener:connect_signal("upower::update", function(_, device)
     notify("Fully charged")
   end
 
-  if prevpercent > 20 and device.percentage <= 20 then
+  if prevpercent and (prevpercent > 20 and device.percentage <= 20) then
     notify("Battery " .. device.percentage)
-  elseif prevpercent > 10 and device.percentage <= 10 then
+  elseif prevpercent and (prevpercent > 10 and device.percentage <= 10) then
     notify("Battery low: " .. device.percentage)
   end
 

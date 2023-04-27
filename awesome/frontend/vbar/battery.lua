@@ -13,9 +13,9 @@ local colorize  = require("utils.ui").colorize
 
 local CHARGING = 1
 
-local charging_color  = beautiful.green
-local normal_color    = beautiful.fg_0
-local low_color       = beautiful.red
+local charging_color  = beautiful.green[300]
+local normal_color    = beautiful.neutral[100]
+local low_color       = beautiful.red[300]
 
 local percentage = wibox.widget({
   markup  = "50",

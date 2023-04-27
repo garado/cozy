@@ -5,8 +5,7 @@
 local gears = require("gears")
 local wibox = require("wibox")
 local beautiful = require("beautiful")
-local xresources = require("beautiful.xresources")
-local dpi = xresources.apply_dpi
+local dpi = require("utils.ui").dpi
 local naughty = require("naughty")
 local menubar = require("menubar")
 local animation = require("modules.animation")
@@ -55,7 +54,7 @@ end)
 naughty.connect_signal("request::display", function(n)
   local accent_color = beautiful.random_accent_color()
   n.font = beautiful.font_reg_s
-  n.fg = beautiful.fg_0
+  n.fg = beautiful.fg
 
 	--- table of icons
 	local app_icons = {
@@ -97,7 +96,7 @@ naughty.connect_signal("request::display", function(n)
 
   local title = wibox.widget({
     {
-      markup = colorize(n.title, beautiful.fg_0),
+      markup = colorize(n.title, beautiful.fg),
       font   = beautiful.font_reg_s,
       widget = wibox.widget.textbox,
     },
@@ -115,7 +114,7 @@ naughty.connect_signal("request::display", function(n)
   else
     message = wibox.widget({
       {
-        markup  = colorize(n.message, beautiful.fg_0),
+        markup  = colorize(n.message, beautiful.fg),
         font    = beautiful.font_reg_s,
         widget  = wibox.widget.textbox,
       },
