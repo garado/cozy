@@ -8,8 +8,12 @@ local cozy    = require("backend.state.cozy")
 local gobject = require("gears.object")
 local gtable  = require("gears.table")
 
-local dash = { }
+local dash = {}
 local instance = nil
+
+-- Enums for tab names
+local MAIN = 1
+local SETTINGS = 2
 
 ---------------------------------------------------------------------
 
@@ -30,6 +34,10 @@ function dash:open()
   -- cozy:close_all_except("dash")
   self:emit_signal("setstate::open")
   self.visible = true
+end
+
+function dash:set_tab(tab_enum)
+  self:emit_signal("tab::set", tab_enum)
 end
 
 function dash:new()

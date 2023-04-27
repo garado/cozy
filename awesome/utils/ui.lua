@@ -47,18 +47,24 @@ end
 function _ui.button(args)
   args = args or {}
   args.bg = args.bg or beautiful.neutral[800]
+  args.color = args.color or beautiful.fg
+  args.text = args.text or "Default"
+  args.shape = args.shape or _ui.rrect()
+  args.margins = args.margins or dpi(15)
+  args.width = args.width or nil
+  args.height = args.height or nil
 
   local btn = wibox.widget({
     {
       _ui.textbox({
-        text = args.text or "Default text",
-        color = args.color or beautiful.fg,
+        text = args.text,
+        color = args.color,
       }),
-      margins = dpi(15),
+      margins = args.margins,
       widget = wibox.container.margin,
     },
     bg = args.bg,
-    shape = _ui.rrect(),
+    shape = args.shape,
     widget = wibox.container.background,
     ------
     bg_color = args.bg,
@@ -69,6 +75,8 @@ function _ui.button(args)
   })
 
   local btn_cont = _ui.place(btn)
+  btn_cont.forced_width = args.width
+  btn_cont.forced_height = args.height
 
   btn_cont:connect_signal("mouse::enter", function()
     btn:update_bg(btn.mouseover_color)
