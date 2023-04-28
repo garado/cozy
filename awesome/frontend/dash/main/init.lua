@@ -13,7 +13,7 @@ local colorize  = require("utils.ui").colorize
 local config    = require("cozyconf")
 
 local profile = require(... .. ".profile")
-local github  = require(... .. ".github")
+-- local github  = require(... .. ".github")
 
 local grid = wibox.widget({
   spacing = 5,
@@ -24,7 +24,7 @@ local grid = wibox.widget({
 
 -- :add_widget_at (child, row, col, row_span, col_span)
 grid:add_widget_at(profile, 1, 1, 3, 3)
-grid:add_widget_at(github,  4, 4, 3, 3)
+-- grid:add_widget_at(github,  4, 4, 3, 3)
 
 return function()
   return grid, false

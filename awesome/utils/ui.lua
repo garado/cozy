@@ -12,7 +12,8 @@ local clrutils = require("utils.color")
 local _ui = {}
 
 --- For people with different screen resolutions, I hope this might be a solution.
--- There will be a config option one day and this will return dpi * scalar.
+-- There will be a config option one day and this will return dpi * scalar to scale
+-- stuff up/down.
 function _ui.dpi(px)
   return dpi(px)
 end
@@ -47,16 +48,21 @@ end
 function _ui.button(args)
   args = args or {}
   args.bg = args.bg or beautiful.neutral[800]
+  args.bg_mo = args.bg_mo or beautiful.neutral[700]
   args.color = args.color or beautiful.fg
   args.text = args.text or "Default"
   args.shape = args.shape or _ui.rrect()
   args.margins = args.margins or dpi(15)
   args.width = args.width or nil
   args.height = args.height or nil
+  args.border_width = args.border_width or 0
+  args.border_color = args.border_color or beautiful.neutral[600]
 
   local btn = wibox.widget({
     {
       _ui.textbox({
+        font = args.font,
+        markup = args.markup,
         text = args.text,
         color = args.color,
       }),
@@ -64,22 +70,24 @@ function _ui.button(args)
       widget = wibox.container.margin,
     },
     bg = args.bg,
-    shape = args.shape,
+    border_width = args.border_width,
+    border_color = args.border_color,
     widget = wibox.container.background,
+    forced_width = args.width,
+    forced_height = args.height,
     ------
+    bg_mo = args.bg_mo,
+    shape = args.shape,
     bg_color = args.bg,
-    mouseover_color = beautiful.neutral[700],
     update_bg = function(self, c)
       self.bg = c
     end,
   })
 
   local btn_cont = _ui.place(btn)
-  btn_cont.forced_width = args.width
-  btn_cont.forced_height = args.height
 
   btn_cont:connect_signal("mouse::enter", function()
-    btn:update_bg(btn.mouseover_color)
+    btn:update_bg(btn.bg_mo)
   end)
 
   btn_cont:connect_signal("mouse::leave", function()

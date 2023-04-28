@@ -25,11 +25,13 @@ local cscheme = require(path)
 
 -- Generate 5 primary colors
 local pbase = cscheme.primary.base
-cscheme.primary[500] = clrutils.darken(pbase, 0.4)
-cscheme.primary[400] = clrutils.darken(pbase, 0.2)
-cscheme.primary[300] = pbase
-cscheme.primary[200] = clrutils.lighten(pbase, 0.2)
-cscheme.primary[100] = clrutils.lighten(pbase, 0.4)
+cscheme.primary[700] = clrutils.darken(pbase, 0.48)
+cscheme.primary[600] = clrutils.darken(pbase, 0.32)
+cscheme.primary[500] = clrutils.darken(pbase, 0.16)
+cscheme.primary[400] = pbase
+cscheme.primary[300] = clrutils.lighten(pbase, 0.16)
+cscheme.primary[200] = clrutils.lighten(pbase, 0.32)
+cscheme.primary[100] = clrutils.lighten(pbase, 0.48)
 
 -- Generate 9 neutral colors
 local ndark = cscheme.neutral.dark
@@ -78,7 +80,8 @@ cscheme.yellow[200] = clrutils.lighten(yellow_base, 0.15)
 cscheme.yellow[100] = clrutils.lighten(yellow_base, 0.3)
 
 function cscheme.random_accent_color()
-  return "#bf616a"
+  local i = math.random(1, #cscheme.accents)
+  return cscheme.accents[i]
 end
 
 -----------

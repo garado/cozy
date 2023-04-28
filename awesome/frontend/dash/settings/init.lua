@@ -84,7 +84,7 @@ end
 -----
 
 local title = ui.textbox({
-  text = "Theme manager",
+  text = "Settings",
   font = beautiful.font_light_xl,
   align = "start",
 })
@@ -97,6 +97,8 @@ local primary = gengroup("Primary", {
   colorbox("300", theme.primary[300]),
   colorbox("400", theme.primary[400]),
   colorbox("500", theme.primary[500]),
+  colorbox("600", theme.primary[600]),
+  colorbox("700", theme.primary[700]),
 })
 local pbase = color.color { hex = theme.primary.base }
 
@@ -153,11 +155,11 @@ local shades = wibox.widget({
 
 local _accents = {}
 for i in ipairs(theme.accents) do
-  _accents[#_accents+1] = colorbox("100", theme.accents[i])
+  _accents[#_accents+1] = colorbox(i, theme.accents[i])
 end
 local accents = gengroup("Accents", _accents)
 
-local ugh = wibox.widget({
+local content = wibox.widget({
   {
     primary,
     neutral,
@@ -167,6 +169,7 @@ local ugh = wibox.widget({
     layout = wibox.layout.fixed.vertical,
   },
   preview,
+  spacing = dpi(50),
   layout = wibox.layout.fixed.horizontal,
 })
 
@@ -180,15 +183,11 @@ local theme_name = ui.textbox({
 
 local container = wibox.widget({
   title,
-  {
-    theme_name,
-    ugh,
-    spacing = dpi(20),
-    layout = wibox.layout.fixed.vertical,
-  },
+  content,
+  spacing = dpi(20),
   layout = wibox.layout.ratio.vertical,
 })
-container:adjust_ratio(1, 0, 0.1, 0.9)
+container:adjust_ratio(1, 0, 0.09, 0.91)
 
 return function()
   return wibox.widget({

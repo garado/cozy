@@ -22,42 +22,54 @@ local content -- Container for tab contents
 -- ▄█ █ █▄▀ ██▄ █▄█ █▀█ █▀▄ 
 
 -- Enums for tab names
-local MAIN = 1
-local SETTINGS = 2
+local MAIN     = 1
+local LEDGER   = 2
+local CALENDAR = 3
+local SETTINGS = 4
 
--- Load tabs
-local main,     nav_main      = require(... .. ".main")()
-local settings, nav_settings  = require(... .. ".settings")()
+-- Set up tab info
+local main,     nav_main     = require(... .. ".main")()
+local ledger,   nav_ledger   = require(... .. ".ledger")()
+local calendar, nav_calendar = require(... .. ".calendar")()
+local settings, nav_settings = require(... .. ".settings")()
 
-local tablist   = { main,     settings,      }
-local tabnames  = { "main",   "settings",    }
-local tab_icons = { "",      "",           }
-local navitems  = { nav_main, nav_settings , }
+local tablist   = { main,     ledger,     calendar,     settings,     }
+local tabnames  = { "main",   "ledger",   "calendar",   "settings",   }
+local tab_icons = { "",      "",        "",          "",          }
+local navitems  = { nav_main, nav_ledger, nav_calendar, nav_settings, }
 
+-- Build tab sidebar
 local tab_buttons = wibox.widget({
   layout  = wibox.layout.fixed.vertical,
-  -------
+
+  -- @param i A tab enum
   add_tab = function(self, i)
     local btn = wibox.widget({
       {
         ui.textbox({
-          text = tab_icons[i]
+          text  = tab_icons[i],
         }),
         left = dpi(2),
         widget = wibox.container.margin,
       },
-      bg = beautiful.neutral[800],
+      bg = beautiful.primary[800],
       forced_height = dpi(50),
       widget = wibox.container.background,
       ------
       tab_enum = i,
       bg_color = beautiful.neutral[800],
       mo_color = beautiful.neutral[700],
-      select = function(self)
-        self.children[1].color = beautiful.fg
+      select = function(_self)
+        _self.children[1].color = beautiful.fg
+        _self.bg_color = beautiful.neutral[700]
+        _self.mo_color = beautiful.neutral[600]
+        _self.bg = _self.bg_color
       end,
-      deselect = function(self)
-        self.children[1].color = nil
+      deselect = function(_self)
+        _self.children[1].color = nil
+        _self.bg_color = beautiful.neutral[800]
+        _self.mo_color = beautiful.neutral[700]
+        _self.bg = _self.bg_color
       end,
     })
 
@@ -84,7 +96,6 @@ end
 --- Pressing a tab button emits tab::set signal throughout dash
 -- Update dash contents and UI of selected tab
 dashstate:connect_signal("tab::set", function(_, tab_enum)
-  -- Tab button UI
   for i = 1, #tab_buttons.children do
     if tab_buttons.children[i].tab_enum == tab_enum then
       tab_buttons.children[i]:select()
@@ -93,9 +104,10 @@ dashstate:connect_signal("tab::set", function(_, tab_enum)
     end
   end
 
-  -- Dash contents
   content:update_contents(tablist[tab_enum])
 end)
+
+-- Building the rest of the sidebar
 
 local distro_icon = ui.textbox({
   text  = config.distro_icon,
@@ -120,6 +132,7 @@ local sidebar = wibox.widget({
     ui.place(pfp, { margins = { top = dpi(10) } }),
     tab_buttons,
     ui.place(distro_icon, { margins = { bottom = dpi(15) } }),
+    expand = "none",
     layout = wibox.layout.align.vertical,
   },
   forced_width  = dpi(50),
@@ -132,6 +145,7 @@ local sidebar = wibox.widget({
 -- ▄▀█ █▀ █▀ █▀▀ █▀▄▀█ █▄▄ █░░ █▄█ 
 -- █▀█ ▄█ ▄█ ██▄ █░▀░█ █▄█ █▄▄ ░█░ 
 
+-- Container for dash contents
 content = wibox.widget({
   main,
   top    = dpi(0),
@@ -179,6 +193,5 @@ end)
 awesome.connect_signal("theme::switch", function()
 end)
 
-dashstate:set_tab(MAIN)
-
+dashstate:set_tab(LEDGER)
 return function(_) return dash end

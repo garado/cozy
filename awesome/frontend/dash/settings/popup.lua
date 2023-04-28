@@ -9,24 +9,34 @@ local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local awful = require("awful")
 local wibox = require("wibox")
+local gears = require("gears")
 local dash  = require("backend.state.dash")
 
 local function gen_slider(label)
+  local _slider = wibox.widget({
+    value = 50,
+    minimum = 0,
+    maximum = 255,
+    forced_height = dpi(12),
+    handle_height = dpi(12),
+    handle_margins = dpi(0),
+    bar_margins  = dpi(0),
+    forced_width = dpi(100),
+    handle_shape = gears.shape.circle,
+    handle_color = beautiful.fg,
+    bar_shape = ui.rrect(),
+    bar_color = beautiful.neutral[500],
+    widget = wibox.widget.slider,
+  })
+
   local slider = wibox.widget({
     ui.textbox({
       text  = label,
       align = "center",
     }),
     {
-      value = 50,
-      minimum = 0,
-      maximum = 255,
-      forced_height = dpi(5),
-      forced_width = dpi(100),
-      handle_width = dpi(15),
-      handle_color = beautiful.fg,
-      bar_color = beautiful.neutral[500],
-      widget = wibox.widget.slider,
+      _slider,
+      widget = wibox.container.place,
     },
     ui.textbox({
       text  = "255",
@@ -37,7 +47,7 @@ local function gen_slider(label)
     -------
   })
 
-  slider.children[2]:connect_signal("property::value", function(_, new_value)
+  _slider:connect_signal("property::value", function(_, new_value)
     slider.children[3]:new_text(new_value)
   end)
 
@@ -45,6 +55,10 @@ local function gen_slider(label)
 end
 
 local widget = {
+  ui.textbox({
+    text = "Edit color",
+    font = beautiful.font_bold_s,
+  }),
   gen_slider("H"),
   gen_slider("S"),
   gen_slider("L"),
@@ -70,5 +84,9 @@ awesome.connect_signal("colorpopup::toggle", function()
 end)
 
 dash:connect_signal("setstate::close", function()
+  cpopup.visible = false
+end)
+
+dash:connect_signal("tab::set", function()
   cpopup.visible = false
 end)
