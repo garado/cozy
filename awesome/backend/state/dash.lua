@@ -7,13 +7,10 @@
 local cozy    = require("backend.state.cozy")
 local gobject = require("gears.object")
 local gtable  = require("gears.table")
+local ui      = require("utils.ui")
 
 local dash = {}
 local instance = nil
-
--- Enums for tab names
-local MAIN = 1
-local SETTINGS = 2
 
 ---------------------------------------------------------------------
 

@@ -23,20 +23,22 @@ local content -- Container for tab contents
 
 -- Enums for tab names
 local MAIN     = 1
-local LEDGER   = 2
-local CALENDAR = 3
-local SETTINGS = 4
+local TASK     = 2
+local LEDGER   = 3
+local CALENDAR = 4
+local SETTINGS = 5
 
 -- Set up tab info
 local main,     nav_main     = require(... .. ".main")()
+local task,     nav_task     = require(... .. ".task")()
 local ledger,   nav_ledger   = require(... .. ".ledger")()
 local calendar, nav_calendar = require(... .. ".calendar")()
 local settings, nav_settings = require(... .. ".settings")()
 
-local tablist   = { main,     ledger,     calendar,     settings,     }
-local tabnames  = { "main",   "ledger",   "calendar",   "settings",   }
-local tab_icons = { "",      "",        "",          "",          }
-local navitems  = { nav_main, nav_ledger, nav_calendar, nav_settings, }
+local tablist   = { main,     task,     ledger,     calendar,     settings,     }
+local tabnames  = { "main",   "task",   "ledger",   "calendar",   "settings",   }
+local tab_icons = { "",      "",      "",        "",          "",          }
+local navitems  = { nav_main, nav_task, nav_ledger, nav_calendar, nav_settings, }
 
 -- Build tab sidebar
 local tab_buttons = wibox.widget({
@@ -60,13 +62,23 @@ local tab_buttons = wibox.widget({
       bg_color = beautiful.neutral[800],
       mo_color = beautiful.neutral[700],
       select = function(_self)
+        -- Margin
         _self.children[1].color = beautiful.fg
-        _self.bg_color = beautiful.neutral[700]
-        _self.mo_color = beautiful.neutral[600]
+
+        -- Icon color
+        _self.children[1].widget:update_color(beautiful.fg)
+
+        _self.bg_color = beautiful.neutral[600]
+        _self.mo_color = beautiful.neutral[500]
         _self.bg = _self.bg_color
       end,
       deselect = function(_self)
+        -- Margin
         _self.children[1].color = nil
+
+        -- Icon color
+        _self.children[1].widget:update_color(beautiful.neutral[500])
+
         _self.bg_color = beautiful.neutral[800]
         _self.mo_color = beautiful.neutral[700]
         _self.bg = _self.bg_color
@@ -148,10 +160,10 @@ local sidebar = wibox.widget({
 -- Container for dash contents
 content = wibox.widget({
   main,
-  top    = dpi(0),
-  bottom = dpi(5),
+  top    = dpi(5),
+  bottom = dpi(35),
   left   = dpi(25),
-  right  = dpi(5),
+  right  = dpi(25),
   widget = wibox.container.margin,
   ------
   update_contents = function(self, new_content)
@@ -193,5 +205,5 @@ end)
 awesome.connect_signal("theme::switch", function()
 end)
 
-dashstate:set_tab(LEDGER)
+dashstate:set_tab(CALENDAR)
 return function(_) return dash end

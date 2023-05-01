@@ -7,15 +7,19 @@ local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local wibox = require("wibox")
 
-local content = wibox.widget({
-  text = "ugh",
-  widget = wibox.widget.textbox,
-})
+local weekview = require(... .. ".weekview")
+
+local content = weekview
+
+-- local content = wibox.widget({
+--   text = "ugh",
+--   widget = wibox.widget.textbox,
+-- })
 
 --------
 
 local header = ui.textbox({
-  text  = "April 2023",
+  markup = ui.colorize("April", beautiful.fg) .. ui.colorize(" 2023", beautiful.neutral[400]),
   align = "left",
   font  = beautiful.font_light_xl,
 })
