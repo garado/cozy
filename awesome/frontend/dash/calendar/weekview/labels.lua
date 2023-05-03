@@ -32,7 +32,7 @@ local hourlabels = wibox.widget({
   ------
   init = function(self, height)
     local hour_spacing = height / (calconf.end_hour - calconf.start_hour + 1)
-    local y = (height * 0.08) + 3 -- off by a little bit for some reason
+    local y = (height * 0.08 / 2) + 6 -- off by a little bit for some reason
     for i = calconf.start_hour, calconf.end_hour do
       self:add_at(gen_hourlabel(i, hour_spacing), { x = 0, y = y })
       y = y + hour_spacing
@@ -42,7 +42,7 @@ local hourlabels = wibox.widget({
 
 ------------
 
-local function gen_daylabel(day, width, ts)
+local function gen_daylabel(width, ts)
   local color = beautiful.neutral[200]
 
   -- Today gets a special color
@@ -53,11 +53,13 @@ local function gen_daylabel(day, width, ts)
   return wibox.widget({
     ui.textbox({
       text = os.date("%d", ts),
+      align = "center",
       font = beautiful.font_med_m,
       color = color,
     }),
     ui.textbox({
       text  = os.date("%a", ts),
+      align = "center",
       font  = beautiful.font_med_s,
       color = color,
     }),
@@ -77,8 +79,8 @@ local daylabels = wibox.widget({
 
     local day_spacing = width / (calconf.end_day - calconf.start_day + 1)
     local x = 0
-    for i = calconf.start_day, calconf.end_day do
-      self:add_at(gen_daylabel(i, day_spacing, ts), { x = x, y = 0 })
+    for _ = calconf.start_day, calconf.end_day do
+      self:add_at(gen_daylabel(day_spacing, ts), { x = x, y = 0 })
       x = x + day_spacing
       ts = ts + SECONDS_IN_DAY
     end

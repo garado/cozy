@@ -9,7 +9,6 @@ local calconf = require("cozyconf").calendar
 local os = os
 
 local SECONDS_IN_HOUR = 60 * 60
-local SECONDS_IN_DAY = 24 * SECONDS_IN_HOUR
 
 local nowline = { mt = {} }
 
@@ -33,7 +32,7 @@ function nowline:draw(_, cr, width, height)
   local y = (now_hour * hourline_spacing) - (calconf.start_hour * hourline_spacing)
 
   -- Figure out x-pos (day)
-  local now_weekday = tonumber(os.date("%w")) + 1
+  local now_weekday = tonumber(os.date("%w"))
   local x = (now_weekday - calconf.start_day) * dayline_spacing
 
   cr:move_to(x, y)

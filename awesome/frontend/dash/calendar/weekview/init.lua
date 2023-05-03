@@ -8,6 +8,7 @@ local dpi   = ui.dpi
 local awful = require("awful")
 local wibox = require("wibox")
 
+local eventbox = require(... .. ".eventbox")
 local nowline = require(... .. ".nowline")
 local gridlines = require(... .. ".gridlines")
 local hourlabels, daylabels = require(... .. ".labels")()
@@ -18,6 +19,7 @@ local background = wibox.widget({
     daylabels,
     {
       gridlines,
+      eventbox,
       nowline,
       layout = wibox.layout.stack,
     },

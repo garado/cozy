@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# █▀▀ █▀▀ ▀█▀ █▀▀ █░█    █▀█ ▄▀█ █▄░█ █▀▀ █▀▀ 
+# █▀░ ██▄ ░█░ █▄▄ █▀█    █▀▄ █▀█ █░▀█ █▄█ ██▄ 
+
+# Fetch events from a range of dates from the calendar cache file.
+# This just does a lexicographic comparison to get the matching dates.
+# The format for start/end date is:
+# 2023-05-05    18:30
+# That's 2 tabs separating the date and (optionally specified) time.
+
+SRC_FILE=$1
+STARTDATE=$2
+ENDDATE=$3
+
+awk -F, ' BEGIN { "echo '$STARTDATE'" | getline a; "echo '$ENDDATE'" | getline b } \
+  { if ( $0>a && $0<b ) { print $0 }} ' $SRC_FILE

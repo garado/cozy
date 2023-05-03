@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# █▀▀ █▀▀ ▀█▀ █▀▀ █░█    █░█ █▀█ █▀▀ █▀█ █▀▄▀█ █ █▄░█ █▀▀ 
+# █▀░ ██▄ ░█░ █▄▄ █▀█    █▄█ █▀▀ █▄▄ █▄█ █░▀░█ █ █░▀█ █▄█ 
+
+# Tiny helper script to parse calendar cache file for upcoming events because
+# for some fucking reason I can't escape the double quotes properly within awful.spawn
+
+CACHEFILE=$1
+DATE=$2
+MAX=$3
+
+awk -F, ' BEGIN { "echo '$DATE'" | getline a } { if ( $0>a ) { print $0 }} ' $CACHEFILE | head -$MAX

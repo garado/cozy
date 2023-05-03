@@ -28,13 +28,14 @@ function dash:close()
 end
 
 function dash:open()
-  -- cozy:close_all_except("dash")
-  self:emit_signal("setstate::open")
+  cozy:close_all_except("dash")
+  self:emit_signal("setstate::open", self.curtab)
   self.visible = true
 end
 
 function dash:set_tab(tab_enum)
   self:emit_signal("tab::set", tab_enum)
+  self.curtab = tab_enum
 end
 
 function dash:new()
