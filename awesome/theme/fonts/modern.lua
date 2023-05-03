@@ -4,8 +4,8 @@
 
 local _font = {}
 
-local type = "Inter Nerd Font "
-_font.font_name = "Inter Nerd Font "
+local type =      "Circular Std "
+_font.font_name = "Circular Std "
 
 local weights = {
   light = "Light ",

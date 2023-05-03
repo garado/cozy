@@ -2,10 +2,11 @@
 -- █▄▄ ▄▀█ ▀█▀ ▀█▀ █▀▀ █▀█ █▄█ 
 -- █▄█ █▀█ ░█░ ░█░ ██▄ █▀▄ ░█░ 
 
--- Instantiates UPower module. Responsible for sending notifications.
+-- Instantiates UPower module. Responsible for generating notifications.
+-- Still needs some work.
 
 local naughty = require("naughty")
-local upower_widget = require("modules.upower")
+local upower  = require("modules.upower")
 
 local curstate, prevstate, prevpercent
 local batnotif
@@ -36,7 +37,7 @@ local function notify(msg)
 end
 
 -- TODO: Make this a config option
-local battery_listener = upower_widget({
+local battery_listener = upower({
   device_path    = "/org/freedesktop/UPower/devices/battery_BAT0",
 	instant_update = true,
 })

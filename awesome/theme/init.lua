@@ -20,10 +20,10 @@ local theme_style = "dark"
 -- █▀█ ▄▀█ █░░ █▀▀ ▀█▀ ▀█▀ █▀▀    █▀▀ █▀▀ █▄░█ █▀▀ █▀█ ▄▀█ ▀█▀ █ █▀█ █▄░█ 
 -- █▀▀ █▀█ █▄▄ ██▄ ░█░ ░█░ ██▄    █▄█ ██▄ █░▀█ ██▄ █▀▄ █▀█ ░█░ █ █▄█ █░▀█ 
 
-local path = "theme.colorschemes." .. theme_name .. "." .. theme_style
-local cscheme = require(path)
+-- local path = "theme.colorschemes." .. theme_name .. "." .. theme_style
+local cscheme = require("theme.colorschemes.mountain.dark")
 
--- Generate 5 primary colors
+-- Generate 7 primary colors
 local pbase = cscheme.primary.base
 cscheme.primary[700] = clrutils.darken(pbase, 0.48)
 cscheme.primary[600] = clrutils.darken(pbase, 0.32)

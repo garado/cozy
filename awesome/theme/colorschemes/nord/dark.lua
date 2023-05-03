@@ -4,12 +4,10 @@
 
 local gfs = require("gears.filesystem")
 local awesome_cfg = gfs.get_configuration_dir()
-local clib = require("modules.color")
-local clrutils = require("utils.color")
 
 local theme = {
   type = "dark",
-  wall = awesome_cfg .. "theme/colorschemes/nord/dark.png",
+  wall = awesome_cfg .. "theme/colorschemes/nord/dark_wp",
 
   primary = {
     base = "#5e81ac",
