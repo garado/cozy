@@ -5,6 +5,7 @@
 local awful = require("awful")
 local gears = require("gears")
 local wibox = require("wibox")
+local ui    = require("utils.ui")
 local dpi   = require("utils.ui").dpi
 local beautiful = require("beautiful")
 local dashstate = require("backend.state.dash")
@@ -12,20 +13,26 @@ local keynav    = require("modules.keynav")
 local colorize  = require("utils.ui").colorize
 local config    = require("cozyconf")
 
+local greeting = require(... .. ".greeting")
+local events = require(... .. ".events")
+local tasks  = require(... .. ".duedates")
+
 local profile = require(... .. ".profile")
 -- local github  = require(... .. ".github")
 
 local grid = wibox.widget({
-  spacing = 5,
-  forced_num_rows = 6,
-  forced_num_cols = 6,
-  layout = wibox.layout.grid,
+  greeting,
+  events,
+  tasks,
+  spacing = dpi(35),
+  layout = wibox.layout.fixed.vertical,
 })
 
--- :add_widget_at (child, row, col, row_span, col_span)
-grid:add_widget_at(profile, 1, 1, 3, 3)
--- grid:add_widget_at(github,  4, 4, 3, 3)
+local widget = wibox.widget({
+  grid,
+  widget = wibox.container.place
+})
 
 return function()
-  return grid, false
+  return widget, false
 end

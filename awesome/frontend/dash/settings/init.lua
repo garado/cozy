@@ -9,7 +9,6 @@ local awful = require("awful")
 local wibox = require("wibox")
 local color = require("modules.color")
 local clrutils = require("utils.color")
-local theme = require("theme.colorschemes.nord.dark")
 
 require(... .. ".popup")
 local preview = require(... .. ".preview")()
@@ -25,6 +24,7 @@ local function colorbox(name, c)
       },
       ui.textbox({
         text = name,
+        align = "center",
       }),
       spacing = dpi(5),
       layout  = wibox.layout.fixed.vertical,
@@ -47,7 +47,7 @@ local function colorbox(name, c)
   end)
 
   cbox:connect_signal("button::press", function()
-    awesome.emit_signal("colorpopup::toggle", color)
+    awesome.emit_signal("colorpopup::toggle", c)
   end)
 
   return cbox
@@ -92,55 +92,55 @@ local title = ui.textbox({
 -- Primary
 local p_palette = {}
 local primary = gengroup("Primary", {
-  colorbox("100", theme.primary[100]),
-  colorbox("200", theme.primary[200]),
-  colorbox("300", theme.primary[300]),
-  colorbox("400", theme.primary[400]),
-  colorbox("500", theme.primary[500]),
-  colorbox("600", theme.primary[600]),
-  colorbox("700", theme.primary[700]),
+  colorbox("100", beautiful.primary[100]),
+  colorbox("200", beautiful.primary[200]),
+  colorbox("300", beautiful.primary[300]),
+  colorbox("400", beautiful.primary[400]),
+  colorbox("500", beautiful.primary[500]),
+  colorbox("600", beautiful.primary[600]),
+  colorbox("700", beautiful.primary[700]),
 })
-local pbase = color.color { hex = theme.primary.base }
+local pbase = color.color { hex = beautiful.primary.base }
 
 local neutral = gengroup("Neutral", {
-  colorbox("100", theme.neutral[100]),
-  colorbox("200", theme.neutral[200]),
-  colorbox("300", theme.neutral[300]),
-  colorbox("400", theme.neutral[400]),
-  colorbox("500", theme.neutral[500]),
-  colorbox("600", theme.neutral[600]),
-  colorbox("700", theme.neutral[700]),
-  colorbox("800", theme.neutral[800]),
-  colorbox("900", theme.neutral[900]),
+  colorbox("100", beautiful.neutral[100]),
+  colorbox("200", beautiful.neutral[200]),
+  colorbox("300", beautiful.neutral[300]),
+  colorbox("400", beautiful.neutral[400]),
+  colorbox("500", beautiful.neutral[500]),
+  colorbox("600", beautiful.neutral[600]),
+  colorbox("700", beautiful.neutral[700]),
+  colorbox("800", beautiful.neutral[800]),
+  colorbox("900", beautiful.neutral[900]),
 })
 
 -- Red, green, yellow
 local clabel = genlabel("Colors")
 
 local _c_red = {
-  colorbox("100", theme.red[100]),
-  colorbox("200", theme.red[200]),
-  colorbox("300", theme.red[300]),
-  colorbox("400", theme.red[400]),
-  colorbox("500", theme.red[500]),
+  colorbox("100", beautiful.red[100]),
+  colorbox("200", beautiful.red[200]),
+  colorbox("300", beautiful.red[300]),
+  colorbox("400", beautiful.red[400]),
+  colorbox("500", beautiful.red[500]),
 }
 local c_red = gengroup(nil, _c_red)
 
 local _c_green = {
-  colorbox("100", theme.green[100]),
-  colorbox("200", theme.green[200]),
-  colorbox("300", theme.green[300]),
-  colorbox("400", theme.green[400]),
-  colorbox("500", theme.green[500]),
+  colorbox("100", beautiful.green[100]),
+  colorbox("200", beautiful.green[200]),
+  colorbox("300", beautiful.green[300]),
+  colorbox("400", beautiful.green[400]),
+  colorbox("500", beautiful.green[500]),
 }
 local c_green = gengroup(nil, _c_green)
 
 local _c_yellow = {
-  colorbox("100", theme.yellow[100]),
-  colorbox("200", theme.yellow[200]),
-  colorbox("300", theme.yellow[300]),
-  colorbox("400", theme.yellow[400]),
-  colorbox("500", theme.yellow[500]),
+  colorbox("100", beautiful.yellow[100]),
+  colorbox("200", beautiful.yellow[200]),
+  colorbox("300", beautiful.yellow[300]),
+  colorbox("400", beautiful.yellow[400]),
+  colorbox("500", beautiful.yellow[500]),
 }
 local c_yellow = gengroup(nil, _c_yellow)
 
@@ -154,8 +154,8 @@ local shades = wibox.widget({
 })
 
 local _accents = {}
-for i in ipairs(theme.accents) do
-  _accents[#_accents+1] = colorbox(i, theme.accents[i])
+for i in ipairs(beautiful.accents) do
+  _accents[#_accents+1] = colorbox(i, beautiful.accents[i])
 end
 local accents = gengroup("Accents", _accents)
 
@@ -175,7 +175,7 @@ local content = wibox.widget({
 
 -------------------------
 
-local theme_name = ui.textbox({
+local beautiful_name = ui.textbox({
   text = "Nord Dark",
   align = "left",
   font = beautiful.font_reg_l,

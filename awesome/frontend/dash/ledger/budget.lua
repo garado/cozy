@@ -42,15 +42,15 @@ local function gen_entry(category)
     },
     bar,
     spacing = dpi(5),
-    forced_width  = dpi(300),
+    forced_width  = dpi(250),
     layout = wibox.layout.fixed.vertical,
   })
 end
 
 local budget = wibox.widget({
   ui.textbox({
-    text = "Monthly budget",
-    font = beautiful.font_reg_m,
+    text = "Monthly Budget",
+    font = beautiful.font_med_m,
   }),
   {
     {
@@ -60,6 +60,7 @@ local budget = wibox.widget({
       gen_entry("Transportation"),
       gen_entry("Household"),
       gen_entry("Hobby"),
+      gen_entry("Other"),
       spacing = dpi(20),
       layout = wibox.layout.fixed.vertical,
     },
@@ -71,16 +72,4 @@ local budget = wibox.widget({
   layout  = wibox.layout.fixed.vertical,
 })
 
-return wibox.widget({
-  {
-    budget,
-    top    = dpi(25),
-    bottom = dpi(25),
-    left   = dpi(5),
-    right  = dpi(5),
-    widget = wibox.container.margin,
-  },
-  bg     = beautiful.neutral[800],
-  shape  = ui.rrect(),
-  widget = wibox.container.background,
-})
+return ui.dashbox(budget, dpi(450), dpi(800))

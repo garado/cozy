@@ -11,12 +11,15 @@ local gears = require("gears")
 local wibox = require("wibox")
 local ui    = require("utils.ui")
 local dpi   = require("utils.ui").dpi
+local keynav = require("modules.keynav")
 local beautiful = require("beautiful")
 local dashstate = require("backend.state.dash")
 local config    = require("cozyconf")
 
 -- Forward declarations
 local content -- Container for tab contents
+
+local navigator, nav_root = keynav.navigator()
 
 -- █▀ █ █▀▄ █▀▀ █▄▄ ▄▀█ █▀█ 
 -- ▄█ █ █▄▀ ██▄ █▄█ █▀█ █▀▄ 
@@ -40,6 +43,15 @@ local tabnames  = { "main",   "task",   "ledger",   "calendar",   "settings",   
 local tab_icons = { "",      "",      "",        "",          "",          }
 local navitems  = { nav_main, nav_task, nav_ledger, nav_calendar, nav_settings, }
 
+-- Pressing number keys switches tabs
+local root_keys = {}
+for i = 1, #tablist do
+  root_keys[tostring(i)] = function()
+    dashstate:set_tab(i)
+  end
+end
+navigator.root.keys = root_keys
+
 -- Build tab sidebar
 local tab_buttons = wibox.widget({
   layout  = wibox.layout.fixed.vertical,
@@ -50,12 +62,13 @@ local tab_buttons = wibox.widget({
       {
         ui.textbox({
           text  = tab_icons[i],
+          align = "center",
         }),
-        left = dpi(2),
+        left   = dpi(2),
         widget = wibox.container.margin,
       },
-      bg = beautiful.primary[800],
       forced_height = dpi(50),
+      bg     = beautiful.primary[800],
       widget = wibox.container.background,
       ------
       tab_enum = i,
@@ -101,7 +114,7 @@ local tab_buttons = wibox.widget({
   end
 })
 
-for i = 1, #tablist, 1 do
+for i = 1, #tablist do
   tab_buttons:add_tab(i)
 end
 
@@ -123,6 +136,7 @@ end)
 
 local distro_icon = ui.textbox({
   text  = config.distro_icon,
+  align = "center",
   color = beautiful.primary[300],
 })
 
@@ -160,10 +174,10 @@ local sidebar = wibox.widget({
 -- Container for dash contents
 content = wibox.widget({
   main,
-  top    = dpi(5),
-  bottom = dpi(35),
-  left   = dpi(25),
-  right  = dpi(25),
+  top    = dpi(15),
+  bottom = dpi(15),
+  left   = dpi(15),
+  right  = dpi(15),
   widget = wibox.container.margin,
   ------
   update_contents = function(self, new_content)
@@ -194,16 +208,15 @@ local dash = awful.popup({
 
 dashstate:connect_signal("setstate::open", function()
   dash.visible = true
+  navigator:start()
   dashstate:emit_signal("newstate::opened")
 end)
 
 dashstate:connect_signal("setstate::close", function()
   dash.visible = false
+  navigator:stop()
   dashstate:emit_signal("newstate::closed")
 end)
 
-awesome.connect_signal("theme::switch", function()
-end)
-
-dashstate:set_tab(CALENDAR)
+dashstate:set_tab(TASK)
 return function(_) return dash end
