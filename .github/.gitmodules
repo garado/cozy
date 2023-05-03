@@ -1,9 +1,0 @@
-[submodule "modules/bling"]
-	path = modules/bling
-	url = https://github.com/BlingCorp/bling
-[submodule "modules/color"]
-	path = modules/color
-	url = https://github.com/andOrlando/color.git
-[submodule "modules/upower"]
-  path = modules/upower
-  url = https://github.com/Aire-One/awesome-battery_widget.git
