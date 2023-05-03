@@ -1,90 +1,78 @@
 
---▀█▀ ▄▀█ █▀▀ █▀ 
---░█░ █▀█ █▄█ ▄█ 
+-- ▀█▀ ▄▀█ █▀▀ █▀ 
+-- ░█░ █▀█ █▄█ ▄█ 
 
-local beautiful = require("beautiful")
+local beautiful  = require("beautiful")
+local ui    = require("utils.ui")
+local dpi   = ui.dpi
+local awful = require("awful")
 local wibox = require("wibox")
-local xresources = require("beautiful.xresources")
-local dpi = xresources.apply_dpi
-local box = require("helpers.ui").create_boxed_widget
-local wheader = require("helpers.ui").create_dash_widget_header
-local colorize = require("helpers.ui").colorize_text
-local keynav = require("modules.keynav")
-local task = require("backend.system.task")
+local task  = require("backend.system.task")
 
-
--- █░█ █ 
--- █▄█ █ 
-
-local tag_list = wibox.widget({
-  spacing = dpi(7),
-  layout = wibox.layout.fixed.vertical,
+local taglist = wibox.widget({
+  ui.textbox({
+    text  = "Tags",
+    align = "center",
+    font  = beautiful.font_bold_m,
+  }),
+  spacing = dpi(10),
+  layout  = wibox.layout.fixed.vertical,
 })
 
-local widget = wibox.widget({
-  wheader("Tags"),
-  tag_list,
-  spacing = dpi(8),
-  forced_width = dpi(150),
-  fill_space = false,
-  layout = wibox.layout.fixed.vertical,
-})
-
-local container = box(widget, nil, nil, beautiful.dash_widget_bg)
-
--- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄ 
--- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀ 
-
-local nav_tags = keynav.area({
-  name   = "nav_tags",
-  widget = keynav.navitem.background({ widget = container.children[1] }),
-  hl_persist_on_area_switch = true,
-  on_area_changed = function(self)
-    self:select_off_recursive()
-    for i = 1, #self.items do
-      if self.items[i].label == task.focused_tag then
-        self:set_curr_item(i)
-        return
-      end
-    end
+function taglist:reset()
+  for i = 2, #self.children do
+    self:remove(i)
   end
-})
-
-local function create_tag_item(tag)
-  local tag_wibox = wibox.widget({
-    id      = tag,
-    markup  = colorize(tag, beautiful.fg_0),
-    align   = "center",
-    font    = beautiful.font_reg_s,
-    widget  = wibox.widget.textbox,
-    forced_height = dpi(20),
-  })
-
-  local nav_tag = keynav.navitem.textbox({
-    widget  = tag_wibox,
-    label   = tag,
-    release = function()
-      task:emit_signal("selected::tag", tag)
-    end
-  })
-
-  return tag_wibox, nav_tag
 end
 
-task:connect_signal("taglist::update", function()
-  tag_list:reset()
-  nav_tags:reset()
+function taglist:add_tag(tag)
+  local t = ui.textbox({
+    text  = tag,
+    align = "center",
+  })
 
-  for i = 1, #task.tag_names do
-    local tag_wibox, nav_tag = create_tag_item(task.tag_names[i])
-    tag_list:add(tag_wibox)
-    nav_tags:add(nav_tag)
+  t.selected = false
+
+  t.select_props = {
+    fg    = beautiful.primary[400],
+    fg_mo = beautiful.primary[500],
+  }
+
+  t.deselect_props = {
+    fg    = beautiful.fg,
+    fg_mo = beautiful.neutral[300],
+  }
+
+  t.props = t.deselect_props
+
+  t:connect_signal("mouse::enter", function()
+    t:update_color(t.props.fg_mo)
+  end)
+
+  t:connect_signal("mouse::leave", function()
+    t:update_color(t.props.fg)
+  end)
+
+  function t:update()
+    t.props = t.selected and t.select_props or t.deselect_props
+  end
+
+  t:connect_signal("button::press", function()
+    t.selected = not t.selected
+    t:update()
+    t:update_color(t.props.fg)
+    task:emit_signal("selected::tag", t.text)
+  end)
+
+  self:add(t)
+end
+
+task:connect_signal("ready::tags", function(_, tags)
+  for i = 1, #tags do
+    taglist:add_tag(tags[i])
   end
 end)
 
-
-
 return function()
-  return container, nav_tags
+  return ui.dashbox(taglist)
 end
-
