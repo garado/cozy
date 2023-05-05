@@ -159,6 +159,9 @@ function calendar:new()
   self.END_TIME   = 4
   self.TITLE      = 5
   self.LOCATION   = 6
+
+  -- Variables shared across UI elements
+  self.weekview_cur_offset = 0
 end
 
 local function new()

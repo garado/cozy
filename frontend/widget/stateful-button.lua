@@ -44,18 +44,23 @@ local function worker(user_args)
     },
   }
   gtable.crush(args, user_args)
+  if args.set_no_shape then args.shape = nil end
 
   stateful_btn = wibox.widget({
     {
       ui.textbox({
         text = args.text,
         font = args.font,
+        align = "center",
         markup = args.markup,
         color = args.fg,
       }),
       margins = args.margins,
       widget  = wibox.container.margin,
     },
+    shape = args.shape,
+    forced_width  = args.width,
+    forced_height = args.height,
     widget = wibox.container.background,
   })
 

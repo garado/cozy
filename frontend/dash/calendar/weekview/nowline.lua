@@ -2,10 +2,13 @@
 -- █▄░█ █▀█ █░█░█ █░░ █ █▄░█ █▀▀ 
 -- █░▀█ █▄█ ▀▄▀▄▀ █▄▄ █ █░▀█ ██▄ 
 
-local wibox = require("wibox")
-local gcolor = require("gears.color")
-local gtable = require("gears.table")
+-- A horizontal line drawn at the current hour.
+
+local wibox   = require("wibox")
+local gcolor  = require("gears.color")
+local gtable  = require("gears.table")
 local calconf = require("cozyconf").calendar
+local cal     = require("backend.system.calendar")
 local os = os
 
 local SECONDS_IN_HOUR = 60 * 60
@@ -18,6 +21,11 @@ function nowline:fit(_, width, height)
 end
 
 function nowline:draw(_, cr, width, height)
+  -- Only draw for the current week
+  -- TODO: There are some weird artifacts left over, not sure
+  -- how to get rid of them.
+  if cal.weekview_cur_offset ~= 0 then return end
+
   cr:set_source(gcolor(calconf.nowline_color))
   cr:set_line_width(2)
 

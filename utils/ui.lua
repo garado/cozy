@@ -13,8 +13,6 @@ local clrutils = require("utils.color")
 local _ui = {}
 
 --- For people with different screen resolutions, I hope this might be a solution.
--- There will be a config option one day and this will return dpi * scalar to scale
--- stuff up/down.
 function _ui.dpi(px)
   return dpi(px)
 end
@@ -24,9 +22,9 @@ function _ui.colorize(text, color)
   return "<span foreground='" .. color .. "'>" .. text .. "</span>"
 end
 
--- TODO: Need to fix (doesn't work right :/)
 --- @function get_children_by_id
 -- The fact that get_children_by_id isn't recursive makes no damn sense
+-- TODO: Need to fix (doesn't work right :/)  
 function _ui.get_children_by_id(widget, target)
   if widget.id == target then
     return widget
@@ -48,19 +46,32 @@ function _ui.get_children_by_id(widget, target)
 end
 
 --- Create textbox with my preferred defaults.
-function _ui.textbox(args)
-  args = args or {}
+function _ui.textbox(userargs)
+  local args = {
+    color  = beautiful.fg,
+    text   = "Default Text",
+    valign = "center",
+    align  = "left",
+    font   = beautiful.font_reg_s,
+    ellipsize = "none",
+    forced_width  = nil,
+    forced_height = nil,
+  }
+  gtable.crush(args, userargs)
+  args.markup = args.markup or _ui.colorize(args.text or "Default text", args.color)
+
   return wibox.widget({
-    markup = args.markup or _ui.colorize(args.text or "Default text", args.color or beautiful.fg),
-    valign = args.valign or "center",
-    align  = args.align  or "left",
-    font   = args.font   or beautiful.font_reg_s,
-    forced_width  = args.width  or nil,
-    forced_height = args.height or nil,
+    markup = args.markup,
+    valign = args.valign,
+    align  = args.align,
+    font   = args.font,
+    ellipsize = args.ellipsize,
+    forced_width  = args.width,
+    forced_height = args.height,
     widget = wibox.widget.textbox,
     -------
-    _text  = args.text or "Default text",
-    _color = args.color or beautiful.fg,
+    _text  = args.text,
+    _color = args.color,
     update_text = function(self, text)
       self.markup = _ui.colorize(text, self._color)
     end,
