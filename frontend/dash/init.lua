@@ -118,9 +118,8 @@ for i = 1, #tablist do
   tab_buttons:add_tab(i)
 end
 
---- Pressing a tab button emits tab::set signal throughout dash
--- Update dash contents and UI of selected tab
 dashstate:connect_signal("tab::set", function(_, tab_enum)
+  -- Update sidebar
   for i = 1, #tab_buttons.children do
     if tab_buttons.children[i].tab_enum == tab_enum then
       tab_buttons.children[i]:select()
@@ -130,6 +129,12 @@ dashstate:connect_signal("tab::set", function(_, tab_enum)
   end
 
   content:update_contents(tablist[tab_enum])
+
+  -- Update keynav areas
+  if navitems[tab_enum] and not nav_root:contains(navitems[tab_enum]) then
+    nav_root:append(navitems[tab_enum])
+    nav_root:verify_nav_references()
+  end
 end)
 
 -- Building the rest of the sidebar
@@ -174,12 +179,8 @@ local sidebar = wibox.widget({
 -- Container for dash contents
 content = wibox.widget({
   main,
-  top    = dpi(15),
-  bottom = dpi(15),
-  left   = dpi(15),
-  right  = dpi(15),
-  widget = wibox.container.margin,
-  ------
+  margins = dpi(15),
+  widget  = wibox.container.margin,
   update_contents = function(self, new_content)
     self.widget = new_content
   end
@@ -218,5 +219,5 @@ dashstate:connect_signal("setstate::close", function()
   dashstate:emit_signal("newstate::closed")
 end)
 
-dashstate:set_tab(TASK)
+dashstate:set_tab(MAIN)
 return function(_) return dash end

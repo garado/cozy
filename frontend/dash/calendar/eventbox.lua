@@ -11,79 +11,141 @@ local cal   = require("backend.system.calendar")
 local calconf = require("cozyconf").calendar
 local strutil = require("utils").string
 
-local ebox_margin    = 4
+local eventboxes
+
 local SECONDS_IN_DAY = 24 * 60 * 60
+local EBOX_MARGIN    = dpi(4)
+local OVERLAP_OFFSET = dpi(7)
+local ELAPSED_BG     = beautiful.neutral[600]
+local ELAPSED_FG     = beautiful.neutral[300]
+
+local colors = {
+  beautiful.primary[900],
+  beautiful.primary[700],
+  beautiful.primary[500],
+  beautiful.primary[300],
+  beautiful.primary[100],
+}
+
+--- @function find_overlapping_events
+-- @brief Find the number of events that this overlaps.
+local function find_overlapping_events(x, y)
+  local num_overlaps = 0
+  for i = 1, #eventboxes.children do
+    local _x = eventboxes.children[i].point.x
+    local _y = eventboxes.children[i].point.y
+    local _h = eventboxes.children[i].forced_height
+
+    if _x == x and y > _y and y < (_y + _h) then
+      num_overlaps = num_overlaps + 1
+    end
+  end
+
+  return num_overlaps
+end
 
 --- @function gen_eventbox
 -- @param event An event table
 local function gen_eventbox(event, height, width)
-  -- Figure out how tall each hour is
+  -- Determine how tall each hour is
   local hour_range = calconf.end_hour - calconf.start_hour + 1
   local hourline_spacing = height / hour_range
 
-  -- Figure out how wide each day is
+  -- Determine how wide each day is
   local day_range = calconf.end_day - calconf.start_day + 1
   local dayline_spacing = width / day_range
 
-  local duration = strutil.time_to_int(event.e_time) - strutil.time_to_int(event.s_time)
+  local duration = strutil.time_to_int(event.e_time) -
+                   strutil.time_to_int(event.s_time)
 
-  -- Figure out y-pos of event box (hour)
-  local y = (strutil.time_to_int(event.s_time) * hourline_spacing) - (calconf.start_hour * hourline_spacing)
+  -- Determine y-pos of event box (hour)
+  local y = (strutil.time_to_int(event.s_time) * hourline_spacing) -
+            (calconf.start_hour * hourline_spacing)
+  y = y + (EBOX_MARGIN / 2)
 
-  -- Figure out x-pos of event box (day)
+  -- Determine x-pos of event box (day)
   local x = (event.s_day - calconf.start_day) * dayline_spacing
+  x = x + (EBOX_MARGIN / 2)
+
+  -- If this event has fully elapsed, it should be grayed out.
+  local bg, fg
+  local now = os.date("%H:%M")
+  local now_weekday = os.date("%w")
+  local elapsed = false
+
+  elapsed = (cal.weekview_cur_offset < 0) or
+            ((cal.weekview_cur_offset == 0) and
+            (event.e_day < now_weekday) or
+            (event.e_day == now_weekday and event.e_time < now))
+
+  if elapsed then
+    bg = ELAPSED_BG
+    fg = ELAPSED_FG
+  end
+
+  -- If this event overlaps others, adjust the properties of this
+  -- event box accordingly.
+  local w = dayline_spacing - EBOX_MARGIN
+  local num_overlaps = find_overlapping_events(x, y)
+  x = x + (num_overlaps * OVERLAP_OFFSET)
+  w = w - (num_overlaps * OVERLAP_OFFSET)
+  bg = bg or colors[num_overlaps + 1]
+
+  fg = fg or beautiful.fg
+
+  -- Different sized event boxes have different layouts.
+  -- (Trying to make a "responsive" event box.)
+  local text_top_margin = dpi(6)
+  local text_layout = wibox.layout.fixed.vertical
+  local time_prefix = ""
+  local text_title_height
+
+  if duration <= 0.5 then
+    duration = 0.5
+    text_top_margin = dpi(2)
+    text_layout = wibox.layout.fixed.horizontal
+    time_prefix = ', '
+  elseif duration <= 0.75 then
+    text_top_margin = dpi(3)
+    text_layout = wibox.layout.fixed.horizontal
+  elseif duration <= 1 then
+    text_title_height = beautiful.font_sizes.s * 1.5
+  end
 
   local text = wibox.widget({
     ui.textbox({
-      text  = event.title,
-      font  = beautiful.font_med_s,
-      align = "left",
-      color = beautiful.fg,
+      text = event.title,
+      font = beautiful.font_med_s,
+      height = text_title_height,
+      color  = fg,
     }),
     ui.textbox({
-      text  = event.s_time .. ' - ' .. event.e_time,
-      align = "left",
-      color = beautiful.fg,
+      text  = time_prefix .. event.s_time .. ' - ' .. event.e_time,
+      color = fg,
     }),
-    layout = wibox.layout.fixed.vertical,
+    layout = text_layout,
   })
 
-  -- Different sized event boxes have different appearances - 
-  -- trying to make a "responsive" event box
+  local h = (duration * hourline_spacing) - EBOX_MARGIN
 
-  -- Force the smallest possible ebox to be 30min tall so that
-  -- at least some text has room to show.
-  if duration <= 0.5 then
-    duration = 0.5
-    text.children[1].ellipsize = "end"
-    text:remove(2)
-  end
-
-  if duration < 1.5 then
-    text.children[1].ellipsize = "end"
-    text.children[1].forced_height = beautiful.font_sizes.s * 1.5
-  end
-
-  local ebox = wibox.widget({
+  return wibox.widget({
     {
       text,
-      top    = duration > 0.5 and dpi(6) or dpi(2),
+      top    = text_top_margin,
       left   = dpi(8),
       right  = dpi(8),
       widget = wibox.container.margin,
     },
-    bg    = beautiful.primary[700],
+    bg    = bg,
     shape = ui.rrect(5),
-    forced_height = (duration * hourline_spacing) - ebox_margin,
-    forced_width  = dayline_spacing - ebox_margin,
+    forced_height = h,
+    forced_width  = w,
     widget = wibox.container.background,
-    point  = { x = x + (ebox_margin / 2), y = y + (ebox_margin / 2)},
+    point  = { x = x, y = y },
   })
-
-  return ebox
 end
 
-local eventboxes = wibox.widget({
+eventboxes = wibox.widget({
   layout = wibox.layout.manual,
   -------
   add_event = function(self, e)

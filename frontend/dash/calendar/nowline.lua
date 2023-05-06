@@ -22,8 +22,6 @@ end
 
 function nowline:draw(_, cr, width, height)
   -- Only draw for the current week
-  -- TODO: There are some weird artifacts left over, not sure
-  -- how to get rid of them.
   if cal.weekview_cur_offset ~= 0 then return end
 
   cr:set_source(gcolor(calconf.nowline_color))

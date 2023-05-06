@@ -18,7 +18,7 @@ local header = {}
 local function worker(user_args)
   local args = {
     title_text    = "Title",
-    subtitle_text = "Subtitle",
+    subtitle_text = "",
   }
   gtable.crush(args, user_args or {})
 
@@ -49,36 +49,41 @@ local function worker(user_args)
 
   header = wibox.widget({
     {
-      title,
-      subtitle,
-      spacing = dpi(15),
-      layout  = wibox.layout.fixed.horizontal,
-    },
-    nil,
-    {
       {
-        actions,
-        nav,
+        title,
+        subtitle,
         spacing = dpi(15),
         layout  = wibox.layout.fixed.horizontal,
       },
-      widget = wibox.container.place,
+      nil,
+      {
+        {
+          actions,
+          nav,
+          spacing = dpi(15),
+          layout  = wibox.layout.fixed.horizontal,
+        },
+        widget = wibox.container.place,
+      },
+      layout = wibox.layout.align.horizontal,
     },
-    layout = wibox.layout.align.horizontal,
+    -- I don't know why I have to make the margins so wonky for it
+    -- to look right.
+    -- bottom = -dpi(30),
+    widget = wibox.container.margin,
   })
 
   -- Methods
   function header:clear_actions()
-    self.children[#self.children].widget.children[1]:reset()
+    actions:reset()
   end
 
   function header:add_action(btn)
-    self.children[#self.children].widget.children[1]:add(btn)
+    actions:add(btn)
   end
 
   function header:add_sb(name, func)
-    local _sbg = self.children[#self.children].widget.children[2]
-    _sbg:add_btn(name, func)
+    nav:add_btn(name, func)
   end
 
   function header:update_title(_args)
@@ -95,6 +100,10 @@ local function worker(user_args)
     elseif _args.markup then
       subtitle.markup = _args.markup
     end
+  end
+
+  function header:get_actions()
+    return actions.children
   end
 
   return header
