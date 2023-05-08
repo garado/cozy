@@ -8,6 +8,7 @@ local gtable = require("gears.table")
 
 local config = {}
 
+gtable.crush(config, require(... .. ".ui"))
 gtable.crush(config, require(... .. ".dash"))
 
 return config

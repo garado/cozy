@@ -33,6 +33,11 @@ local theme = {
     "#a3be8c",
     "#b48ead",
   },
+
+  integrations = {
+    kitty = "Nord",
+    nvim  = "nord",
+  }
 }
 
 return theme

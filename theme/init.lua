@@ -4,6 +4,7 @@
 
 local dpi = require("utils.ui").dpi
 local gfs = require("gears.filesystem")
+local conf = require("cozyconf")
 local gears    = require("gears")
 local gtable   = require("gears.table")
 local clib     = require("modules.color")
@@ -12,26 +13,32 @@ local clrutils = require("utils.color")
 -- Load default AwesomeWM theme
 local theme = dofile(gfs.get_themes_dir() .. "default/theme.lua")
 
--- Get options from cozyconf
-local fontset = require("theme.fonts.modern")
-local theme_name  = "nord"
-local theme_style = "dark"
+local fontset = require("theme.fonts." .. conf.fontset)
+
+theme.pfp = gfs.get_configuration_dir() .. "theme/assets/pfp.png"
+
+if conf.theme_switch_integration then
+  -- Not sure why require(... .. ".integration") doesn't work.
+  require("theme.integration")
+end
 
 -- █▀█ ▄▀█ █░░ █▀▀ ▀█▀ ▀█▀ █▀▀    █▀▀ █▀▀ █▄░█ █▀▀ █▀█ ▄▀█ ▀█▀ █ █▀█ █▄░█ 
 -- █▀▀ █▀█ █▄▄ ██▄ ░█░ ░█░ ██▄    █▄█ ██▄ █░▀█ ██▄ █▀▄ █▀█ ░█░ █ █▄█ █░▀█ 
 
--- local path = "theme.colorschemes." .. theme_name .. "." .. theme_style
-local cscheme = require("theme.colorschemes.mountain.dark")
+local path = "theme.colorschemes." .. conf.theme_name .. "." .. conf.theme_style
+local cscheme = require(path)
 
 -- Generate 7 primary colors
 local pbase = cscheme.primary.base
-cscheme.primary[700] = clrutils.darken(pbase, 0.48)
-cscheme.primary[600] = clrutils.darken(pbase, 0.32)
-cscheme.primary[500] = clrutils.darken(pbase, 0.16)
-cscheme.primary[400] = pbase
-cscheme.primary[300] = clrutils.lighten(pbase, 0.16)
-cscheme.primary[200] = clrutils.lighten(pbase, 0.32)
-cscheme.primary[100] = clrutils.lighten(pbase, 0.48)
+cscheme.primary[900] = clrutils.darken(pbase, 0.54)
+cscheme.primary[800] = clrutils.darken(pbase, 0.48)
+cscheme.primary[700] = clrutils.darken(pbase, 0.32)
+cscheme.primary[600] = clrutils.darken(pbase, 0.16)
+cscheme.primary[500] = pbase
+cscheme.primary[400] = clrutils.lighten(pbase, 0.16)
+cscheme.primary[300] = clrutils.lighten(pbase, 0.32)
+cscheme.primary[200] = clrutils.lighten(pbase, 0.48)
+cscheme.primary[100] = clrutils.lighten(pbase, 0.54)
 
 -- Generate 9 neutral colors
 local ndark = cscheme.neutral.dark
@@ -96,6 +103,7 @@ theme.wibar_occupied  = cscheme.neutral[100]
 theme.notif_bg = cscheme.neutral[900]
 theme.notif_actions_bg = cscheme.neutral[800]
 theme.notif_timeout_bg = cscheme.neutral[800]
+theme.notification_spacing = dpi(10)
 
 theme.wallpaper = gears.surface.load_uncached(cscheme.wall)
 

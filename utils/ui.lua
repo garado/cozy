@@ -53,9 +53,9 @@ function _ui.textbox(userargs)
     valign = "center",
     align  = "left",
     font   = beautiful.font_reg_s,
-    ellipsize = "none",
-    forced_width  = nil,
-    forced_height = nil,
+    width  = nil,
+    height = nil,
+    ellipsize = "end",
   }
   gtable.crush(args, userargs)
   args.markup = args.markup or _ui.colorize(args.text or "Default text", args.color)

@@ -8,7 +8,7 @@ local awesome_cfg = gfs.get_configuration_dir()
 
 local theme = {
   type = "dark",
-  wall = awesome_cfg .. "theme/colorschemes/mountain/color_wp",
+  wall = awesome_cfg .. "theme/colorschemes/mountain/fuji_wp",
 
   primary = {
     base = "#7d6a4f",
@@ -33,6 +33,11 @@ local theme = {
     "#9ec49f",
     "#a5b4cb",
   },
+
+  integrations = {
+    kitty = "Mountain Fuji",
+    nvim  = "mountain",
+  }
 }
 
 return theme
