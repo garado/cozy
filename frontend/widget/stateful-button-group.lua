@@ -11,6 +11,7 @@ local dpi   = ui.dpi
 local wibox = require("wibox")
 local sbtn  = require("frontend.widget.stateful-button")
 local gtable = require("gears.table")
+local keynav = require("modules.keynav")
 
 local sb_group = {}
 
@@ -21,6 +22,8 @@ local function worker(user_args)
     group_bg = beautiful.neutral[800],
     btn_shape = ui.rrect(),
     autoselect_first = true,
+    keynav   = false,
+    name = nil,
   }
   gtable.crush(args, user_args or {})
   if args.set_no_shape then args.btn_shape = nil end
@@ -43,10 +46,19 @@ local function worker(user_args)
   sb_group.autoselect_first = args.autoselect_first
   sb_group.current_selection_idx = 0
 
+  -- Set up keynav area if necessary
+  if args.keynav then
+    sb_group.keynav = true
+    sb_group.area = keynav.area({
+      name = "nav_sbg" .. (args.name and ('_' .. args.name) or "")
+    })
+  end
+
   function sb_group:get_buttons()
     return self.children[1].widget.children
   end
 
+  -- Add a stateful button to this stateful button group
   function sb_group:add_btn(btn_name, func)
     local w = sbtn({
       width  = args.width,
@@ -69,6 +81,15 @@ local function worker(user_args)
     if self.autoselect_first and #self:get_buttons() == 1 then
       self.current_selection_idx = 1
       w.selected = true
+    end
+
+    -- Create navitem if necessary
+    if self.keynav then
+      local nav_sbtn = keynav.navitem.btn({
+        widget = w
+      })
+      nav_sbtn.widget = w
+      self.area:append(nav_sbtn)
     end
 
     w:update()
@@ -98,6 +119,7 @@ local function worker(user_args)
     self.current_selection_idx = 0
     local btns = self.children[1].widget
     btns:reset()
+    if self.area then self.area:clear() end
   end
 
   return sb_group:init()

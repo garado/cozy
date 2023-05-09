@@ -2,7 +2,6 @@
 -- ▀█▀ █░█ █▀▀ █▀▄▀█ █▀▀    █▀ █░█░█ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█ 
 -- ░█░ █▀█ ██▄ █░▀░█ ██▄    ▄█ ▀▄▀▄▀ █ ░█░ █▄▄ █▀█ ██▄ █▀▄ 
 
-local beautiful  = require("beautiful")
 local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local awful = require("awful")
@@ -10,6 +9,10 @@ local wibox = require("wibox")
 local ts    = require("backend.state.themeswitch")
 local sbg   = require("frontend.widget.stateful-button-group")
 local btn   = require("frontend.widget.button")
+local keynav = require("modules.keynav")
+local beautiful  = require("beautiful")
+
+local navigator, nav_root = keynav.navigator()
 
 local themeswitcher = {}
 
@@ -21,6 +24,8 @@ local themes_header = ui.textbox({
 })
 
 local themes_sbg = sbg({
+  keynav  = true,
+  name    = "themes",
   layout  = "vertical",
   spacing = dpi(12),
   shape   = ui.rrect(8),
@@ -28,6 +33,7 @@ local themes_sbg = sbg({
   set_no_shape = false,
   autoselect_first = false,
 })
+nav_root:append(themes_sbg.area)
 
 local themes = wibox.widget({
   {
@@ -47,12 +53,15 @@ local styles_header = ui.textbox({
 })
 
 local styles_sbg = sbg({
+  keynav = true,
+  name = "styles",
   spacing = dpi(12),
   shape   = ui.rrect(8),
   group_bg = beautiful.neutral[900],
   set_no_shape = false,
   autoselect_first = false,
 })
+nav_root:append(styles_sbg.area)
 
 local styles = wibox.widget({
   ui.vpad(dpi(25)),
@@ -70,21 +79,33 @@ local styles = wibox.widget({
 })
 
 -- Apply/cancel action buttons
+
+local apply_btn = btn({
+  text = "Apply",
+  func = function() ts:apply() end,
+  bg    = beautiful.neutral[700],
+  bg_mo = beautiful.neutral[600],
+})
+local nav_apply = keynav.navitem.btn({ widget = apply_btn })
+
+local cancel_btn = btn({
+  text = "Cancel",
+  func = function() themeswitcher:reset() end,
+  bg    = beautiful.neutral[700],
+  bg_mo = beautiful.neutral[600],
+})
+local nav_cancel = keynav.navitem.btn({ widget = cancel_btn })
+
+local nav_actions = keynav.area({
+  name = "nav_actions",
+})
+nav_root:append(nav_actions)
+
 local actions = wibox.widget({
   {
     {
-      btn({
-        text = "Apply",
-        func = function() ts:apply() end,
-        bg    = beautiful.neutral[700],
-        bg_mo = beautiful.neutral[600],
-      }),
-      btn({
-        text = "Cancel",
-        func = function() themeswitcher:reset() end,
-        bg    = beautiful.neutral[700],
-        bg_mo = beautiful.neutral[600],
-      }),
+      apply_btn,
+      cancel_btn,
       spacing = dpi(10),
       layout  = wibox.layout.fixed.horizontal,
     },
@@ -138,9 +159,16 @@ themeswitcher = awful.popup({
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█    █▀█ █░▀█ █▄▀    ▄█ ░█░ █▄█ █▀░ █▀░ 
 
 function themeswitcher:reset()
+  -- UI
   styles_sbg:reset()
   styles.visible  = false
   actions.visible = false
+
+  -- Keynav
+  styles_sbg.area:clear()
+  nav_actions:clear()
+  nav_root:set_active_element(1)
+  navigator.focused_area = nav_root
 end
 
 ts:connect_signal("ready::themes", function()
@@ -167,15 +195,20 @@ end)
 
 styles_sbg:connect_signal("child::press", function(self, idx)
   ts.selected_style = self:get_name_at_idx(idx)
+  nav_actions:clear()
+  nav_actions:append(nav_apply)
+  nav_actions:append(nav_cancel)
   actions.visible = true
 end)
 
 ts:connect_signal("setstate::open", function()
+  navigator:start()
   themeswitcher.visible = true
   ts:emit_signal("newstate::opened")
 end)
 
 ts:connect_signal("setstate::close", function()
+  navigator:stop()
   themeswitcher.visible = false
   ts:emit_signal("newstate::closed")
 end)
