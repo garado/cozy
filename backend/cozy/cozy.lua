@@ -15,16 +15,16 @@ local cozy = {}
 local instance = nil
 
 function cozy:close_all()
-  require("backend.state.dash"):close()
-  require("backend.state.themeswitch"):close()
+  require("backend.cozy.dash"):close()
+  require("backend.cozy.themeswitch"):close()
 end
 
 -- TODO: Could be improved
 function cozy:close_all_except(exception)
   if exception == "dash" then
-    require("backend.state.themeswitch"):close()
+    require("backend.cozy.themeswitch"):close()
   elseif exception == "themeswitch" then
-    require("backend.state.dash"):close()
+    require("backend.cozy.dash"):close()
   end
 end
 

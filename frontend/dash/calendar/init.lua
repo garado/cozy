@@ -9,6 +9,7 @@ local cal   = require("backend.system.calendar")
 local btn   = require("frontend.widget.button")
 local header = require("frontend.widget.dash.header")
 local keynav = require("modules.keynav")
+local dash   = require("backend.cozy.dash")
 local mathutils = require("utils.math")
 
 local SECONDS_IN_WEEK = 24 * 60 * 60 * 7
@@ -96,9 +97,15 @@ end)
 -- █▄▀ █▀▀ █▄█ █▄░█ ▄▀█ █░█ 
 -- █░█ ██▄ ░█░ █░▀█ █▀█ ▀▄▀ 
 
-local nav_calendar
-nav_calendar = keynav.area({
+local function send_popup_close_signal()
+  dash:emit_signal("calpopup::hide")
+end
+
+local nav_calendar = keynav.area({
   name = "nav_calendar",
+  items = {
+    eventbox.area,
+  },
   keys = {
     ["r"] = function()
       action_refresh:emit_signal("button::press")
@@ -106,12 +113,28 @@ nav_calendar = keynav.area({
     ["t"] = function()
       action_today:emit_signal("button::press")
     end,
-    ["h"] = function()
+    ["H"] = function()
+      -- TODO: Clearing active element doesn't seem to work
+      eventbox.area.active_element = nil
       action_prev:emit_signal("button::press")
     end,
-    ["l"] = function()
+    ["L"] = function()
+      eventbox.area.active_element = nil
       action_next:emit_signal("button::press")
-    end
+    end,
+    ["J"] = function()
+      cal:increment_hour()
+      cal:emit_signal("hours::adjust")
+      -- dash:emit_signal("caljump::toggle")
+    end,
+    ["K"] = function()
+      cal:decrement_hour()
+      cal:emit_signal("hours::adjust")
+    end,
+    ["h"] = send_popup_close_signal,
+    ["j"] = send_popup_close_signal,
+    ["k"] = send_popup_close_signal,
+    ["l"] = send_popup_close_signal,
   }
 })
 

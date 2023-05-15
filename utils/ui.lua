@@ -45,11 +45,15 @@ function _ui.get_children_by_id(widget, target)
   end
 end
 
+
+-- █░█░█ █ █▄▄ █▀█ ▀▄▀ 
+-- ▀▄▀▄▀ █ █▄█ █▄█ █░█ 
+
 --- Create textbox with my preferred defaults.
 function _ui.textbox(userargs)
   local args = {
     color  = beautiful.fg,
-    text   = "Default Text",
+    text   = "",
     valign = "center",
     align  = "left",
     font   = beautiful.font_reg_s,
@@ -57,7 +61,7 @@ function _ui.textbox(userargs)
     height = nil,
     ellipsize = "end",
   }
-  gtable.crush(args, userargs)
+  gtable.crush(args, userargs or {})
   args.markup = args.markup or _ui.colorize(args.text or "Default text", args.color)
 
   return wibox.widget({
@@ -81,7 +85,27 @@ function _ui.textbox(userargs)
   })
 end
 
---- Horizontal padding.
+--- @method cborder
+-- @brief Create circular border around a widget
+function _ui.cborder(widget)
+  local cborder = wibox.widget({
+    {
+      widget,
+      margins = dpi(2),
+      widget = wibox.container.margin,
+    },
+    shape  = gshape.circle,
+    widget = wibox.container.background,
+  })
+
+  function cborder:update_border(color)
+    self.bg = color
+  end
+
+  return cborder
+end
+
+--- Horizontal padding
 function _ui.hpad(width)
 	return wibox.widget({
 		forced_width = width,
@@ -89,7 +113,7 @@ function _ui.hpad(width)
 	})
 end
 
---- Vertical padding.
+--- Vertical padding
 function _ui.vpad(height)
 	return wibox.widget({
 		forced_height = height,
@@ -97,6 +121,7 @@ function _ui.vpad(height)
 	})
 end
 
+-- Place + margin
 function _ui.place(content, args)
   args = args or {}
   return wibox.widget({
@@ -116,6 +141,10 @@ function _ui.rrect(radius)
 		gshape.rounded_rect(cr, width, height, radius)
 	end
 end
+
+
+-- █▀▄▀█ █ █▀ █▀▀ 
+-- █░▀░█ █ ▄█ █▄▄ 
 
 --- (Dashboard) Put a box around a widget.
 function _ui.dashbox(content, width, height, bg)

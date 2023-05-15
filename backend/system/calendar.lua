@@ -47,7 +47,7 @@ end
 -- and store in cache file
 function calendar:update_cache()
   local cmd = "gcalcli agenda '5 months ago' '5 months' --details location --tsv > " .. CACHE_PATH
-  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+  awful.spawn.easy_async_with_shell(cmd, function()
     self:emit_signal("cache::ready")
   end)
 end
@@ -147,6 +147,18 @@ end
 
 ---------------------------------------------------------------------
 
+function calendar:increment_hour()
+  if self.end_hour == 24 then return end
+  self.start_hour = self.start_hour + 1
+  self.end_hour = self.end_hour + 1
+end
+
+function calendar:decrement_hour()
+  if self.start_hour == 0 then return end
+  self.start_hour = self.start_hour - 1
+  self.end_hour = self.end_hour - 1
+end
+
 function calendar:new()
   self.init = false
 
@@ -162,6 +174,8 @@ function calendar:new()
 
   -- Variables shared across UI elements
   self.weekview_cur_offset = 0
+  self.start_hour = calconf.start_hour
+  self.end_hour   = calconf.end_hour
 end
 
 local function new()

@@ -9,6 +9,7 @@ local gcolor  = require("gears.color")
 local gtable  = require("gears.table")
 local calconf = require("cozyconf").calendar
 local cal     = require("backend.system.calendar")
+local beautiful = require("beautiful")
 local os = os
 
 local SECONDS_IN_HOUR = 60 * 60
@@ -24,10 +25,10 @@ function nowline:draw(_, cr, width, height)
   -- Only draw for the current week
   if cal.weekview_cur_offset ~= 0 then return end
 
-  cr:set_source(gcolor(calconf.nowline_color))
+  cr:set_source(gcolor(beautiful.red[300]))
   cr:set_line_width(2)
 
-  local hour_range = calconf.end_hour - calconf.start_hour + 1
+  local hour_range = cal.end_hour - cal.start_hour + 1
   local hourline_spacing = height / hour_range
 
   local day_range = calconf.end_day - calconf.start_day + 1
@@ -35,7 +36,7 @@ function nowline:draw(_, cr, width, height)
 
   -- Figure out y-pos (hour)
   local now_hour = tonumber(os.date("%H")) + (tonumber(os.date("%M")) / 60)
-  local y = (now_hour * hourline_spacing) - (calconf.start_hour * hourline_spacing)
+  local y = (now_hour * hourline_spacing) - (cal.start_hour * hourline_spacing)
 
   -- Figure out x-pos (day)
   local now_weekday = tonumber(os.date("%w"))
@@ -63,6 +64,9 @@ function nowline.new(args)
   -- Except those, which don't belong in the widget instance
   rawset(_nowline, "new", nil)
   rawset(_nowline, "mt", nil)
+  cal:connect_signal("hours::adjust", function()
+    _nowline:emit_signal("widget::redraw_needed")
+  end)
 
   return _nowline
 end

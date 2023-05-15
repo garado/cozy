@@ -6,7 +6,8 @@ local wibox = require("wibox")
 local gcolor = require("gears.color")
 local gtable = require("gears.table")
 local calconf = require("cozyconf").calendar
-local dash  = require("backend.state.dash")
+local dash  = require("backend.cozy.dash")
+local beautiful = require("beautiful")
 
 local gridlines = { mt = {} }
 
@@ -19,7 +20,7 @@ function gridlines:fit(_, width, height)
 end
 
 function gridlines:draw(_, cr, width, height)
-  cr:set_source(gcolor(calconf.gridline_color))
+  cr:set_source(gcolor(beautiful.neutral[800]))
   cr:set_line_width(1)
 
   -- Draw horizontal lines (to separate hours)
@@ -51,6 +52,8 @@ function gridlines:draw(_, cr, width, height)
   if (not signal_sent) or (signal_sent and (w ~= width or h ~= height)) then
     w = width
     h = height
+    dash.weekview_h = height
+    dash.weekview_w = width
     dash:emit_signal("weekview::size_calculated", height, width)
     signal_sent = true
   end

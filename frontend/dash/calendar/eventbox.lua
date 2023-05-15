@@ -6,12 +6,28 @@ local beautiful  = require("beautiful")
 local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local wibox = require("wibox")
-local dash  = require("backend.state.dash")
+local dash  = require("backend.cozy.dash")
 local cal   = require("backend.system.calendar")
 local calconf = require("cozyconf").calendar
 local strutil = require("utils").string
+local keynav = require("modules.keynav")
+local math  = math
 
-local eventboxes
+local eventboxes = wibox.widget({
+  layout = wibox.layout.manual,
+})
+
+eventboxes.area = keynav.area({
+  name = "nav_eventboxes",
+  keys = {
+    ["m"] = function(self)
+      if not self.active_element then return end
+      local x = self.active_element.widget.point.x
+      local y = self.active_element.widget.point.y
+      dash:emit_signal("calpopup::toggle", x, y, self.active_element.event)
+    end
+  }
+})
 
 local SECONDS_IN_DAY = 24 * 60 * 60
 local EBOX_MARGIN    = dpi(4)
@@ -29,6 +45,7 @@ local colors = {
 
 --- @function find_overlapping_events
 -- @brief Find the number of events that this overlaps.
+-- @param x, y The starting coordinates for an event.
 local function find_overlapping_events(x, y)
   local num_overlaps = 0
   for i = 1, #eventboxes.children do
@@ -36,7 +53,7 @@ local function find_overlapping_events(x, y)
     local _y = eventboxes.children[i].point.y
     local _h = eventboxes.children[i].forced_height
 
-    if _x == x and y > _y and y < (_y + _h) then
+    if _x == x and y >= _y and y <= (_y + _h) then
       num_overlaps = num_overlaps + 1
     end
   end
@@ -48,7 +65,7 @@ end
 -- @param event An event table
 local function gen_eventbox(event, height, width)
   -- Determine how tall each hour is
-  local hour_range = calconf.end_hour - calconf.start_hour + 1
+  local hour_range = cal.end_hour - cal.start_hour + 1
   local hourline_spacing = height / hour_range
 
   -- Determine how wide each day is
@@ -60,12 +77,19 @@ local function gen_eventbox(event, height, width)
 
   -- Determine y-pos of event box (hour)
   local y = (strutil.time_to_int(event.s_time) * hourline_spacing) -
-            (calconf.start_hour * hourline_spacing)
+            (cal.start_hour * hourline_spacing)
   y = y + (EBOX_MARGIN / 2)
 
   -- Determine x-pos of event box (day)
-  local x = (event.s_day - calconf.start_day) * dayline_spacing
+  local x = (strutil.date_to_weekday_int(event.s_date) - calconf.start_day) * dayline_spacing
   x = x + (EBOX_MARGIN / 2)
+
+  -- Since we can scroll up/down through hours on the calendar, some
+  -- eventboxes need to be truncated.
+  local truncate = y < 0
+  local truncate_duration = math.abs(y)
+
+  if truncate then y = 0 end
 
   -- If this event has fully elapsed, it should be grayed out.
   local bg, fg
@@ -74,9 +98,9 @@ local function gen_eventbox(event, height, width)
   local elapsed = false
 
   elapsed = (cal.weekview_cur_offset < 0) or
-            ((cal.weekview_cur_offset == 0) and
-            (event.e_day < now_weekday) or
-            (event.e_day == now_weekday and event.e_time < now))
+            (cal.weekview_cur_offset == 0 and
+            ((strutil.date_to_weekday_int(event.e_date) < now_weekday) or
+            (strutil.date_to_weekday_int(event.e_date) == now_weekday and event.e_time < now)))
 
   if elapsed then
     bg = ELAPSED_BG
@@ -127,14 +151,21 @@ local function gen_eventbox(event, height, width)
   })
 
   local h = (duration * hourline_spacing) - EBOX_MARGIN
+  if truncate then h = h - truncate_duration end
 
-  return wibox.widget({
+  -- Final assembly + keynav stuff
+  local ebox = wibox.widget({
     {
-      text,
-      top    = text_top_margin,
-      left   = dpi(8),
-      right  = dpi(8),
-      widget = wibox.container.margin,
+      {
+        text,
+        top    = text_top_margin,
+        left   = dpi(8),
+        right  = dpi(8),
+        widget = wibox.container.margin,
+      },
+      margins = dpi(2),
+      color   = beautiful.bg,
+      widget  = wibox.container.margin,
     },
     bg    = bg,
     shape = ui.rrect(5),
@@ -143,16 +174,33 @@ local function gen_eventbox(event, height, width)
     widget = wibox.container.background,
     point  = { x = x, y = y },
   })
+
+  -- Custom navitem
+  ebox.nav = keynav.navitem.base({ widget = ebox })
+  ebox.nav.event = event
+
+  function ebox.nav:select_on()
+    self.selected = true
+    self.widget.widget.color = beautiful.primary[200]
+  end
+
+  function ebox.nav:select_off()
+    self.selected = false
+    self.widget.widget.color = self.widget.bg
+  end
+
+  function ebox.nav:modify()
+    print('Modifying ebox '..self.event.title)
+  end
+
+  return ebox
 end
 
-eventboxes = wibox.widget({
-  layout = wibox.layout.manual,
-  -------
-  add_event = function(self, e)
-    local ebox = gen_eventbox(e, self._height, self._width)
-    self:add(ebox)
-  end
-})
+function eventboxes:add_event(e)
+  local ebox = gen_eventbox(e, self._height, self._width)
+  self:add(ebox)
+  self.area:append(ebox.nav)
+end
 
 -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
@@ -170,11 +218,14 @@ dash:connect_signal("weekview::size_calculated", function(_, height, width)
   weekview_update()
 end)
 
+-- TODO: Could probably consolidate these signals somehow
+cal:connect_signal("hours::adjust", weekview_update)
 cal:connect_signal("cache::ready", weekview_update)
-
 cal:connect_signal("weekview::change_week", weekview_update)
+dash:connect_signal("date::changed", weekview_update)
 
 cal:connect_signal("ready::range::weekview", function(_, events)
+  eventboxes.area:clear()
   eventboxes.children = {}
   for i = 1, #events do
     local e = events[i]
@@ -182,8 +233,8 @@ cal:connect_signal("ready::range::weekview", function(_, events)
       title  = e[cal.TITLE],
       s_time = e[cal.START_TIME],
       e_time = e[cal.END_TIME],
-      s_day  = strutil.date_to_weekday_int(e[cal.START_DATE]),
-      e_day  = strutil.date_to_weekday_int(e[cal.END_DATE]),
+      s_date = e[cal.START_DATE],
+      e_date = e[cal.END_DATE],
       loc    = e[cal.LOCATION],
     })
   end

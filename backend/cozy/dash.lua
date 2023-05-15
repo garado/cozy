@@ -2,12 +2,12 @@
 -- █▀▄ ▄▀█ █▀ █░█ 
 -- █▄▀ █▀█ ▄█ █▀█ 
 
--- Manages state (open/closed) for dashboard.
+-- Manages state (open/closed) for dashboard, along with
+-- other miscellaneous variables.
 
-local cozy    = require("backend.state.cozy")
+local cozy    = require("backend.cozy.cozy")
 local gobject = require("gears.object")
 local gtable  = require("gears.table")
-local ui      = require("utils.ui")
 
 local dash = {}
 local instance = nil
@@ -28,6 +28,10 @@ function dash:close()
 end
 
 function dash:open()
+  if os.date("%d") ~= self.date then
+    self:emit_signal("date::changed")
+  end
+
   cozy:close_all_except("dash")
   self:emit_signal("setstate::open", self.curtab)
   self.visible = true
@@ -40,6 +44,7 @@ end
 
 function dash:new()
   self.visible = false
+  self.date = os.date("%d")
 end
 
 local function new()

@@ -59,6 +59,18 @@ function _string.datetime_to_ts(datetime)
   end
 end
 
+--- @method datetime_to_human
+-- @brief Convert YYYY-MM-DD to human-readable date.
+-- i.e. 2023-05-14 to Sunday, May 14 2023
+function _string.datetime_to_human(datetime)
+  local pattern = "(%d%d%d%d)-(%d%d)-(%d%d)"
+  local xyear, xmon, xday = datetime:match(pattern)
+  local ts = os.time({
+      year = xyear, month = xmon, day = xday,
+      hour = 0, min = 0, sec = 0})
+  return os.date("%A, %B %d %Y", ts)
+end
+
 --- @method time_to_int
 -- @param time  A time in format HH:MM (military time)
 -- Converts time in HH:MM to an integer 0-24.
@@ -80,6 +92,75 @@ function _string.date_to_weekday_int(date)
     year = xyear, month = xmon, day = xday,
     hour = 0, min = 0, sec = 0})
   return os.date("%w", ts)
+end
+
+--- @method iso_to_ts
+-- @brief Converts ISO-8601-formatted date (as used by Taskwarrior
+-- and Timewarrior) to an os.time timestamp.
+function _string.iso_to_ts(iso)
+  -- ISO-8601 format: YYYY-MM-DDThh:mm:ssZ
+  local pattern = "(%d%d%d%d)(%d%d)(%d%d)T(%d%d)(%d%d)(%d%d)Z"
+  local xyear, xmon, xday, xhr, xmin, xsec = iso:match(pattern)
+  local ts = os.time({
+    year = xyear, month = xmon, day = xday,
+    hour = xhr, min = xmin, sec = xsec })
+
+  -- Account for timezone (america/los_angeles: -8 hours)
+  ts = ts - (7 * 60 * 60)
+
+  return ts
+end
+
+--- @method iso_to_readable
+-- @brief Converts ISO-8601 format dates (as used by Taskwarrior
+-- and Timewarrior) into human-readable dates.
+-- @param iso     (string) ISO-formatted date
+-- @param format  
+function _string.iso_to_readable(iso, format)
+  local ts = _string.iso_to_ts(iso)
+  format = format or '%A %B %d %Y'
+  return os.date(format, ts)
+end
+
+--- @method iso_to_relative
+-- @brief Converts ISO-8601 format dates (as used by Task/Timewarrior)
+-- into a relative date (i.e. 'in 3 days', '3 days ago')
+-- @return (string) The relative date
+-- @return (bool) If task is overdue
+function _string.iso_to_relative(iso)
+  local ts = _string.iso_to_ts(iso)
+  local now = os.time()
+  local diff = now - ts
+  local overdue = diff <= 0
+  diff = math.abs(diff)
+
+  local SECONDS_IN_HOUR = 60 * 60
+  local SECONDS_IN_DAY = 24 * SECONDS_IN_HOUR
+
+  local timestr, divisor
+
+  if diff < SECONDS_IN_HOUR then
+    timestr = "minute"
+    divisor = 60
+  elseif diff < SECONDS_IN_DAY then
+    timestr = "hour"
+    divisor = SECONDS_IN_HOUR
+  else
+    timestr = "day"
+    divisor = SECONDS_IN_DAY
+  end
+
+  local res = math.floor(diff / divisor)
+  local plural = res == 1 and "" or "s"
+  local relative = res .. ' ' .. timestr .. plural
+
+  if overdue then
+    relative = relative .. ' ago'
+  else
+    relative = 'in ' .. relative
+  end
+
+  return relative, overdue
 end
 
 -- █▀▄▀█ █ █▀ █▀▀ 

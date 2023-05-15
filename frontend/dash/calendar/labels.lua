@@ -8,14 +8,14 @@ local beautiful  = require("beautiful")
 local ui    = require("utils.ui")
 local wibox = require("wibox")
 local calconf = require("cozyconf").calendar
-local dash  = require("backend.state.dash")
+local dash  = require("backend.cozy.dash")
 local cal   = require("backend.system.calendar")
 local os = os
 
 -- #defines
 local SECONDS_IN_HOUR = 60 * 60
 local SECONDS_IN_DAY  = 24 * SECONDS_IN_HOUR
-local HOURLABEL_START_OFFSET = calconf.start_hour * SECONDS_IN_HOUR
+local HOURLABEL_START_OFFSET = cal.start_hour * SECONDS_IN_HOUR
 
 -- Module-level variables
 local gridline_height = nil
@@ -35,9 +35,10 @@ local hourlabels = wibox.widget({
   layout = wibox.layout.manual,
   ------
   init = function(self)
-    local hour_spacing = gridline_height / (calconf.end_hour - calconf.start_hour + 1)
+    self:reset()
+    local hour_spacing = gridline_height / (cal.end_hour - cal.start_hour + 1)
     local y = (gridline_height * 0.08 / 2) + 8 -- off by a little bit for some reason
-    for i = calconf.start_hour, calconf.end_hour do
+    for i = cal.start_hour, cal.end_hour do
       self:add_at(gen_hourlabel(i, hour_spacing), { x = 0, y = y })
       y = y + hour_spacing
     end
@@ -104,9 +105,9 @@ dash:connect_signal("weekview::size_calculated", function(_, height, width)
   daylabels:init()
 end)
 
-cal:connect_signal("weekview::change_week", function(_)
-  daylabels:init()
-end)
+-- cal:connect_signal("weekview::change_week", function(_) daylabels:init() end)
+cal:connect_signal("hours::adjust", function(_) hourlabels:init() end)
+dash:connect_signal("date::changed", function() daylabels:init() end)
 
 return function()
   return hourlabels, daylabels
