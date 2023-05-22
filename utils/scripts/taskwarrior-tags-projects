@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# ▀█▀ ▄▀█ █▀▀ █▀    ▄▀█ █▄░█ █▀▄    █▀█ █▀█ █▀█ ░░█ █▀▀ █▀▀ ▀█▀ █▀ 
+# ░█░ █▀█ █▄█ ▄█    █▀█ █░▀█ █▄▀    █▀▀ █▀▄ █▄█ █▄█ ██▄ █▄▄ ░█░ ▄█ 
+
+# The goal of this script is to reduce the number of async calls required
+# in Awesome to get data from Taskwarrior. It gets all active tags and all
+# active projects for those tags at once. It returns them in this format,
+# which is easily parsable within Awesome:
+
+# Cozy    # <- The first line is the tag name
+# Agenda  # <- The rest of the lines are all the projects in this tag
+# General
+# Ledger
+# Misc apps
+# Other configs
+# Support
+# Tasks
+# Timewarrior
+# UI
+# -----   # <- This separates the tags
+# Applications
+# (none)  # <- This shows when there's a task with this tag, but no set project
+# Have not applied
+# Prep
+# Rejected
+# Waiting for reply
+# -----
+
+# Get all tags in a string, with each tag separated by newline
+tags="$(task tag 2> /dev/null | tail -n +4 | head -n -2 | awk 'NF--')"
+
+# Put tags into tags_array
+IFS='\r\n' readarray -t tags_array <<< $tags
+
+# For each tag, print the tag name, then print all projects in the tag
+for tag in "${tags_array[@]}"
+do
+  echo $tag
+  task tag:$tag projects 2> /dev/null | tail -n +4 | head -n -2 | awk 'NF--'
+  echo "-----"
+done
+

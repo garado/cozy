@@ -1,45 +1,38 @@
 
--- ▀█▀ ▄▀█ █▀ █▄▀ █░░ █ █▀ ▀█▀ 
--- ░█░ █▀█ ▄█ █░█ █▄▄ █ ▄█ ░█░ 
+-- ▀█▀ ▄▀█ █▀ █▄▀ █░░ █ █▀ ▀█▀    █░█ █▀▀ ▄▀█ █▀▄ █▀▀ █▀█ 
+-- ░█░ █▀█ ▄█ █░█ █▄▄ █ ▄█ ░█░    █▀█ ██▄ █▀█ █▄▀ ██▄ █▀▄ 
 
 local beautiful  = require("beautiful")
 local ui    = require("utils.ui")
 local dpi   = ui.dpi
-local awful = require("awful")
 local wibox = require("wibox")
-
--- █░█ █▀▀ ▄▀█ █▀▄ █▀▀ █▀█ 
--- █▀█ ██▄ █▀█ █▄▀ ██▄ █▀▄ 
+local task  = require("backend.system.task")
 
 local title = ui.textbox({
-  text = "Project name",
-  align = "left",
+  text = "Project",
   font = beautiful.font_reg_l,
 })
 
-local done = ui.textbox({
-  text = "21 done",
-  align = "left",
+local tag = ui.textbox({
+  text  = "Cozy",
   color = beautiful.neutral[400],
 })
 
 local remaining = ui.textbox({
-  text = "2 rem",
-  align = "left",
+  text  = "19/54 remaining",
   color = beautiful.neutral[400],
 })
 
 local wait_status = ui.textbox({
-  text = " (Wait Shown)",
-  align = "left",
+  text  = " (Wait Shown)",
   color = beautiful.neutral[400],
 })
 
 local percent = ui.textbox({
-  text = "88%",
+  text  = "88%",
   align = "right",
   color = beautiful.neutral[200],
-  font = beautiful.font_reg_l,
+  font  = beautiful.font_reg_l,
 })
 
 local progress = wibox.widget({
@@ -59,7 +52,7 @@ local header = wibox.widget({
     layout = wibox.layout.align.horizontal,
   },
   {
-    done,
+    tag,
     ui.textbox({
       text = " - ",
       color = beautiful.neutral[400],
@@ -73,25 +66,13 @@ local header = wibox.widget({
   layout = wibox.layout.fixed.vertical,
 })
 
-----------------------
 
--- ▀█▀ ▄▀█ █▀ █▄▀ █▀ 
--- ░█░ █▀█ ▄█ █░█ ▄█ 
+-- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
+-- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
 
-local function gen_task(task)
-end
+task:connect_signal("selected::project", function(_, _tag, project)
+  title:update_text(project)
+  tag:update_text(_tag)
+end)
 
-local tasks = wibox.widget({
-  layout = wibox.layout.fixed.vertical,
-  -------
-})
-
-local contents = wibox.widget({
-  header,
-  tasks,
-  layout = wibox.layout.fixed.vertical,
-})
-
-return function()
-  return ui.dashbox(contents)
-end
+return header

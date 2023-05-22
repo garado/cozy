@@ -4,61 +4,68 @@
 
 -- These functions talk to Taskwarrior directly.
 
+-- Resources:
+-- - https://taskwarrior.org/docs/commands/export/
+
+-- Task fields: uuid urgency due status entry modified id description
+
 local awful   = require("awful")
 local strutil = require("utils.string")
 local gtable  = require("gears.table")
+local json    = require("modules.json")
+local gfs     = require("gears.filesystem")
 
 local task = {}
 
--- How Task data is organized:
---    [tag]
---        [project]
---            [tasks]
---    [tag]
---        [project]
---            [tasks]
+local JSON_EXPORT = ' export rc.json.array=on'
+local SCRIPTS_PATH = gfs.get_configuration_dir() .. "utils/scripts/"
 
---- @method fetch_tags
--- @brief Fetch all currently active Taskwarrior tags.
-function task:fetch_tags()
-  -- self:dbprint('Fetching tags')
-
-  -- The head/tail/awk stuff is for trimming down the task command's
-  -- output to isolate the tags; it's got a lot of extraneous lines.
-  -- (Pipe 'task tags' to a file to see).
-  local cmd = "task tags | tail -n +4 | head -n -2 | awk 'NF--'"
+--- @method fetch_today
+-- @brief Fetch tasks due today.
+function task:fetch_today()
+  local cmd = "task due:today" .. JSON_EXPORT
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    self.data = {}
-    local tags = strutil.split(stdout, '\r\n')
-    for i = 1, #tags do
-      self.data[tags[i]] = {}
-    end
-    self:emit_signal("ready::tags", tags)
+    self:emit_signal("ready::due::today", json.decode(stdout))
   end)
 end
 
---- @method fetch_projects_for_tag
--- @param tag   A Taskwarrior tag to fetch projects for
--- @brief Fetch all currently active projects for a specified tag.
-function task:fetch_projects_for_tag(tag)
-  local cmd = "task tag:"..tag.." projects | tail -n +4 | head -n -2 | awk 'NF--'"
+--- @method fetch_upcoming
+-- @brief Fetch upcoming tasks.
+function task:fetch_upcoming()
+  local cmd = "task +DUE -DUETODAY" .. JSON_EXPORT
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    -- self:dbprint('Fetching projects for '..tag)
-    self.data[tag] = {}
-    local projects = strutil.split(stdout, '\r\n')
-    for i = 1, #projects do
-      self.data[tag][projects[i]] = {}
+    self:emit_signal("ready::due::upcoming", json.decode(stdout))
+  end)
+end
+
+--- @method fetch_tags_and_projects
+-- @brief Fetches Taskwarrior tags and projects together using custom script
+function task:fetch_tags_and_projects()
+  local cmd = SCRIPTS_PATH .. 'taskwarrior-tags-projects'
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    self.data = {}
+    local tag_groups = strutil.split(stdout, '-----')
+    table.remove(tag_groups, #tag_groups)
+    for i = 1, #tag_groups do
+      local projects = strutil.split(tag_groups[i], "\r\n")
+      local tag = table.remove(projects, 1)
+      self.data[tag] = projects
     end
-    self:emit_signal("ready::projects", tag, projects)
+    self:emit_signal("ready::tags_and_projects")
   end)
 end
 
 --- @method fetch_tasks_for_project
 -- @param tag
 -- @param project
--- @brief
 function task:fetch_tasks_for_project(tag, project)
   self:dbprint('Fetching tasks for '..project..' in '..tag)
+
+  local cmd = "task status:pending tag:'"..tag.."' project:'"..project.."' " .. JSON_EXPORT
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    local tasks = json.decode(stdout)
+    self:emit_signal("ready::tasks", tag, project, tasks)
+  end)
 end
 
 return function(_task)

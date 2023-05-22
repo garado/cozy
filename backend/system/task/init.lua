@@ -11,7 +11,6 @@ local instance = nil
 ---------------------------------------------------------------------
 
 require(... .. ".interface")(task)
-require(... .. ".signal")(task)
 require(... .. ".ui")(task)
 
 function task:dbprint(...)
@@ -23,10 +22,9 @@ end
 ---------------------------------------------------------------------
 
 function task:new()
-  self.debug_print = true
-  self:signal_setup()
+  self.debug_print = false
   self:ui_signal_setup()
-  self:fetch_tags()
+  self:fetch_tags_and_projects()
 end
 
 local function new()
