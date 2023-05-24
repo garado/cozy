@@ -46,23 +46,25 @@ end
 -- @brief Fetch last 5 months and next 5 months of data from gcalcli
 -- and store in cache file
 function calendar:update_cache()
-  local cmd = "gcalcli agenda '5 months ago' '5 months' --details location --tsv > " .. CACHE_PATH
+  local cmd = "gcalcli agenda '5 months ago' '5 months' --details location --details description --tsv > " .. CACHE_PATH
   awful.spawn.easy_async_with_shell(cmd, function()
     self:emit_signal("cache::ready")
   end)
 end
 
---- @function Convert gcalcli output tsv into a table.
+--- @function tsv_to_table
+-- @brief Convert gcalcli output tsv into a table
 local function tsv_to_table(stdout)
   local t = {}
 
   local lines = strutil.split(stdout, '\r\n')
   for i = 1, #lines do
     local event = {}
-    local fields = strutil.split(lines[i], '\t')
+    local fields = strutil.split(lines[i], '\t', true)
     for j = 1, #fields do
       event[#event+1] = fields[j]
     end
+
     t[#t+1] = event
   end
 
@@ -138,31 +140,48 @@ end
 -- from Sunday - Saturday (start/end days specified within cozyconf). To get events for that
 -- we call fetch_range on the starting Sunday and ending Saturday. This function returns the
 -- os.time timestamp for the starting Sunday of the current week.
--- TODO: Might need to be made more flexible when scrolling through different weeks is implemented.
 function calendar:get_weekview_start_ts()
   local now = os.time()
   local weekday_today = os.date("%w")
   return now - (weekday_today * SECONDS_IN_DAY)
 end
 
----------------------------------------------------------------------
-
 function calendar:increment_hour()
   if self.end_hour == 24 then return end
   self.start_hour = self.start_hour + 1
   self.end_hour = self.end_hour + 1
+  self:emit_signal("hours::adjust")
 end
 
 function calendar:decrement_hour()
   if self.start_hour == 0 then return end
   self.start_hour = self.start_hour - 1
   self.end_hour = self.end_hour - 1
+  self:emit_signal("hours::adjust")
 end
+
+function calendar:jump_start_hour()
+  self.start_hour = 0
+  self.end_hour = 13
+  self:emit_signal("hours::adjust")
+end
+
+function calendar:jump_middle_hour()
+  self.start_hour = calconf.start_hour
+  self.end_hour = calconf.end_hour)
+  self:emit_signal("hours::adjust")
+end
+
+function calendar:jump_end_hour()
+  self.start_hour = 11
+  self.end_hour = 24
+  self:emit_signal("hours::adjust")
+end
+
+---------------------------------------------------------------------
 
 function calendar:new()
   self.init = false
-
-  -- self:check_cache_empty()
 
   -- When gcalcli dumps to tsv, this is the order of an event's fields.
   self.START_DATE = 1
@@ -171,6 +190,7 @@ function calendar:new()
   self.END_TIME   = 4
   self.TITLE      = 5
   self.LOCATION   = 6
+  self.DESCRIPTION = 7
 
   -- Variables shared across UI elements
   self.weekview_cur_offset = 0

@@ -1,3 +1,4 @@
+
 -- █▀▀ ▄▀█ █░░ █▀▀ █▄░█ █▀▄ ▄▀█ █▀█ 
 -- █▄▄ █▀█ █▄▄ ██▄ █░▀█ █▄▀ █▀█ █▀▄ 
 
@@ -122,19 +123,17 @@ local nav_calendar = keynav.area({
       eventbox.area.active_element = nil
       action_next:emit_signal("button::press")
     end,
-    ["J"] = function()
-      cal:increment_hour()
-      cal:emit_signal("hours::adjust")
-      -- dash:emit_signal("caljump::toggle")
-    end,
-    ["K"] = function()
-      cal:decrement_hour()
-      cal:emit_signal("hours::adjust")
-    end,
+    ["J"] = function() cal:increment_hour() end,
+    ["K"] = function() cal:decrement_hour() end,
     ["h"] = send_popup_close_signal,
     ["j"] = send_popup_close_signal,
     ["k"] = send_popup_close_signal,
     ["l"] = send_popup_close_signal,
+  },
+  override_keys = {
+    ["zz"] = function() cal:jump_middle_hour() end,
+    ["gg"] = function() cal:jump_start_hour()  end,
+    ["GG"] = function() cal:jump_end_hour()    end,
   }
 })
 
