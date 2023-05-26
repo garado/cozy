@@ -16,7 +16,7 @@ function task:ui_signal_setup()
     self:emit_signal("selected::project", tag, self.data[tag][1])
   end)
 
-  self:connect_signal("selected::project", self.fetch_tasks_for_project)
+  self:connect_signal("selected::project", self.fetch_pending_tasks_for_project)
 end
 
 return function(_task)

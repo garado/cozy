@@ -1,0 +1,7 @@
+#!/bin/bash
+
+pending=$(task tag:$1 project:$2 | tail -n 1 | awk 'NF--')
+completed=$(task tag:$1 project:$2 completed | tail -n 1 | awk 'NF--')
+
+echo $pending
+echo $completed

@@ -73,6 +73,11 @@ local header = wibox.widget({
 task:connect_signal("selected::project", function(_, _tag, project)
   title:update_text(project)
   tag:update_text(_tag)
+  task:fetch_project_stats(_tag, project)
+end)
+
+task:connect_signal("ready::project_stats", function(_, pending, completed)
+  remaining:update_text(pending..'/'..pending+completed..' remaining')
 end)
 
 return header

@@ -58,13 +58,23 @@ end
 --- @method fetch_tasks_for_project
 -- @param tag
 -- @param project
-function task:fetch_tasks_for_project(tag, project)
+function task:fetch_pending_tasks_for_project(tag, project)
   self:dbprint('Fetching tasks for '..project..' in '..tag)
 
   local cmd = "task status:pending tag:'"..tag.."' project:'"..project.."' " .. JSON_EXPORT
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local tasks = json.decode(stdout)
     self:emit_signal("ready::tasks", tag, project, tasks)
+  end)
+end
+
+--- @method fetch_project_stats
+-- @brief Get the number of pending and completed tasks for a project
+function task:fetch_project_stats(tag, project)
+  local cmd = SCRIPTS_PATH .. 'task-project-stats ' .. tag .. ' ' .. project
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    local arr = strutil.split(stdout)
+    self:emit_signal("ready::project_stats", arr[1] or 0, arr[2] or 0)
   end)
 end
 
