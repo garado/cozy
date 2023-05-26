@@ -54,8 +54,8 @@ local function worker(args)
     self:add(widget)
 
     if layout.area then
-      local navitem = keynav.navitem.base({ widget = widget })
-      layout.area:append(navitem)
+      widget.navitem = keynav.navitem.base({ widget = widget })
+      layout.area:append(widget.navitem)
     end
   end
 

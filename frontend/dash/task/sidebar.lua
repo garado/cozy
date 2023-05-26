@@ -87,6 +87,7 @@ end)
 
 taglist.area:connect_signal("area::left", function()
   taglist.active_element.children[2]:update_color(beautiful.fg)
+  taglist.area:set_active_element(taglist.active_element.navitem)
 end)
 
 local projectlist = wibox.widget({
@@ -97,6 +98,7 @@ projectlist = singlesel({ layout = projectlist, keynav = true, name = "nav_proje
 
 projectlist.area:connect_signal("area::left", function()
   projectlist.active_element.children[2]:update_color(beautiful.fg)
+  projectlist.area:set_active_element(projectlist.active_element.navitem)
 end)
 
 projectlist.area:connect_signal("area::enter", function()
