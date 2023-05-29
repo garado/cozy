@@ -23,29 +23,23 @@ local function gen_taskitem(t)
     text = t.description
   })
 
+  -- Indicator icon shows which task is selected
   local indicator = wibox.widget({
     forced_height = dpi(3),
     forced_width  = dpi(3),
     bg = beautiful.neutral[800],
     shape  = gears.shape.circle,
     widget = wibox.container.background,
-    visible = true,
   })
 
-  local desc_indicator = wibox.widget({
-    indicator,
-    desc,
-    spacing = dpi(10),
-    layout = wibox.layout.fixed.horizontal,
-  })
-
+  -- Due date
   local due_text, overdue, color
   if t.due then
     due_text, overdue = strutil.iso_to_relative(t.due)
     color = overdue and beautiful.red[400] or beautiful.fg
   else
     due_text = "no due date"
-    color = beautiful.fg
+    color = beautiful.neutral[300]
   end
 
   local due = ui.textbox({
@@ -54,7 +48,12 @@ local function gen_taskitem(t)
   })
 
   local taskitem = wibox.widget({
-    desc_indicator,
+    {
+      indicator,
+      desc,
+      spacing = dpi(10),
+      layout = wibox.layout.fixed.horizontal,
+    },
     nil,
     due,
     layout = wibox.layout.align.horizontal,
@@ -63,13 +62,13 @@ local function gen_taskitem(t)
   })
 
   taskitem:connect_signal("mouse::enter", function(self)
-    self.parent.active_element.desc:update_color(beautiful.fg)
-    desc:update_color(beautiful.primary[500])
+    self:emit_signal("button::press")
+    task.active_task = self.data
+    task.active_task_ui = desc
+    task:emit_signal("selected::task", self.data)
   end)
 
-  taskitem:connect_signal("mouse::leave", function(self)
-    self:update()
-  end)
+  taskitem:connect_signal("mouse::leave", function(self) self:update() end)
 
   function taskitem:update()
     local c = self.selected and beautiful.primary[400] or beautiful.fg
@@ -96,9 +95,9 @@ tasklist.area:connect_signal("area::left", function()
   tasklist.active_element.desc:update_color(beautiful.fg)
 end)
 
-tasklist.area:connect_signal("area::enter", function()
-  tasklist.active_element:update()
-end)
+tasklist.area.keys = {
+  ["z"] = function() task:emit_signal("details::toggle") end
+}
 
 -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀    ▄▀█ █▄░█ █▀▄    █▀ ▀█▀ █░█ █▀▀ █▀▀ 
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█    █▀█ █░▀█ █▄▀    ▄█ ░█░ █▄█ █▀░ █▀░ 
@@ -110,6 +109,7 @@ task:connect_signal("ready::tasks", function(_, tag, project, tasks)
   for i = 1, #tasks do
     local taskitem = gen_taskitem(tasks[i])
     tasklist:add_element(taskitem)
+    taskitem.data = tasks[i]
   end
 
   -- Assume the first task is selected
@@ -119,4 +119,4 @@ task:connect_signal("ready::tasks", function(_, tag, project, tasks)
   tasklist.children[1].desc:update_color(beautiful.fg)
 end)
 
-return function() return tasklist end
+return tasklist

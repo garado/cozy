@@ -38,6 +38,6 @@ for tag in "${tags_array[@]}"
 do
   echo $tag
   task tag:$tag projects 2> /dev/null | tail -n +4 | head -n -2 | awk 'NF--'
-  echo "-----"
+  echo "====="
 done
 

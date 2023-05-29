@@ -23,10 +23,10 @@ local remaining = ui.textbox({
   color = beautiful.neutral[400],
 })
 
-local wait_status = ui.textbox({
-  text  = " (Wait Shown)",
-  color = beautiful.neutral[400],
-})
+-- local wait_status = ui.textbox({
+--   text  = " (Wait Shown)",
+--   color = beautiful.neutral[400],
+-- })
 
 local percent = ui.textbox({
   text  = "88%",
@@ -58,7 +58,7 @@ local header = wibox.widget({
       color = beautiful.neutral[400],
     }),
     remaining,
-    wait_status,
+    -- wait_status,
     layout = wibox.layout.fixed.horizontal,
   },
   progress,

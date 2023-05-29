@@ -11,8 +11,11 @@ local task  = require("backend.system.task")
 local keynav = require("modules.keynav")
 
 local sidebar, nav_tags, nav_projects = require(... .. ".sidebar")()
-local tasklist_header = require(... .. ".tasklist-header")
-local tasklist_body   = require(... .. ".tasklist-body")()
+local tasklist_header = require(... .. ".tasklist.header")
+local tasklist_body   = require(... .. ".tasklist.list")
+local tasklist_details = require(... .. ".tasklist.details")
+local tasklist_prompt = require(... .. ".tasklist.prompt")
+local keybinds = require(... .. ".tasklist.keybinds")
 
 local nav_tasks = keynav.area({
   name = "nav_tasks",
@@ -20,18 +23,39 @@ local nav_tasks = keynav.area({
     nav_tags,
     nav_projects,
     tasklist_body.area,
-  }
+  },
+  keys = keybinds,
 })
 
 local _tasklist = wibox.widget({
-  tasklist_header,
+  {
+    tasklist_header,
+    ui.vpad(dpi(8)),
+    layout = wibox.layout.fixed.vertical,
+  },
   {
     tasklist_body,
     margins = dpi(10),
     widget = wibox.container.margin,
   },
+  {
+    {
+      -- Note to self: If you don't have 2 layoutboxes like this and you instead have details/actions
+      -- in the same layoutbox and set spacing = dpi(10), tasklist_actions will move around when you
+      -- toggle the visibility of details. very annoying
+      {
+        tasklist_details,
+        ui.vpad(dpi(10)),
+        layout = wibox.layout.fixed.vertical,
+      },
+      tasklist_prompt,
+      layout = wibox.layout.fixed.vertical,
+    },
+    margins = dpi(5),
+    widget  = wibox.container.margin,
+  },
   spacing = dpi(10),
-  layout  = wibox.layout.fixed.vertical,
+  layout  = wibox.layout.align.vertical,
 })
 
 local tasklist = ui.dashbox(_tasklist)

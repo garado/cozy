@@ -2,12 +2,21 @@
 -- █▀ █ █▀▄ █▀▀ █▄▄ ▄▀█ █▀█ 
 -- ▄█ █ █▄▀ ██▄ █▄█ █▀█ █▀▄ 
 
+-- Defines the tag list and project list.
+-- This code is a little wonky. Beware.
+
+-- It uses the single select stuff and adds indicators on top of it to distinguish
+-- between *highlighted* and *selected* items.
+-- Selected: currently chosen.
+-- Highlighted: just a mouseover.
+
 local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local gears = require("gears")
 local wibox = require("wibox")
 local task  = require("backend.system.task")
 local beautiful = require("beautiful")
+local cozyconf  = require("cozyconf")
 local singlesel = require("frontend.widget.single-select")
 
 -- Item types
@@ -54,11 +63,14 @@ local function gen_item(type, name)
     indicator.bg = self.props.indicator_color
   end
 
+  -- Executed on click or on pressing Enter
   function item:release()
     if not self.selected then return end
     if type == TAG then
+      task.active_tag = tbox.text
       task:emit_signal("selected::tag", tbox.text)
     elseif type == PROJECT then
+      task.active_project = tbox.text
       task:emit_signal("selected::project", self.parent.tag, tbox.text)
     end
   end
@@ -96,13 +108,13 @@ local projectlist = wibox.widget({
 })
 projectlist = singlesel({ layout = projectlist, keynav = true, name = "nav_projects" })
 
+projectlist.area:connect_signal("area::enter", function()
+  projectlist.active_element:update()
+end)
+
 projectlist.area:connect_signal("area::left", function()
   projectlist.active_element.children[2]:update_color(beautiful.fg)
   projectlist.area:set_active_element(projectlist.active_element.navitem)
-end)
-
-projectlist.area:connect_signal("area::enter", function()
-  projectlist.active_element:update()
 end)
 
 local sidebar = wibox.widget({
@@ -151,22 +163,34 @@ end
 -- Initialization
 task:connect_signal("ready::tags_and_projects", function()
   taglist:clear_elements()
+
+  -- Sort alphabetically
+  -- Need to make a 2nd temp table because the original table is associative and cannot be
+  -- sorted (irritating)
+  local ugh = {}
   for t in pairs(task.data) do
-    taglist:add_element(gen_item(TAG, t))
+    ugh[#ugh+1] = t
   end
 
-  -- Assume first tag is selected
-  -- TODO: Config option to customize this
+  table.sort(ugh, function(a, b) return a:lower() < b:lower() end)
 
+  for i = 1, #ugh do
+    taglist:add_element(gen_item(TAG, ugh[i]))
+  end
+
+  -- Assume the first tag is selected
   taglist.active_element = taglist.children[1]
   taglist.children[1].selected = true
   taglist.children[1]:update()
   taglist.children[1].children[2]:update_color(beautiful.fg)
 
-  local first_tag = next(task.data)
+  local first_tag = ugh[1]
+  local first_project = task.data[first_tag][1]
   projectlist_update(first_tag)
 
-  task:emit_signal("selected::project", first_tag, task.data[first_tag][1])
+  task.active_tag = first_tag
+  task.active_project = first_project
+  task:emit_signal("selected::project", first_tag, first_project)
 end)
 
 -- Update project list when a new task is selected

@@ -24,6 +24,7 @@ end
 function task:new()
   self.debug_print = false
   self:ui_signal_setup()
+  self:interface_signal_setup()
   self:fetch_tags_and_projects()
 end
 
