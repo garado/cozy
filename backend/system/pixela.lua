@@ -24,10 +24,11 @@ local gobject = require("gears.object")
 local gtable  = require("gears.table")
 local awful   = require("awful")
 local gfs     = require("gears.filesystem")
-local json    = require("modules.json")
 
-local USER_NAME  = "garado"
-local USER_TOKEN = "sWrUeIaTWH0REpixela"
+local credentials = require("cozyconf.pixela")
+
+local USER_NAME  = credentials.name
+local USER_TOKEN = credentials.token
 local SECONDS_PER_DAY = 24 * 60 * 60
 local DATE_FORMAT ="%Y%m%d"
 local CACHE_DIR  = gfs.get_cache_dir() .. "pixela/"
