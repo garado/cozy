@@ -14,6 +14,7 @@ task:connect_signal("input::cancelled", function() curmode = "normal" end)
 local keybinds = {
   normal = {
     ["a"] = "add",
+    ["A"] = "annotation",
     ["m"] = "modify",
     ["d"] = "done",
     ["x"] = "delete",

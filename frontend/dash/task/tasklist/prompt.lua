@@ -90,16 +90,17 @@ end
 -- then calls function to actually start the prompt
 task:connect_signal("input::request", function(_, type)
   local prompt_options = {
-    add       = "Add: ",
-    modify    = "Modify (d)ue, (n)ame, (p)roject, (t)ag",
-    done      = "Mark task as done? (y/n) ",
-    delete    = "Delete task? (y/n) ",
-    mod_due   = "Modify due: ",
-    mod_tag   = "Modify tag: ",
-    mod_name  = "Modify name: ",
-    mod_clear = "",
+    add         = "Add: ",
+    annotation  = "Add annotation: ",
+    modify      = "Modify (d)ue, (n)ame, (p)roject, (t)ag",
+    done        = "Mark task as done? (y/n) ",
+    delete      = "Delete task? (y/n) ",
+    mod_due     = "Modify due: ",
+    mod_tag     = "Modify tag: ",
+    mod_name    = "Modify name: ",
+    mod_clear   = "",
     mod_project = "Modify project: ",
-    search    = "/",
+    search      = "/",
   }
 
   local text_options = {

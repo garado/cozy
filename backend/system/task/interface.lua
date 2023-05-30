@@ -122,6 +122,10 @@ function task:execute_command(type, input)
     cmd = "task add project:'"..project.."' tag:'"..tag.."' '"..input.."'"
   end
 
+  if type == "annotation" then
+    cmd = "task "..tdata.id.." annotate '"..input.."'"
+  end
+
   if type == "delete" then
     if input == "y" or input == "Y" then
       cmd = "echo 'y' | task delete " .. tdata.id
