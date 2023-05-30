@@ -146,18 +146,24 @@ local sidebar = wibox.widget({
 -- Called when a new tag is selected
 local function projectlist_update(tag)
   projectlist.tag = tag
-
   projectlist:clear_elements()
+
+  -- Keep track of project to show on initialization
+  local idx = 1
+
   for i = 1, #task.data[tag] do
     local p = task.data[tag][i]
+    if task.restore and task.restore.project == p then idx = i end
     projectlist:add_element(gen_item(PROJECT, p))
   end
 
-  -- Assume first project is selected
-  projectlist.active_element = projectlist.children[1]
-  projectlist.children[1].selected = true
-  projectlist.children[1]:update()
-  projectlist.children[1].children[2]:update_color(beautiful.fg)
+  projectlist.active_element = projectlist.children[idx]
+  projectlist.children[idx].selected = true
+  projectlist.children[idx]:update()
+  projectlist.children[idx].children[2]:update_color(beautiful.fg)
+  projectlist.area:set_active_element_by_index(idx)
+
+  return task.data[tag][idx]
 end
 
 -- Initialization
@@ -167,30 +173,36 @@ task:connect_signal("ready::tags_and_projects", function()
   -- Sort alphabetically
   -- Need to make a 2nd temp table because the original table is associative and cannot be
   -- sorted (irritating)
-  local ugh = {}
+  local tagsort = {}
   for t in pairs(task.data) do
-    ugh[#ugh+1] = t
+    tagsort[#tagsort+1] = t
   end
 
-  table.sort(ugh, function(a, b) return a:lower() < b:lower() end)
+  table.sort(tagsort, function(a, b) return a:lower() < b:lower() end)
 
-  for i = 1, #ugh do
-    taglist:add_element(gen_item(TAG, ugh[i]))
+  -- Keep track of the tag to initially show
+  local tag_idx = 1
+
+  for i = 1, #tagsort do
+    if task.restore and tagsort[i] == task.restore.tag then
+      tag_idx = i
+    end
+    taglist:add_element(gen_item(TAG, tagsort[i]))
   end
 
-  -- Assume the first tag is selected
-  taglist.active_element = taglist.children[1]
-  taglist.children[1].selected = true
-  taglist.children[1]:update()
-  taglist.children[1].children[2]:update_color(beautiful.fg)
+  taglist.active_element = taglist.children[tag_idx]
+  taglist.children[tag_idx].selected = true
+  taglist.children[tag_idx]:update()
+  taglist.children[tag_idx].children[2]:update_color(beautiful.fg)
+  taglist.area:set_active_element_by_index(tag_idx)
 
-  local first_tag = ugh[1]
-  local first_project = task.data[first_tag][1]
-  projectlist_update(first_tag)
+  local init_tag = tagsort[tag_idx]
+  local init_project = projectlist_update(init_tag)
 
-  task.active_tag = first_tag
-  task.active_project = first_project
-  task:emit_signal("selected::project", first_tag, first_project)
+  task.active_tag = init_tag
+  task.active_project = init_project
+
+  task:emit_signal("selected::project", init_tag, init_project)
 end)
 
 -- Update project list when a new task is selected

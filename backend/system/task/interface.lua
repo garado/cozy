@@ -147,7 +147,7 @@ function task:execute_command(type, input)
   end
 
   awful.spawn.easy_async_with_shell(cmd, function()
-    self:emit_signal("ui::update", type, input)
+    self:emit_signal("refresh", type, input)
   end)
 end
 

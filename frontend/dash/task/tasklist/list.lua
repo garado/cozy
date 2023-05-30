@@ -20,7 +20,8 @@ local tasklist = {}
 -- @brief Generate a single tasklist entry.
 local function gen_taskitem(t)
   local desc = ui.textbox({
-    text = t.description
+    text  = t.description,
+    width = dpi(750),
   })
 
   -- Indicator icon shows which task is selected
@@ -106,17 +107,25 @@ task:connect_signal("ready::tasks", function(_, tag, project, tasks)
   tasklist:clear_elements()
   tasklist.tag = tag
   tasklist.project = project
+
+  -- Keep track of the task to show on init
+  local idx = 1
+
   for i = 1, #tasks do
     local taskitem = gen_taskitem(tasks[i])
     tasklist:add_element(taskitem)
     taskitem.data = tasks[i]
+    if task.restore and task.restore.id == tasks[i].id then
+      idx = i
+    end
   end
 
-  -- Assume the first task is selected
-  tasklist.active_element = tasklist.children[1]
-  tasklist.children[1].selected = true
-  tasklist.children[1]:update()
-  tasklist.children[1].desc:update_color(beautiful.fg)
+  -- Initialize
+  tasklist.active_element = tasklist.children[idx]
+  tasklist.children[idx].selected = true
+  tasklist.children[idx]:update()
+  tasklist.children[idx].desc:update_color(beautiful.fg)
+  tasklist.area:set_active_element_by_index(idx)
 end)
 
 return tasklist

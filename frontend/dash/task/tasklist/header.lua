@@ -41,7 +41,7 @@ local progress = wibox.widget({
   background_color = beautiful.neutral[700],
   forced_height = dpi(8),
   shape = ui.rrect(),
-  color = beautiful.random_accent_color(),
+  color = beautiful.primary[400],
   widget = wibox.widget.progressbar,
 })
 
@@ -77,7 +77,10 @@ task:connect_signal("selected::project", function(_, _tag, project)
 end)
 
 task:connect_signal("ready::project_stats", function(_, pending, completed)
+  local val = math.floor((completed / (pending+completed)) * 100)
   remaining:update_text(pending..'/'..pending+completed..' remaining')
+  percent:update_text(val..'%')
+  progress.value = val
 end)
 
 return header
