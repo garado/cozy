@@ -15,7 +15,6 @@ local tasklist_header = require(... .. ".tasklist.header")
 local tasklist_body   = require(... .. ".tasklist.list")
 local tasklist_details = require(... .. ".tasklist.details")
 local tasklist_prompt = require(... .. ".tasklist.prompt")
-local keybinds = require(... .. ".tasklist.keybinds")
 
 local nav_tasks = keynav.area({
   name = "nav_tasks",
@@ -24,7 +23,6 @@ local nav_tasks = keynav.area({
     nav_projects,
     tasklist_body.area,
   },
-  keys = keybinds,
 })
 
 local _tasklist = wibox.widget({

@@ -2,27 +2,46 @@
 -- █▀█ █▀█ █▀█ █▀▄▀█ █▀█ ▀█▀ 
 -- █▀▀ █▀▄ █▄█ █░▀░█ █▀▀ ░█░ 
 
+-- Stuff related to the prompt textbox that appears when editing tasks.
+
 local beautiful  = require("beautiful")
 local wibox = require("wibox")
 local awful = require("awful")
 local bold  = require("utils.string").pango_bold
 local task  = require("backend.system.task")
 
---- @brief Completion callback for modifying task name
-local function desc_search_callback(command_before_comp, cur_pos_before_comp, ncomp)
-  local t = task.focused_tag
-  local p = task.focused_project
-  local tasks = task.tags[t].projects[p].tasks
+-- █▀▀ ▄▀█ █░░ █░░ █▄▄ ▄▀█ █▀▀ █▄▀ █▀
+-- █▄▄ █▀█ █▄▄ █▄▄ █▄█ █▀█ █▄▄ █░█ ▄█
 
-  -- Need to put all of the task descriptions into their own separate table
-  -- Probably not the most optimal way to do this, but it is... a way
-  local searchtasks = {}
-  for i = 1, #tasks do
-    searchtasks[#searchtasks+1] = tasks[i]["description"]
-  end
-
-  return awful.completion.generic(command_before_comp, cur_pos_before_comp, ncomp, searchtasks)
+local comp_callback_table = {}
+local function comp_callback(command_before_comp, cur_pos_before_comp, ncomp)
+  return awful.completion.generic(command_before_comp, cur_pos_before_comp, ncomp, comp_callback_table)
 end
+
+local function search_callback()
+  local t = task.active_tag
+  local p = task.active_project
+  local tasks = task.data[t][p]
+
+  -- Don't know if this is the most efficient way to do this.
+  for i = 1, #tasks do
+    comp_callback_table[#comp_callback_table+1] = tasks[i].description
+  end
+end
+
+local function mod_project_callback()
+  local tag = task.active_tag
+  comp_callback_table = task.data[tag]
+end
+
+local function mod_tag_callback()
+  for tag in pairs(task.data) do
+    comp_callback_table[#comp_callback_table+1] = tag
+  end
+end
+
+-- █░█ █
+-- █▄█ █
 
 local promptbox = wibox.widget({
   font   = beautiful.font_reg_s,
@@ -38,9 +57,17 @@ promptbox_colorized:set_fg(beautiful.fg)
 -- @param prompt The prompt to display.
 -- @param text The initial textbox text.
 local function task_input(type, prompt, text)
-  print('Starting task input')
 
-  -- local comp_callback   = get_completion_callback(type)
+  -- Generate completion callback list
+  comp_callback_table = {}
+  if type == "mod_project" then
+    mod_project_callback()
+  elseif type == "mod_tag" then
+    mod_tag_callback()
+  elseif type == "search" then
+    search_callback()
+  end
+
   awful.prompt.run {
     font         = beautiful.font_reg_s,
     prompt       = prompt or "",
@@ -48,15 +75,14 @@ local function task_input(type, prompt, text)
     fg           = beautiful.fg,
     bg_cursor    = beautiful.primary[400],
     textbox      = promptbox,
+    completion_callback = comp_callback,
     exe_callback = function(input)
       if not input or #input == 0 then
         task:emit_signal("input::cancelled")
         return
       end
-      print('frontend:prompt: input complete')
       task:emit_signal("input::complete", type, input)
     end,
-    -- completion_callback = comp_callback,
   }
 end
 
@@ -73,11 +99,11 @@ task:connect_signal("input::request", function(_, type)
     mod_name  = "Modify name: ",
     mod_clear = "",
     mod_project = "Modify project: ",
+    search    = "/",
   }
 
   local text_options = {
-    search   = "/",
-    mod_name = task.active_task.description or "asdfadsf",
+    mod_name  = task.active_task.description
   }
 
   local prompt = bold(prompt_options[type])

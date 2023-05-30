@@ -2,8 +2,7 @@
 -- ▀█▀ ▄▀█ █▀ █▄▀ █░░ █ █▀ ▀█▀    █▄▄ █▀█ █▀▄ █▄█ 
 -- ░█░ █▀█ ▄█ █░█ █▄▄ █ ▄█ ░█░    █▄█ █▄█ █▄▀ ░█░ 
 
--- Displays a list of tasks for the currently-selected
--- tag and project.
+-- Displays a list of tasks for the currently selected tag and project.
 
 local beautiful  = require("beautiful")
 local ui    = require("utils.ui")
@@ -13,12 +12,14 @@ local gears = require("gears")
 local singlesel = require("frontend.widget.single-select")
 local strutil = require("utils.string")
 local task  = require("backend.system.task")
+local keybinds = require("frontend.dash.task.tasklist.keybinds")
 
 local tasklist = {}
 
 --- @function gen_taskitem
 -- @brief Generate a single tasklist entry.
 local function gen_taskitem(t)
+  -- Task name
   local desc = ui.textbox({
     text  = t.description,
     width = dpi(750),
@@ -44,7 +45,7 @@ local function gen_taskitem(t)
   end
 
   local due = ui.textbox({
-    text = due_text,
+    text  = due_text,
     color = color
   })
 
@@ -96,9 +97,8 @@ tasklist.area:connect_signal("area::left", function()
   tasklist.active_element.desc:update_color(beautiful.fg)
 end)
 
-tasklist.area.keys = {
-  ["z"] = function() task:emit_signal("details::toggle") end
-}
+tasklist.area.keys = keybinds
+tasklist.area.keys["z"] = function() task:emit_signal("details::toggle") end
 
 -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀    ▄▀█ █▄░█ █▀▄    █▀ ▀█▀ █░█ █▀▀ █▀▀ 
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█    █▀█ █░▀█ █▄▀    ▄█ ░█░ █▄█ █▀░ █▀░ 
@@ -120,7 +120,7 @@ task:connect_signal("ready::tasks", function(_, tag, project, tasks)
     end
   end
 
-  -- Initialize
+  -- Initialize first active task
   tasklist.active_element = tasklist.children[idx]
   tasklist.children[idx].selected = true
   tasklist.children[idx]:update()
