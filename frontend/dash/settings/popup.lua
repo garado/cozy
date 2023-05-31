@@ -10,7 +10,7 @@ local dpi   = ui.dpi
 local awful = require("awful")
 local wibox = require("wibox")
 local gears = require("gears")
-local dash  = require("backend.state.dash")
+local dash  = require("backend.cozy.dash")
 local clib  = require("modules.color")
 
 local function gen_slider(label)
