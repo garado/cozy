@@ -2,20 +2,17 @@
 -- █▀▀ █▀█ ▄▀█ █░░ █▀ 
 -- █▄█ █▄█ █▀█ █▄▄ ▄█ 
 
-local beautiful  = require("beautiful")
-local awful = require("awful")
-local keynav = require("modules.keynav")
-local dash = require("backend.cozy.dash")
 local wibox = require("wibox")
+local goals = require("backend.system.goals")
+local keynav = require("modules.keynav")
 
 local overview = require(... .. ".overview")
-local details  = require(... .. ".details")
+local roadmap  = require(... .. ".roadmap")
 
 local nav_goals = keynav.area({
   name  = "nav_goals",
-  items = { overview.area }
+  items = overview.areas
 })
-
 
 local content = wibox.widget({
   overview,
@@ -24,18 +21,19 @@ local content = wibox.widget({
   area = nav_goals
 })
 
-dash:connect_signal("goals::show_details", function(_, data)
+goals:connect_signal("goals::show_roadmap", function()
   content:reset()
-  content:add(details)
+  content:add(roadmap)
   content.area:clear()
-  content.area:append(details.area)
+  content.area:append(roadmap.area)
 end)
 
-dash:connect_signal("goals::show_overview", function(_)
+goals:connect_signal("goals::show_overview", function()
   content:reset()
   content:add(overview)
   content.area:clear()
-  content.area:append(overview.area)
+  content.area:append(overview.areas[1])
+  content.area:append(overview.areas[2])
 end)
 
 return content

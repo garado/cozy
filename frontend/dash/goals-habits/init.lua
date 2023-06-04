@@ -11,13 +11,22 @@ local btn   = require("frontend.widget.button")
 local header = require("frontend.widget.dash.header")
 local dash  = require("backend.cozy.dash")
 local keynav = require("modules.keynav")
+local gstate = require("backend.system.goals")
 
 -- Modules
 local goals = require(... .. ".goals")
 
 local nav_goals_habits = keynav.area({
   name  = "nav_goals_habits",
-  items = { goals.area },
+  items = {
+    goals.area
+  },
+  keys  = {
+    ["r"] = function()
+      gstate:fetch_shortterm()
+      gstate:fetch_longterm()
+    end
+  },
 })
 
 ---------------------
@@ -29,7 +38,7 @@ local goals_header = header({
 local action_refresh = btn({
   text = "Refresh",
   func = function()
-    dash:emit_signal("goals::refresh")
+    goals:emit_signal("goals::refresh")
   end,
 })
 
@@ -41,6 +50,14 @@ goals_header:add_sb("Habits")
 local content = goals
 
 ------------------
+
+goals:connect_signal("goals::show_details", function(_, data)
+  goals_header:update_title({ text = data.description })
+end)
+
+goals:connect_signal("goals::show_overview", function()
+  goals_header:update_title({ text = "Goals &amp; habits" })
+end)
 
 local container = wibox.widget({
   goals_header,
