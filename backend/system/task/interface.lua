@@ -30,7 +30,6 @@ function task:fetch_today()
 end
 
 --- @method fetch_upcoming
--- @brief Fetch upcoming tasks.
 function task:fetch_upcoming()
   local cmd = "task +DUE -DUETODAY" .. JSON_EXPORT
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
@@ -56,11 +55,15 @@ function task:fetch_tags_and_projects()
     self.data = {}
     local tag_groups = strutil.split(stdout, '=====')
     table.remove(tag_groups, #tag_groups)
+
     for i = 1, #tag_groups do
       local projects = strutil.split(tag_groups[i], "\r\n")
       local tag = table.remove(projects, 1)
       self.data[tag] = projects
     end
+
+    self.data["next"] = nil
+
     self:emit_signal("ready::tags_and_projects")
   end)
 end
@@ -104,6 +107,23 @@ function task:fetch_task_data(id)
   end)
 end
 
+function task:fetch_due_soon_count_tag(tag)
+  local cmd = "task tag:'"..tag.."' status:pending due export | wc -l"
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    local signal = "ready::duesoon::" .. tag
+    -- Subtract 2 because when doing task export the first and last lines are just brackets
+    self:emit_signal(signal, tonumber(stdout) - 2)
+  end)
+end
+
+function task:fetch_due_soon_count_project(tag, project)
+  local cmd = "task tag:'"..tag.."' project:'"..project.."' status:pending due export | wc -l"
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    local signal = "ready::duesoon::" .. tag .. '::' .. project
+    self:emit_signal(signal, tonumber(stdout) - 2)
+  end)
+end
+
 --- @brief Build and execute command given input and input type.
 -- Also send signals to update UI elements if necessary.
 -- @param type  Type of input. See keybinds table in frontent/task/keybinds.lua for complete list.
@@ -138,6 +158,15 @@ function task:execute_command(type, input)
     else return end
   end
 
+  -- Toggle start/stop
+  if type == "start" then
+    if tdata.start then
+      cmd = "task "..tdata.id.." stop"
+    else
+      cmd = "task "..tdata.id.." start"
+    end
+  end
+
   -- Modify requests
   if type == "mod_due" then
     if input == "none" then input = '' end
@@ -148,6 +177,8 @@ function task:execute_command(type, input)
     cmd = "task "..tdata.id.." mod tag:'"..input.."'"
   elseif type == "mod_name" then
     cmd = "task "..tdata.id.." mod desc:'"..input.."'"
+  elseif type == "mod_uda" then
+    cmd = "task "..tdata.id.." mod "..input
   end
 
   awful.spawn.easy_async_with_shell(cmd, function()

@@ -35,8 +35,32 @@ local deselect_props = {
   indicator_color = beautiful.neutral[800],
 }
 
+--- Generate badge.
+-- A badge is a little indicator next to the tag/project name
+-- indicating how many tasks are overdue/due very soon within
+-- that tag/project.
+-- TODO: Still needs a lot of work.
+local function gen_badge(type, name)
+  local badge = wibox.widget({
+    {
+      ui.textbox({
+        text = "2",
+        font = beautiful.font_bold_xs,
+        align = "center",
+      }),
+      margins = dpi(4),
+      widget  = wibox.container.margin,
+    },
+    bg     = beautiful.red[500],
+    shape  = gears.shape.circle,
+    widget = wibox.container.background,
+  })
+
+  return badge
+end
+
 -- Generate a tag or project entry
-local function gen_item(type, name)
+local function gen_item(type, name, parent_tag)
   local tbox = ui.textbox({ text = name })
   local indicator = wibox.widget({
     forced_height = dpi(3),
@@ -47,9 +71,29 @@ local function gen_item(type, name)
     visible = true,
   })
 
+  -- Shows number of urgent tasks
+  local badge = gen_badge(type, name)
+
+  if type == TAG then
+    local signal = "ready::duesoon::"..name
+    task:connect_signal(signal, function(_, num)
+      badge.widget.widget:update_text(num)
+      if num == 0 then badge.visible = false end
+    end)
+    task:fetch_due_soon_count_tag(name)
+  elseif type == PROJECT then
+    local signal = "ready::duesoon::"..parent_tag.."::"..name
+    task:connect_signal(signal, function(_, num)
+      badge.widget.widget:update_text(num)
+      if num == 0 then badge.visible = false end
+    end)
+    task:fetch_due_soon_count_project(parent_tag, name)
+  end
+
   local item = wibox.widget({
     indicator,
     tbox,
+    badge,
     spacing = dpi(10),
     layout = wibox.layout.fixed.horizontal,
   })
@@ -154,7 +198,7 @@ local function projectlist_update(tag)
   for i = 1, #task.data[tag] do
     local p = task.data[tag][i]
     if task.restore and task.restore.project == p then idx = i end
-    projectlist:add_element(gen_item(PROJECT, p))
+    projectlist:add_element(gen_item(PROJECT, p, tag))
   end
 
   projectlist.active_element = projectlist.children[idx]
