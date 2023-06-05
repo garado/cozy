@@ -92,7 +92,7 @@ task:connect_signal("input::request", function(_, type)
   local prompt_options = {
     add         = "Add: ",
     annotation  = "Add annotation: ",
-    modify      = "Modify (d)ue, (n)ame, (p)roject, (t)ag",
+    modify      = "Modify (d)ue, (n)ame, (p)roject, (t)ag, custom (u)da",
     done        = "Mark task as done? (y/n) ",
     delete      = "Delete task? (y/n) ",
     mod_due     = "Modify due: ",
@@ -110,9 +110,15 @@ task:connect_signal("input::request", function(_, type)
   local prompt = bold(prompt_options[type])
   local text   = text_options[type]
 
-  -- Modify and Start take no input - they just execute
-  if type == "modify" or type == "start" then
+  -- Modify takes no input; just changes the prompt
+  if type == "modify" then
     promptbox.markup = prompt
+    return
+  end
+
+  -- Start takes no input; just executes immediately
+  if type == "start" then
+    task:emit_signal("input::complete", type, nil)
     return
   end
 

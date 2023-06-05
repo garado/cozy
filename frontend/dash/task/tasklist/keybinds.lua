@@ -17,6 +17,7 @@ local keybinds = {
     ["A"] = "annotation",
     ["m"] = "modify",
     ["d"] = "done",
+    ["s"] = "start",
     ["x"] = "delete",
     ["r"] = "refresh",
     ["/"] = "search",
@@ -26,6 +27,7 @@ local keybinds = {
     ["p"] = "mod_project",
     ["t"] = "mod_tag",
     ["n"] = "mod_name",
+    ["u"] = "mod_uda",
     ["Escape"] = "mod_clear",
   }
 }
@@ -33,8 +35,6 @@ local keybinds = {
 -- Emit signal name.
 -- This is caught in prompt.lua
 local function request_input(key)
-  print('Requesting input for "'..key..'". Current mode is '..curmode)
-
   -- Refreshing should immediately execute and take no input
   if key == "r" then
     task:emit_signal("refresh")
@@ -42,8 +42,6 @@ local function request_input(key)
   end
 
   local cmd  = keybinds[curmode][key]
-
-  print('Cmd is '..(cmd or "n/a"))
 
   if not cmd then return end
   if key == 'm' then curmode = "modify" end

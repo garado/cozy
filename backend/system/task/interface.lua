@@ -108,7 +108,7 @@ function task:fetch_task_data(id)
 end
 
 function task:fetch_due_soon_count_tag(tag)
-  local cmd = "task tag:'"..tag.."' status:pending due export | wc -l"
+  local cmd = "task tag:'"..tag.."' status:pending \\(+DUE or +OVERDUE\\) export | wc -l"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local signal = "ready::duesoon::" .. tag
     -- Subtract 2 because when doing task export the first and last lines are just brackets
@@ -117,7 +117,7 @@ function task:fetch_due_soon_count_tag(tag)
 end
 
 function task:fetch_due_soon_count_project(tag, project)
-  local cmd = "task tag:'"..tag.."' project:'"..project.."' status:pending due export | wc -l"
+  local cmd = "task tag:'"..tag.."' project:'"..project.."' status:pending \\(+DUE or +OVERDUE\\) export | wc -l"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local signal = "ready::duesoon::" .. tag .. '::' .. project
     self:emit_signal(signal, tonumber(stdout) - 2)

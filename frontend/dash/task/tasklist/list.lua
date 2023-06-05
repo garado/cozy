@@ -19,10 +19,29 @@ local tasklist = {}
 --- @function gen_taskitem
 -- @brief Generate a single tasklist entry.
 local function gen_taskitem(t)
-  -- Task name
+  -- Determine colors for task name, due date
+  local text_color = beautiful.fg
+  local due_color  = beautiful.neutral[300]
+
+  local due_str, is_overdue
+  if t.due then
+    due_str, is_overdue = strutil.iso_to_relative(t.due)
+  end
+
+  if is_overdue or t.urgency > 9 then
+    due_color  = beautiful.red[400]
+    text_color = beautiful.red[400]
+  end
+
+  if t.start then
+    text_color = beautiful.green[400]
+  end
+
+  -- Wibox for task name
   local desc = ui.textbox({
     text  = t.description,
     width = dpi(750),
+    color = text_color
   })
 
   -- Indicator icon shows which task is selected
@@ -35,18 +54,9 @@ local function gen_taskitem(t)
   })
 
   -- Due date
-  local due_text, overdue, color
-  if t.due then
-    due_text, overdue = strutil.iso_to_relative(t.due)
-    color = overdue and beautiful.red[400] or beautiful.fg
-  else
-    due_text = "no due date"
-    color = beautiful.neutral[300]
-  end
-
   local due = ui.textbox({
-    text  = due_text,
-    color = color
+    text  = t.due and due_str or "no due date",
+    color = due_color
   })
 
   local taskitem = wibox.widget({
@@ -73,7 +83,7 @@ local function gen_taskitem(t)
   taskitem:connect_signal("mouse::leave", function(self) self:update() end)
 
   function taskitem:update()
-    local c = self.selected and beautiful.primary[400] or beautiful.fg
+    local c = self.selected and beautiful.primary[400] or desc._color
     indicator.bg = self.selected and beautiful.fg or beautiful.neutral[800]
     desc:update_color(c)
   end
@@ -124,8 +134,8 @@ task:connect_signal("ready::tasks", function(_, tag, project, tasks)
   tasklist.active_element = tasklist.children[idx]
   tasklist.children[idx].selected = true
   tasklist.children[idx]:update()
-  tasklist.children[idx].desc:update_color(beautiful.fg)
   tasklist.area:set_active_element_by_index(idx)
+  tasklist.children[idx].desc:update_color(tasklist.children[idx].desc._color)
 end)
 
 return tasklist

@@ -9,14 +9,31 @@ local _string = {}
 -- █▀▄▀█ ▄▀█ █▄░█ █ █▀█ █░█ █░░ ▄▀█ ▀█▀ █ █▀█ █▄░█ 
 -- █░▀░█ █▀█ █░▀█ █ █▀▀ █▄█ █▄▄ █▀█ ░█░ █ █▄█ █░▀█ 
 
---- Split text input on a given character(s).
+--- @brief Capitalize the first letter of the string
+function _string.first_to_upper(str)
+  return (str:gsub("^%l", string.upper))
+end
+
+--- @brief Split text input on a given delimiter.
 -- @param text  A string to delimit.
--- @param delim Delimiting characters
+-- @param delim Delimiting character(s)
+-- @param keepEmpty True if empty tokens should be kept (stored
+-- in return array as "")
 -- @return A table containing the split tokens.
-function _string.split(text, delim)
-  delim = delim or "%s" -- default all whitespace 
+function _string.split(text, delim, keepEmpty)
+  delim = delim or "%s" -- default all whitespace
+  keepEmpty = keepEmpty or false
+
+  local match
+  if keepEmpty then
+    text  = text .. delim
+    match = "([^"..delim.."]*)" .. delim
+  else
+    match = "([^"..delim.."]+)"
+  end
+
   local ret = {}
-  for str in text:gmatch("([^"..delim.."]+)") do
+  for str in text:gmatch(match) do
     ret[#ret + 1] = str
   end
   return ret
@@ -131,7 +148,7 @@ function _string.iso_to_relative(iso)
   local ts = _string.iso_to_ts(iso)
   local now = os.time()
   local diff = now - ts
-  local overdue = diff <= 0
+  local overdue = diff > 0
   diff = math.abs(diff)
 
   local SECONDS_IN_HOUR = 60 * 60
@@ -163,6 +180,15 @@ function _string.iso_to_relative(iso)
   return relative, overdue
 end
 
+
+-- █▀█ ▄▀█ █▄░█ █▀▀ █▀█ 
+-- █▀▀ █▀█ █░▀█ █▄█ █▄█ 
+
+function _string.pango_bold(str)
+  if not str then return end
+  return "<b>"..str.."</b>"
+end
+
 -- █▀▄▀█ █ █▀ █▀▀ 
 -- █░▀░█ █ ▄█ █▄▄ 
 
@@ -184,6 +210,10 @@ function _string.print_arr(arr, indentLevel)
   for index,value in pairs(arr) do
     if type(value) == "boolean" then
       value = value and "true" or "false"
+    end
+
+    if type(value) == "function" then
+      value = "is a function"
     end
 
     if type(value) == "table" then
