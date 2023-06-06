@@ -41,7 +41,7 @@ local deselect_props = {
 -- that tag/project.
 -- TODO: Still needs a lot of work.
 local function gen_badge(type, name)
-  local badge = wibox.widget({
+  return wibox.widget({
     {
       ui.textbox({
         text = "2",
@@ -54,9 +54,8 @@ local function gen_badge(type, name)
     bg     = beautiful.red[500],
     shape  = gears.shape.circle,
     widget = wibox.container.background,
+    visible = false
   })
-
-  return badge
 end
 
 -- Generate a tag or project entry
@@ -78,14 +77,14 @@ local function gen_item(type, name, parent_tag)
     local signal = "ready::duesoon::"..name
     task:connect_signal(signal, function(_, num)
       badge.widget.widget:update_text(num)
-      if num == 0 then badge.visible = false end
+      badge.visible = num > 0
     end)
     task:fetch_due_soon_count_tag(name)
   elseif type == PROJECT then
     local signal = "ready::duesoon::"..parent_tag.."::"..name
     task:connect_signal(signal, function(_, num)
       badge.widget.widget:update_text(num)
-      if num == 0 then badge.visible = false end
+      badge.visible = num > 0
     end)
     task:fetch_due_soon_count_project(parent_tag, name)
   end
