@@ -10,6 +10,8 @@ local cal   = require("backend.system.calendar")
 local btn   = require("frontend.widget.button")
 local header = require("frontend.widget.dash.header")
 local keynav = require("modules.keynav")
+local awful  = require("awful")
+local gears  = require("gears")
 local dash   = require("backend.cozy.dash")
 local mathutils = require("utils.math")
 
@@ -104,6 +106,7 @@ end
 
 local nav_calendar = keynav.area({
   name = "nav_calendar",
+  autofocus = true,
   items = {
     eventbox.area,
   },
@@ -115,7 +118,6 @@ local nav_calendar = keynav.area({
       action_today:emit_signal("button::press")
     end,
     ["H"] = function()
-      -- TODO: Clearing active element doesn't seem to work
       eventbox.area.active_element = nil
       action_prev:emit_signal("button::press")
     end,
@@ -159,6 +161,16 @@ content.children[2]:adjust_ratio(1, 0, 0.08, 0.92)
 
 -- Adjust hourlabels + { daylabels, gridlines }
 content:adjust_ratio(1, 0, 0.05, 0.95)
+
+-- Mouse scrolling adjusts hours shown
+content.buttons = gears.table.join({
+	awful.button({}, 4, function()
+    cal:decrement_hour()
+  end),
+	awful.button({}, 5, function()
+    cal:increment_hour()
+  end),
+})
 
 local container = wibox.widget({
   calheader,
