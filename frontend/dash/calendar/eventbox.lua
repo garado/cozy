@@ -66,7 +66,7 @@ end
 local function gen_eventbox(event, height, width)
   -- Determine how tall each hour is
   local hour_range = cal.end_hour - cal.start_hour + 1
-  local hourline_spacing = height / hour_range
+  local hour_height = height / hour_range
 
   -- Determine how wide each day is
   local day_range = calconf.end_day - calconf.start_day + 1
@@ -76,8 +76,8 @@ local function gen_eventbox(event, height, width)
                    strutil.time_to_int(event.s_time)
 
   -- Determine y-pos of event box (hour)
-  local y = (strutil.time_to_int(event.s_time) * hourline_spacing) -
-            (cal.start_hour * hourline_spacing)
+  local y = (strutil.time_to_int(event.s_time) * hour_height) -
+            (cal.start_hour * hour_height)
   y = y + (EBOX_MARGIN / 2)
 
   -- Determine x-pos of event box (day)
@@ -86,12 +86,23 @@ local function gen_eventbox(event, height, width)
 
   -- Since we can scroll up/down through hours on the calendar, some
   -- eventboxes need to be truncated.
-  local truncate = y < 0
-  local truncate_duration = math.abs(y)
+  local MAX_Y = (cal.end_hour - cal.start_hour + 1) * hour_height
 
-  if truncate then y = 0 end
+  -- Height of eventbox
+  local h = (duration * hour_height) - EBOX_MARGIN
 
-  -- If this event has fully elapsed, it should be grayed out.
+  if y < 0 then
+    h = h - math.abs(y)
+    y = 0
+  elseif y >= MAX_Y then
+    return
+  end
+
+  if (y + h) >= MAX_Y then
+    h = h - ((y + h) - MAX_Y)
+  end
+
+  -- If this event has fully elapsed, it should be greyed out.
   local bg, fg
   local now = os.date("%H:%M")
   local now_weekday = os.date("%w")
@@ -118,21 +129,21 @@ local function gen_eventbox(event, height, width)
   fg = fg or beautiful.fg
 
   -- Different sized event boxes have different layouts.
-  -- (Trying to make a "responsive" event box.)
+  -- Below we're just trying to make a "responsive" event box.
   local text_top_margin = dpi(6)
   local text_layout = wibox.layout.fixed.vertical
   local time_prefix = ""
   local text_title_height
 
-  if duration <= 0.5 then
-    duration = 0.5
+  if h <= 0.5 * hour_height then
+    h = 0.5 * hour_height
     text_top_margin = dpi(2)
     text_layout = wibox.layout.fixed.horizontal
     time_prefix = ', '
-  elseif duration <= 0.75 then
+  elseif h <= 0.75 * hour_height then
     text_top_margin = dpi(3)
     text_layout = wibox.layout.fixed.horizontal
-  elseif duration <= 1 then
+  elseif h <= hour_height then
     text_title_height = beautiful.font_sizes.s * 1.5
   end
 
@@ -149,9 +160,6 @@ local function gen_eventbox(event, height, width)
     }),
     layout = text_layout,
   })
-
-  local h = (duration * hourline_spacing) - EBOX_MARGIN
-  if truncate then h = h - truncate_duration end
 
   -- Final assembly + keynav stuff
   local ebox = wibox.widget({
@@ -189,17 +197,15 @@ local function gen_eventbox(event, height, width)
     self.widget.widget.color = self.widget.bg
   end
 
-  function ebox.nav:modify()
-    print('Modifying ebox '..self.event.title)
-  end
-
   return ebox
 end
 
 function eventboxes:add_event(e)
   local ebox = gen_eventbox(e, self._height, self._width)
-  self:add(ebox)
-  self.area:append(ebox.nav)
+  if ebox then
+    self:add(ebox)
+    self.area:append(ebox.nav)
+  end
 end
 
 -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
