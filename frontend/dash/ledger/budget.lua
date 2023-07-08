@@ -2,12 +2,14 @@
 -- █▄▄ █░█ █▀▄ █▀▀ █▀▀ ▀█▀ 
 -- █▄█ █▄█ █▄▀ █▄█ ██▄ ░█░ 
 
+local ui  = require("utils.ui")
+local dpi = ui.dpi
 local beautiful  = require("beautiful")
-local ui    = require("utils.ui")
-local dpi   = ui.dpi
-local awful = require("awful")
 local wibox = require("wibox")
+local ledger = require("backend.system.ledger")
 
+-- @function gen_entry
+-- @brief Generates a progress bar showing percent fulfillment of a budget category.
 -- @param category Budget category
 local function gen_entry(category)
   local label = ui.textbox({
@@ -17,9 +19,10 @@ local function gen_entry(category)
   })
 
   local amounts = ui.textbox({
-    text  = "Remaining: 418.00",
-    align = "right",
+    text   = "Remaining: 0.00",
+    align  = "right",
     valign = "end",
+    color  = beautiful.neutral[300],
   })
 
   local barval = math.random() * 100
@@ -42,15 +45,16 @@ local function gen_entry(category)
     },
     bar,
     spacing = dpi(5),
-    forced_width  = dpi(250),
+    forced_width = dpi(250),
     layout = wibox.layout.fixed.vertical,
   })
 end
 
 local budget = wibox.widget({
   ui.textbox({
-    text = "Monthly Budget",
-    font = beautiful.font_med_m,
+    text  = "Monthly Budget",
+    align = "center",
+    font  = beautiful.font_med_m,
   }),
   {
     {
@@ -62,7 +66,7 @@ local budget = wibox.widget({
       gen_entry("Hobby"),
       gen_entry("Other"),
       spacing = dpi(20),
-      layout = wibox.layout.fixed.vertical,
+      layout = wibox.layout.flex.vertical,
     },
     left   = dpi(30),
     right  = dpi(30),
@@ -71,5 +75,15 @@ local budget = wibox.widget({
   spacing = dpi(10),
   layout  = wibox.layout.fixed.vertical,
 })
+
+
+-- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄
+-- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀
+
+ledger:get_budget()
+
+ledger:connect_signal("ready::budget", function(_, bdata)
+  require("utils.string").print_arr(bdata)
+end)
 
 return ui.dashbox(budget, dpi(450), dpi(800))

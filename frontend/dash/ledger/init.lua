@@ -2,45 +2,44 @@
 -- █░░ █▀▀ █▀▄ █▀▀ █▀▀ █▀█ 
 -- █▄▄ ██▄ █▄▀ █▄█ ██▄ █▀▄ 
 
-local beautiful  = require("beautiful")
-local ui    = require("utils.ui")
-local dpi   = ui.dpi
-local awful = require("awful")
-local wibox = require("wibox")
-local gears = require("gears")
-
--- Widgets
-local linegraph = require("frontend.widget.linegraph")
+local ui  = require("utils.ui")
+local dpi = ui.dpi
+local btn    = require("frontend.widget.button")
+local wibox  = require("wibox")
+local header = require("frontend.widget.dash.header")
 
 -- Modules
-local balance = require(... .. ".balance")
-local budget  = require(... .. ".budget")
+local overview = require(... .. ".overview")
+local budget   = require(... .. ".budget")
+local transactions = require(... .. ".transactions")
 
 local content = wibox.widget({
   {
-    balance,
+    overview,
     widget = wibox.container.place,
   },
-  budget,
+  {
+    budget,
+    transactions,
+    layout = wibox.layout.fixed.horizontal,
+  },
   layout = wibox.layout.fixed.vertical,
 })
 
 -------------------------
 
-local header = ui.textbox({
-  text = "Ledger",
-  align = "left",
-  font = beautiful.font_light_xl,
+local action_refresh = btn({
+  text = "Refresh",
+  func = function()
+  end,
 })
 
+local ledger_header = header({ title_text = "Ledger" })
+ledger_header:add_action(action_refresh)
+
 local container = wibox.widget({
-  {
-    header,
-    nil,
-    layout = wibox.layout.align.horizontal,
-  },
+  ledger_header,
   content,
-  spacing = dpi(20),
   layout = wibox.layout.ratio.vertical,
 })
 container:adjust_ratio(1, 0, 0.08, 0.92)

@@ -26,8 +26,9 @@ local balance = wibox.widget({
     {
       {
         ui.textbox({
-          text = " 20%",
-          font = beautiful.font_bold_s,
+          text  = "20%",
+          align = "center",
+          font  = beautiful.font_bold_s,
           color = beautiful.green[500],
         }),
         top = dpi(3),
