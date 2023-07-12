@@ -51,6 +51,12 @@ function _string.contains(str, target)
   return string.find(str, target)
 end
 
+--- @method count
+-- @brief Count the number of occurrences of a pattern character in the string.
+function _string.count(str, pattern)
+  local _, count = str:gsub("%" .. pattern, "")
+  return count
+end
 
 -- █▀▄ ▄▀█ ▀█▀ █▀▀    ▄▀█ █▄░█ █▀▄    ▀█▀ █ █▀▄▀█ █▀▀ 
 -- █▄▀ █▀█ ░█░ ██▄    █▀█ █░▀█ █▄▀    ░█░ █ █░▀░█ ██▄ 
@@ -72,13 +78,14 @@ function _string.datetime_to_ts(datetime)
     local xyear, xmon, xday = datetime:match(pattern)
     return os.time({
       year = xyear, month = xmon, day = xday,
-      hour = 0, min = 0, sec = 0})
+      hour = 0, min = 0, sec = 0 })
   end
 end
 
 --- @method datetime_to_human
 -- @brief Convert YYYY-MM-DD to human-readable date.
 -- i.e. 2023-05-14 to Sunday, May 14 2023
+-- TODO: Bad naming lol both formats are definitely human readable
 function _string.datetime_to_human(datetime)
   local pattern = "(%d%d%d%d)-(%d%d)-(%d%d)"
   local xyear, xmon, xday = datetime:match(pattern)
@@ -86,6 +93,45 @@ function _string.datetime_to_human(datetime)
       year = xyear, month = xmon, day = xday,
       hour = 0, min = 0, sec = 0})
   return os.date("%A, %B %d %Y", ts)
+end
+
+--- @method ts_to_relative
+-- @brief Convert an os.time timestamp to relative time (i.e. '2 days ago')
+-- @param ts os.time timestamp for the date to convert
+-- TODO: Make all the old to_relative functions use this
+function _string.ts_to_relative(ts)
+  local now = os.time()
+  local diff = now - ts
+  local overdue = diff > 0
+  diff = math.abs(diff)
+
+  local SECONDS_IN_HOUR = 60 * 60
+  local SECONDS_IN_DAY = 24 * SECONDS_IN_HOUR
+
+  local timestr, divisor
+
+  if diff < SECONDS_IN_HOUR then
+    timestr = "minute"
+    divisor = 60
+  elseif diff < SECONDS_IN_DAY then
+    timestr = "hour"
+    divisor = SECONDS_IN_HOUR
+  else
+    timestr = "day"
+    divisor = SECONDS_IN_DAY
+  end
+
+  local res = math.floor(diff / divisor)
+  local plural = res == 1 and "" or "s"
+  local relative = res .. ' ' .. timestr .. plural
+
+  if overdue then
+    relative = relative .. ' ago'
+  else
+    relative = 'in ' .. relative
+  end
+
+  return relative, overdue
 end
 
 --- @method time_to_int
@@ -122,8 +168,8 @@ function _string.iso_to_ts(iso)
     year = xyear, month = xmon, day = xday,
     hour = xhr, min = xmin, sec = xsec })
 
-  -- Account for timezone (america/los_angeles: -8 hours)
-  ts = ts - (7 * 60 * 60)
+  local tz_offset = require("cozyconf.dash").timezone
+  ts = ts + (tz_offset * 60 * 60)
 
   return ts
 end
@@ -144,6 +190,7 @@ end
 -- into a relative date (i.e. 'in 3 days', '3 days ago')
 -- @return (string) The relative date
 -- @return (bool) If task is overdue
+-- TODO: Merge this with datetime_to_relative
 function _string.iso_to_relative(iso)
   local ts = _string.iso_to_ts(iso)
   local now = os.time()
