@@ -2,44 +2,55 @@
 -- █░░ █▀▀ █▀▄ █▀▀ █▀▀ █▀█ 
 -- █▄▄ ██▄ █▄▀ █▄█ ██▄ █▀▄ 
 
-local ui  = require("utils.ui")
-local dpi = ui.dpi
+local beautiful  = require("beautiful")
+local ui    = require("utils.ui")
+local dpi   = ui.dpi
+local awful = require("awful")
+local wibox = require("wibox")
 local btn    = require("frontend.widget.button")
-local wibox  = require("wibox")
 local header = require("frontend.widget.dash.header")
+local ledger = require("backend.system.ledger")
+local keynav = require("modules.keynav")
 
--- Modules
-local overview = require(... .. ".overview")
-local budget   = require(... .. ".budget")
-local transactions = require(... .. ".transactions")
+-- Forward declaration
+local container
+
+-- Import pages
+local overview, nav_overview = require(... .. ".overview")()
+local stats, nav_stats = require(... .. ".stats")()
 
 local content = wibox.widget({
-  {
-    overview,
-    widget = wibox.container.place,
-  },
-  {
-    budget,
-    transactions,
-    layout = wibox.layout.fixed.horizontal,
-  },
-  layout = wibox.layout.fixed.vertical,
+  overview,
+  widget = wibox.container.margin,
 })
 
--------------------------
-
-local action_refresh = btn({
-  text = "Refresh",
-  func = function()
-  end,
+-- Set up the rest of this tab's UI
+local ledger_header = header({
+  title_text = "Ledger",
+  actions = {
+    {
+      text = "Refresh",
+      func = function()
+        ledger:emit_signal("refresh")
+      end,
+    },
+  },
+  pages = {
+    {
+      text = "Overview",
+      func = function() content.widget = overview end,
+    },
+    {
+      text = "Stats",
+      func = function() content.widget = stats end,
+    },
+  }
 })
 
-local ledger_header = header({ title_text = "Ledger" })
-ledger_header:add_action(action_refresh)
-
-local container = wibox.widget({
+container = wibox.widget({
   ledger_header,
   content,
+  forced_width = dpi(2000),
   layout = wibox.layout.ratio.vertical,
 })
 container:adjust_ratio(1, 0, 0.08, 0.92)
@@ -50,5 +61,6 @@ return function()
     forced_height = dpi(2000),
     forced_width  = dpi(2000),
     layout = wibox.layout.fixed.horizontal,
-  }), false
+  }),
+  nav_ledger
 end
