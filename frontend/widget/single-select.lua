@@ -57,6 +57,10 @@ local function worker(args)
       widget.navitem = keynav.navitem.base({ widget = widget })
       layout.area:append(widget.navitem)
     end
+
+    if args.autoset_first and #self.children == 1 then
+      widget:emit_signal("button::press")
+    end
   end
 
   function layout:clear_elements()

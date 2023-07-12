@@ -18,7 +18,7 @@ local function worker(user_args)
     bg_mo   = beautiful.neutral[700],
     fg      = beautiful.fg,
     fg_mo   = beautiful.fg,
-    align   = "left",
+    align   = "center",
     text    = "Default",
     shape   = ui.rrect(),
     margins = dpi(12),
@@ -51,13 +51,18 @@ local function worker(user_args)
     widget        = wibox.container.background,
   })
 
+  btn.func = args.func
+
   btn.props = {
     bg    = args.bg,
     bg_mo = args.bg_mo,
     fg    = args.fg,
     fg_mo = args.fg_mo,
-    func  = args.func
   }
+
+  function btn:update()
+    self.bg = self.selected and self.props.bg_sel or self.props.bg
+  end
 
   btn:connect_signal("mouse::enter", function(self)
     btn.bg = self.props.bg_mo
@@ -68,7 +73,7 @@ local function worker(user_args)
   end)
 
   btn:connect_signal("button::press", function(self)
-    if self.props.func then self.props.func() end
+    if self.func then self:func() end
   end)
 
   return btn

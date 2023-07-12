@@ -4,13 +4,15 @@
 
 -- To keep things looking nice and uniform, this is a widget
 -- for the header of all the dashboard tabs. It has a title/
--- subtitle and action/navigation buttons.
+-- subtitle and action/pagesigation buttons.
 
 local beautiful  = require("beautiful")
 local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local wibox = require("wibox")
-local sbg   = require("frontend.widget.stateful-button-group")
+local ss    = require("frontend.widget.single-select")
+local sbtn  = require("frontend.widget.stateful-button")
+local btn    = require("frontend.widget.button")
 local gtable = require("gears.table")
 
 local header = {}
@@ -19,6 +21,8 @@ local function worker(user_args)
   local args = {
     title_text    = "Title",
     subtitle_text = "",
+    actions = {},
+    pages = {},
   }
   gtable.crush(args, user_args or {})
 
@@ -43,34 +47,56 @@ local function worker(user_args)
     layout  = wibox.layout.fixed.horizontal,
   })
 
-  local nav = sbg({
-    set_no_shape = true,
+  if args.actions then
+    for i = 1, #args.actions do
+      local act = btn({
+        text = args.actions[i].text,
+        func = args.actions[i].func,
+      })
+      actions:add(act)
+    end
+  end
+
+  local pages = wibox.widget({
+    layout = wibox.layout.fixed.horizontal,
   })
+
+  -- Set up single-select for pages in tab
+  pages = ss({ layout = pages, autoset_first = true })
+
+  if args.pages then
+    for i = 1, #args.pages do
+      local page = sbtn({
+        text = args.pages[i].text,
+        func = args.pages[i].func,
+        set_no_shape = true,
+      })
+      pages:add_element(page)
+    end
+  end
 
   header = wibox.widget({
     {
+      title,
+      subtitle,
+      spacing = dpi(15),
+      layout  = wibox.layout.fixed.horizontal,
+    },
+    nil,
+    {
       {
-        title,
-        subtitle,
+        actions,
+        {
+          pages,
+          shape = ui.rrect(),
+          widget = wibox.container.background,
+        },
         spacing = dpi(15),
         layout  = wibox.layout.fixed.horizontal,
       },
-      nil,
-      {
-        {
-          actions,
-          nav,
-          spacing = dpi(15),
-          layout  = wibox.layout.fixed.horizontal,
-        },
-        widget = wibox.container.place,
-      },
-      layout = wibox.layout.align.horizontal,
+      widget = wibox.container.place,
     },
-    -- I don't know why I have to make the margins so wonky for it
-    -- to look right.
-    -- bottom = -dpi(30),
-    widget = wibox.container.margin,
+    layout = wibox.layout.align.horizontal,
   })
 
   -- Methods
@@ -78,12 +104,17 @@ local function worker(user_args)
     actions:reset()
   end
 
-  function header:add_action(btn)
-    actions:add(btn)
+  function header:add_action(_btn)
+    actions:add(_btn)
   end
 
-  function header:add_sb(name, func)
-    nav:add_btn(name, func)
+  function header:add_sb(text, func)
+    local s = sbtn({
+      text = text,
+      func = func,
+      set_no_shape = true,
+    })
+    pages:add_element(s)
   end
 
   function header:update_title(_args)

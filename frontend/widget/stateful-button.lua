@@ -21,6 +21,7 @@ local function worker(user_args)
     height   = nil,
     name     = nil,
     selected = false,
+    func     = nil,
 
     select = {
       bg    = beautiful.primary[700],
@@ -29,7 +30,6 @@ local function worker(user_args)
       fg_mo = nil,
       border_width = 0,
       border_color = beautiful.neutral[600],
-      funcs = {},
     },
 
     deselect = {
@@ -39,7 +39,6 @@ local function worker(user_args)
       fg_mo = nil,
       border_width = 0,
       border_color = beautiful.neutral[600],
-      funcs = {},
     },
   }
   gtable.crush(args, user_args)
@@ -64,6 +63,7 @@ local function worker(user_args)
   })
 
   stateful_btn.name = args.name
+  stateful_btn.func = args.func
   stateful_btn.select_props = args.select
   stateful_btn.deselect_props = args.deselect
 
@@ -79,22 +79,13 @@ local function worker(user_args)
     self.bg = self.props.bg
   end)
 
-  local press_function = args.press_func or function(self)
-    self.selected = not self.selected
-    self:update()
-  end
-  stateful_btn:connect_signal("button::press", press_function)
-
   function stateful_btn:update()
-    local props = self.selected and self.select_props or self.deselect_props
-    self.props = props
-
-    self.bg = props.bg
-
-    for i = 1, #self.props.funcs do
-      self.props.funcs[i]()
-    end
+    self.props = self.selected and self.select_props or self.deselect_props
+    self.bg = self.props.bg
+    if self.selected and self.func then self:func() end
   end
+
+  stateful_btn:connect_signal("button::press", stateful_btn.update)
 
   stateful_btn:update()
   return stateful_btn
