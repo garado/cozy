@@ -46,11 +46,14 @@ Simple, aesthetic, and easy-to-use GUI for Taskwarrior.
 
 <h2> Goal tracking </h2>
 
-Goal tracking with Taskwarrior, GraphViz, and twdeps.
+Goal visualization and tracking with Taskwarrior, GraphViz, and twdeps.
 
-<h2> Habit tracking </h2>
+<img src = "./goals-overview.png">
 
-Powered by Pixela, a habit/effort tracking app controlled entirely by API.
+<img src = "./goals-details.png">
+
+<!-- <h2> Habit tracking </h2> -->
+<!-- Powered by Pixela, a habit/effort tracking app controlled entirely by API. -->
 
 <!-- █▀█ ▀█▀ █░█ █▀▀ █▀█ -->
 <!-- █▄█ ░█░ █▀█ ██▄ █▀▄ -->
