@@ -1,8 +1,10 @@
 <h1 align="center">Cozy</h1>
 
-<p>Hi! This is Cozy, my AwesomeWM config. Its focus is creating widgets that increase efficiency and productivity by
+<p>Hi! This is Cozy, my AwesomeWM config. Its focus is creating widgets that increase my efficiency and productivity by
 integrating various command-line programs like gcalcli, Taskwarrior, Timewarrior, Ledger, and more. Thanks for checking
 it out!<p>
+
+⚠️ I'm rewriting this from scratch and this is under really heavy development. Clone at your own risk. ⚠️ <p>
 
 <!-- █▀▄ ▄▀█ █▀ █░█ █▄▄ █▀█ ▄▀█ █▀█ █▀▄ -->
 <!-- █▄▀ █▀█ ▄█ █▀█ █▄█ █▄█ █▀█ █▀▄ █▄▀ --> 
@@ -11,27 +13,51 @@ it out!<p>
 
 <h2> Calendar </h2>
 
-Lets you see your schedule at a glance. Powered by gcalcli.
+Your schedule at a glance. Powered by gcalcli.
+
+<img src="./calendar.png">
+
+<img src="./calendar-details.png">
 
 <details>
 <summary>Calendar keybinds</summary>
 
-| Keybind          | Action         |
-| -------          | ------         |
-| <kbd>h</kbd>     | Previous week  |
-| <kbd>l</kbd>     | Next week      |
-| <kbd>t</kbd>     | Jump to today  |
-| <kbd>r</kbd>     | Refresh        |
+| Keybind          | Action           |
+| -------          | ------           |
+| <kbd>H</kbd>     | Previous week    |
+| <kbd>L</kbd>     | Next week        |
+| <kbd>J</kbd>     | Scroll down      |
+| <kbd>K</kbd>     | Scroll up        |
+| <kbd>gg</kbd>    | Scroll to top    |
+| <kbd>GG</kbd>    | Scroll to bottom |
+| <kbd>zz</kbd>    | Center           |
+| <kbd>h/k</kbd>   | Previous event   |
+| <kbd>j/l</kbd>   | Next event       |
+| <kbd>t</kbd>     | Jump to today    |
+| <kbd>r</kbd>     | Refresh          |
 
 </details>
 
+<h2> Task management </h2>
+
+Simple, aesthetic, and easy-to-use GUI for Taskwarrior.
+
+<img src="./taskwarrior.png">
+
+<h2> Goal tracking </h2>
+
+Goal tracking with Taskwarrior, GraphViz, and twdeps.
+
+<h2> Habit tracking </h2>
+
+Powered by Pixela, a habit/effort tracking app controlled entirely by API.
 
 <!-- █▀█ ▀█▀ █░█ █▀▀ █▀█ -->
 <!-- █▄█ ░█░ █▀█ ██▄ █▀▄ -->
 
 <h1> Theme switcher </h1>
 
-With the theme switcher, you can seamlessly match Cozy's colorscheme with the rest of your system.
+The theme switcher seamlessly matches Cozy's colorscheme with the rest of your system.
 
 <!-- █▀▀ █▀█ █▀█ ▀█▀ █▄░█ █▀█ ▀█▀ █▀▀ █▀ --> 
 <!-- █▀░ █▄█ █▄█ ░█░ █░▀█ █▄█ ░█░ ██▄ ▄█ --> 
@@ -40,6 +66,9 @@ With the theme switcher, you can seamlessly match Cozy's colorscheme with the re
 <b>Why is it called 'cozy'?</b>
 
 I've spent a lot of time tweaking this setup to be just the way I like it, so now this setup feels very personal, comfortable, and cozy. :-)
+
+<b>Why write this with Awesome and not a "proper" UI framework?</b>
+Awesome is robust and unbelievably easy to use, and development with it is really, really fast. Since this is just a hobby and frontend development has nothing to do with my career skillset, learning a different framework would be a waste of time.
 
 <h3>Credits</h3>
 <ul>
