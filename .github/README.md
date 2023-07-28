@@ -2,14 +2,22 @@
 
 <p>Hi! This is Cozy, my AwesomeWM config. Its focus is creating widgets that increase my efficiency and productivity by
 integrating various command-line programs like gcalcli, Taskwarrior, Timewarrior, Ledger, and more. Thanks for checking
-it out!<p>
+it out!</p>
 
-⚠️ I'm rewriting this from scratch and this is under really heavy development. Clone at your own risk. ⚠️ <p>
+<p>
+⚠️ I'm rewriting this from scratch and this is under really heavy development. Clone at your own risk. ⚠️
+</p>
 
 <!-- █▀▄ ▄▀█ █▀ █░█ █▄▄ █▀█ ▄▀█ █▀█ █▀▄ -->
 <!-- █▄▀ █▀█ ▄█ █▀█ █▄█ █▄█ █▀█ █▀▄ █▄▀ --> 
 
 <h1> Dashboard </h1>
+
+<h2> Habits </h2>
+
+Track your habits with <a href="https://pixe.la/">Pixela</a>.
+
+<img src="./habits.png">
 
 <h2> Calendar </h2>
 
@@ -71,6 +79,7 @@ The theme switcher seamlessly matches Cozy's colorscheme with the rest of your s
 I've spent a lot of time tweaking this setup to be just the way I like it, so now this setup feels very personal, comfortable, and cozy. :-)
 
 <b>Why write this with Awesome and not a "proper" UI framework?</b>
+
 Awesome is robust and unbelievably easy to use, and development with it is really, really fast. Since this is just a hobby and frontend development has nothing to do with my career skillset, learning a different framework would be a waste of time.
 
 <h3>Credits</h3>
