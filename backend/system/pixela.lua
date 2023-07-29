@@ -5,6 +5,7 @@
 -- Pixela is a habit/effort tracker that you can use entirely through
 -- API calls. It's pretty neat. https://pixe.la/
 
+local habits  = require("cozyconf").habits
 local gobject = require("gears.object")
 local gtable  = require("gears.table")
 local awful   = require("awful")
@@ -21,12 +22,12 @@ local instance = nil
 
 ---------------------------------------------------------------------
 
-function pixela:get_graph_def(id)
-  local url = "https://pixe.la/v1/users/"..USER_NAME.."/graphs/"..id.."/graph-def"
-  local cmd = "curl -X GET "..url..HEADER
-  awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    print('GET GRAPH DEF: '..stdout)
-  end)
+--- @method get_all_graph_pixels
+-- @brief Refresh cache for all graphs listed in config.
+function pixela:get_all_graph_pixels()
+  for i = 1, #habits do
+    self:get_graph_pixels(habits[i])
+  end
 end
 
 --- @method get_graph_pixels
@@ -36,15 +37,12 @@ function pixela:get_graph_pixels(id)
   local cfile = CACHE_DIR .. id
   local url = "https://pixe.la/v1/users/"..USER_NAME.."/graphs/"..id.."/pixels"
   local cmd = "curl -X GET "..url..HEADER.." > "..cfile
-  print(cmd)
-  awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    print(id..": "..stdout)
-    local signal = "cached::" .. id
-    self:emit_signal(signal)
+  awful.spawn.easy_async_with_shell(cmd, function()
+    self:emit_signal("cached::"..id)
   end)
 end
 
---- @method set_habit_status
+--- @method put_habit_status
 -- @param id    pixela graph ID
 -- @param ts    os.time timestamp for the day in question
 -- @param state true or false
@@ -72,17 +70,6 @@ function pixela:read_graph_pixels(id)
   local cfile = CACHE_DIR .. id
 
   if not gfs.file_readable(cfile) then
-    local on_cache
-    function on_cache()
-      local cmd = "cat " .. cfile
-      awful.spawn.easy_async_with_shell(cmd, function(stdout)
-        local signal = "ready::" .. id
-        self:emit_signal(signal, stdout)
-        self:disconnect_signal("cached::"..id, on_cache)
-      end)
-    end
-
-    self:connect_signal("cached::"..id, on_cache)
     self:get_graph_pixels(id)
   else
     local cmd = "cat " .. cfile
@@ -97,6 +84,15 @@ end
 
 function pixela:new()
   self.date_format = "%Y%m%d"
+
+  -- 'cached::id' signal is emitted whenever the cache is updated with data fetched
+  -- from Pixela. When this signal is received, read the cache file so that the UI
+  -- can update.
+  for i = 1, #habits do
+    self:connect_signal("cached::"..habits[i], function()
+      self:read_graph_pixels(habits[i])
+    end)
+  end
 end
 
 local function new()

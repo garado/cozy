@@ -10,6 +10,8 @@ local dpi   = ui.dpi
 local wibox = require("wibox")
 local habit = require(... .. ".habit")
 local conf  = require("cozyconf")
+local pixela = require("backend.system.pixela")
+local keynav = require("modules.keynav")
 
 local SECONDS_PER_DAY = 24 * 60 * 60
 
@@ -38,7 +40,7 @@ for _ = 1, 7 do
   ts = ts - SECONDS_PER_DAY
 end
 
-return wibox.widget({
+local widget = wibox.widget({
   {
     {
       {
@@ -57,3 +59,15 @@ return wibox.widget({
   shape  = ui.rrect(),
   widget = wibox.container.background,
 })
+
+local tmp = ui.rrborder(widget)
+
+tmp.keynav = keynav.area({
+  name = "nav_habits",
+  keys = {
+    ["r"] = function() pixela:get_all_graph_pixels() end
+  },
+  widget = tmp,
+})
+
+return tmp
