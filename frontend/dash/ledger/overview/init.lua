@@ -15,6 +15,7 @@ local keynav = require("modules.keynav")
 -- Modules
 local overview = require(... .. ".overview")
 local budget   = require(... .. ".budget")
+local buckets  = require(... .. ".buckets")
 local transactions = require(... .. ".transactions")
 
 -- TODO: Enable if #budget_entries > 7
@@ -37,12 +38,14 @@ local content = wibox.widget({
     widget = wibox.container.place,
   },
   {
-    {
-      budget,
-      quote,
-      layout = wibox.layout.fixed.vertical,
-    },
+    budget,
+    -- {
+    --   budget,
+    --   quote,
+    --   layout = wibox.layout.fixed.vertical,
+    -- },
     transactions,
+    buckets,
     layout = wibox.layout.fixed.horizontal,
   },
   layout = wibox.layout.fixed.vertical,

@@ -22,11 +22,14 @@ local function gen_entry(bdata)
     valign = "end",
   })
 
+  local amount_color = (allotted - spent) < 0 and beautiful.red[300]
+                          or beautiful.neutral[300]
+
   local amounts = ui.textbox({
-    text   = "Remaining: " .. (allotted - spent),
+    text   = ledger:format(spent) ..' / '.. ledger:format(allotted),
     align  = "right",
     valign = "end",
-    color  = beautiful.neutral[300],
+    color  = amount_color
   })
 
   local barval = (spent / allotted) * 100
@@ -49,7 +52,7 @@ local function gen_entry(bdata)
     },
     bar,
     spacing = dpi(5),
-    forced_width = dpi(250),
+    forced_width = dpi(280),
     layout = wibox.layout.fixed.vertical,
   })
 end
@@ -92,4 +95,8 @@ ledger:connect_signal("ready::budget", function(_, bdata)
   end
 end)
 
-return ui.dashbox(ui.place(budget), dpi(450), dpi(500))
+return ui.dashbox(
+  ui.place(budget),
+  dpi(390), -- width
+  dpi(500)  -- height
+)

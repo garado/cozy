@@ -12,9 +12,9 @@ local strutil = require("utils.string")
 local ledger = require("backend.system.ledger")
 
 -- Module-level variables
-local TITLE_WIDTH   = dpi(250)
-local ACCOUNT_WIDTH = TITLE_WIDTH
-local DATE_WIDTH    = dpi(100)
+local TITLE_WIDTH   = dpi(240)
+local DATE_WIDTH    = TITLE_WIDTH
+local ICON_WIDTH    = dpi(30)
 local AMOUNT_WIDTH  = dpi(100)
 local TEXT_HEIGHT   = dpi(20)
 
@@ -24,6 +24,46 @@ local function ledger_date_to_ts(date)
   return os.time({
       year = xyear, month = xmon, day = xday,
       hour = 0, min = 0, sec = 0})
+end
+
+local function pick_transaction_icon(title, account)
+  -- Default icon
+  local icon = ""
+
+  local account_icons = {
+    { "󰉛", "Food"       },
+    { "", "Household"  },
+    { "", "Education"  },
+    { "", "Personal"   },
+    { "", "Hobby"      },
+    { "", "Gifts"      },
+    { "󰄛", "Pets"       },
+    { "", "Bills"      },
+    { "", "Transportation" },
+    { "󰉚", "Restaurant" },
+  }
+
+  -- More specialized stuff based on title
+  local title_icons = {
+    { "", "Spotify"    },
+    { "", "Amazon"     },
+    { "󱐋", "Utilities"  },
+    { "󱐋", "PGE"        },
+  }
+
+  for i = #title_icons, 1, -1 do
+    if strutil.contains(title, title_icons[i][2]) then
+      return title_icons[i][1]
+    end
+  end
+
+  for i = #account_icons, 1, -1 do
+    if strutil.contains(account, account_icons[i][2]) then
+      return account_icons[i][1]
+    end
+  end
+
+  return icon
 end
 
 --- @function gen_transaction
@@ -38,6 +78,25 @@ local function gen_transaction(tdata)
   -- I do not understand why lol
   local t_amt   = tdata[5] * -1
 
+  local icon = wibox.widget({
+    {
+      {
+        ui.textbox({
+          text  = pick_transaction_icon(t_title, t_acnt),
+          color = beautiful.primary[700],
+        }),
+        widget = wibox.container.place,
+      },
+      -- margins = dpi(5),
+      widget  = wibox.container.margin,
+    },
+    bg = beautiful.primary[200],
+    shape  = ui.rrect(),
+    forced_width = ICON_WIDTH,
+    forced_height = ICON_WIDTH,
+    widget = wibox.container.background,
+  })
+
   local title = ui.textbox({
     text = t_title,
     font = beautiful.font_bold_s,
@@ -45,23 +104,16 @@ local function gen_transaction(tdata)
     width  = TITLE_WIDTH
   })
 
-  local account = ui.textbox({
-    text = t_acnt,
-    color = beautiful.neutral[300],
-    height = TEXT_HEIGHT,
-    width = ACCOUNT_WIDTH
-  })
-
   local date = ui.textbox({
-    text  = strutil.ts_to_relative( ledger_date_to_ts(t_date) ),
-    align = "right",
-    font  = beautiful.font_reg_s,
+    text   = strutil.ts_to_relative( ledger_date_to_ts(t_date) ),
+    font   = beautiful.font_reg_s,
+    color  = beautiful.neutral[300],
     height = TEXT_HEIGHT,
-    width = DATE_WIDTH
+    width  = DATE_WIDTH
   })
 
   local amount = ui.textbox({
-    text = t_amt,
+    text  = ledger:format(t_amt),
     color = t_amt > 0 and beautiful.green[300] or beautiful.red[300],
     align = "right",
     font = beautiful.font_reg_s,
@@ -71,16 +123,20 @@ local function gen_transaction(tdata)
 
   return wibox.widget({
     {
+      icon,
+      widget = wibox.container.place,
+      forced_width = ICON_WIDTH * 1.5,
+    },
+    {
       title,
-      account,
+      date,
       spacing = dpi(5),
       layout = wibox.layout.fixed.vertical,
     },
-    date,
     amount,
-    align = "right",
-    forced_height = dpi(100),
+    align   = "right",
     spacing = dpi(8),
+    forced_height = TEXT_HEIGHT * 2,
     layout  = wibox.layout.fixed.horizontal,
   })
 end
@@ -92,7 +148,7 @@ local transaction_entries = wibox.widget({
 
 local transactions = wibox.widget({
   ui.textbox({
-    text  = "Recent transactions",
+    text  = "Transactions",
     align = "center",
     font  = beautiful.font_med_m,
   }),
@@ -117,6 +173,6 @@ end)
 
 return ui.dashbox(
   ui.place(transactions),
-  dpi(1000), -- width
+  dpi(410), -- width
   dpi(2000)  -- height
 )
