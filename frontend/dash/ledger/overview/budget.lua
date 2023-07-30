@@ -39,7 +39,7 @@ local function gen_entry(bdata)
     forced_height = dpi(8),
     value = barval,
     max_value = 100,
-    shape  = ui.rrect(),
+    shape  = ui.rrect(dpi(3)),
     widget = wibox.widget.progressbar,
   })
 

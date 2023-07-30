@@ -17,7 +17,6 @@ local container
 
 -- Import pages
 local overview, nav_overview = require(... .. ".overview")()
-local stats, nav_stats = require(... .. ".stats")()
 
 local content = wibox.widget({
   overview,
@@ -35,16 +34,6 @@ local ledger_header = header({
       end,
     },
   },
-  pages = {
-    {
-      text = "Overview",
-      func = function() content.widget = overview end,
-    },
-    {
-      text = "Stats",
-      func = function() content.widget = stats end,
-    },
-  }
 })
 
 container = wibox.widget({

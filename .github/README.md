@@ -19,6 +19,18 @@ Track your habits with <a href="https://pixe.la/">Pixela</a>.
 
 <img src="./habits.png">
 
+<h2> Task management </h2>
+
+Simple, aesthetic, and easy-to-use GUI for Taskwarrior.
+
+<img src="./taskwarrior.png">
+
+<h2> Ledger </h2>
+
+Use data from <a href="https://github.com/ledger/ledger">ledger-cli</a> to view your budget progress, recent transactions, savings goals, and yearly balance trends.
+
+<img src="./ledger.png">
+
 <h2> Calendar </h2>
 
 Your schedule at a glance. Powered by gcalcli.
@@ -45,12 +57,6 @@ Your schedule at a glance. Powered by gcalcli.
 | <kbd>r</kbd>     | Refresh          |
 
 </details>
-
-<h2> Task management </h2>
-
-Simple, aesthetic, and easy-to-use GUI for Taskwarrior.
-
-<img src="./taskwarrior.png">
 
 <h2> Goal tracking </h2>
 

@@ -20,18 +20,39 @@ local prop_defaults = {
   autoscale = false,
   legend = false,
   min_value = 0,
-  max_value = 1,
-  colors = { beautiful.primary[400], beautiful.primary[200] },
+  max_value = 100,
+  autoset_max = true,
+  autoset_min = true,
+  show_average = true,
+  avg_color = beautiful.neutral[600],
+  colors = { beautiful.primary[400] },
   data = {},
 }
 
 function linegraph:add_data(data)
   local len = #data
   if self._private.len and self._private.len ~= len then
-    error()
+    print('Linegraph error: Incorrect length')
   end
   self._private.len = len
   table.insert(self._private.data, data)
+
+  if self._private.autoset_max then
+    for i = 1, #data do
+      if data[i] > self._private.max_value then
+        self._private.max_value = data[i] + 100
+      end
+    end
+  end
+
+  if self._private.autoset_min then
+    for i = 1, #data do
+      if data[i] < self._private.min_value then
+        self._private.min_value = data[i] - 100
+      end
+    end
+  end
+
   self:emit_signal("widget::redraw_needed")
 end
 
@@ -56,18 +77,21 @@ function linegraph:draw(_, cr, width, height)
   local xscale = width / (#data - 1)
   local yscale = height / (self._private.max_value - self._private.min_value)
 
-  local sum = 0
-  local fuck = self._private.data[1]
-  for i = 1, #fuck do
-    sum = sum + fuck[i]
-  end
-  local avg = sum / #fuck
+  -- Calculate the average
+  -- NOTE: This only works for the first dataset!
+  if self._private.show_average then
+    local sum = 0
+    for i = 1, #data do
+      sum = sum + data[i][1]
+    end
+    local avg = sum / #data
 
-  local clr = beautiful.neutral[600]
-  cr:set_source(gears.color(clr))
-  cr:move_to(0, avg * yscale)
-  cr:line_to(9 * xscale, avg * yscale)
-  cr: stroke()
+    local clr = self._private.avg_color
+    cr:set_source(gears.color(clr))
+    cr:move_to(0, avg * yscale)
+    cr:line_to(width, avg * yscale)
+    cr: stroke()
+  end
 
   -- Now, actually draw things
   for line = 1, self._private.len do

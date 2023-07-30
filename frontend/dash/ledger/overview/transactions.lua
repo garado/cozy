@@ -34,16 +34,16 @@ local function pick_transaction_icon(title, account)
     { "󰉛", "Food"       },
     { "", "Household"  },
     { "", "Education"  },
-    { "", "Personal"   },
+    { "", "Personal"   },
     { "", "Hobby"      },
-    { "", "Gifts"      },
+    { "", "Gifts"      },
     { "󰄛", "Pets"       },
     { "", "Bills"      },
     { "", "Transportation" },
     { "󰉚", "Restaurant" },
   }
 
-  -- More specialized stuff based on title
+  -- More specialized stuff based on transaction title
   local title_icons = {
     { "", "Spotify"    },
     { "", "Amazon"     },

@@ -149,6 +149,33 @@ function ledger:format(num)
   return string.format("%.2f", num)
 end
 
+--- @function balances_this_year
+-- @brief Get a table of all balances this year. Data points are taken every 7 days
+-- starting from January 1.
+function ledger:balances_this_year()
+  local SECONDS_PER_WEEK = 24 * 60 * 60 * 7
+  local ts = os.time({ year = 2023, month = 1, day = 2, hour = 0, min = 0, sec = 0 })
+
+  -- This chained command will write total assets to a new line, skip ahead 14 days,
+  -- and then repeat. There may be a better command for this, but I couldn't find
+  -- anything in the ledger docs.
+  local cmd = ""
+  while ts < os.time() do
+    cmd = cmd .. " ledger -f " .. lfile .. " balance -e " .. os.date("%m/%d", ts) .. " | head -n 1 ; "
+    ts = ts + SECONDS_PER_WEEK
+  end
+
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    -- Clean stuff up
+    local data = {}
+    local tmp = strutil.split(stdout, "\r\n")
+    for i = 1, #tmp do
+      data[#data+1] = tmp[i]:gsub("[^0-9.]", "")
+    end
+    self:emit_signal("ready::year_data", data)
+  end)
+end
+
 ---------------------------------------------------------------------
 
 function ledger:new()

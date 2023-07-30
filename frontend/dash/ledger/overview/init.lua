@@ -15,6 +15,7 @@ local keynav = require("modules.keynav")
 -- Modules
 local overview = require(... .. ".overview")
 local budget   = require(... .. ".budget")
+local graph    = require(... .. ".graph")
 local buckets  = require(... .. ".buckets")
 local transactions = require(... .. ".transactions")
 
@@ -39,13 +40,12 @@ local content = wibox.widget({
   },
   {
     budget,
-    -- {
-    --   budget,
-    --   quote,
-    --   layout = wibox.layout.fixed.vertical,
-    -- },
     transactions,
-    buckets,
+    {
+      buckets,
+      graph,
+      layout = wibox.layout.fixed.vertical,
+    },
     layout = wibox.layout.fixed.horizontal,
   },
   layout = wibox.layout.fixed.vertical,
