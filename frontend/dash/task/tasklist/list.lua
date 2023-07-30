@@ -28,7 +28,7 @@ local function gen_taskitem(t)
     due_str, is_overdue = strutil.iso_to_relative(t.due)
   end
 
-  if is_overdue or t.urgency > 9 then
+  if is_overdue or t.urgency > 7.5 then
     due_color  = beautiful.red[400]
     text_color = beautiful.red[400]
   end
@@ -104,11 +104,13 @@ tasklist = wibox.widget({
 tasklist = singlesel({ layout = tasklist, keynav = true, name = "nav_tasklist" })
 
 tasklist.area:connect_signal("area::left", function()
-  tasklist.active_element.desc:update_color(beautiful.fg)
+  local c = tasklist.active_element.desc._color
+  tasklist.active_element.desc:update_color(c)
 end)
 
 tasklist.area.keys = keybinds
 tasklist.area.keys["z"] = function() task:emit_signal("details::toggle") end
+tasklist.area.keys["t"] = function() task:gen_twdeps_img() end
 
 -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀    ▄▀█ █▄░█ █▀▄    █▀ ▀█▀ █░█ █▀▀ █▀▀ 
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█    █▀█ █░▀█ █▄▀    ▄█ ░█░ █▄█ █▀░ █▀░ 

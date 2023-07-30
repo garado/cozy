@@ -39,8 +39,7 @@ local deselect_props = {
 -- A badge is a little indicator next to the tag/project name
 -- indicating how many tasks are overdue/due very soon within
 -- that tag/project.
--- TODO: Still needs a lot of work.
-local function gen_badge(type, name)
+local function gen_badge()
   return wibox.widget({
     {
       ui.textbox({
@@ -48,7 +47,7 @@ local function gen_badge(type, name)
         font = beautiful.font_bold_xs,
         align = "center",
       }),
-      margins = dpi(4),
+      margins = dpi(5),
       widget  = wibox.container.margin,
     },
     bg     = beautiful.red[500],
@@ -71,22 +70,22 @@ local function gen_item(type, name, parent_tag)
   })
 
   -- Shows number of urgent tasks
-  local badge = gen_badge(type, name)
+  local badge = gen_badge()
 
   if type == TAG then
-    local signal = "ready::duesoon::"..name
+    local signal = "ready::duecount::"..name
     task:connect_signal(signal, function(_, num)
       badge.widget.widget:update_text(num)
       badge.visible = num > 0
     end)
-    task:fetch_due_soon_count_tag(name)
+    task:fetch_due_count_tag(name)
   elseif type == PROJECT then
-    local signal = "ready::duesoon::"..parent_tag.."::"..name
+    local signal = "ready::duecount::"..parent_tag.."::"..name
     task:connect_signal(signal, function(_, num)
       badge.widget.widget:update_text(num)
       badge.visible = num > 0
     end)
-    task:fetch_due_soon_count_project(parent_tag, name)
+    task:fetch_due_count_project(parent_tag, name)
   end
 
   local item = wibox.widget({
@@ -94,6 +93,7 @@ local function gen_item(type, name, parent_tag)
     tbox,
     badge,
     spacing = dpi(10),
+    forced_height = dpi(18),
     layout = wibox.layout.fixed.horizontal,
   })
 

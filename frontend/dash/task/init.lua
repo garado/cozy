@@ -66,14 +66,20 @@ local content = wibox.widget({
 })
 content:adjust_ratio(1, 0, 0.25, 0.75)
 
--------------------------
+
+-- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
+-- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
+
+task:connect_signal("task::show_tasklist", function() end)
+task:connect_signal("ready::dependencies", function() end)
 
 local taskheader = header({
-  title_text = "Taskwarrior"
+  title_text = "Taskwarrior",
+  pages = {
+    { text = "Category" },
+    { text = "Kanban" },
+  },
 })
-
-taskheader:add_sb("Category")
-taskheader:add_sb("Kanban")
 
 local container = wibox.widget({
   taskheader,
