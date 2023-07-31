@@ -2,7 +2,7 @@
 -- █▀█ █░█ █▀▀ █▀█ █░█ █ █▀▀ █░█░█ 
 -- █▄█ ▀▄▀ ██▄ █▀▄ ▀▄▀ █ ██▄ ▀▄▀▄▀ 
 
--- Nice little overview pane.
+-- Nice little overview page.
 
 local ui  = require("utils.ui")
 local dpi = ui.dpi
@@ -19,7 +19,7 @@ local graph    = require(... .. ".graph")
 local buckets  = require(... .. ".buckets")
 local transactions = require(... .. ".transactions")
 
--- TODO: Enable if #budget_entries > 7
+-- TODO: Enable if #budget_entries > 7 (just to take up the blank space)
 local quote = wibox.widget({
   nil,
   {

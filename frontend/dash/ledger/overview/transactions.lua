@@ -151,6 +151,7 @@ local transactions = wibox.widget({
     text  = "Transactions",
     align = "center",
     font  = beautiful.font_med_m,
+    height = dpi(30),
   }),
   transaction_entries,
   spacing = dpi(10),

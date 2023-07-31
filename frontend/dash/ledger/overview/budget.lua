@@ -35,8 +35,8 @@ local function gen_entry(bdata)
   local barval = (spent / allotted) * 100
   local bar = wibox.widget({
     color  = beautiful.random_accent_color(),
-    background_color = beautiful.neutral[700],
-    forced_height = dpi(8),
+    background_color = beautiful.neutral[500],
+    forced_height = dpi(3),
     value = barval,
     max_value = 100,
     shape  = ui.rrect(dpi(3)),
@@ -60,6 +60,7 @@ end
 -- Assembly
 local budget_entries = wibox.widget({
   spacing = dpi(25),
+  forced_height = dpi(420),
   layout  = wibox.layout.flex.vertical,
 })
 
@@ -68,6 +69,7 @@ local budget = wibox.widget({
     text  = "Monthly Budget",
     align = "center",
     font  = beautiful.font_med_m,
+    height = dpi(30),
   }),
   {
     budget_entries,
@@ -76,7 +78,6 @@ local budget = wibox.widget({
     widget = wibox.container.margin,
   },
   spacing = dpi(10),
-  forced_width = dpi(450),
   layout  = wibox.layout.fixed.vertical,
 })
 
