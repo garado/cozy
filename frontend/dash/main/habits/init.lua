@@ -10,6 +10,7 @@ local dpi   = ui.dpi
 local wibox = require("wibox")
 local habit = require(... .. ".habit")
 local conf  = require("cozyconf")
+local dash  = require("backend.cozy.dash")
 local pixela = require("backend.system.pixela")
 local keynav = require("modules.keynav")
 
@@ -29,16 +30,23 @@ local labels = wibox.widget({
   layout = wibox.layout.fixed.horizontal,
 })
 
-local ts = os.time()
-for _ = 1, 7 do
-  labels:insert(1, ui.textbox({
-    text  = os.date("%d", ts),
-    width = dpi(20),
-    align = "center",
-    font  = beautiful.font_reg_xs,
-  }))
-  ts = ts - SECONDS_PER_DAY
+local function refresh()
+  pixela:get_all_graph_pixels()
+
+  -- Update labels
+  local ts = os.time()
+  for _ = 1, 7 do
+    labels:insert(1, ui.textbox({
+      text  = os.date("%d", ts),
+      width = dpi(20),
+      align = "center",
+      font  = beautiful.font_reg_xs,
+    }))
+    ts = ts - SECONDS_PER_DAY
+  end
 end
+
+dash:connect_signal("date::changed", refresh)
 
 local widget = wibox.widget({
   {
@@ -65,7 +73,7 @@ local tmp = ui.rrborder(widget)
 tmp.keynav = keynav.area({
   name = "nav_habits",
   keys = {
-    ["r"] = function() pixela:get_all_graph_pixels() end
+    ["r"] = refresh
   },
   widget = tmp,
 })
