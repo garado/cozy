@@ -35,11 +35,11 @@ function gridlines:draw(_, cr, width, height)
   end
 
   -- Draw vertical lines (to separate days)
-  local day_range = calconf.end_day - calconf.start_day + 1
-  local dayline_spacing = width / day_range
+  local num_days = 7
+  local dayline_spacing = width / num_days
   local x = 0
   cr:move_to(0, 0)
-  for _ = calconf.start_day, calconf.end_day do
+  for _ = 0, num_days do
     cr:line_to(x, height)
     x = x + dayline_spacing
     cr:move_to(x, 0)

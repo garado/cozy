@@ -1,8 +1,9 @@
 
--- █▀▀ ▄▀█ █░░    █▀█ █▀█ █▀█ █░█ █▀█ 
--- █▄▄ █▀█ █▄▄    █▀▀ █▄█ █▀▀ █▄█ █▀▀ 
+-- █▀▄ █▀▀ ▀█▀ ▄▀█ █ █░░ █▀ 
+-- █▄▀ ██▄ ░█░ █▀█ █ █▄▄ ▄█ 
 
--- Cool little calendar popup. Used for modifying events.
+-- Cool little calendar popup. Used for modifying events and
+-- showing event details.
 
 local beautiful  = require("beautiful")
 local ui    = require("utils.ui")
@@ -108,14 +109,6 @@ local calpopup = awful.popup({
   })
 })
 
-dash:connect_signal("calpopup::show", function(_, x, y)
-  calpopup.visible = true
-end)
-
-dash:connect_signal("calpopup::hide", function()
-  calpopup.visible = false
-end)
-
 dash:connect_signal("calpopup::toggle", function(_, x, y, event)
   if x < dpi(270) then
     calpopup.x = x + dpi(600)
@@ -129,8 +122,8 @@ dash:connect_signal("calpopup::toggle", function(_, x, y, event)
   endtime:update_text(event.e_time)
   date:update_text(strutils.datetime_to_human(event.s_date))
 
-  if event.loc then
-    location:update_text(event.loc or "")
+  if event.loc ~= "" then
+    location:update_text(event.loc)
     location.visible = true
   else
     location.visible = false
@@ -138,5 +131,13 @@ dash:connect_signal("calpopup::toggle", function(_, x, y, event)
 
   calpopup.visible = not calpopup.visible
 end)
+
+-- Hide calpopup when dash closes
+dash:connect_signal("setstate::close", function()
+  calpopup.visible = false
+end)
+
+dash:connect_signal("calpopup::show", function() calpopup.visible = true  end)
+dash:connect_signal("calpopup::hide", function() calpopup.visible = false end)
 
 return function() return calpopup end

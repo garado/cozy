@@ -12,8 +12,6 @@ local cal     = require("backend.system.calendar")
 local beautiful = require("beautiful")
 local os = os
 
-local SECONDS_IN_HOUR = 60 * 60
-
 local nowline = { mt = {} }
 
 function nowline:fit(_, width, height)
@@ -31,8 +29,8 @@ function nowline:draw(_, cr, width, height)
   local hour_range = cal.end_hour - cal.start_hour + 1
   local hourline_spacing = height / hour_range
 
-  local day_range = calconf.end_day - calconf.start_day + 1
-  local dayline_spacing = width / day_range
+  local num_days = 7
+  local dayline_spacing = width / num_days
 
   -- Figure out y-pos (hour)
   local now_hour = tonumber(os.date("%H")) + (tonumber(os.date("%M")) / 60)
@@ -40,7 +38,7 @@ function nowline:draw(_, cr, width, height)
 
   -- Figure out x-pos (day)
   local now_weekday = tonumber(os.date("%w"))
-  local x = (now_weekday - calconf.start_day) * dayline_spacing
+  local x = now_weekday * dayline_spacing
 
   cr:move_to(x, y)
   cr:line_to(x + dayline_spacing, y)

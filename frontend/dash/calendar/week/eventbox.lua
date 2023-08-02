@@ -44,7 +44,7 @@ local colors = {
 }
 
 --- @function find_overlapping_events
--- @brief Find the number of events that this overlaps.
+-- @brief Find the number of other events that an overlaps.
 -- @param x, y The starting coordinates for an event.
 local function find_overlapping_events(x, y)
   local num_overlaps = 0
@@ -69,8 +69,8 @@ local function gen_eventbox(event, height, width)
   local hour_height = height / hour_range
 
   -- Determine how wide each day is
-  local day_range = calconf.end_day - calconf.start_day + 1
-  local dayline_spacing = width / day_range
+  local num_days = 7
+  local dayline_spacing = width / num_days
 
   local duration = strutil.time_to_int(event.e_time) -
                    strutil.time_to_int(event.s_time)
@@ -81,7 +81,7 @@ local function gen_eventbox(event, height, width)
   y = y + (EBOX_MARGIN / 2)
 
   -- Determine x-pos of event box (day)
-  local x = (strutil.date_to_weekday_int(event.s_date) - calconf.start_day) * dayline_spacing
+  local x = (strutil.date_to_weekday_int(event.s_date)) * dayline_spacing
   x = x + (EBOX_MARGIN / 2)
 
   -- Since we can scroll up/down through hours on the calendar, some
