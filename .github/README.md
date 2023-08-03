@@ -86,7 +86,7 @@ I've spent a lot of time tweaking this setup to be just the way I like it, so no
 
 <b>Why write this with Awesome and not a "proper" UI framework?</b>
 
-Awesome is robust and unbelievably easy to use, and development with it is really, really fast. Since this is just a hobby and frontend development has nothing to do with my career skillset, learning a different framework would be a waste of time.
+I started out making simple things like a fancy bar and then over the course of a year it slowly but steadily turned into whatever this is. I'm in too deep, I fear. Also, Awesome is unbelievably easy to use and development with it is really, really fast, and since this is just a hobby and this stuff has nothing to do with my career skillset, starting over with a different framework would be a waste of time.
 
 <h3>Credits</h3>
 <ul>
