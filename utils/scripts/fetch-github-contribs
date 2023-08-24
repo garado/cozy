@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# █▀▀ █ ▀█▀ █░█ █░█ █▄▄    █▀▀ █▀█ █▄░█ ▀█▀ █▀█ █ █▄▄
+# █▄█ █ ░█░ █▀█ █▄█ █▄█    █▄▄ █▄█ █░▀█ ░█░ █▀▄ █ █▄█
+
+CACHE_PATH="$HOME/.cache/awesome/github"
+
+curl -s https://github-contributions.vercel.app/api/v1/$1 | jq -r '[.contributions[] | select(.date | strptime("%Y-%m-%d") | mktime < now)] | .[].intensity' | tee $CACHE_PATH
