@@ -15,7 +15,7 @@ local theme = {
   },
   neutral = {
     dark  = "#0f0f0f",
-    base  = "#2c2c2c",
+    base  = "#222222",
     light = "#dedede",
   },
   colors = {

@@ -36,7 +36,7 @@ local theme = {
 
   integrations = {
     kitty = "Nord",
-    nvim  = "nord",
+    nvim  = { "nord", "dark" },
   }
 }
 
