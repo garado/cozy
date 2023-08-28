@@ -58,7 +58,7 @@ function details:update(t)
     if t[field] then
       local content = t[field]
       if field == "modified" or field == "entry" then
-        content = strutil.iso_to_readable(t[field])
+        content = strutil.dt_convert(t[field], strutil.dt_format.iso, '%A %B %d %Y')
       end
       if field == "id" then field = "ID" end
 

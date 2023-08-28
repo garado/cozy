@@ -5,18 +5,17 @@
 -- Defines the tag list and project list.
 -- This code is a little wonky. Beware.
 
--- It uses the single select stuff and adds indicators on top of it to distinguish
+-- It uses the single select stuff and adds an indicator widget to distinguish
 -- between *highlighted* and *selected* items.
--- Selected: currently chosen.
--- Highlighted: just a mouseover.
+-- Highlighted: mouse over or press j/k
+-- Selected: clicked or press enter
 
-local ui    = require("utils.ui")
-local dpi   = ui.dpi
+local ui = require("utils.ui")
+local dpi = ui.dpi
 local gears = require("gears")
 local wibox = require("wibox")
 local task  = require("backend.system.task")
 local beautiful = require("beautiful")
-local cozyconf  = require("cozyconf")
 local singlesel = require("frontend.widget.single-select")
 
 -- Item types
@@ -24,23 +23,23 @@ local TAG = 1
 local PROJECT = 2
 
 local select_props = {
-  fg    = beautiful.primary[400],
+  fg = beautiful.primary[400],
   fg_mo = beautiful.primary[500],
   indicator_color = beautiful.fg,
 }
 
 local deselect_props = {
-  fg    = beautiful.fg,
+  fg = beautiful.fg,
   fg_mo = beautiful.neutral[300],
   indicator_color = beautiful.neutral[800],
 }
 
---- Generate badge.
+--- @function gen_badge
 -- A badge is a little indicator next to the tag/project name
 -- indicating how many tasks are overdue/due very soon within
 -- that tag/project.
 local function gen_badge()
-  return wibox.widget({
+  local badge = wibox.widget({
     {
       ui.textbox({
         text = "2",
@@ -50,13 +49,16 @@ local function gen_badge()
       margins = dpi(5),
       widget  = wibox.container.margin,
     },
-    bg     = beautiful.red[500],
-    shape  = gears.shape.circle,
+    bg = beautiful.red[500],
+    shape = gears.shape.circle,
     widget = wibox.container.background,
     visible = false
   })
+  badge.textbox = badge.widget.widget
+  return badge
 end
 
+--- @function gen_item
 -- Generate a tag or project entry
 local function gen_item(type, name, parent_tag)
   local tbox = ui.textbox({ text = name })
@@ -64,7 +66,7 @@ local function gen_item(type, name, parent_tag)
     forced_height = dpi(3),
     forced_width  = dpi(3),
     bg = beautiful.neutral[800],
-    shape  = gears.shape.circle,
+    shape = gears.shape.circle,
     widget = wibox.container.background,
     visible = true,
   })
@@ -72,17 +74,18 @@ local function gen_item(type, name, parent_tag)
   -- Shows number of urgent tasks
   local badge = gen_badge()
 
+  -- Specify when badges should update
   if type == TAG then
     local signal = "ready::duecount::"..name
     task:connect_signal(signal, function(_, num)
-      badge.widget.widget:update_text(num)
+      badge.textbox:update_text(num)
       badge.visible = num > 0
     end)
     task:fetch_due_count_tag(name)
   elseif type == PROJECT then
     local signal = "ready::duecount::"..parent_tag.."::"..name
     task:connect_signal(signal, function(_, num)
-      badge.widget.widget:update_text(num)
+      badge.textbox:update_text(num)
       badge.visible = num > 0
     end)
     task:fetch_due_count_project(parent_tag, name)
@@ -95,71 +98,85 @@ local function gen_item(type, name, parent_tag)
     spacing = dpi(10),
     forced_height = dpi(18),
     layout = wibox.layout.fixed.horizontal,
+    ---
+    props = deselect_props,
+    indicator = indicator,
+    textbox = tbox,
+    tag = parent_tag,
   })
 
-  item.props = deselect_props
-
-  -- Update UI
+  -- Update UI based on selection status
   function item:update()
     self.props = self.selected and select_props or deselect_props
-    tbox:update_color(self.props.fg)
-    indicator.bg = self.props.indicator_color
+    self.textbox:update_color(self.props.fg)
+    self.indicator.bg = self.props.indicator_color
   end
 
-  -- Executed on click or on pressing Enter
-  function item:release()
-    if not self.selected then return end
+  -- Select entry (executed on click or on pressing Enter)
+  item:connect_signal("button::press", function(self)
     if type == TAG then
-      task.active_tag = tbox.text
-      task:emit_signal("selected::tag", tbox.text)
+      task.active_tag = self.textbox.text
+      task:emit_signal("selected::tag", self.textbox.text)
     elseif type == PROJECT then
-      task.active_project = tbox.text
-      task:emit_signal("selected::project", self.parent.tag, tbox.text)
+      task.active_project = self.textbox.text
+      task:emit_signal("selected::project", self.tag, self.textbox.text)
     end
-  end
-
-  item:connect_signal("mouse::enter", function(self)
-    self.parent.active_element.children[2]:update_color(beautiful.fg)
-    tbox:update_color(beautiful.primary[400])
   end)
 
+  -- Highlight
+  item:connect_signal("mouse::enter", function(self)
+    -- Unhighlight last item
+    self.parent.active_element.textbox:update_color(beautiful.neutral[100])
+
+    -- Highlight this item
+    self.textbox:update_color(beautiful.primary[400])
+  end)
+
+  -- Un-highlight
   item:connect_signal("mouse::leave", function(self)
-    tbox:update_color(self.props.fg)
+    self.textbox:update_color(self.props.fg)
   end)
 
   return item
 end
 
-local taglist = wibox.widget({
+-- Set up taglist
+local taglist = singlesel({
   spacing = dpi(10),
   layout  = wibox.layout.fixed.vertical,
+  ---
+  keynav = true,
+  name = "nav_tags"
 })
-taglist = singlesel({ layout = taglist, keynav = true, name = "nav_tags" })
 
 taglist.area:connect_signal("area::enter", function()
   taglist.active_element:update()
 end)
 
 taglist.area:connect_signal("area::left", function()
-  taglist.active_element.children[2]:update_color(beautiful.fg)
-  taglist.area:set_active_element(taglist.active_element.navitem)
+  taglist.active_element.textbox:update_color(beautiful.fg)
+  taglist.area:set_active_element(taglist.active_element)
 end)
 
-local projectlist = wibox.widget({
+-- Set up projectlist
+local projectlist = singlesel({
   spacing = dpi(10),
-  layout  = wibox.layout.fixed.vertical,
+  layout = wibox.layout.fixed.vertical,
+  ---
+  keynav = true,
+  name = "nav_projects"
 })
-projectlist = singlesel({ layout = projectlist, keynav = true, name = "nav_projects" })
 
 projectlist.area:connect_signal("area::enter", function()
   projectlist.active_element:update()
 end)
 
 projectlist.area:connect_signal("area::left", function()
-  projectlist.active_element.children[2]:update_color(beautiful.fg)
-  projectlist.area:set_active_element(projectlist.active_element.navitem)
+  projectlist.active_element.textbox:update_color(beautiful.fg)
+  projectlist.area:set_active_element(projectlist.active_element)
 end)
 
+-- Final widget assembly
 local sidebar = wibox.widget({
   { -- Tags
     ui.textbox({
@@ -186,9 +203,9 @@ local sidebar = wibox.widget({
 -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
 
--- Called when a new tag is selected
+-- @function projectlist_update
+-- @brief Called when a new tag is selected. Populates projectlist with new projects. 
 local function projectlist_update(tag)
-  projectlist.tag = tag
   projectlist:clear_elements()
 
   -- Keep track of project to show on initialization
@@ -196,26 +213,36 @@ local function projectlist_update(tag)
 
   for i = 1, #task.data[tag] do
     local p = task.data[tag][i]
-    if task.restore and task.restore.project == p then idx = i end
+
+    if task.restore and task.restore.project == p
+      then idx = i
+    end
+
     projectlist:add_element(gen_item(PROJECT, p, tag))
   end
 
   projectlist.active_element = projectlist.children[idx]
   projectlist.children[idx].selected = true
   projectlist.children[idx]:update()
-  projectlist.children[idx].children[2]:update_color(beautiful.fg)
+  projectlist.children[idx].textbox:update_color(beautiful.fg)
   projectlist.area:set_active_element_by_index(idx)
 
   return task.data[tag][idx]
 end
 
--- Initialization
+-- Update project list when a new tag is selected.
+task:connect_signal("selected::tag", function(_, tag)
+  projectlist_update(tag)
+end)
+
+-- Initialize taglist and projectlist.
+-- Signal emitted on startup or after refresh.
 task:connect_signal("ready::tags_and_projects", function()
   taglist:clear_elements()
 
   -- Sort alphabetically
-  -- Need to make a 2nd temp table because the original table is associative and cannot be
-  -- sorted (irritating)
+  -- Need to make a 2nd tmp table because the original table is associative and cannot be
+  -- table.sorted (irritating)
   local tagsort = {}
   for t in pairs(task.data) do
     tagsort[#tagsort+1] = t
@@ -227,16 +254,19 @@ task:connect_signal("ready::tags_and_projects", function()
   local tag_idx = 1
 
   for i = 1, #tagsort do
+    -- Restore position after updating or refreshing
     if task.restore and tagsort[i] == task.restore.tag then
       tag_idx = i
     end
+
     taglist:add_element(gen_item(TAG, tagsort[i]))
   end
 
+  -- Initialize UI.
   taglist.active_element = taglist.children[tag_idx]
   taglist.children[tag_idx].selected = true
   taglist.children[tag_idx]:update()
-  taglist.children[tag_idx].children[2]:update_color(beautiful.fg)
+  taglist.children[tag_idx].textbox:update_color(beautiful.fg)
   taglist.area:set_active_element_by_index(tag_idx)
 
   local init_tag = tagsort[tag_idx]
@@ -246,11 +276,6 @@ task:connect_signal("ready::tags_and_projects", function()
   task.active_project = init_project
 
   task:emit_signal("selected::project", init_tag, init_project)
-end)
-
--- Update project list when a new task is selected
-task:connect_signal("selected::tag", function(_, tag)
-  projectlist_update(tag)
 end)
 
 return function()

@@ -26,6 +26,16 @@ local SCRIPTS_PATH = gfs.get_configuration_dir() .. "utils/scripts/"
 -- █ █▄░█ ▀█▀ █▀▀ █▀█ █▀▀ ▄▀█ █▀▀ █▀▀ 
 -- █ █░▀█ ░█░ ██▄ █▀▄ █▀░ █▀█ █▄▄ ██▄ 
 
+--- @method fetch_due_on_date
+-- @brief Fetch tasks due on a particular day.
+-- @param date The date (YYYY-MM-DD)
+function task:fetch_due_on_date(date)
+  local cmd = "task due:" .. date .. JSON_EXPORT
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    self:emit_signal("ready::due::"..date, json.decode(stdout))
+  end)
+end
+
 --- @method fetch_today
 -- @brief Fetch tasks due today.
 function task:fetch_today()
@@ -37,7 +47,7 @@ end
 
 --- @method fetch_upcoming
 function task:fetch_upcoming()
-  local cmd = "task +DUE -DUETODAY" .. JSON_EXPORT
+  local cmd = "task +DUE " .. JSON_EXPORT
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     self:emit_signal("ready::due::upcoming", json.decode(stdout))
   end)
@@ -127,6 +137,7 @@ end
 -- @brief Fetch the number of tasks that are due soon/overdue for a tag.
 -- Used in the task tab sidebar.
 function task:fetch_due_count_tag(tag)
+  -- This command outputs each due/overdue task on a new line - so just count the lines
   local cmd = "task tag:'"..tag.."' status:pending \\(+DUE or +OVERDUE\\) export | wc -l"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local signal = "ready::duecount::" .. tag
@@ -147,10 +158,11 @@ function task:fetch_due_count_project(tag, project)
   end)
 end
 
---- @brief Build and execute command given input and input type.
--- Also send signals to update UI elements if necessary.
--- @param type  Type of input. See keybinds table in frontend/task/keybinds.lua for complete list.
--- @param input User input from awful.prompt
+--- @method execute_command
+-- @brief Build and execute command given input and input type.
+--        Also send signals to update UI elements if necessary.
+-- @param type    Type of input. See keybinds table in frontend/dash/task/keybinds.lua for complete list.
+-- @param input   User input from awful.prompt
 function task:execute_command(type, input)
   -- print('Backend:task: execute_command for '..type)
   -- print('    input: '..(input or ""))
@@ -230,8 +242,8 @@ function task:gen_twdeps_img()
                       " --selbg="..beautiful.primary[100]..
                       " --selfg="..beautiful.primary[700]..
                       " --selsbfg="..beautiful.primary[500]..
-                      " --green="..beautiful.green[400]..
-                      " --fontname='"..beautiful.font_name.."'"
+                      " --green="..beautiful.green[400]
+                      -- " --fontname='"..beautiful.font_name.."'"
   local twdeps_cmd = "twdeps " .. twdeps_args .. '> ' .. self.deps_img_path
   local cmd = task_cmd .. ' | ' .. twdeps_cmd
   awful.spawn.easy_async_with_shell(cmd, function()
@@ -258,7 +270,7 @@ function task:signal_setup()
     self.restore = {
       tag     = self.active_tag,
       project = self.active_project,
-      id      = self.active_task.id,
+      id      = self.active_task and self.active_task.id or nil,
     }
     self:fetch_tags_and_projects()
   end)
@@ -272,6 +284,10 @@ end
 function task:new()
   self:signal_setup()
   self:fetch_tags_and_projects()
+
+  awesome.connect_signal("task::external_update", function()
+    self:emit_signal("refresh")
+  end)
 end
 
 local function new()

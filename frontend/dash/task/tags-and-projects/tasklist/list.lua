@@ -12,7 +12,7 @@ local gears = require("gears")
 local singlesel = require("frontend.widget.single-select")
 local strutil = require("utils.string")
 local task  = require("backend.system.task")
-local keybinds = require("frontend.dash.task.tasklist.keybinds")
+local keybinds = require("frontend.dash.task.tags-and-projects.tasklist.keybinds")
 
 local tasklist = {}
 
@@ -25,7 +25,8 @@ local function gen_taskitem(t)
 
   local due_str, is_overdue
   if t.due then
-    due_str, is_overdue = strutil.iso_to_relative(t.due)
+    local ts = strutil.dt_convert(t.due, strutil.dt_format.iso, nil)
+    due_str, is_overdue = strutil.ts_to_relative(ts)
   end
 
   if is_overdue or t.urgency > 7.5 then
@@ -80,7 +81,13 @@ local function gen_taskitem(t)
     task:emit_signal("selected::task", self.data)
   end)
 
-  taskitem:connect_signal("mouse::leave", function(self) self:update() end)
+  taskitem:connect_signal("mouse::leave", function(self)
+    self:update()
+  end)
+
+  taskitem:connect_signal("button::press", function(self)
+    self:update()
+  end)
 
   function taskitem:update()
     local c = self.selected and beautiful.primary[400] or desc._color
