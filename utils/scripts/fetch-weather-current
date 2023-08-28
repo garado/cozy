@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# █▀▀ █░█ █▀█ █▀█ █▀▀ █▄░█ ▀█▀    █░█░█ █▀▀ ▄▀█ ▀█▀ █░█ █▀▀ █▀█ 
+# █▄▄ █▄█ █▀▄ █▀▄ ██▄ █░▀█ ░█░    ▀▄▀▄▀ ██▄ █▀█ ░█░ █▀█ ██▄ █▀▄ 
+
+UNITS=$1
+LAT=$2
+LON=$3
+API_KEY=$4
+
+CACHE_PATH="$HOME/.cache/awesome/weather-current"
+
+curl "https://api.openweathermap.org/data/2.5/weather?units=$UNITS&lat=$LAT&lon=$LON&appid=$API_KEY" | tee $CACHE_PATH
