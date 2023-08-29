@@ -8,119 +8,37 @@ local beautiful  = require("beautiful")
 local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local wibox = require("wibox")
-local gears = require("gears")
 local singlesel = require("frontend.widget.single-select")
-local strutil = require("utils.string")
 local task  = require("backend.system.task")
 local keybinds = require("frontend.dash.task.tags-and-projects.tasklist.keybinds")
+local gen_taskitem = require("frontend.dash.task.gen_taskitem")
 
 local tasklist = {}
 
---- @function gen_taskitem
--- @brief Generate a single tasklist entry.
-local function gen_taskitem(t)
-  -- Determine colors for task name, due date
-  local text_color = beautiful.fg
-  local due_color  = beautiful.neutral[300]
+-- ▄▀█ █▀ █▀ █▀▀ █▀▄▀█ █▄▄ █░░ █▄█
+-- █▀█ ▄█ ▄█ ██▄ █░▀░█ █▄█ █▄▄ ░█░
 
-  local due_str, is_overdue
-  if t.due then
-    local ts = strutil.dt_convert(t.due, strutil.dt_format.iso, nil)
-    due_str, is_overdue = strutil.ts_to_relative(ts)
-  end
-
-  if is_overdue or t.urgency > 7.5 then
-    due_color  = beautiful.red[400]
-    text_color = beautiful.red[400]
-  end
-
-  if t.start then
-    text_color = beautiful.green[400]
-  end
-
-  -- Wibox for task name
-  local desc = ui.textbox({
-    text  = t.description,
-    width = dpi(750),
-    color = text_color
-  })
-
-  -- Indicator icon shows which task is selected
-  local indicator = wibox.widget({
-    forced_height = dpi(3),
-    forced_width  = dpi(3),
-    bg = beautiful.neutral[800],
-    shape  = gears.shape.circle,
-    widget = wibox.container.background,
-  })
-
-  -- Due date
-  local due = ui.textbox({
-    text  = t.due and due_str or "no due date",
-    color = due_color
-  })
-
-  local taskitem = wibox.widget({
-    {
-      indicator,
-      desc,
-      spacing = dpi(10),
-      layout = wibox.layout.fixed.horizontal,
-    },
-    nil,
-    due,
-    layout = wibox.layout.align.horizontal,
-    -----
-    desc = desc, -- need an easy-access reference for later
-  })
-
-  taskitem:connect_signal("mouse::enter", function(self)
-    self:emit_signal("button::press")
-    task.active_task = self.data
-    task.active_task_ui = desc
-    task:emit_signal("selected::task", self.data)
-  end)
-
-  taskitem:connect_signal("mouse::leave", function(self)
-    self:update()
-  end)
-
-  taskitem:connect_signal("button::press", function(self)
-    self:update()
-  end)
-
-  function taskitem:update()
-    local c = self.selected and beautiful.primary[400] or desc._color
-    indicator.bg = self.selected and beautiful.fg or beautiful.neutral[800]
-    desc:update_color(c)
-  end
-
-  return taskitem
-end
-
--- TODO: this whole thing
---- @function gen_scrollbar
-local function gen_scrollbar()
-end
-
-tasklist = wibox.widget({
+tasklist = singlesel({
   spacing = dpi(15),
-  layout  = wibox.layout.fixed.vertical,
+  layout = wibox.layout.fixed.vertical,
+  ---
+  keynav = true,
+  name = "nav_tasklist",
+  scroll = true,
+  max_visible_elements = 19
 })
 
-tasklist = singlesel({ layout = tasklist, keynav = true, name = "nav_tasklist" })
+tasklist.area.keys = keybinds
+tasklist.area.keys["z"] = function() task:emit_signal("details::toggle") end
+-- tasklist.area.keys["t"] = function() task:gen_twdeps_img() end
+
+-- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀    ▄▀█ █▄░█ █▀▄    █▀ ▀█▀ █░█ █▀▀ █▀▀ 
+-- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█    █▀█ █░▀█ █▄▀    ▄█ ░█░ █▄█ █▀░ █▀░ 
 
 tasklist.area:connect_signal("area::left", function()
   local c = tasklist.active_element.desc._color
   tasklist.active_element.desc:update_color(c)
 end)
-
-tasklist.area.keys = keybinds
-tasklist.area.keys["z"] = function() task:emit_signal("details::toggle") end
-tasklist.area.keys["t"] = function() task:gen_twdeps_img() end
-
--- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀    ▄▀█ █▄░█ █▀▄    █▀ ▀█▀ █░█ █▀▀ █▀▀ 
--- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█    █▀█ █░▀█ █▄▀    ▄█ ░█░ █▄█ █▀░ █▀░ 
 
 task:connect_signal("ready::tasks", function(_, tag, project, tasks)
   tasklist:clear_elements()
@@ -139,12 +57,19 @@ task:connect_signal("ready::tasks", function(_, tag, project, tasks)
     end
   end
 
+  tasklist:update_scrollbar()
+
   -- Initialize first active task
   tasklist.active_element = tasklist.children[idx]
   tasklist.children[idx].selected = true
   tasklist.children[idx]:update()
   tasklist.area:set_active_element_by_index(idx)
   tasklist.children[idx].desc:update_color(tasklist.children[idx].desc._color)
+end)
+
+-- Update UI when scrolling
+task:connect_signal("selected::task", function()
+  tasklist:update()
 end)
 
 return tasklist

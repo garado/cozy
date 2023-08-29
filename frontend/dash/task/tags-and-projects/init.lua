@@ -41,7 +41,11 @@ local _tasklist = wibox.widget({
     layout = wibox.layout.fixed.vertical,
   },
   {
-    tasklist_body,
+    {
+      tasklist_body.scrollbar,
+      tasklist_body,
+      layout = wibox.layout.fixed.horizontal,
+    },
     margins = dpi(10),
     widget = wibox.container.margin,
   },
