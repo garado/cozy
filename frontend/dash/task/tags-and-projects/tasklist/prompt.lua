@@ -9,15 +9,47 @@ local wibox = require("wibox")
 local awful = require("awful")
 local bold  = require("utils.string").pango_bold
 local task  = require("backend.system.task")
+local fzf = require("modules.fzf")
 
 -- █▀▀ ▄▀█ █░░ █░░ █▄▄ ▄▀█ █▀▀ █▄▀ █▀
 -- █▄▄ █▀█ █▄▄ █▄▄ █▄█ █▀█ █▄▄ █░█ ▄█
 
-local comp_callback_table = {}
-local function comp_callback(command_before_comp, cur_pos_before_comp, ncomp)
-  return awful.completion.generic(command_before_comp, cur_pos_before_comp, ncomp, comp_callback_table)
+local keywords = {}
+
+-- Completion with fuzzy find
+local function fzf_completion(text, cur_pos, ncomp)
+  -- The keywords table may be empty
+  if #keywords == 0 then
+    return text, text + 1
+  end
+
+  -- If no text had been typed yet, then we could start cycling around all
+  -- keywords with out filtering and move the cursor at the end of keyword
+  if text == nil or #text == 0 then
+    ncomp = math.fmod(ncomp - 1, #keywords) + 1
+    return keywords[ncomp], #keywords[ncomp] + 2
+  end
+
+  -- Filter out only keywords starting with text
+  local tmp = fzf.filter(text, keywords, false)
+
+  local matches = {}
+  for i = 1, #tmp do
+    matches[#matches+1] = keywords[tmp[i][1]]
+  end
+
+  -- If there are no matches, just leave out with the current text and position
+  if #matches == 0 then
+    return text, #text + 1, matches
+  end
+
+  -- Cycle around all matches
+  ncomp = math.fmod(ncomp - 1, #matches) + 1
+  return matches[ncomp], #matches[ncomp] + 1, matches
 end
 
+--- @function search_callback
+-- @brief Populate keywords{} with task descriptions
 local function search_callback()
   local t = task.active_tag
   local p = task.active_project
@@ -25,18 +57,22 @@ local function search_callback()
 
   -- Don't know if this is the most efficient way to do this.
   for i = 1, #tasks do
-    comp_callback_table[#comp_callback_table+1] = tasks[i].description
+    keywords[#keywords+1] = tasks[i].description
   end
 end
 
+--- @function mod_project_callback
+-- @brief Populate keywords{} with project names
 local function mod_project_callback()
   local tag = task.active_tag
-  comp_callback_table = task.data[tag]
+  keywords = task.data[tag]
 end
 
+--- @function mod_tag_callback
+-- @brief Populate keywords{} with tag names
 local function mod_tag_callback()
   for tag in pairs(task.data) do
-    comp_callback_table[#comp_callback_table+1] = tag
+    keywords[#keywords+1] = tag
   end
 end
 
@@ -59,7 +95,7 @@ promptbox_colorized:set_fg(beautiful.fg)
 local function task_input(type, prompt, text)
 
   -- Generate completion callback list
-  comp_callback_table = {}
+  keywords = {}
   if type == "mod_project" then
     mod_project_callback()
   elseif type == "mod_tag" then
@@ -75,7 +111,7 @@ local function task_input(type, prompt, text)
     fg           = beautiful.fg,
     bg_cursor    = beautiful.primary[400],
     textbox      = promptbox,
-    completion_callback = comp_callback,
+    completion_callback = fzf_completion,
     exe_callback = function(input)
       if not input or #input == 0 then
         task:emit_signal("input::cancelled")
