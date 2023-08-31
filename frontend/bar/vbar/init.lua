@@ -6,11 +6,14 @@ local awful = require("awful")
 local wibox = require("wibox")
 local dpi   = require("utils.ui").dpi
 local beautiful  = require("beautiful")
+local conf = require("cozyconf")
 
 local logo = require(... .. ".logo")
 local clock = require(... .. ".clock")
 local taglist = require(... .. ".taglist")
 local battery = require(... .. ".battery")
+
+local align = (conf.bar_align == "left") and "left" or "right"
 
 local top_vbar = wibox.widget({
   logo,
@@ -32,7 +35,7 @@ return function(s)
     maximum_height = s.geometry.height,
     minimum_width = dpi(40),
     maximum_width = dpi(40),
-    placement = awful.placement.left,
+    placement = awful.placement[align],
     widget = {
       {
         {
@@ -60,6 +63,6 @@ return function(s)
 
   -- Reserve screen space
   s.bar:struts({
-    left = s.bar.maximum_width,
+    [align] = s.bar.maximum_width,
   })
 end
