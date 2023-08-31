@@ -5,7 +5,7 @@
 -- Cozy configuration options.
 
 -- Other things you might want to change:
---    > profile picture theme/assets/pfp.png
+--    > profile picture: theme/assets/pfp.png
 
 return {
 
@@ -16,14 +16,14 @@ return {
   -- Default available options:
   --    > [mountain] fuji
   --    > [nord] dark light
-  theme_name  = "rose-pine",
-  theme_style = "main",
+  theme_name  = "mountain",
+  theme_style = "fuji",
 
   -- If Cozy's theme switcher should try to switch themes for other applications.
   -- See `theme/integration.lua` for details and setup examples.
   theme_switch_integration = true,
 
-  -- Font style to use. It'll generate every combination of weights and sizes.
+  -- Font style to use. Cozy will autogenerate every combination of weights and sizes.
   -- Make sure the weights for your font actually exist.
   -- Name/weight strings must have a trailing space!
   font = {
@@ -55,12 +55,13 @@ return {
   bar_style = "horizontal",
 
   -- Set bar alignment.
-  -- Options (horizontal): top bottom
-  -- Options (vertical): left right
+  -- Options:
+  --    > [horizontal] top bottom
+  --    > [vertical] left right
   bar_align = "top",
 
   -- Show notifications for playerctl - they look cool but they get annoying fast.
-  playerctl_notifications = false,
+  playerctl_notifications = true,
 
   -- █▀▄▀█ █ █▀ █▀▀ 
   -- █░▀░█ █ ▄█ █▄▄ 
@@ -102,6 +103,17 @@ return {
     "CLI sorcerer",
     "Linux enthusiast",
     "Unofficial 5th member of Polyphia",
+    "Anti-Python",
+    "Average Chebyshev enjoyer",
+    "Disciple of the peaceful atom",
+    "In no rush",
+  },
+
+  quotes = {
+    { "Everything you want is on the other side of fear.",
+      "Jack Canfield", },
+    { "Nothing happens to anyone that they can't endure.",
+      "Marcus Aurelius", },
   },
 
   -- Icon shown on bar and at bottom of dash sidebar.
@@ -125,6 +137,7 @@ return {
     "journal",
     "outside",
     "music",
+    "reading",
   },
 
   ----------------------------
