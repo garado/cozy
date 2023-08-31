@@ -89,7 +89,7 @@ local function worker(id)
   })
 
   local ts = os.time()
-  for _ = 1, 7 do
+  for _ = 1, 8 do
     boxes:insert(1, gen_day(id, ts))
     ts = ts - SECONDS_PER_DAY
   end
