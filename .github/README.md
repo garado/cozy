@@ -1,6 +1,6 @@
 <h1 align="center">Cozy</h1>
 
-<p>Hi! This is Cozy, my AwesomeWM config. Its focus is creating widgets that increase my efficiency and productivity by
+<p>Hi! This is Cozy, my AwesomeWM config. Its focus is creating widgets that increase efficiency and productivity by
 integrating various command-line programs like gcalcli, Taskwarrior, Timewarrior, Ledger, and more. Thanks for checking
 it out!</p>
 
@@ -13,11 +13,11 @@ it out!</p>
 
 <h1> Dashboard </h1>
 
-<h2> Main page </h2>
-
-<img src="./main.png">
+<h2> Main tab </h2>
 
 All the essentials.
+
+<img src="./main.png">
 
 <ul>
   <li>View upcoming tasks and events using Taskwarrior + gcalcli</li>
@@ -34,7 +34,7 @@ Simple, aesthetic, and easy-to-use GUI for Taskwarrior.
 
 <h2> Ledger </h2>
 
-Use data from <a href="https://github.com/ledger/ledger">ledger-cli</a> to view your budget progress, recent transactions, savings goals, and yearly balance trends.
+Use data from <a href="https://github.com/ledger/ledger">ledger-cli</a> to view your budget progress, recent transactions, and yearly balance trends.
 
 <img src="./ledger.png">
 
@@ -72,9 +72,6 @@ Goal visualization and tracking with Taskwarrior, GraphViz, and twdeps.
 <img src = "./goals-overview.png">
 
 <img src = "./goals-details.png">
-
-<!-- <h2> Habit tracking </h2> -->
-<!-- Powered by Pixela, a habit/effort tracking app controlled entirely by API. -->
 
 <!-- █▀█ ▀█▀ █░█ █▀▀ █▀█ -->
 <!-- █▄█ ░█░ █▀█ ██▄ █▀▄ -->
