@@ -5,7 +5,7 @@ integrating various command-line programs like gcalcli, Taskwarrior, Timewarrior
 it out!</p>
 
 <p>
-⚠️ I'm rewriting this from scratch and this is under really heavy development. Clone at your own risk. ⚠️
+⚠️ I'm rewriting this from scratch and this is under really heavy development. This code probably won't work on your machine. Clone at your own risk. ⚠️
 </p>
 
 <!-- █▀▄ ▄▀█ █▀ █░█ █▄▄ █▀█ ▄▀█ █▀█ █▀▄ -->
