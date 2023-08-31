@@ -4,11 +4,9 @@
 
 local ui  = require("utils.ui")
 local dpi = ui.dpi
-local btn = require("frontend.widget.button")
 local wibox     = require("wibox")
 local keynav    = require("modules.keynav")
 local control   = require("backend.cozy.control")
-local beautiful = require("beautiful")
 local actions   = require("cozyconf.actions")
 
 local nav_qactions = keynav.area({
@@ -41,13 +39,19 @@ local qactions = wibox.widget({
 
 -- why doesn't children = actions work :(
 for i = 1, #actions do
-  qactions.widget.children[2]:add(actions[i])
-  nav_qactions:append( keynav.navitem.base({ widget = actions[i] }) )
-end
+  local action = actions[i]
 
-control:connect_signal("qaction::selected", function(_, name)
-  header:update_text(name)
-end)
+  action:connect_signal("mouse::enter", function(self)
+    header:update_text(self.name)
+  end)
+
+  action:connect_signal("mouse::leave", function()
+    header:update_text("Quick Actions")
+  end)
+
+  qactions.widget.children[2]:add(action)
+  nav_qactions:append(action)
+end
 
 return function()
   return qactions, nav_qactions

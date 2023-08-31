@@ -50,9 +50,7 @@ local function create_poweropt(icon, text, _cmd)
     end
   })
 
-  local nav_opt = keynav.navitem.base({ widget = opt })
-  nav_power_opts:append(nav_opt)
-
+  nav_power_opts:append(opt)
   return opt
 end
 
@@ -96,8 +94,8 @@ local no_btn = btn({
   end
 })
 
-nav_power_confirm:append(keynav.navitem.base({ widget = yes_btn }))
-nav_power_confirm:append(keynav.navitem.base({ widget = no_btn }))
+nav_power_confirm:append(yes_btn)
+nav_power_confirm:append(no_btn)
 
 confirm_text = ui.textbox({ text = "Shut down?" })
 

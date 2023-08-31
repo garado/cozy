@@ -40,6 +40,12 @@ local function create_option_btn(opt)
       right  = dpi(15),
     },
     func = function()
+      if opt == "off" then
+        local cmd = "pkill picom"
+        awful.spawn.easy_async_with_shell(cmd, function() end)
+        return
+      end
+
       -- Create backup of user's config if necessary
       if gfs.file_readable(PICOM_CFG_PATH) then
         if not gfs.file_readable(PICOM_BACKUP) then
@@ -51,15 +57,11 @@ local function create_option_btn(opt)
       -- Set desired setting by copying new config
       local config_name = PICOM_OPTS_DIR .. opt .. ".conf"
       local cmd = "cp " .. config_name .. ' ' .. PICOM_CFG_PATH
-      if opt == "off" then
-        awful.spawn.with_shell("pkill picom")
-      else
-        awful.spawn.easy_async_with_shell(cmd, function() end)
-      end
+      awful.spawn.easy_async_with_shell(cmd, function() end)
     end
   })
 
-  return option, keynav.navitem.base({ widget = option })
+  return option
 end
 
 local option_btns = wibox.widget({
@@ -82,9 +84,9 @@ local picom = wibox.widget({
 })
 
 for i = 1, #PICOM_OPTIONS do
-  local pbtn, nav_pbtn = create_option_btn(PICOM_OPTIONS[i])
+  local pbtn = create_option_btn(PICOM_OPTIONS[i])
   option_btns:add(pbtn)
-  nav_picom:append(nav_pbtn)
+  nav_picom:append(pbtn)
 end
 
 return function()
