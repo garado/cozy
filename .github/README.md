@@ -13,11 +13,18 @@ it out!</p>
 
 <h1> Dashboard </h1>
 
-<h2> Habits </h2>
+<h2> Main page </h2>
 
-Track your habits with <a href="https://pixe.la/">Pixela</a>.
+<img src="./main.png">
 
-<img src="./habits.png">
+All the essentials.
+
+<ul>
+  <li>View upcoming tasks and events using Taskwarrior + gcalcli</li>
+  <li>Track habits with <a href="https://pixe.la">Pixela</a></li>
+  <li><a href="https://github.com/GothenburgBitFactory/timewarrior">Timewarrior</a> time-tracking</li>
+  <li>And more fun widgets!</li>
+</ul>
 
 <h2> Task management </h2>
 
