@@ -80,7 +80,7 @@ Goal visualization and tracking with Taskwarrior, GraphViz, and twdeps.
 
 <h2> App launcher </h2>
 
-<img src="./notrofi-launcher.png">
+<img src="./notrofi-launcher.png" height=400>
 
 <!-- █▀▀ █▀█ █▀█ ▀█▀ █▄░█ █▀█ ▀█▀ █▀▀ █▀ --> 
 <!-- █▀░ █▄█ █▄█ ░█░ █░▀█ █▄█ ░█░ ██▄ ▄█ --> 
