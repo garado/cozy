@@ -14,13 +14,21 @@ local rrect   = require("utils.ui").rrect
 local dpi     = require("utils.ui").dpi
 local os = os
 
-local cozy  = require("backend.state.cozy")
-local dash  = require("backend.state.dash")
+local control = require("backend.cozy.control")
+local dash  = require("backend.cozy.dash")
+local cozy  = require("backend.cozy.cozy")
+local themeswitch = require("backend.cozy.themeswitch")
+local nrofi = require("backend.cozy.notrofi")
+local bluetooth = require("backend.cozy.bluetooth")
 
 local mod   = "Mod4"
 local alt   = "Mod1"
 local ctrl  = "Control"
 local shift = "Shift"
+
+
+-- █░█ █▀▀ █░░ █▀█ █▀▀ █▀█ █▀ 
+-- █▀█ ██▄ █▄▄ █▀▀ ██▄ █▀▄ ▄█ 
 
 -- Saner keyboard resizing
 local function resize_horizontal(factor) local layout = awful.layout.get(awful.screen.focused())
@@ -134,13 +142,25 @@ awful.keyboard.append_global_keybindings({
 	end),
 
   -- Playerctl
+  awful.key({}, "XF86AudioPlay", function()
+		awful.spawn("playerctl play-pause", false)
+	end),
+
   awful.key({ mod }, "XF86AudioLowerVolume", function()
     awful.spawn("playerctl play-pause", false)
   end, { description = "play/pause track", group = "Hotkeys" }),
 
+  awful.key({}, "XF86AudioPrev", function()
+		awful.spawn("playerctl previous", false)
+	end),
+
   awful.key({ mod }, "XF86AudioMute", function()
     awful.spawn("playerctl previous", false)
   end, { description = "previous track", group = "Hotkeys" }),
+
+  awful.key({}, "XF86AudioNext", function()
+		awful.spawn("playerctl next", false)
+	end),
 
   awful.key({ mod }, "XF86AudioRaiseVolume", function()
     awful.spawn("playerctl next", false)
@@ -176,6 +196,31 @@ awful.keyboard.append_global_keybindings({
     dash:toggle()
   end, { description = "Open dashboard", group = "Launchers" }),
 
+  awful.key({ mod }, "k", function()
+    scratchpad:turn_off()
+    control:toggle()
+  end, { description = "Open control center", group = "Launcher "}),
+
+  awful.key({ mod }, "l", function()
+    scratchpad:turn_off()
+    themeswitch:toggle()
+  end, { description = "Open theme switcher", group = "Launcher "}),
+
+  awful.key({ alt }, "b", function()
+    scratchpad:turn_off()
+    bluetooth:toggle()
+  end, { description = "Open Bluetooth menu", group = "Launcher "}),
+
+  awful.key({ alt }, "e", function()
+    scratchpad:turn_off()
+    nrofi:toggle()
+  end, { description = "app launcher", group = "Launchers" }),
+
+  awful.key({ alt }, "r", function()
+    cozy:close_all()
+    app_launcher:toggle()
+  end, { description = "app launcher", group = "Launchers" }),
+
 
   --  █░░ ▄▀█ █░█ █▄░█ █▀▀ █░█ █▀▀ █▀█ █▀
   --  █▄▄ █▀█ █▄█ █░▀█ █▄▄ █▀█ ██▄ █▀▄ ▄█
@@ -190,12 +235,6 @@ awful.keyboard.append_global_keybindings({
     cozy:close_all()
     scratchpad:toggle()
   end, { description = "scratchpad", group = "Launchers"}),
-
-  -- App launcher
-  awful.key({ alt }, "r", function()
-    cozy:close_all()
-    app_launcher:toggle()
-  end, { description = "app launcher", group = "Launchers" }),
 
   -- Thunar
   awful.key({ alt }, "t", function()
@@ -295,6 +334,7 @@ end)
 -- ░█░█░█▀█░█▀▄░█░█░█▀▀░█▀█░█▀█░█▀▀░█▀▀░░░█░█░█▀▀░█░█░█▀▄░▀█▀░█▀█░█▀▄░█▀▀
 -- ░█▄█░█░█░█▀▄░█▀▄░▀▀█░█▀▀░█▀█░█░░░█▀▀░░░█▀▄░█▀▀░░█░░█▀▄░░█░░█░█░█░█░▀▀█
 -- ░▀░▀░▀▀▀░▀░▀░▀░▀░▀▀▀░▀░░░▀░▀░▀▀▀░▀▀▀░░░▀░▀░▀▀▀░░▀░░▀▀░░▀▀▀░▀░▀░▀▀░░▀▀▀
+
 awful.keyboard.append_global_keybindings({
   -- Switch to prev/next workspaces 
   awful.key({ mod }, "Tab", awful.tag.viewnext,
@@ -311,9 +351,7 @@ awful.keyboard.append_global_keybindings({
     on_press = function(index)
       local screen = awful.screen.focused()
       local tag = screen.tags[index]
-      if tag then
-        tag:view_only()
-      end
+      if tag then tag:view_only() end
     end,
   }),
 

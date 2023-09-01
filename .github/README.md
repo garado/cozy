@@ -76,9 +76,11 @@ Goal visualization and tracking with Taskwarrior, GraphViz, and twdeps.
 <!-- █▀█ ▀█▀ █░█ █▀▀ █▀█ -->
 <!-- █▄█ ░█░ █▀█ ██▄ █▀▄ -->
 
-<h1> Theme switcher </h1>
+<h1> Other stuff </h1>
 
-The theme switcher seamlessly matches Cozy's colorscheme with the rest of your system.
+<h2> App launcher </h2>
+
+<img src="./notrofi-launcher.png">
 
 <!-- █▀▀ █▀█ █▀█ ▀█▀ █▄░█ █▀█ ▀█▀ █▀▀ █▀ --> 
 <!-- █▀░ █▄█ █▄█ ░█░ █░▀█ █▄█ ░█░ ██▄ ▄█ --> 
