@@ -63,6 +63,8 @@ return function(t, index)
     },
     nil,
     due,
+    forced_width = dpi(900),
+    forced_height = dpi(15),
     layout = wibox.layout.align.horizontal,
     -----
     desc = desc, -- need an easy-access reference for later
