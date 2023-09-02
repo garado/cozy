@@ -6,4 +6,4 @@
 
 local awful = require("awful")
 
-awful.spawn.once("picom", false)
+awful.spawn.easy_async_with_shell("picom", false)
