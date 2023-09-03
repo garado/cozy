@@ -6,8 +6,7 @@
 -- https://github.com/streetturtle/awesome-wm-widgets/blob/master/github-contributions-widget/github-contributions-widget.lua
 
 -- Modified to play nicer with Cozy and also to be an imagebox. It only actually draws the
--- widget once on AwesomeWM startup. I thought it would be faster that way, but I've never
--- verified that.
+-- widget once on AwesomeWM startup. I noticed that opening the dash is significantly faster that way.
 
 -- For best results, set up a cronjob to run the script to cache the data once daily.
 -- Script path: utils/scripts/fetch-github-contribs [username] [number of days]
@@ -19,9 +18,11 @@ local awful = require("awful")
 local wibox = require("wibox")
 local gears = require("gears")
 local beautiful = require("beautiful")
+local strutil = require("utils.string")
 
-local CACHEFILE = gfs.get_cache_dir() .. "github-contrib-data"
-local SVG_CACHE_PATH = gfs.get_cache_dir() .. "github-contrib.svg"
+local HEATMAP_DATA = gfs.get_cache_dir() .. "github-data-heatmap"
+local CONTRIB_COUNT_DATA = gfs.get_cache_dir() .. "github-data-year-totals"
+local SVG_CACHE_PATH = gfs.get_cache_dir() .. "github-data-heatmap.svg"
 
 local DAYS_SHOWN    = 120
 local BOXES_PER_COL = 5
@@ -31,14 +32,12 @@ local WIDTH  = SIDELENGTH * (DAYS_SHOWN / BOXES_PER_COL)
 local HEIGHT = SIDELENGTH * BOXES_PER_COL
 
 local img = wibox.widget({
-  image = SVG_CACHE_PATH,
   resize = true,
   widget = wibox.widget.imagebox,
 })
 
-
--- █ █▀▄▀█ ▄▀█ █▀▀ █▀▀    █▀▀ █▀▀ █▄░█ 
--- █ █░▀░█ █▀█ █▄█ ██▄    █▄█ ██▄ █░▀█ 
+-- █▀▀ █▀█ █▀█ █▄░█ ▀█▀ █▀▀ █▄░█ █▀▄ 
+-- █▀░ █▀▄ █▄█ █░▀█ ░█░ ██▄ █░▀█ █▄▀ 
 
 -- Generating the widget, which gets saved as an SVG
 
@@ -95,36 +94,53 @@ local update_widget = function(_, stdout, _, _, _)
   })
 end
 
--- If cache file doesn't exist, run script to populate it.
--- Otherwise read from cache file like normal.
-if not gfs.file_readable(CACHEFILE) then
+local contrib_count = ui.textbox({
+  text = "2351",
+  align = "center",
+  font = beautiful.font_reg_l,
+})
+
+-- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄ 
+-- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀ 
+
+local function process_data(stdout)
+  -- Script outputs heatmap data and total contrib data to stdout, and these
+  -- two are separated by a '=' on a newline
+  local data = strutil.split(stdout, "=")
+
+  -- SVG
+  update_widget(github, data[1])
+  wibox.widget.draw_to_svg_file(github, SVG_CACHE_PATH, WIDTH, HEIGHT)
+  img.image = gears.surface.load_uncached(SVG_CACHE_PATH)
+
+  -- Contrib count
+  local total = 0
+  local lines = strutil.split(data[2], "\r\n")
+  for i = 1, #lines do
+    total = total + tonumber(lines[i])
+  end
+  contrib_count:update_text(total)
+end
+
+-- If cache files don't exist, run script to populate them.
+-- Otherwise read cache files like normal.
+-- (The script writes to both cache files and stdout.)
+if not gfs.file_readable(HEATMAP_DATA) or not gfs.file_readable(CONTRIB_COUNT_DATA) then
+  print('doesnt exist')
   local cmd = "utils/scripts/fetch-github-contribs " .. conf.github_username .. ' ' .. DAYS_SHOWN
-  awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    update_widget(github, stdout)
-    wibox.widget.draw_to_svg_file(github, SVG_CACHE_PATH, WIDTH, HEIGHT)
-    img.image = gears.surface.load_uncached(SVG_CACHE_PATH)
-    img:emit_signal("widget::redraw_needed")
-  end)
+  awful.spawn.easy_async_with_shell(cmd, process_data)
 else
-  local cmd = "cat " .. CACHEFILE
-  awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    update_widget(github, stdout)
-    wibox.widget.draw_to_svg_file(github, SVG_CACHE_PATH, WIDTH, HEIGHT)
-    img.image = gears.surface.load_uncached(SVG_CACHE_PATH)
-    img:emit_signal("widget::redraw_needed")
-  end)
+  print('does exist')
+  local cmd = "cat " .. HEATMAP_DATA .. " ; echo '=' ; cat " .. CONTRIB_COUNT_DATA
+  awful.spawn.easy_async_with_shell(cmd, process_data)
 end
 
 return ui.dashbox_v2(
   wibox.widget({
     {
+      contrib_count,
       ui.textbox({
-        text = "2351",
-        font = beautiful.font_reg_l,
-        align = "center",
-      }),
-      ui.textbox({
-        text = "contributions so far",
+        text = "total lifetime contributions",
         color = beautiful.neutral[400],
         align = "center",
       }),
