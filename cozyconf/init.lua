@@ -21,7 +21,7 @@ return {
 
   -- If Cozy's theme switcher should try to switch themes for other applications.
   -- See `theme/integration.lua` for details and setup examples.
-  theme_switch_integration = true,
+  theme_switch_integration = false,
 
   -- Font style to use. Cozy will autogenerate every combination of weights and sizes.
   -- Make sure the weights for your font actually exist.
@@ -60,7 +60,7 @@ return {
   --    > [vertical] left right
   bar_align = "top",
 
-  -- Show notifications for playerctl - they look cool but they get annoying fast.
+  -- Show notifications for playerctl.
   playerctl_notifications = true,
 
   -- █▀▄▀█ █ █▀ █▀▀ 
@@ -82,6 +82,10 @@ return {
 
   -- █▀▄ ▄▀█ █▀ █░█ 
   -- █▄▀ █▀█ ▄█ █▀█ 
+
+  -- Configure the visibility and order of tab.
+  -- Options: main task ledger calendar goals settings
+  tabs = { "main", "task", "ledger", "calendar" },
 
   ---------------------------
   -------- MAIN TAB ---------

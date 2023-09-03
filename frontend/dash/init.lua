@@ -16,23 +16,10 @@ local beautiful = require("beautiful")
 local dashstate = require("backend.cozy.dash")
 local config    = require("cozyconf")
 
--- Forward declarations
-local content -- Container for tab contents
-
 local navigator, nav_root = keynav.navigator()
+local content
 
--- █▀ █ █▀▄ █▀▀ █▄▄ ▄▀█ █▀█ 
--- ▄█ █ █▄▀ ██▄ █▄█ █▀█ █▀▄ 
-
--- Enums for tab names
-local MAIN     = 1
-local TASK     = 2
-local LEDGER   = 3
-local CALENDAR = 4
-local GOALS    = 5
-local SETTINGS = 6
-
--- Set up tab info
+-- Pick tabs based on user input
 local main,     nav_main     = require(... .. ".main")()
 local task,     nav_task     = require(... .. ".task")()
 local ledger,   nav_ledger   = require(... .. ".ledger")()
@@ -40,21 +27,35 @@ local calendar, nav_calendar = require(... .. ".calendar")()
 local goals,    nav_goals    = require(... .. ".goals-habits")()
 local settings, nav_settings = require(... .. ".settings")()
 
-local tablist   = { main,     task,     ledger,     calendar,     goals,      settings,     }
-local tabnames  = { "main",   "task",   "ledger",   "calendar",   "goals",    "settings",   }
-local tab_icons = { "",      "",      "",        "",          "󰓾",        "",          }
-local navitems  = { nav_main, nav_task, nav_ledger, nav_calendar, nav_goals,  nav_settings, }
+local tabs = {
+  ["main"]     = { "", main,     nav_main     },
+  ["task"]     = { "", task,     nav_task     },
+  ["ledger"]   = { "", ledger,   nav_ledger   },
+  ["calendar"] = { "", calendar, nav_calendar },
+  ["goals"]    = { "", goals,    nav_goals    },
+  ["settings"] = { "", settings, nav_settings },
+}
 
--- Pressing number keys switches tabs
+local tab_list  = {}
+local tab_icons = {}
+local tab_nav   = {}
+
+for _, tab in ipairs(config.tabs) do
+  tab_icons[#tab_icons+1] = tabs[tab][1]
+  tab_list[#tab_list+1]   = tabs[tab][2]
+  tab_nav[#tab_nav+1]     = tabs[tab][3]
+end
+
+-- Generate keybinds for switching tabs (number keys)
 local root_keys = {}
-for i = 1, #tablist do
+for i = 1, #tab_list do
   root_keys[tostring(i)] = function()
     dashstate:set_tab(i)
   end
 end
 nav_root.keys = root_keys
 
--- Build tab sidebar
+-- Generate tab sidebar
 local tab_buttons = wibox.widget({
   layout  = wibox.layout.fixed.vertical,
 
@@ -116,10 +117,11 @@ local tab_buttons = wibox.widget({
   end
 })
 
-for i = 1, #tablist do
+for i = 1, #tab_list do
   tab_buttons:add_tab(i)
 end
 
+-- Logic for switching tabs
 dashstate:connect_signal("tab::set", function(_, tab_enum)
   -- Update sidebar
   for i = 1, #tab_buttons.children do
@@ -130,42 +132,47 @@ dashstate:connect_signal("tab::set", function(_, tab_enum)
     end
   end
 
-  content:update_contents(tablist[tab_enum])
+  content:update_contents(tab_list[tab_enum])
 
   -- Update keynav areas
-  if navitems[tab_enum] and not nav_root:contains_area(navitems[tab_enum]) then
+  if tab_nav[tab_enum] and not nav_root:contains_area(tab_nav[tab_enum].name) then
     nav_root:clear()
-    nav_root:append(navitems[tab_enum])
+    nav_root:append(tab_nav[tab_enum])
     nav_root:verify_nav_references()
   end
 end)
 
 -- Building the rest of the sidebar
-
-local distro_icon = ui.textbox({
-  text  = config.distro_icon,
-  align = "center",
-  color = beautiful.primary[300],
-})
-
-local pfp = wibox.widget({
-  {
-    image  = beautiful.pfp,
-    resize = true,
-    forced_height = dpi(28),
-    forced_width  = dpi(28),
-    widget = wibox.widget.imagebox,
-  },
-  bg     = beautiful.primary[300],
-  shape  = gears.shape.circle,
-  widget = wibox.container.background,
-})
-
 local sidebar = wibox.widget({
   {
-    ui.place(pfp, { margins = { top = dpi(10) } }),
+    { -- Profile picture
+      {
+        {
+          {
+            image  = beautiful.pfp,
+            resize = true,
+            forced_height = dpi(28),
+            forced_width  = dpi(28),
+            widget = wibox.widget.imagebox,
+          },
+          bg     = beautiful.primary[300],
+          shape  = gears.shape.circle,
+          widget = wibox.container.background,
+        },
+        top = dpi(10),
+        widget = wibox.container.margin,
+      },
+      widget = wibox.container.place,
+    },
     tab_buttons,
-    ui.place(distro_icon, { margins = { bottom = dpi(15) } }),
+    { -- Distro icon
+      ui.textbox({
+        text  = config.distro_icon,
+        align = "center",
+        color = beautiful.primary[300],
+      }),
+      widget = wibox.container.place,
+    },
     expand = "none",
     layout = wibox.layout.align.vertical,
   },
@@ -196,6 +203,7 @@ local dash = awful.popup({
   minimum_width  = dpi(1350),
   maximum_width  = dpi(1350),
   bg = beautiful.neutral[900],
+  shape = ui.rrect(),
   ontop     = true,
   visible   = false,
   placement = awful.placement.centered,
@@ -205,7 +213,6 @@ local dash = awful.popup({
     layout = wibox.layout.align.horizontal,
   }),
 })
-
 
 -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
@@ -222,5 +229,5 @@ dashstate:connect_signal("setstate::close", function()
   dashstate:emit_signal("newstate::closed")
 end)
 
-dashstate:set_tab(MAIN)
+dashstate:set_tab(1)
 return function(_) return dash end
