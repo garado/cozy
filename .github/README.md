@@ -82,10 +82,14 @@ Goal visualization and tracking with Taskwarrior, GraphViz, and twdeps.
 
 <img src="./notrofi-launcher.png" height=400>
 
+<h2> Slightly nicer hotkeys popup </h2>
+
+<img src="./hotkeys.png" height=500>
+
 <!-- █▀▀ █▀█ █▀█ ▀█▀ █▄░█ █▀█ ▀█▀ █▀▀ █▀ --> 
 <!-- █▀░ █▄█ █▄█ ░█░ █░▀█ █▄█ ░█░ ██▄ ▄█ --> 
 
-<h3>Other stuff</h3>
+<h3>Misc</h3>
 <b>Why is it called 'cozy'?</b>
 
 I've spent a lot of time tweaking this setup to be just the way I like it, so now this setup feels very personal, comfortable, and cozy. :-)
@@ -94,7 +98,7 @@ I've spent a lot of time tweaking this setup to be just the way I like it, so no
 
 I started out making simple things like a fancy bar and then over the course of a year it slowly but steadily turned into whatever this is. I'm in too deep, I fear. Also, Awesome is unbelievably easy to use and development with it is really, really fast, and since this is just a hobby and this stuff has nothing to do with my career skillset, starting over with a different framework would be a waste of time.
 
-<h3>Credits</h3>
+<h3>Acknowledgements</h3>
 <ul>
   <li><a href="https://github.com/rxyhn/yoru" target="_blank">rxyhn</a> jumpstarted my interest in AwesomeWM and I was only able to get this far thanks to studying his dotfiles.
   </li>
