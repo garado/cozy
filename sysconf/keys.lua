@@ -20,6 +20,7 @@ local cozy  = require("backend.cozy.cozy")
 local themeswitch = require("backend.cozy.themeswitch")
 local nrofi = require("backend.cozy.notrofi")
 local bluetooth = require("backend.cozy.bluetooth")
+local help = require("frontend.help")
 
 local mod   = "Mod4"
 local alt   = "Mod1"
@@ -107,7 +108,7 @@ awful.keyboard.append_global_keybindings({
     { description = "quit", group = "Awesome" }),
 
   -- Show help
-  awful.key({ mod }, "s", hotkeys_popup.show_help,
+  awful.key({ mod }, "s", function() help:show_help() end,
     { description = "help", group = "Awesome"}),
 
 
