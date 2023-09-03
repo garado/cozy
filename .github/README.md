@@ -78,6 +78,10 @@ Goal visualization and tracking with Taskwarrior, GraphViz, and twdeps.
 
 <h1> Other stuff </h1>
 
+<h2> Control center </h2>
+
+<img src="./control.png" height=400>
+
 <h2> App launcher </h2>
 
 <img src="./notrofi-launcher.png" height=400>
