@@ -5,6 +5,7 @@
 -- Pixela is a habit/effort tracker that you can use entirely through
 -- API calls. It's pretty neat. https://pixe.la/
 
+local json    = require("modules.json")
 local habits  = require("cozyconf").habits
 local gobject = require("gears.object")
 local gtable  = require("gears.table")
@@ -57,9 +58,23 @@ function pixela:put_habit_status(id, ts, state)
     cmd = "curl -X DELETE "..url..HEADER
   end
 
-  awful.spawn.easy_async_with_shell(cmd, function()
-    -- Update local cache
-    self:get_graph_pixels(id)
+  awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
+    if stdout:find('"isSuccess":true') then
+      self:get_graph_pixels(id) -- Update local cache
+
+      require("naughty").notification {
+        app_name = "Cozy",
+        title = "Pixela",
+        message = "API call successful.",
+      }
+    else
+      local msg = stderr:find("Could not resolve host") and "Could not resolve host" or json.decode(stdout).message
+      require("naughty").notification {
+        app_name = "Cozy",
+        title = "Pixela: API call unsuccessful",
+        message = msg,
+      }
+    end
   end)
 end
 

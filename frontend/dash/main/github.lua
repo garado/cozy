@@ -126,11 +126,9 @@ end
 -- Otherwise read cache files like normal.
 -- (The script writes to both cache files and stdout.)
 if not gfs.file_readable(HEATMAP_DATA) or not gfs.file_readable(CONTRIB_COUNT_DATA) then
-  print('doesnt exist')
   local cmd = "utils/scripts/fetch-github-contribs " .. conf.github_username .. ' ' .. DAYS_SHOWN
   awful.spawn.easy_async_with_shell(cmd, process_data)
 else
-  print('does exist')
   local cmd = "cat " .. HEATMAP_DATA .. " ; echo '=' ; cat " .. CONTRIB_COUNT_DATA
   awful.spawn.easy_async_with_shell(cmd, process_data)
 end
