@@ -2,9 +2,6 @@
 -- █▄▀ █▀▀ █▄█ █▀
 -- █░█ ██▄ ░█░ ▄█
 
--- Keybindings
-
-local hotkeys_popup = require("awful.hotkeys_popup")
 local beautiful = require("beautiful")
 local awful   = require("awful")
 local apps    = require("sysconf.apps")
@@ -27,12 +24,28 @@ local alt   = "Mod1"
 local ctrl  = "Control"
 local shift = "Shift"
 
+awful.key.keygroups["workspaces"] = {
+  { "1", 1 },
+  { "2", 2 },
+  { "3", 3 },
+  { "4", 4 },
+  { "5", 5 },
+  { "6", 6 },
+  { "7", 7 },
+  { "8", 8 },
+}
 
--- █░█ █▀▀ █░░ █▀█ █▀▀ █▀█ █▀ 
--- █▀█ ██▄ █▄▄ █▀▀ ██▄ █▀▄ ▄█ 
+awful.key.keygroups["vimlike"] = {
+  { "h", 1 },
+  { "j", 2 },
+  { "k", 3 },
+  { "l", 4 },
+}
+
 
 -- Saner keyboard resizing
-local function resize_horizontal(factor) local layout = awful.layout.get(awful.screen.focused())
+local function resize_h(factor)
+  local layout = awful.layout.get(awful.screen.focused())
   if layout == awful.layout.suit.tile then
     awful.tag.incmwfact(-factor)
   elseif layout == awful.layout.suit.tile.left then
@@ -46,7 +59,7 @@ local function resize_horizontal(factor) local layout = awful.layout.get(awful.s
   end
 end
 
-local function resize_vertical(factor)
+local function resize_v(factor)
   local layout = awful.layout.get(awful.screen.focused())
   if layout == awful.layout.suit.tile then
     awful.client.incwfact(-factor)
@@ -70,25 +83,6 @@ local scratchpad = bling.module.scratchpad {
   dont_focus_before_close = true,
 }
 
-local app_launcher = bling.widget.app_launcher({
-  terminal = "kitty",
-  favorites = { "firefox", },
-  search_commands = true,
-  skip_commands = { "thunar" },
-  hide_on_right_clicked_outside = true,
-  hide_on_launch = true,
-  shape = rrect(),
-  app_width = dpi(100),
-  app_height = dpi(100),
-
-  background = beautiful.bg_0,
-  border_color = beautiful.bg_0,
-  prompt_text_color = beautiful.fg_0,
-})
-
-awesome.connect_signal("startup", function()
-  scratchpad:turn_off()
-end)
 
 -- ░█▀▀░█░░░█▀█░█▀▄░█▀█░█░░░░░█░█░█▀▀░█░█░█▀▄░▀█▀░█▀█░█▀▄░█▀▀
 -- ░█░█░█░░░█░█░█▀▄░█▀█░█░░░░░█▀▄░█▀▀░░█░░█▀▄░░█░░█░█░█░█░▀▀█
@@ -108,8 +102,10 @@ awful.keyboard.append_global_keybindings({
     { description = "quit", group = "Awesome" }),
 
   -- Show help
-  awful.key({ mod }, "s", function() help:show_help() end,
-    { description = "help", group = "Awesome"}),
+  awful.key({ mod }, "s", function()
+    cozy:close_all()
+    help:show_help()
+  end, { description = "show help", group = "Awesome"}),
 
 
   -- █░█ █▀█ ▀█▀ █▄▀ █▀▀ █▄█ █▀
@@ -195,32 +191,27 @@ awful.keyboard.append_global_keybindings({
   awful.key({ mod }, "j", function()
     scratchpad:turn_off()
     dash:toggle()
-  end, { description = "Open dashboard", group = "Launchers" }),
+  end, { description = "dashboard", group = "Launchers" }),
 
   awful.key({ mod }, "k", function()
     scratchpad:turn_off()
     control:toggle()
-  end, { description = "Open control center", group = "Launcher "}),
+  end, { description = "control center", group = "Launchers "}),
 
   awful.key({ mod }, "l", function()
     scratchpad:turn_off()
     themeswitch:toggle()
-  end, { description = "Open theme switcher", group = "Launcher "}),
+  end, { description = "theme switcher", group = "Launchers "}),
 
   awful.key({ alt }, "b", function()
     scratchpad:turn_off()
     bluetooth:toggle()
-  end, { description = "Open Bluetooth menu", group = "Launcher "}),
-
-  awful.key({ alt }, "e", function()
-    scratchpad:turn_off()
-    nrofi:toggle()
-  end, { description = "app launcher", group = "Launchers" }),
+  end, { description = "bluetooth menu", group = "Launchers "}),
 
   awful.key({ alt }, "r", function()
-    cozy:close_all()
-    app_launcher:toggle()
-  end, { description = "app launcher", group = "Launchers" }),
+    scratchpad:turn_off()
+    nrofi:toggle()
+  end, { description = "not rofi", group = "Launchers" }),
 
 
   --  █░░ ▄▀█ █░█ █▄░█ █▀▀ █░█ █▀▀ █▀█ █▀
@@ -259,24 +250,24 @@ client.connect_signal("request::default_keybindings", function()
     awful.key({ ctrl, shift }, "g", function()
       client.focus.floating = not client.focus.floating
       client.focus:raise()
-    end, { description = "floating", group = "Client" }),
+    end, { description = "toggle floating", group = "Client" }),
 
     -- Toggle fullscreen
     awful.key({ ctrl, shift }, "f", function()
       client.focus.fullscreen = not client.focus.fullscreen
       client.focus:raise()
-    end, { description = "fullscreen", group = "Client" }),
+    end, { description = "toggle fullscreen", group = "Client" }),
 
     -- Toggle sticky
     awful.key({ ctrl, shift }, "d", function()
       client.focus.sticky = not client.focus.sticky
-    end, { description = "sticky", group = "Client" }),
+    end, { description = "toggle sticky", group = "Client" }),
 
     -- Toggle maximize
     awful.key({ ctrl, shift }, "m", function(c)
       c.maximized = not c.maximized
       c:raise()
-    end, { description = "(un)maximize", group = "Client" }),
+    end, { description = "toggle min/maximize", group = "Client" }),
 
     -- Close window
     awful.key({ ctrl, shift }, "w", function()
@@ -284,49 +275,50 @@ client.connect_signal("request::default_keybindings", function()
     end, { description = "close", group = "Client" }),
 
     -- Layout-aware resizing
-    awful.key({ alt, shift   }, "h", function () resize_horizontal(0.05) end,
-    { group = "Client", description = "(vimlike) resize" }),
-    awful.key({ alt, shift   }, "l", function () resize_horizontal(-0.05) end),
-    awful.key({ alt, shift   }, "k", function () resize_vertical(-0.05) end),
-    awful.key({ alt, shift   }, "j", function () resize_vertical(0.05) end),
+    awful.key({
+      modifiers = { alt, shift },
+      keygroup = "vimlike",
+      description = "resize",
+      group = "Client",
+      on_press = function(index)
+        local functions = { resize_h, resize_v, resize_v, resize_h }
+        local factors = { 0.05, -0.05, 0.05, -0.05 }
+        functions[index](factors[index])
+      end,
+    }),
 
-  -- Changing focus
-  -- Special case: mstab layout (TODO)
-  awful.key({ alt }, "Tab", function()
-    local layout = awful.layout.get(awful.screen.focused())
-    if layout.name == "mstab" then
-      -- if a slave is selected, alt tab switches between master and slave
-      awful.client.focus.byidx(1)
-    else
-      awful.client.focus.byidx(1)
-    end
-  end),
+    -- Changing focus
+    -- Special case: mstab layout (TODO)
+    awful.key({ alt }, "Tab", function()
+      local layout = awful.layout.get(awful.screen.focused())
+      if layout.name == "mstab" then
+        -- if a slave is selected, alt tab switches between master and slave
+        awful.client.focus.byidx(1)
+      else
+        awful.client.focus.byidx(1)
+      end
+    end),
 
-  awful.key({ alt , shift }, "Tab", function()
-    awful.client.focus.byidx(-1)
-  end),
+    awful.key({ alt , shift }, "Tab", function()
+      awful.client.focus.byidx(-1)
+    end),
 
-  -- When in mstab, ctrl tab cycles between only slaves
-  -- If master selected and ctrl tab is pressed, go to slave
-  -- awful.key({ ctrl }, "Tab", function()
-  -- end),
+    -- When in mstab, ctrl tab cycles between only slaves
+    -- If master selected and ctrl tab is pressed, go to slave
+    -- awful.key({ ctrl }, "Tab", function()
+    -- end),
 
-  -- Swapping clients
-  awful.key({ mod, shift }, "h", function()
-    awful.client.swap.bydirection("left")
-  end, { description = "(v) swap left", group = "Client"}),
-
-  awful.key({ mod, shift }, "j", function()
-    awful.client.swap.bydirection("down")
-  end),
-
-  awful.key({ mod, shift }, "k", function()
-    awful.client.swap.bydirection("up")
-  end),
-
-  awful.key({ mod, shift }, "l", function()
-    awful.client.swap.bydirection("right")
-  end),
+    -- Swapping clients
+    awful.key({
+      modifiers = { mod, shift },
+      keygroup = "vimlike",
+      description = "swap",
+      group = "Client",
+      on_press = function(index)
+        local dir = { "left", "down", "up", "right" }
+        awful.client.swap.bydirection(dir[index])
+      end,
+    }),
 
   })
 end)
@@ -346,7 +338,7 @@ awful.keyboard.append_global_keybindings({
   -- View nth workspace
   awful.key({
     modifiers = { mod },
-    keygroup = "numrow",
+    keygroup = "workspaces",
     description = "view nth workspace",
     group = "Workspace",
     on_press = function(index)

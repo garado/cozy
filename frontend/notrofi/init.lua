@@ -1,81 +1,29 @@
--- █▄░█ █▀█ ▀█▀    █▀█ █▀█ █▀▀ █
--- █░▀█ █▄█ ░█░    █▀▄ █▄█ █▀░ █
+
+-- █▄░█ █▀█ ▀█▀    █▀█ █▀█ █▀▀ █ 
+-- █░▀█ █▄█ ░█░    █▀▄ █▄█ █▀░ █ 
 
 -- It's not Rofi, but it's Rofi.
 -- https://github.com/adi1090x/rofi/ (Type 7 Img 10)
 
 -- Window switcher and app launcher with implementation heavily inspired by
--- bling's but modified to suit my aesthetic.
+-- bling's but trimmed down and with modified UI to suit my aesthetic.
 
+local beautiful  = require("beautiful")
 local ui = require("utils.ui")
 local dpi = ui.dpi
-local gfs = require("gears.filesystem")
 local awful = require("awful")
 local wibox = require("wibox")
 local notrofi = require("backend.cozy.notrofi")
-local beautiful = require("beautiful")
-local keynav = require("modules.keynav")
-local fzf = require("modules.fzf")
-local Gio = require("lgi").Gio
-local strutil = require("utils.string")
 
-local CFG_DIR = gfs.get_configuration_dir()
-local MAX_ENTRIES = 8
-local APP_ENTRY_HEIGHT = dpi(30)
+local launcher = require(... .. ".launcher")
+local switcher = require(... .. ".switcher")
 
-local all_entries = {}
-local comp_keywords = {}
-local first_app = nil
-
-local navigator, nav_root = keynav.navigator({
-  stop_key = "Mod1",
-  autofocus = true,
-})
-
--- █▀▀ █▀█ █▀█ █▄░█ ▀█▀ █▀▀ █▄░█ █▀▄
--- █▀░ █▀▄ █▄█ █░▀█ ░█░ ██▄ █░▀█ █▄▀
-
---- @function gen_app_entry
-local function gen_app_entry(app)
-  local entry = wibox.widget({
-    {
-      {
-        ui.textbox({ text = app.name }),
-        margins = dpi(8),
-        widget = wibox.container.margin,
-      },
-      bg = beautiful.neutral[800],
-      forced_width = dpi(1000),
-      widget = wibox.container.background,
-    },
-    forced_height = APP_ENTRY_HEIGHT,
-    layout = wibox.layout.fixed.horizontal,
-  })
-
-  entry.app = app
-  entry.bg = entry.children[1]
-
-  entry:connect_signal("mouse::enter", function(self)
-    self.bg.bg = beautiful.primary[700]
-  end)
-
-  entry:connect_signal("mouse::leave", function(self)
-    self.bg.bg = beautiful.neutral[800]
-  end)
-
-  entry:connect_signal("button::press", function(self)
-    if self.app.terminal then
-    else
-      awful.spawn(self.app.executable)
-      notrofi:close()
-    end
-  end)
-
-  return entry
-end
+local content = launcher
+local LAUNCHER, SWITCHER = 1, 2
+local active_opt = LAUNCHER
 
 local img = wibox.widget({
-  image = CFG_DIR .. "theme/colorschemes/mountain/nrofi",
+  image = beautiful.accent_img,
   resize = true,
   forced_width = dpi(200),
   widget = wibox.widget.imagebox,
@@ -120,33 +68,54 @@ local search = wibox.widget({
   layout = wibox.layout.fixed.horizontal,
 })
 
--- App entries
-local app_list = wibox.widget({
-  forced_height = APP_ENTRY_HEIGHT * MAX_ENTRIES,
-  layout = wibox.layout.fixed.vertical,
-  -----
-  area = keynav.area({
-    name = "nav_applist",
-  })
-})
-
-local app_list_container = wibox.widget({
+local opt_launcher = wibox.widget({
   {
-    app_list,
-    margins = dpi(20),
+    ui.textbox({ text = "󰀻", align = "center" }),
+    margins = dpi(10),
     widget = wibox.container.margin,
   },
-  bg = beautiful.neutral[800],
+  shape = ui.rrect(),
+  bg = beautiful.primary[700],
   widget = wibox.container.background,
+  ------
+  set_active = function(self)
+    self.bg = beautiful.primary[700]
+  end,
+  set_inactive = function(self)
+    self.bg = beautiful.neutral[600]
+  end,
+})
+
+local opt_switcher = wibox.widget({
+  {
+    ui.textbox({ text = "", align = "center" }),
+    margins = dpi(10),
+    widget = wibox.container.margin,
+  },
+  shape = ui.rrect(),
+  bg = beautiful.neutral[600],
+  widget = wibox.container.background,
+  ------
+  set_active = function(self)
+    self.bg = beautiful.primary[700]
+  end,
+  set_inactive = function(self)
+    self.bg = beautiful.neutral[600]
+  end,
 })
 
 local options = wibox.widget({
   {
     {
-      layout = wibox.layout.fixed.horizontal,
+      opt_launcher,
+      opt_switcher,
+      spacing = dpi(8),
+      layout = wibox.layout.flex.horizontal,
     },
+    margins = dpi(10),
     widget = wibox.container.margin,
   },
+  bg = beautiful.neutral[800],
   widget = wibox.container.background,
 })
 
@@ -156,9 +125,23 @@ local widget = wibox.widget({
     ui.place(search),
     widget = wibox.layout.stack,
   },
-  app_list_container,
+  {
+    {
+      content,
+      top   = dpi(10),
+      left  = dpi(10),
+      right = dpi(10),
+      widget = wibox.container.margin,
+    },
+    bg = beautiful.neutral[800],
+    widget = wibox.container.background,
+  },
   options,
   layout = wibox.layout.fixed.vertical,
+  -----
+  set_content = function(self, c)
+    self.children[2].widget.widget = c
+  end,
 })
 
 local nrofi = awful.popup({
@@ -173,89 +156,100 @@ local nrofi = awful.popup({
   widget        = widget
 })
 
+------------------------
 
--- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄
--- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀
-
---- @function generate_apps
--- @brief Generate a list of all apps that can possibly show within launcher.
-local function generate_apps()
-  all_entries = {}
-  comp_keywords = {}
-  local app_info = Gio.AppInfo
-  local apps = app_info.get_all()
-
-  for _, app in ipairs(apps) do
-    if app.should_show(app) then
-      local name = app_info.get_name(app)
-
-      comp_keywords[#comp_keywords+1] = name
-
-      all_entries[#all_entries+1] = {
-        name = name,
-        executable = app_info.get_executable(app),
-      }
-    end
-  end
-end
-generate_apps()
-
---- @function update_applist
--- @brief Updates the app list based on the user's current text input.
--- Called on every keypress.
-local function update_applist(_, key, input)
-  if key == "Escape" then notrofi:close() end
-  if input == "" then return end
-
-  local matches = fzf.filter(input, comp_keywords, false)
-
-  app_list:reset()
-  app_list.area:clear()
-
-  for i = 1, #matches do
-    if i > MAX_ENTRIES then return end
-    local entry = gen_app_entry( all_entries[matches[i][1]] )
-    app_list:add(entry)
-    app_list.area:append(entry)
-
-    if i == 1 then first_app = entry end
-  end
+local function show_launcher()
+  content = launcher
+  launcher.switch_callback()
+  widget:set_content(launcher)
+  opt_launcher:set_active()
+  opt_switcher:set_inactive()
+  active_opt = LAUNCHER
 end
 
---- @function prompt
--- @brief Get user's input
+local function show_switcher()
+  content = switcher
+  switcher.switch_callback()
+  widget:set_content(switcher)
+  opt_switcher:set_active()
+  opt_launcher:set_inactive()
+  active_opt = SWITCHER
+end
+
 local function prompt()
   awful.prompt.run {
-    font         = beautiful.font_reg_s,
-    prompt       = "",
-    text         = "",
-    bg_cursor    = beautiful.primary[400],
-    textbox      = promptbox,
-    keypressed_callback = update_applist,
-    exe_callback = function()
-      first_app:emit_signal("button::press")
+    font                 = beautiful.font_reg_s,
+    prompt               = "",
+    text                 = "",
+    bg_cursor            = beautiful.primary[400],
+    textbox              = promptbox,
+    keypressed_callback  = function(_, key, input)
+      if key == "Escape" then
+        notrofi:close()
+      elseif key == "Alt_L" then
+        notrofi.mode = "nav"
+      elseif key == "Tab" then
+        if active_opt == LAUNCHER then
+          show_switcher()
+        else
+          show_launcher()
+        end
+      else
+        if content.keypressed_callback then
+          content.keypressed_callback(_, key, input)
+        end
+      end
     end,
+    keyreleased_callback = function(_, key, input)
+      if notrofi.mode == "nav" then
+        if key == "j" then
+          notrofi:iter_element(1)
+        elseif key == "k" then
+          notrofi:iter_element(-1)
+        elseif key == "Alt_L" then
+          notrofi.mode = ""
+        end
+        return
+      end
+
+      if key == "Down" then
+        notrofi:iter_element(1)
+        return
+      elseif key == "Up" then
+        notrofi:iter_element(-1)
+        return
+      end
+
+      content.keyreleased_callback(_, key, input)
+    end,
+    exe_callback = function()
+      content.exe_callback()
+      notrofi:close()
+    end
   }
 end
 
-nav_root:append(app_list.area)
+------------------------
 
-for i = 1, MAX_ENTRIES do
-  local entry = gen_app_entry(all_entries[i])
-  app_list:add(entry)
-  app_list.area:append(entry)
+function notrofi:iter_element(iter_amt)
+  if not self.active_element then return end
+  self.active_element:emit_signal("mouse::leave")
+
+  local new_idx = math.fmod(self.active_element.index + iter_amt, #content.children)
+  if new_idx == 0 then new_idx = #content.children end
+
+  self.active_element = content.children[new_idx]
+  if self.active_element then self.active_element:emit_signal("mouse::enter") end
 end
 
+
 notrofi:connect_signal("setstate::open", function()
+  notrofi.mode = "nav"
   nrofi.visible = true
-  navigator:start()
   prompt()
 end)
 
 notrofi:connect_signal("setstate::close", function()
-  nrofi.visible = false
-  navigator:stop()
-
-  -- To kill the prompt
   awful.keygrabber.stop()
+  nrofi.visible = false
 end)

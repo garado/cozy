@@ -1,5 +1,4 @@
 
-
 -- █▄░█ █▀█ ▀█▀    █▀█ █▀█ █▀▀ █
 -- █░▀█ █▄█ ░█░    █▀▄ █▄█ █▀░ █
 
@@ -12,15 +11,6 @@ local gtable  = require("gears.table")
 
 local notrofi = {}
 local instance = nil
-
----------------------------------------------------------------------
-
---- @method generate_apps
--- @brief Populate all_entries with all searchable apps
-function notrofi:generate_apps()
-end
-
----------------------------------------------------------------------
 
 function notrofi:toggle()
   if self.visible then
@@ -43,7 +33,6 @@ end
 
 function notrofi:new()
   self.visible = false
-  -- self:generate_apps()
 end
 
 local function new()
