@@ -13,9 +13,9 @@ A desktop with an emphasis on functionality and cohesive design. Made with ‚ù§Ô∏
 
 <h1> Dashboard </h1>
 
-<h2> Main tab </h2>
-
 The dashboard combines all my essential organizational tools into one convenient place.
+
+<h2> Main tab </h2>
 
 <img src="./main.png">
 
@@ -76,6 +76,12 @@ Goal visualization and tracking with Taskwarrior, GraphViz, and twdeps.
 
 <h1> Other stuff </h1>
 
+<h2> Theme switcher </h2>
+
+<img src="./hotreload.gif">
+
+Theme switching with hot reloading and integration with other applications.
+
 <h2> Control center </h2>
 
 <img src="./control.png" height=400>
@@ -97,6 +103,7 @@ Goal visualization and tracking with Taskwarrior, GraphViz, and twdeps.
 I've spent a lot of time tweaking this setup to be just the way I like it, so now this setup feels very personal, comfortable, and cozy.
 
 <b>Why write this with Awesome and not a "proper" UI framework?</b>
+
 I started out making simple things like a fancy bar and then over the course of a year it slowly but steadily turned into whatever this is. I'm in too deep. Also, AWM is unbelievably easy to use and development with it is really, really fast, and since this is just a hobby and this stuff has nothing to do with my career skillset, starting over with a different framework would be a waste of time.
 
 <h3>Acknowledgements</h3>
