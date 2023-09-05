@@ -1,24 +1,26 @@
 
--- █▀ ▀█▀ █▀█ █ █▄░█ █▀▀    █░█ ▀█▀ █ █░░ █▀ 
--- ▄█ ░█░ █▀▄ █ █░▀█ █▄█    █▄█ ░█░ █ █▄▄ ▄█ 
+-- █▀ ▀█▀ █▀█ █ █▄░█ █▀▀    █░█ ▀█▀ █ █░░ █▀
+-- ▄█ ░█░ █▀▄ █ █░▀█ █▄█    █▄█ ░█░ █ █▄▄ ▄█
 
 local string = string -- Lua library
 
 local _string = {}
 
--- █▀▄▀█ ▄▀█ █▄░█ █ █▀█ █░█ █░░ ▄▀█ ▀█▀ █ █▀█ █▄░█ 
--- █░▀░█ █▀█ █░▀█ █ █▀▀ █▄█ █▄▄ █▀█ ░█░ █ █▄█ █░▀█ 
+-- █▀▄▀█ ▄▀█ █▄░█ █ █▀█ █░█ █░░ ▄▀█ ▀█▀ █ █▀█ █▄░█
+-- █░▀░█ █▀█ █░▀█ █ █▀▀ █▄█ █▄▄ █▀█ ░█░ █ █▄█ █░▀█
 
---- @brief Capitalize the first letter of the string
+--- @function first_to_upper
+-- @brief Capitalize the first letter of the string
 function _string.first_to_upper(str)
   return (str:gsub("^%l", string.upper))
 end
 
---- @brief Split text input on a given delimiter.
+--- @function split
+-- @brief Split text input on a given delimiter.
 -- @param text  A string to delimit.
 -- @param delim Delimiting character(s)
 -- @param keepEmpty True if empty tokens should be kept (stored
--- in return array as "")
+--                  in return array as "")
 -- @return A table containing the split tokens.
 function _string.split(text, delim, keepEmpty)
   delim = delim or "%s" -- default all whitespace
@@ -27,9 +29,9 @@ function _string.split(text, delim, keepEmpty)
   local match
   if keepEmpty then
     text  = text .. delim
-    match = "([^"..delim.."]*)" .. delim
+    match = "([^" .. delim .. "]*)" .. delim
   else
-    match = "([^"..delim.."]+)"
+    match = "([^" .. delim .. "]+)"
   end
 
   local ret = {}
@@ -39,14 +41,16 @@ function _string.split(text, delim, keepEmpty)
   return ret
 end
 
---- Check if string starts with another string
+--- @function hasprefix
+-- @brief Check if string starts with another string
 -- @param text    Text to search through
 -- @param prefix  Text to look for
 function _string.hasprefix(text, prefix)
-   return string.sub(text, 1, string.len(prefix)) == prefix
+  return string.sub(text, 1, string.len(prefix)) == prefix
 end
 
---- Check if string contains a substring
+--- @function contains
+-- @brief Check if string contains a substring
 function _string.contains(str, target)
   return string.find(str, target)
 end
@@ -58,46 +62,103 @@ function _string.count(str, pattern)
   return count
 end
 
--- █▀▄ ▄▀█ ▀█▀ █▀▀    ▄▀█ █▄░█ █▀▄    ▀█▀ █ █▀▄▀█ █▀▀ 
--- █▄▀ █▀█ ░█░ ██▄    █▀█ █░▀█ █▄▀    ░█░ █ █░▀░█ ██▄ 
+-- █▀▄ ▄▀█ ▀█▀ █▀▀    ▄▀█ █▄░█ █▀▄    ▀█▀ █ █▀▄▀█ █▀▀
+-- █▄▀ █▀█ ░█░ ██▄    █▀█ █░▀█ █▄▀    ░█░ █ █░▀░█ ██▄
 
---- @method date_to_int
--- @brief   Convert date from gcalcli (YYYY-MM-DD or YYYY-MM-DD\t\tHH:MM) to a timestamp
--- @return  An os.time timestamp
-function _string.datetime_to_ts(datetime)
-  local time_specified = _string.contains(datetime, ":")
+-- Define these here so they don't get created each time dt_convert is called.
+-- NOTE: Tables need to be numerically indexed because the order matters a lot and
+-- associative arrays are in a kind of random order when you iterate through them.
 
-  if time_specified then
-    local pattern = "(%d%d%d%d)-(%d%d)-(%d%d)\t\t(%d%d:%d%d)"
-    local xyear, xmon, xday, xhr, xmin = datetime:match(pattern)
-    return os.time({
-      year = xyear, month = xmon, day = xday,
-      hour = xhr, min = xmin, sec = 0})
-  else
-    local pattern = "(%d%d%d%d)-(%d%d)-(%d%d)"
-    local xyear, xmon, xday = datetime:match(pattern)
-    return os.time({
-      year = xyear, month = xmon, day = xday,
-      hour = 0, min = 0, sec = 0 })
+local DT_OPTIONS = {
+  "%%d", -- Day [01-31]
+  "%%H", -- Hour [00-23]
+  "%%h", -- Hour [01-12]
+  "%%M", -- Minute [00-59]
+  "%%S", -- Second [00-59]
+  "%%y", -- Two-digit year
+  "%%m", -- Month [01-12]
+  "%%p", -- "am" or "pm"
+  "%%a", -- Weekday name (3 letters)
+  "%%Y", -- Full year
+}
+
+local DT_MATCH_REPLACE = {
+  "(%%d%%d)", -- Day [01-31]
+  "(%%d%%d)", -- Hour [00-23]
+  "(%%d%%d)", -- Hour [01-12]
+  "(%%d%%d)", -- Minute [00-59]
+  "(%%d%%d)", -- Second [00-59]
+  "(%%d%%d)", -- Two-digit year
+  "(%%d%%d)", -- Month [01-12]
+  "(%%d%%d)", -- "am" or "pm"
+  "(%%d%%d%%d)", -- Weekday name (3 letters)
+  "(%%d%%d%%d%%d)", -- Full year
+}
+
+local DT_LETTERS = {
+  ["Y"] = "year",
+  ["d"] = "day",
+  ["H"] = "hour",
+  ["h"] = "hour",
+  ["M"] = "minute",
+  ["m"] = "month",
+}
+
+_string.dt_format = {
+  standard = "%Y-%m-%d",
+  iso = "%Y%m%dT%H%M%SZ",
+}
+
+-- @brief Convert a datetime string to another format.
+--        This function is meant to be a catch-all replacement for all of the datetime
+--        conversion functions I've had to write because writing really specific conversion
+--        functions got annoying.
+-- @param subject       The string to convert, i.e. "2023-03-02"
+-- @param old_pattern   The pattern for the subject string, i.e. "%Y-%m-%d"
+--                      If not specified, %Y-%m-%d is assumed.
+-- @param new_pattern   The new pattern, i.e. "%A %M %d"
+--                      If not specified, the function returns the raw timestamp.
+function _string.dt_convert(subject, old_pattern, new_pattern)
+  old_pattern = old_pattern or "%Y-%m-%d"
+
+  -- Record the order in which matches appear.
+  -- This generates a table that for the example case %Y-%m-%d looks like { "Y", "m", "d" }
+  local captures = _string.split(old_pattern, "%%")
+  for i = 1, #captures do
+    captures[i] = captures[i]:sub(1, 1)
   end
-end
 
---- @method datetime_to_human
--- @brief Convert YYYY-MM-DD to human-readable date.
--- i.e. 2023-05-14 to Sunday, May 14 2023
--- TODO: Bad naming lol both formats are definitely human readable
-function _string.datetime_to_human(datetime)
-  local pattern = "(%d%d%d%d)-(%d%d)-(%d%d)"
-  local xyear, xmon, xday = datetime:match(pattern)
-  local ts = os.time({
-      year = xyear, month = xmon, day = xday,
-      hour = 0, min = 0, sec = 0})
-  return os.date("%A, %B %d %Y", ts)
+  -- This takes the subject string: 2023-04-02
+  -- And the old_pattern information: %Y-%m-%d
+  -- And turns old_pattern into this: (%d%d%d%d)-(%d%d)-(%d%d)
+  for i = 1, #DT_OPTIONS do
+    if old_pattern:find(DT_OPTIONS[i]) then
+      old_pattern = string.gsub(old_pattern, DT_OPTIONS[i], DT_MATCH_REPLACE[i])
+    end
+  end
+
+  -- Get table of matches using old_pattern (%d%d%d%d)-(%d%d)-(%d%d)
+  local match_values = { subject:match(old_pattern) }
+
+  -- Set up inputs to get os.time timestamp
+  local timetable = {}
+  for i = 1, #captures do
+    if DT_LETTERS[captures[i]] then
+      timetable[DT_LETTERS[captures[i]]] = match_values[i]
+    end
+  end
+
+  local ts = os.time(timetable)
+  local tz_offset = require("cozyconf").timezone or 0
+  ts = ts + (tz_offset * 60 * 60)
+
+  return (new_pattern and os.date(new_pattern, ts)) or ts
 end
 
 --- @method ts_to_relative
--- @brief Convert an os.time timestamp to relative time (i.e. '2 days ago')
--- @param ts os.time timestamp for the date to convert
+-- @brief Convert an os.time timestamp to relative time
+--        i.e. '1 day ago', '2 months ago'
+-- @param ts  os.time timestamp for the date to convert
 -- TODO: Make all the old to_relative functions use this
 function _string.ts_to_relative(ts)
   local now = os.time()
@@ -134,113 +195,30 @@ function _string.ts_to_relative(ts)
   return relative, overdue
 end
 
---- @method time_to_int
--- @param time  A time in format HH:MM (military time)
--- Converts time in HH:MM to an integer 0-24.
--- Example: 23:15 -> 23.25
-function _string.time_to_int(time)
+--- @method time_to_float
+-- @brief Converts time in HH:MM to a float [0-24).
+--        i.e. 23:15 -> 23.25
+-- @param time  A time in format HH:MM 24-hour time
+function _string.time_to_float(time)
   local fields = _string.split(time, ":")
   local h = tonumber(fields[1])
   local m = tonumber(fields[2]) / 60
   return h + m
 end
 
---- @method day_to_int
--- @param date  A date in the form YYYY-MM-DD
--- @brief Convert a date to a weekday 0-6.
-function _string.date_to_weekday_int(date)
-  local pattern = "(%d%d%d%d)-(%d%d)-(%d%d)"
-  local xyear, xmon, xday = date:match(pattern)
-  local ts = os.time({
-    year = xyear, month = xmon, day = xday,
-    hour = 0, min = 0, sec = 0})
-  return os.date("%w", ts)
-end
-
---- @method iso_to_ts
--- @brief Converts ISO-8601-formatted date (as used by Taskwarrior
--- and Timewarrior) to an os.time timestamp.
-function _string.iso_to_ts(iso)
-  -- ISO-8601 format: YYYY-MM-DDThh:mm:ssZ
-  local pattern = "(%d%d%d%d)(%d%d)(%d%d)T(%d%d)(%d%d)(%d%d)Z"
-  local xyear, xmon, xday, xhr, xmin, xsec = iso:match(pattern)
-  local ts = os.time({
-    year = xyear, month = xmon, day = xday,
-    hour = xhr, min = xmin, sec = xsec })
-
-  local tz_offset = require("cozyconf.dash").timezone
-  ts = ts + (tz_offset * 60 * 60)
-
-  return ts
-end
-
---- @method iso_to_readable
--- @brief Converts ISO-8601 format dates (as used by Taskwarrior
--- and Timewarrior) into human-readable dates.
--- @param iso     (string) ISO-formatted date
--- @param format  
-function _string.iso_to_readable(iso, format)
-  local ts = _string.iso_to_ts(iso)
-  format = format or '%A %B %d %Y'
-  return os.date(format, ts)
-end
-
---- @method iso_to_relative
--- @brief Converts ISO-8601 format dates (as used by Task/Timewarrior)
--- into a relative date (i.e. 'in 3 days', '3 days ago')
--- @return (string) The relative date
--- @return (bool) If task is overdue
--- TODO: Merge this with datetime_to_relative
-function _string.iso_to_relative(iso)
-  local ts = _string.iso_to_ts(iso)
-  local now = os.time()
-  local diff = now - ts
-  local overdue = diff > 0
-  diff = math.abs(diff)
-
-  local SECONDS_IN_HOUR = 60 * 60
-  local SECONDS_IN_DAY = 24 * SECONDS_IN_HOUR
-
-  local timestr, divisor
-
-  if diff < SECONDS_IN_HOUR then
-    timestr = "minute"
-    divisor = 60
-  elseif diff < SECONDS_IN_DAY then
-    timestr = "hour"
-    divisor = SECONDS_IN_HOUR
-  else
-    timestr = "day"
-    divisor = SECONDS_IN_DAY
-  end
-
-  local res = math.floor(diff / divisor)
-  local plural = res == 1 and "" or "s"
-  local relative = res .. ' ' .. timestr .. plural
-
-  if overdue then
-    relative = relative .. ' ago'
-  else
-    relative = 'in ' .. relative
-  end
-
-  return relative, overdue
-end
-
-
--- █▀█ ▄▀█ █▄░█ █▀▀ █▀█ 
--- █▀▀ █▀█ █░▀█ █▄█ █▄█ 
+-- █▀█ ▄▀█ █▄░█ █▀▀ █▀█
+-- █▀▀ █▀█ █░▀█ █▄█ █▄█
 
 function _string.pango_bold(str)
   if not str then return end
-  return "<b>"..str.."</b>"
+  return "<b>" .. str .. "</b>"
 end
 
--- █▀▄▀█ █ █▀ █▀▀ 
--- █░▀░█ █ ▄█ █▄▄ 
+-- █▀▄▀█ █ █▀ █▀▀
+-- █░▀░█ █ ▄█ █▄▄
 
 --- @method print_arr
---@brief Pretty print array
+-- @brief Pretty print array. Stolen from somewhere on StackOverflow
 function _string.print_arr(arr, indentLevel)
   local str = ""
   local indentStr = "#"
@@ -251,10 +229,10 @@ function _string.print_arr(arr, indentLevel)
   end
 
   for _ = 0, indentLevel do
-    indentStr = indentStr.."  "
+    indentStr = indentStr .. "  "
   end
 
-  for index,value in pairs(arr) do
+  for index, value in pairs(arr) do
     if type(value) == "boolean" then
       value = value and "true" or "false"
     end
@@ -264,9 +242,9 @@ function _string.print_arr(arr, indentLevel)
     end
 
     if type(value) == "table" then
-      str = str..indentStr..index..": \n".._string.print_arr(value, (indentLevel + 1))
+      str = str .. indentStr .. index .. ": \n" .. _string.print_arr(value, (indentLevel + 1))
     else
-      str = str..indentStr..index..": "..value.."\n"
+      str = str .. indentStr .. index .. ": " .. value .. "\n"
     end
   end
   return str
