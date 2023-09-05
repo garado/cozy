@@ -30,7 +30,7 @@ The dashboard combines all my essential organizational tools into one convenient
 
 Simple, aesthetic, and effective GUI for Taskwarrior.
 
-<img src="./taskwarrior.png">
+<img src="./dashboard-task.gif">
 
 <h2> Ledger </h2>
 
@@ -42,7 +42,7 @@ Use data from <a href="https://github.com/ledger/ledger">ledger-cli</a> to view 
 
 Your schedule at a glance. Powered by gcalcli.
 
-<img src="./calendar.png">
+<img src="./dashboard-calendar.gif">
 
 <details>
 <summary>Calendar keybinds</summary>
@@ -82,8 +82,7 @@ Goal visualization and tracking with Taskwarrior, GraphViz, and twdeps.
 
 <h2> App launcher and window switcher </h2>
 
-<img src="./notrofi-applauncher.png" height=400>
-<img src="./notrofi-windowswitcher.png" height=400>
+<img src="./notrofi-applauncher.png" height=400> <img src="./notrofi-windowswitcher.png" height=400>
 
 <h2> Slightly nicer hotkeys popup </h2>
 
@@ -98,7 +97,6 @@ Goal visualization and tracking with Taskwarrior, GraphViz, and twdeps.
 I've spent a lot of time tweaking this setup to be just the way I like it, so now this setup feels very personal, comfortable, and cozy.
 
 <b>Why write this with Awesome and not a "proper" UI framework?</b>
-
 I started out making simple things like a fancy bar and then over the course of a year it slowly but steadily turned into whatever this is. I'm in too deep. Also, AWM is unbelievably easy to use and development with it is really, really fast, and since this is just a hobby and this stuff has nothing to do with my career skillset, starting over with a different framework would be a waste of time.
 
 <h3>Acknowledgements</h3>
