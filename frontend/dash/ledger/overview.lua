@@ -39,6 +39,7 @@ local function gen_thing(id, color)
   })
 
   ledger:connect_signal("ready::" .. id, function(_, amount)
+    if amount == "" then amount = "0.00" end
     thing.children[2]:update_text(amount)
   end)
 

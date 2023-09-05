@@ -64,22 +64,6 @@ local budget_entries = wibox.widget({
   layout  = wibox.layout.flex.vertical,
 })
 
-local budget = wibox.widget({
-  ui.textbox({
-    text  = "Monthly Budget",
-    align = "center",
-    font  = beautiful.font_med_m,
-    height = dpi(30),
-  }),
-  {
-    budget_entries,
-    left   = dpi(30),
-    right  = dpi(30),
-    widget = wibox.container.margin,
-  },
-  spacing = dpi(10),
-  layout  = wibox.layout.fixed.vertical,
-})
 
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄
 -- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀
@@ -97,7 +81,7 @@ ledger:connect_signal("ready::budget", function(_, bdata)
 end)
 
 return ui.dashbox(
-  ui.place(budget),
+  ui.place(budget_entries),
   dpi(390), -- width
   dpi(500)  -- height
 )

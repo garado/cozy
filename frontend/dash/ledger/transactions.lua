@@ -14,7 +14,7 @@ local ledger = require("backend.system.ledger")
 -- Module-level variables
 local TITLE_WIDTH   = dpi(240)
 local DATE_WIDTH    = TITLE_WIDTH
-local ICON_WIDTH    = dpi(30)
+local ICON_WIDTH    = dpi(32)
 local AMOUNT_WIDTH  = dpi(100)
 local TEXT_HEIGHT   = dpi(20)
 
@@ -34,12 +34,12 @@ local function pick_transaction_icon(title, account)
     { "󰉛", "Food"       },
     { "", "Household"  },
     { "", "Education"  },
-    { "", "Personal"   },
+    { "", "Personal"   },
     { "", "Hobby"      },
     { "", "Gifts"      },
     { "󰄛", "Pets"       },
     { "", "Bills"      },
-    { "", "Transportation" },
+    { "󰄋", "Transportation" },
     { "󰉚", "Restaurant" },
   }
 
@@ -80,18 +80,16 @@ local function gen_transaction(tdata)
 
   local icon = wibox.widget({
     {
-      {
-        ui.textbox({
-          text  = pick_transaction_icon(t_title, t_acnt),
-          color = beautiful.primary[700],
-        }),
-        widget = wibox.container.place,
-      },
-      -- margins = dpi(5),
-      widget  = wibox.container.margin,
+      ui.textbox({
+        text  = pick_transaction_icon(t_title, t_acnt),
+        color = beautiful.primary[700],
+        align = "center",
+        width = dpi(20),
+      }),
+      widget = wibox.container.place,
     },
     bg = beautiful.primary[200],
-    shape  = ui.rrect(),
+    shape = require("gears").shape.circle,
     forced_width = ICON_WIDTH,
     forced_height = ICON_WIDTH,
     widget = wibox.container.background,
@@ -130,7 +128,7 @@ local function gen_transaction(tdata)
     {
       title,
       date,
-      spacing = dpi(5),
+      spacing = dpi(4),
       layout = wibox.layout.fixed.vertical,
     },
     amount,
@@ -144,18 +142,6 @@ end
 local transaction_entries = wibox.widget({
   spacing = dpi(15),
   layout  = wibox.layout.flex.vertical,
-})
-
-local transactions = wibox.widget({
-  ui.textbox({
-    text  = "Transactions",
-    align = "center",
-    font  = beautiful.font_med_m,
-    height = dpi(30),
-  }),
-  transaction_entries,
-  spacing = dpi(10),
-  layout = wibox.layout.fixed.vertical,
 })
 
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄ 
@@ -173,7 +159,7 @@ ledger:connect_signal("ready::transactions", function(_, tx)
 end)
 
 return ui.dashbox(
-  ui.place(transactions),
+  ui.place(transaction_entries),
   dpi(410), -- width
   dpi(2000)  -- height
 )

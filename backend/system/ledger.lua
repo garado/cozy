@@ -14,6 +14,8 @@ local lfile = config.ledger.ledger_file
 local bfile = config.ledger.budget_file
 local afile = config.ledger.account_file
 
+local LEDGER_CMD = "ledger -f "..lfile.." -f "..afile.." -f "..bfile.." "
+
 local ledger = {}
 local instance = nil
 
@@ -29,11 +31,11 @@ local instance = nil
 -- TODO: More customization options - this is very specific to the way I have
 -- my ledger set up
 function ledger:parse_assets()
-  local cmd = "ledger -f " .. lfile .. " balance checking savings cash --no-total"
+  local cmd = LEDGER_CMD .. " balance checking savings cash --no-total"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local lines = strutil.split(stdout, "\r\n")
     local signal_names = { "total", "cash", "checking", "savings" }
-    for i = 1, #lines do
+    for i = 1, #signal_names do
       -- Remove all chars except numbers and decimal points
       local amount = lines[i]:gsub("[^0-9.]", "")
       local signal = "ready::" .. signal_names[i]
@@ -42,32 +44,32 @@ function ledger:parse_assets()
   end)
 end
 
--- @method parse_month_income
+--- @method parse_month_income
 -- @brief Get income for the current month
 function ledger:parse_month_income()
   local date = os.date("%m") .. "/01" -- Beginning of this month
-  local cmd = "ledger -f " .. lfile .. " balance ^Income -b " .. date .. " | head -n 1"
+  local cmd = LEDGER_CMD .. " balance ^Income -b " .. date .. " | head -n 1"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local amount = stdout:gsub("[^0-9.]", "")
     self:emit_signal("ready::income", amount)
   end)
 end
 
--- @method parse_month_expenses
+--- @method parse_month_expenses
 -- @brief Get expenses for the current month
 function ledger:parse_month_expenses()
   local date = os.date("%m") .. "/01" -- Beginning of this month
-  local cmd = "ledger -f " .. lfile .. " balance ^Expense -b " .. date .. " | head -n 1"
+  local cmd = LEDGER_CMD .. " --cleared balance ^Expense -b " .. date .. " | head -n 1"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local amount = stdout:gsub("[^0-9.]", "")
     self:emit_signal("ready::expenses", amount)
   end)
 end
 
--- @method parse_recent_transactions
+--- @method parse_recent_transactions
 -- @brief Gets recent ledger transactions using `ledger csv` command
 function ledger:parse_recent_transactions()
-  local cmd = "ledger -f " .. afile .. " -f " .. lfile .. " --pedantic csv ^expenses ^income | head -n 9"
+  local cmd = LEDGER_CMD .. " csv ^expenses ^income --cleared | head -n 10"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     -- Clean up the CSV so it's easier to parse
     local transactions = {}
@@ -78,6 +80,34 @@ function ledger:parse_recent_transactions()
       table.insert(transactions, fields)
     end
     self:emit_signal("ready::transactions", transactions)
+  end)
+end
+
+--- @method parse_reimbursements
+-- @brief Get info on who owes what. This only shows the amount owed.
+--        See parse_reimbursement_data to get information on what the transaction was.
+function ledger:parse_reimbursements()
+  local cmd = LEDGER_CMD .." bal Liabilities Assets:Reimbursements | tail -n +2 | head -n -2"
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    -- Clean up data
+    local tmp = strutil.split(stdout, "\r\n")
+    local lines = {}
+
+    for i = 1, #tmp do
+      lines[i] = strutil.split(tmp[i], "%s+%$")
+    end
+
+    self:emit_signal("ready::reimbursements", lines)
+  end)
+end
+
+--- @method parse_reimbursement_data
+-- @brief Get information on transaction data.
+function ledger:parse_reimbursement_data(account)
+  local cmd = LEDGER_CMD .. " reg --pedantic --pending Liabilities Assets:Reimbursements"
+  cmd = cmd .. " | head -n -2"
+  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+    -- local lines = strutil.strip(stdout, "\r\n")
   end)
 end
 

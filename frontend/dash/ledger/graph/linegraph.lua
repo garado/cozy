@@ -126,7 +126,16 @@ function linegraph.new(args)
 end
 
 function linegraph.mt:__call(...)
-    return linegraph.new(...)
+  local g = linegraph.new(...)
+
+  awesome.connect_signal("theme::reload", function(lut)
+    g._private.avg_color = lut[g._private.avg_color]
+    for i = 1, #g._private.colors do
+      g._private.colors[i] = lut[g._private.colors[i]]
+    end
+  end)
+
+  return g
 end
 
 return setmetatable(linegraph, linegraph.mt)
