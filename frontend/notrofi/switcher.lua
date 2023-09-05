@@ -15,7 +15,7 @@ local client_list
 
 --- @function gen_client_entry
 local function gen_client_entry(c, index)
-  local color = c.urgent and beautiful.red[400] or beautiful.neutral[100]
+  local fg = c.urgent and beautiful.red[400] or beautiful.neutral[100]
 
   local tags = c:tags()
   local tag_text = tags[1] and tags[1].name or "?"
@@ -40,14 +40,14 @@ local function gen_client_entry(c, index)
       {
         {
           tag,
-          ui.textbox({ color = color, text = c.class .. ": " }),
-          ui.textbox({ color = color, text = c.name }),
+          ui.textbox({ color = fg, text = c.class .. ": " }),
+          ui.textbox({ color = fg, text = c.name }),
           layout = wibox.layout.fixed.horizontal,
         },
         margins = dpi(8),
         widget = wibox.container.margin,
       },
-      bg = beautiful.neutral[800],
+      bg = index == 1 and beautiful.primary[700] or beautiful.neutral[800],
       forced_width = dpi(1000),
       widget = wibox.container.background,
     },
@@ -68,12 +68,10 @@ local function gen_client_entry(c, index)
   end)
 
   entry:connect_signal("button::press", function(self)
-    -- if self.app.terminal then
-    -- else
-    --   awful.spawn.easy_async_with_shell(self.app.executable, function() end)
-    --   notrofi:close()
-    -- end
+    self.client:jump_to()
   end)
+
+  if index == 1 then notrofi.active_element = entry end
 
   return entry
 end
@@ -89,10 +87,6 @@ local function update_clientlist(_, key, input)
       if i > #clients then return end
       local entry = gen_client_entry(clients[i], i)
       client_list:add(entry)
-      if i == 1 then
-        notrofi.active_element = entry
-        notrofi.active_element:emit_signal("mouse::enter")
-      end
     end
     return
   end

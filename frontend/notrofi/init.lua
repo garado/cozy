@@ -21,9 +21,10 @@ local switcher = require(... .. ".switcher")
 local content = launcher
 local LAUNCHER, SWITCHER = 1, 2
 local active_opt = LAUNCHER
+local last_key = ""
 
 local img = wibox.widget({
-  image = beautiful.accent_img,
+  image = beautiful.accent_image,
   resize = true,
   forced_width = dpi(200),
   widget = wibox.widget.imagebox,
@@ -184,11 +185,11 @@ local function prompt()
     bg_cursor            = beautiful.primary[400],
     textbox              = promptbox,
     keypressed_callback  = function(_, key, input)
-      if key == "Escape" then
+      if key == "Escape" or last_key..key == "Alt_Lr" then
         notrofi:close()
       elseif key == "Alt_L" then
         notrofi.mode = "nav"
-      elseif key == "Tab" then
+      elseif key == "Tab" or (notrofi.mode == "nav" and (key == "h" or key == "l")) then
         if active_opt == LAUNCHER then
           show_switcher()
         else
@@ -199,6 +200,7 @@ local function prompt()
           content.keypressed_callback(_, key, input)
         end
       end
+      last_key = key
     end,
     keyreleased_callback = function(_, key, input)
       if notrofi.mode == "nav" then

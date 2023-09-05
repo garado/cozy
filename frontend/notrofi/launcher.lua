@@ -49,7 +49,7 @@ local function gen_app_entry(app, index)
         margins = dpi(8),
         widget = wibox.container.margin,
       },
-      bg = beautiful.neutral[800],
+      bg = index == 1 and beautiful.primary[700] or beautiful.neutral[800],
       forced_width = dpi(1000),
       widget = wibox.container.background,
     },
@@ -77,6 +77,8 @@ local function gen_app_entry(app, index)
     end
   end)
 
+  if index == 1 then notrofi.active_element = entry end
+
   return entry
 end
 
@@ -88,10 +90,6 @@ local function update_applist(_, key, input)
     for i = 1, MAX_ENTRIES do
       local entry = gen_app_entry(all_entries[i], i)
       app_list:add(entry)
-      if i == 1 then
-        notrofi.active_element = entry
-        notrofi.active_element:emit_signal("mouse::enter")
-      end
     end
     return
   end
