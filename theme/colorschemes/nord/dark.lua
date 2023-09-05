@@ -7,8 +7,8 @@ local awesome_cfg = gfs.get_configuration_dir()
 
 local theme = {
   type = "dark",
-  wall = awesome_cfg .. "theme/colorschemes/nord/dark_wp",
-  accent_image = awesome_cfg .. "theme/colorschemes/nord/alt",
+  wall = awesome_cfg .. "theme/colorschemes/nord/wallpaper",
+  accent_image = awesome_cfg .. "theme/colorschemes/nord/accent_image",
 
   primary = {
     base = "#5e81ac",

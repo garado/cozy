@@ -7,8 +7,8 @@ local awesome_cfg = gfs.get_configuration_dir()
 
 return {
   type = "dark",
-  wall = awesome_cfg .. "theme/colorschemes/mountain/wp",
-  accent_image = awesome_cfg .. "theme/colorschemes/mountain/nrofi",
+  wall = awesome_cfg .. "theme/colorschemes/mountain/wallpaper",
+  accent_image = awesome_cfg .. "theme/colorschemes/mountain/accent_image",
 
   primary = {
     base = "#7d6a4f",
