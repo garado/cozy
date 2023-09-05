@@ -58,28 +58,28 @@ local colors = {
   [0] = beautiful.neutral[900],
 }
 
-local function get_square(color)
-  return wibox.widget {
-    fit = function()
-      return SIDELENGTH, SIDELENGTH
-    end,
-    draw = function(_, _, cr, _, _)
-      cr:set_source(gears.color(color))
-      cr:rectangle(0, 0, SIDELENGTH - GAP_SIZE, SIDELENGTH - GAP_SIZE)
-      cr:fill()
-    end,
-    layout = wibox.widget.base.make_widget
-  }
-end
-
-local col = { layout = wibox.layout.fixed.vertical }
-local row = { layout = wibox.layout.fixed.horizontal }
-local day_idx = BOXES_PER_COL - os.date('%w')
-for _ = 0, day_idx do
-  table.insert(col, get_square(color_of_empty_cells))
-end
-
 local update_widget = function(_, stdout, _, _, _)
+  local function get_square(color)
+    return wibox.widget {
+      fit = function()
+        return SIDELENGTH, SIDELENGTH
+      end,
+      draw = function(_, _, cr, _, _)
+        cr:set_source(gears.color(color))
+        cr:rectangle(0, 0, SIDELENGTH - GAP_SIZE, SIDELENGTH - GAP_SIZE)
+        cr:fill()
+      end,
+      layout = wibox.widget.base.make_widget
+    }
+  end
+
+  local col = { layout = wibox.layout.fixed.vertical }
+  local row = { layout = wibox.layout.fixed.horizontal }
+  local day_idx = BOXES_PER_COL - os.date('%w')
+  for _ = 0, day_idx do
+    table.insert(col, get_square(color_of_empty_cells))
+  end
+
   for intensity in stdout:gmatch("[^\r\n]+") do
     if day_idx % BOXES_PER_COL == 0 then
       table.insert(row, col)
@@ -122,16 +122,31 @@ local function process_data(stdout)
   contrib_count:update_text(total)
 end
 
--- If cache files don't exist, run script to populate them.
--- Otherwise read cache files like normal.
--- (The script writes to both cache files and stdout.)
-if not gfs.file_readable(HEATMAP_DATA) or not gfs.file_readable(CONTRIB_COUNT_DATA) then
-  local cmd = "utils/scripts/fetch-github-contribs " .. conf.github_username .. ' ' .. DAYS_SHOWN
-  awful.spawn.easy_async_with_shell(cmd, process_data)
-else
-  local cmd = "cat " .. HEATMAP_DATA .. " ; echo '=' ; cat " .. CONTRIB_COUNT_DATA
-  awful.spawn.easy_async_with_shell(cmd, process_data)
+local function load_data()
+  -- Reset vars in case theme was reloaded
+  color_of_empty_cells = beautiful.neutral[900]
+  colors = {
+    [4] = beautiful.primary[400],
+    [3] = beautiful.primary[500],
+    [2] = beautiful.primary[600],
+    [1] = beautiful.primary[700],
+    [0] = beautiful.neutral[900],
+  }
+
+  -- If cache files don't exist, run script to populate them.
+  -- Otherwise read cache files like normal.
+  -- (The script writes to both cache files and stdout.)
+  if not gfs.file_readable(HEATMAP_DATA) or not gfs.file_readable(CONTRIB_COUNT_DATA) then
+    local cmd = "utils/scripts/fetch-github-contribs " .. conf.github_username .. ' ' .. DAYS_SHOWN
+    awful.spawn.easy_async_with_shell(cmd, process_data)
+  else
+    local cmd = "cat " .. HEATMAP_DATA .. " ; echo '=' ; cat " .. CONTRIB_COUNT_DATA
+    awful.spawn.easy_async_with_shell(cmd, process_data)
+  end
 end
+
+load_data()
+awesome.connect_signal("theme::reload", load_data)
 
 return ui.dashbox_v2(
   wibox.widget({
@@ -145,10 +160,7 @@ return ui.dashbox_v2(
       spacing = ui.dpi(4),
       layout = wibox.layout.fixed.vertical,
     },
-    {
-      img,
-      widget = wibox.container.place,
-    },
+    wibox.container.place(img),
     spacing = ui.dpi(10),
     layout = wibox.layout.fixed.vertical,
   })

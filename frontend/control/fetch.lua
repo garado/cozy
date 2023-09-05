@@ -16,15 +16,13 @@ local fetchlist = wibox.widget({
   layout  = wibox.layout.fixed.vertical,
 })
 
-local function create_entry(_title, _value)
-  local title = ui.colorize(_title .. " " , beautiful.primary[400])
-  local value = ui.colorize(_value, beautiful.neutral[100])
-
+local function create_entry(title, value)
   return wibox.widget({
     ui.textbox({
       text  = title,
       width = dpi(40),
       align = "right",
+      color = beautiful.primary[400]
     }),
     ui.textbox({
       text  = value,

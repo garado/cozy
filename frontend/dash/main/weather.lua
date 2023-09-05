@@ -25,14 +25,20 @@ local function gen_forecast_entry(data, is_current)
   local temp = math.floor(data.main.feels_like)
   local time = is_current and "Now" or os.date("%I:%M%p", data.dt)
 
+  local img = wibox.widget({
+    image = gcolor.recolor_image(path, beautiful.primary[400]),
+    forced_width = dpi(40),
+    forced_height = dpi(40),
+    widget = wibox.widget.imagebox,
+  })
+
+  awesome.connect_signal("theme::reload", function()
+    img.image = gcolor.recolor_image(path, beautiful.primary[400])
+  end)
+
   return wibox.widget({
     {
-      {
-        image = gcolor.recolor_image(path, beautiful.primary[400]),
-        forced_width = dpi(40),
-        forced_height = dpi(40),
-        widget = wibox.widget.imagebox,
-      },
+      img,
       widget = wibox.container.place,
     },
     ui.textbox({

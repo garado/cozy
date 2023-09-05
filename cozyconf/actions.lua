@@ -9,7 +9,7 @@ local sbtn      = require("frontend.widget.stateful-button")
 local awful     = require("awful")
 local gears     = require("gears")
 local apps      = require("sysconf.apps")
-local strutil   = require("utils.string")
+local naughty   = require("naughty")
 local beautiful = require("beautiful")
 local control   = require("backend.cozy.control")
 
@@ -39,14 +39,6 @@ local function create_stateful_qa(name, icon, init, activate, deactivate)
     text     = icon,
     height   = dpi(40),
     width    = dpi(40),
-    deselect = {
-      bg    = beautiful.neutral[600],
-      bg_mo = beautiful.neutral[500],
-    },
-    select  = {
-      bg    = beautiful.primary[600],
-      bg_mo = beautiful.primary[500],
-    },
     on_press = function(self)
       self.selected = not self.selected
       self:update()
@@ -217,10 +209,37 @@ create_stateless_qa("lmao", "", function()
 end)
 
 
-create_stateless_qa("Filler", "", function()
-end)
+-- █▀ █▀▀ █▀█ █▀▀ █▀▀ █▄░█    █▀█ █▀▀ █▀▀ █▀█ █▀█ █▀▄ 
+-- ▄█ █▄▄ █▀▄ ██▄ ██▄ █░▀█    █▀▄ ██▄ █▄▄ █▄█ █▀▄ █▄▀ 
 
-create_stateless_qa("Filler", "", function()
+create_stateful_qa("Dash: Screen record", "",
+  -- Init
+  function(qa)
+    qa:emit_signal("setstate", false)
+  end,
+
+  -- Activate
+  function()
+    local cmd = 'ffmpeg -y -video_size 1370x830 -framerate 25 -f x11grab -i :0.0+275,125 $HOME/Videos/cozy/output.mp4'
+    awful.spawn.easy_async_with_shell(cmd, function() end)
+  end,
+
+  -- Deactivate
+  function()
+    local cmd = "pkill ffmpeg"
+    awful.spawn.easy_async_with_shell(cmd, function() end)
+  end
+)
+
+create_stateless_qa("Dash: Screenshot", "󰹑", function()
+  local cmd = "sleep 4 ; scrot -a 275,125,1370,830 -F $HOME/Videos/cozy/dashpic.png"
+  awful.spawn.easy_async_with_shell(cmd, function()
+    naughty.notification {
+      app_name = "Cozy",
+      title = "Quick actions",
+      message = "Screenshot taken",
+    }
+  end)
 end)
 
 create_stateless_qa("Filler", "󱐟", function()

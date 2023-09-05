@@ -14,7 +14,7 @@ local task = require("backend.system.task")
 -- @brief Generate a single tasklist entry.
 return function(t, index)
   -- Determine colors for task name, due date
-  local text_color = beautiful.fg
+  local text_color = beautiful.neutral[100]
   local due_color  = beautiful.neutral[300]
 
   local due_str, is_overdue
@@ -46,6 +46,9 @@ return function(t, index)
     bg = beautiful.neutral[800],
     shape  = gears.shape.circle,
     widget = wibox.container.background,
+    ----
+    select_color   = beautiful.neutral[100],
+    deselect_color = beautiful.neutral[800],
   })
 
   -- Due date
@@ -69,13 +72,14 @@ return function(t, index)
     -----
     desc = desc, -- need an easy-access reference for later
     index = index,
+    select_color = beautiful.primary[400],
   })
 
   taskitem:connect_signal("mouse::enter", function(self)
     self:emit_signal("button::press")
     task.active_task = self.data
     task.active_task_ui = desc
-    task:emit_signal("selected::task", self.data)
+    if self.data then task:emit_signal("selected::task", self.data) end
   end)
 
   taskitem:connect_signal("mouse::leave", function(self)
@@ -87,10 +91,16 @@ return function(t, index)
   end)
 
   function taskitem:update()
-    local c = self.selected and beautiful.primary[400] or desc._color
-    indicator.bg = self.selected and beautiful.fg or beautiful.neutral[800]
+    local c = self.selected and self.select_color or desc._color
+    indicator.bg = self.selected and indicator.select_color or indicator.deselect_color
     desc:update_color(c)
   end
+
+  awesome.connect_signal("theme::reload", function(lut)
+    taskitem.select_color = lut[taskitem.select_color]
+    indicator.select_color = lut[indicator.select_color]
+    indicator.deselect_color = lut[indicator.deselect_color]
+  end)
 
   return taskitem
 end

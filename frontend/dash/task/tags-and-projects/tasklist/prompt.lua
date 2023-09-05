@@ -86,7 +86,7 @@ local promptbox = wibox.widget({
 
 local promptbox_colorized = wibox.container.background()
 promptbox_colorized:set_widget(promptbox)
-promptbox_colorized:set_fg(beautiful.fg)
+promptbox_colorized:set_fg(beautiful.neutral[100])
 
 --- Starts prompt to get user input.
 -- @param type The action type.
@@ -108,7 +108,7 @@ local function task_input(type, prompt, text)
     font         = beautiful.font_reg_s,
     prompt       = prompt or "",
     text         = text or "",
-    fg           = beautiful.fg,
+    fg           = beautiful.neutral[100],
     bg_cursor    = beautiful.primary[400],
     textbox      = promptbox,
     completion_callback = fzf_completion,

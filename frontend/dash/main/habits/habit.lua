@@ -15,6 +15,33 @@ local SECONDS_PER_DAY = 24 * 60 * 60
 
 local habit = {}
 
+local TICKED_PROPS = {
+  bg    = beautiful.primary[500],
+  bg_mo = beautiful.primary[400],
+  fg    = beautiful.neutral[100],
+  fg_mo = beautiful.neutral[100],
+  text  = "󰄬",
+}
+
+local UNTICKED_PROPS = {
+  bg    = beautiful.neutral[700],
+  bg_mo = beautiful.neutral[600],
+  fg    = beautiful.neutral[300],
+  fg_mo = beautiful.neutral[300],
+  text  = "",
+}
+
+awesome.connect_signal("theme::reload", function(lut)
+  TICKED_PROPS.bg      = lut[TICKED_PROPS.bg]
+  TICKED_PROPS.bg_mo   = lut[TICKED_PROPS.bg_mo]
+  TICKED_PROPS.fg      = lut[TICKED_PROPS.fg]
+  TICKED_PROPS.fg_mo   = lut[TICKED_PROPS.fg_mo]
+  UNTICKED_PROPS.bg    = lut[UNTICKED_PROPS.bg]
+  UNTICKED_PROPS.bg_mo = lut[UNTICKED_PROPS.bg_mo]
+  UNTICKED_PROPS.fg    = lut[UNTICKED_PROPS.fg]
+  UNTICKED_PROPS.fg_mo = lut[UNTICKED_PROPS.fg_mo]
+end)
+
 --- @function gen_day
 -- @brief Generates a checkbox indicating habit completion for a certain day.
 local function gen_day(id, ts)
@@ -30,33 +57,17 @@ local function gen_day(id, ts)
     },
     forced_width  = dpi(20),
     forced_height = dpi(20),
-    bg     = beautiful.primary[400],
+    bg = beautiful.primary[400],
     shape  = ui.rrect(dpi(2)),
     widget = wibox.container.background,
   })
-
-  day.ticked_props = {
-    bg    = beautiful.primary[500],
-    bg_mo = beautiful.primary[400],
-    fg    = beautiful.fg,
-    fg_mo = beautiful.fg,
-    text  = "󰄬",
-  }
-
-  day.unticked_props = {
-    bg    = beautiful.neutral[700],
-    bg_mo = beautiful.neutral[600],
-    fg    = beautiful.neutral[300],
-    fg_mo = beautiful.neutral[300],
-    text  = "",
-  }
 
   day.id = id
   day.ts = ts
   day.ticked = false
 
   function day:update()
-    self.props = (self.ticked and self.ticked_props) or self.unticked_props
+    self.props = (self.ticked and TICKED_PROPS) or UNTICKED_PROPS
     self.bg = self.props.bg
     self.children[1].widget:update_color(self.props.fg)
     self.children[1].widget:update_text(self.props.text)
@@ -76,6 +87,10 @@ local function gen_day(id, ts)
     self.ticked = not self.ticked
     self:update()
     pixela:put_habit_status(id, ts, self.ticked)
+  end)
+
+  awesome.connect_signal("theme::reload", function()
+    day:update()
   end)
 
   day:update()

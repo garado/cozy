@@ -9,9 +9,21 @@ local ui = require("utils.ui")
 local dpi = ui.dpi
 local beautiful = require("beautiful")
 
+local taglist
+
 local FG_EMPTY    = beautiful.neutral[600]
 local FG_FOCUSED  = beautiful.primary[400]
 local FG_OCCUPIED = beautiful.neutral[100]
+
+awesome.connect_signal("theme::reload", function(lut)
+  FG_EMPTY    = lut[FG_EMPTY]
+  FG_FOCUSED  = lut[FG_FOCUSED]
+  FG_OCCUPIED = lut[FG_OCCUPIED]
+
+  -- Undocumented taglist function 
+  -- https://www.reddit.com/r/awesomewm/comments/c6r2co/how_to_force_a_widget_to_update/
+  taglist._do_taglist_update()
+end)
 
 return function(s)
   -- Mouse + client actions
@@ -67,7 +79,7 @@ return function(s)
     update_callback(self, c3, _)
   end
 
-	local taglist = awful.widget.taglist({
+	taglist = awful.widget.taglist({
 		screen = s,
 		filter = awful.widget.taglist.filter.all,
 		layout = wibox.layout.fixed.horizontal,

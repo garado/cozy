@@ -19,20 +19,32 @@ local beautiful = require("beautiful")
 local singlesel = require("frontend.widget.single-select")
 
 -- Item types
-local TAG = 1
-local PROJECT = 2
+local TAG, PROJECT, SORT = 1, 2, 3
+
+
+-- ▀█▀ ▄▀█ █▀▀ █▀    ▄█▄    █▀█ █▀█ █▀█ ░░█ █▀▀ █▀▀ ▀█▀ █▀ 
+-- ░█░ █▀█ █▄█ ▄█    ░▀░    █▀▀ █▀▄ █▄█ █▄█ ██▄ █▄▄ ░█░ ▄█ 
 
 local select_props = {
   fg = beautiful.primary[400],
   fg_mo = beautiful.primary[500],
-  indicator_color = beautiful.fg,
+  indicator_color = beautiful.neutral[100],
 }
 
 local deselect_props = {
-  fg = beautiful.fg,
+  fg = beautiful.neutral[100],
   fg_mo = beautiful.neutral[300],
   indicator_color = beautiful.neutral[800],
 }
+
+awesome.connect_signal("theme::reload", function(lut)
+  select_props.fg    = lut[select_props.fg]
+  select_props.fg_mo = lut[select_props.fg_mo]
+  select_props.indicator_color = lut[select_props.indicator_color]
+  deselect_props.fg    = lut[deselect_props.fg]
+  deselect_props.fg_mo = lut[deselect_props.fg_mo]
+  deselect_props.indicator_color = lut[deselect_props.indicator_color]
+end)
 
 --- @function gen_badge
 -- A badge is a little indicator next to the tag/project name
@@ -137,6 +149,10 @@ local function gen_item(type, name, parent_tag)
     self.textbox:update_color(self.props.fg)
   end)
 
+  awesome.connect_signal("theme::reload", function(lut)
+    item:update()
+  end)
+
   return item
 end
 
@@ -154,7 +170,7 @@ taglist.area:connect_signal("area::enter", function()
 end)
 
 taglist.area:connect_signal("area::left", function()
-  taglist.active_element.textbox:update_color(beautiful.fg)
+  taglist.active_element.textbox:update_color(beautiful.neutral[100])
   taglist.area:set_active_element(taglist.active_element)
 end)
 
@@ -172,11 +188,79 @@ projectlist.area:connect_signal("area::enter", function()
 end)
 
 projectlist.area:connect_signal("area::left", function()
-  projectlist.active_element.textbox:update_color(beautiful.fg)
+  projectlist.active_element.textbox:update_color(beautiful.neutral[100])
   projectlist.area:set_active_element(projectlist.active_element)
 end)
 
--- Final widget assembly
+
+-- █▀ █▀█ █▀█ ▀█▀    █▀█ █▀█ ▀█▀ █ █▀█ █▄░█ █▀ 
+-- ▄█ █▄█ █▀▄ ░█░    █▄█ █▀▀ ░█░ █ █▄█ █░▀█ ▄█ 
+
+--- @function gen_sort_option
+-- @param type
+local function gen_sort_option(name)
+  local tbox = ui.textbox({ text = name })
+  local indicator = wibox.widget({
+    forced_height = dpi(3),
+    forced_width  = dpi(3),
+    bg = beautiful.neutral[800],
+    shape = gears.shape.circle,
+    widget = wibox.container.background,
+  })
+
+  local item = wibox.widget({
+    indicator,
+    tbox,
+    spacing = dpi(10),
+    forced_height = dpi(18),
+    layout = wibox.layout.fixed.horizontal,
+    ---
+    props = deselect_props,
+    indicator = indicator,
+    textbox = tbox,
+  })
+
+  -- Highlight
+  item:connect_signal("mouse::enter", function(self)
+    -- Unhighlight last item
+    self.parent.active_element.textbox:update_color(beautiful.neutral[100])
+
+    -- Highlight this item
+    self.textbox:update_color(beautiful.primary[400])
+  end)
+
+  -- Un-highlight
+  item:connect_signal("mouse::leave", function(self)
+    self.textbox:update_color(self.props.fg)
+  end)
+
+  return item
+end
+
+local sortoptions = singlesel({
+  spacing = dpi(10),
+  layout = wibox.layout.fixed.vertical,
+  ---
+  keynav = true,
+  name = "nav_sort",
+})
+
+local options = { "Alphabetical", "Due", "Urgency", "Effort", }
+
+for i = 1, #options do
+  sortoptions:add_element( gen_sort_option(options[i]) )
+end
+
+sortoptions.area:connect_signal("area::enter", function()
+  sortoptions.active_element:update()
+end)
+
+sortoptions.area:connect_signal("area::left", function()
+  sortoptions.active_element.textbox:update_color(beautiful.neutral[100])
+  sortoptions.area:set_active_element(sortoptions.active_element)
+end)
+
+-- Final widget assembly -----------
 local sidebar = wibox.widget({
   { -- Tags
     ui.textbox({
@@ -193,6 +277,15 @@ local sidebar = wibox.widget({
       font = beautiful.font_med_m,
     }),
     projectlist,
+    spacing = dpi(15),
+    layout = wibox.layout.fixed.vertical,
+  },
+  { -- Sort options
+    ui.textbox({
+      text = "Sort options",
+      font = beautiful.font_med_m,
+    }),
+    sortoptions,
     spacing = dpi(15),
     layout = wibox.layout.fixed.vertical,
   },
@@ -215,7 +308,7 @@ local function projectlist_update(tag)
     local p = task.data[tag][i]
 
     if task.restore and task.restore.project == p
-      then idx = i
+    then idx = i
     end
 
     projectlist:add_element(gen_item(PROJECT, p, tag))
@@ -224,7 +317,7 @@ local function projectlist_update(tag)
   projectlist.active_element = projectlist.children[idx]
   projectlist.children[idx].selected = true
   projectlist.children[idx]:update()
-  projectlist.children[idx].textbox:update_color(beautiful.fg)
+  projectlist.children[idx].textbox:update_color(beautiful.neutral[100])
   projectlist.area:set_active_element_by_index(idx)
 
   return task.data[tag][idx]
@@ -266,7 +359,7 @@ task:connect_signal("ready::tags_and_projects", function()
   taglist.active_element = taglist.children[tag_idx]
   taglist.children[tag_idx].selected = true
   taglist.children[tag_idx]:update()
-  taglist.children[tag_idx].textbox:update_color(beautiful.fg)
+  taglist.children[tag_idx].textbox:update_color(beautiful.neutral[100])
   taglist.area:set_active_element_by_index(tag_idx)
 
   local init_tag = tagsort[tag_idx]

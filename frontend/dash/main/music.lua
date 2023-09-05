@@ -54,6 +54,15 @@ local album_art_filter = wibox.widget({
   widget = wibox.container.rotate,
 })
 
+awesome.connect_signal("theme::reload", function(lut)
+  album_art_filter.widget.bg = {
+    type  = "linear",
+    from  = { 0, 0 },
+    to    = { 0, 400 },
+    stops = { { 0, beautiful.primary[800]}, { 1, beautiful.primary[700] .. "99" } },
+  }
+end)
+
 -- local playerctl_buttons = {
 --   {
 -- 	  widgets.playerctl.previous(20, beautiful.mus_control_fg, beautiful.mus_control_bg),

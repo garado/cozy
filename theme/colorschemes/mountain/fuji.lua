@@ -1,14 +1,14 @@
 
-
 -- █▀▄▀█ █▀█ █░█ █▄░█ ▀█▀ ▄▀█ █ █▄░█ ▀    █▀▀ █░█ ░░█ █ 
 -- █░▀░█ █▄█ █▄█ █░▀█ ░█░ █▀█ █ █░▀█ ▄    █▀░ █▄█ █▄█ █ 
 
 local gfs = require("gears.filesystem")
 local awesome_cfg = gfs.get_configuration_dir()
 
-local theme = {
+return {
   type = "dark",
-  wall = awesome_cfg .. "theme/colorschemes/mountain/fuji_wp",
+  wall = awesome_cfg .. "theme/colorschemes/mountain/wp",
+  accent_image = awesome_cfg .. "theme/colorschemes/mountain/nrofi",
 
   primary = {
     base = "#7d6a4f",
@@ -26,8 +26,8 @@ local theme = {
   accents = {
     "#a39ec4",
     "#c49ec4",
-    "#c4c19e",
-    "#c49ea0",
+    "#c4c19f",
+    "#c49ea1",
     "#ceb188",
     "#9ec3c4",
     "#9ec49f",
@@ -39,5 +39,3 @@ local theme = {
     nvim  = "mountain",
   }
 }
-
-return theme

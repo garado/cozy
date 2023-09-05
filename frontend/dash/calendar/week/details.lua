@@ -1,4 +1,4 @@
-
+  
 -- █▀▄ █▀▀ ▀█▀ ▄▀█ █ █░░ █▀ 
 -- █▄▀ ██▄ ░█░ █▀█ █ █▄▄ ▄█ 
 
@@ -96,16 +96,20 @@ local calpopup = awful.popup({
   minimum_width  = dpi(380),
   maximum_width  = dpi(380),
   minimum_height = dpi(100),
-  bg = beautiful.neutral[700],
+  shape = ui.rrect(),
   ontop   = true,
   visible = false,
   widget  = wibox.widget({
     {
-      widget,
-      margins = dpi(15),
-      widget  = wibox.container.margin,
+      {
+        widget,
+        margins = dpi(15),
+        widget  = wibox.container.margin,
+      },
+      widget = wibox.container.place,
     },
-    widget = wibox.container.place,
+    bg = beautiful.neutral[700],
+    widget = wibox.container.background,
   })
 })
 
@@ -120,7 +124,8 @@ dash:connect_signal("calpopup::toggle", function(_, x, y, event)
   title:update_text(event.title)
   starttime:update_text(event.s_time)
   endtime:update_text(event.e_time)
-  date:update_text(strutils.datetime_to_human(event.s_date))
+  date:update_text(strutils.dt_convert(event.s_date, "%Y-%m-%d", "%A, %B %d %Y"))
+  -- date:update_text(strutils.datetime_to_human(event.s_date))
 
   if event.loc ~= "" then
     location:update_text(event.loc)

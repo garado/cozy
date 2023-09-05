@@ -16,8 +16,10 @@ local function worker(user_args)
   local args = {
     bg      = beautiful.neutral[800],
     bg_mo   = beautiful.neutral[700],
-    fg      = beautiful.fg,
-    fg_mo   = beautiful.fg,
+    fg      = beautiful.neutral[100],
+    fg_mo   = beautiful.neutral[100],
+    font    = beautiful.font_reg_s,
+    font_mo = beautiful.font_reg_s,
     align   = "center",
     text    = "Default",
     shape   = ui.rrect(),
@@ -25,6 +27,7 @@ local function worker(user_args)
     width   = nil,
     height  = nil,
     func    = nil,
+    on_release = nil,
     border_width = 0,
     border_color = beautiful.neutral[600],
   }
@@ -51,29 +54,43 @@ local function worker(user_args)
     widget        = wibox.container.background,
   })
 
-  btn.func = args.func
+  btn.textbox = btn.widget.widget
+  btn.func = args.func or args.on_release
 
   btn.props = {
     bg    = args.bg,
     bg_mo = args.bg_mo,
     fg    = args.fg,
     fg_mo = args.fg_mo,
+    font    = args.font,
+    font_mo = args.font_mo,
   }
 
+  -- NOTE: when is this used...?
   function btn:update()
-    self.bg = self.selected and self.props.bg_sel or self.props.bg
+    self.bg = self.selected and self.props.bg_mo or self.props.bg
   end
 
   btn:connect_signal("mouse::enter", function(self)
     btn.bg = self.props.bg_mo
+    btn.textbox.font = self.props.font_mo
   end)
 
   btn:connect_signal("mouse::leave", function(self)
     btn.bg = self.props.bg
+    btn.textbox.font = self.props.font
   end)
 
   btn:connect_signal("button::press", function(self)
     if self.func then self:func() end
+  end)
+
+  awesome.connect_signal("theme::reload", function(lut)
+    btn.props.bg    = lut[btn.props.bg]
+    btn.props.bg_mo = lut[btn.props.bg_mo]
+    btn.props.fg    = lut[btn.props.bg]
+    btn.props.fg_mo = lut[btn.props.bg_mo]
+    btn:update()
   end)
 
   return btn

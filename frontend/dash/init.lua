@@ -20,6 +20,8 @@ local navigator, nav_root = keynav.navigator()
 local content
 
 -- Pick tabs based on user input
+-- TODO: Only require the tabs specified in the user config
+-- might speed things up or improve mem usage?
 local main,     nav_main     = require(... .. ".main")()
 local task,     nav_task     = require(... .. ".task")()
 local ledger,   nav_ledger   = require(... .. ".ledger")()
@@ -70,8 +72,8 @@ local tab_buttons = wibox.widget({
         left   = dpi(2),
         widget = wibox.container.margin,
       },
+      bg = beautiful.primary[800],
       forced_height = dpi(50),
-      bg     = beautiful.primary[800],
       widget = wibox.container.background,
       ------
       tab_enum = i,
@@ -79,10 +81,10 @@ local tab_buttons = wibox.widget({
       mo_color = beautiful.neutral[700],
       select = function(_self)
         -- Margin
-        _self.children[1].color = beautiful.fg
+        _self.children[1].color = beautiful.neutral[100]
 
         -- Icon color
-        _self.children[1].widget:update_color(beautiful.fg)
+        _self.children[1].widget:update_color(beautiful.neutral[100])
 
         _self.bg_color = beautiful.neutral[600]
         _self.mo_color = beautiful.neutral[500]
@@ -166,12 +168,16 @@ local sidebar = wibox.widget({
     },
     tab_buttons,
     { -- Distro icon
-      ui.textbox({
-        text  = config.distro_icon,
-        align = "center",
-        color = beautiful.primary[300],
-      }),
-      widget = wibox.container.place,
+      {
+        ui.textbox({
+          text  = config.distro_icon,
+          align = "center",
+          color = beautiful.primary[300],
+        }),
+        widget = wibox.container.place,
+      },
+      bottom = dpi(15),
+      widget = wibox.container.margin,
     },
     expand = "none",
     layout = wibox.layout.align.vertical,
@@ -208,9 +214,13 @@ local dash = awful.popup({
   visible   = false,
   placement = awful.placement.centered,
   widget = ({
-    sidebar,
-    content,
-    layout = wibox.layout.align.horizontal,
+    {
+      sidebar,
+      content,
+      layout = wibox.layout.align.horizontal,
+    },
+    bg = beautiful.neutral[900],
+    widget = wibox.container.background,
   }),
 })
 
@@ -227,6 +237,10 @@ dashstate:connect_signal("setstate::close", function()
   dash.visible = false
   navigator:stop()
   dashstate:emit_signal("newstate::closed")
+end)
+
+awesome.connect_signal("theme::reload", function()
+  dashstate:set_tab(dashstate.curtab)
 end)
 
 dashstate:set_tab(1)
