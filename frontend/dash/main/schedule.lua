@@ -2,18 +2,22 @@
 -- █▀ █▀▀ █░█ █▀▀ █▀▄ █░█ █░░ █▀▀
 -- ▄█ █▄▄ █▀█ ██▄ █▄▀ █▄█ █▄▄ ██▄
 
--- Lil thingy showing upcoming tasks and events.
+-- Widget showing upcoming tasks and events.
 
-local beautiful      = require("beautiful")
-local ui             = require("utils.ui")
-local dpi            = ui.dpi
-local wibox          = require("wibox")
-local cal            = require("backend.system.calendar")
-local task           = require("backend.system.task")
-local strutil        = require("utils.string")
+local beautiful     = require("beautiful")
+local ui            = require("utils.ui")
+local dpi           = ui.dpi
+local wibox         = require("wibox")
+local cal           = require("backend.system.calendar")
+local conf          = require("cozyconf")
+local task          = require("backend.system.task")
+local strutil       = require("utils.string")
+local truncate_fixed = require("utils.layout.truncate_fixed")
 
 -- █▀▀ █▀█ █▀█ █▄░█ ▀█▀ █▀▀ █▄░█ █▀▄
 -- █▀░ █▀▄ █▄█ █░▀█ ░█░ ██▄ █░▀█ █▄▀
+
+local WIDGET_HEIGHT = dpi(520)
 
 --- @function gen_date
 -- @brief Generate container widget that holds tasks + events for a single date.
@@ -72,6 +76,7 @@ local function gen_event(data)
     ui.textbox({
       text = data[cal.START_TIME]
     }),
+    forced_height = conf.font.sizes.s + dpi(4),
     forced_width = dpi(2000),
     layout = wibox.layout.align.horizontal,
   })
@@ -85,6 +90,7 @@ local function gen_event(data)
         color = beautiful.neutral[300],
       }),
       forced_width = dpi(2000),
+      forced_height = conf.font.sizes.s + dpi(4),
       layout = wibox.layout.align.horizontal,
     })
   end
@@ -95,7 +101,7 @@ local function gen_event(data)
       {
         toptext,
         bottext,
-        spacing = dpi(2),
+        spacing = dpi(4),
         layout = wibox.layout.fixed.vertical,
       },
       top    = dpi(3),
@@ -113,17 +119,18 @@ end
 -- TODO: Make this interactive + add UI for completed tasks
 local function gen_task(data)
   local cbox = ui.textbox({
-    text = "󰄱"
+    text = data.status == "pending" and "󰄱" or "󰱒"
   })
 
   local desc = ui.textbox({
     text = data.description,
+    strikethrough = data.status == "completed"
   })
 
   local tag = wibox.widget({
     {
       ui.textbox({
-        text = data.tags[1],
+        text = data.tags and data.tags[1] or "",
         font = beautiful.font_med_xs,
       }),
       margins = dpi(4),
@@ -148,7 +155,8 @@ end
 local schedule = wibox.widget({
   spacing = dpi(12),
   forced_width = dpi(1000),
-  layout = wibox.layout.fixed.vertical,
+  forced_height = WIDGET_HEIGHT,
+  layout = truncate_fixed.vertical,
 })
 
 --- @method create_date
@@ -201,8 +209,8 @@ end
 -- We get data from 2 separate async calls, one for tasks and one for events
 
 -- Function to add events once they're ready
--- BUG: doesnt work after refresh (no events get added)
 local function add_events(_, events)
+  schedule:clear_events()
   for i = 1, #events do
     local d = schedule:create_date(events[i][cal.START_DATE])
     d.events:add(gen_event(events[i]))
@@ -211,6 +219,7 @@ end
 
 -- Function to add tasks once they're ready
 local function add_tasks(_, tasks)
+  schedule:clear_tasks()
   for i = 1, #tasks do
     -- Convert from ISO to YYYY-mm-dd
     local date = strutil.dt_convert(tasks[i].due, strutil.dt_format.iso, "%Y-%m-%d")
@@ -219,13 +228,11 @@ local function add_tasks(_, tasks)
   end
 end
 
-cal:connect_signal("refresh", function()
-  schedule:clear_events()
+cal:connect_signal("cache::ready", function()
   cal:fetch_upcoming("main")
 end)
 
 task:connect_signal("refresh", function()
-  schedule:clear_tasks()
   task:fetch_upcoming()
 end)
 
@@ -236,4 +243,6 @@ task:connect_signal("ready::due::upcoming", add_tasks)
 cal:fetch_upcoming("main")
 task:fetch_upcoming()
 
-return ui.dashbox_v2(schedule)
+local tmp = ui.dashbox_v2(schedule)
+tmp.forced_height = WIDGET_HEIGHT
+return tmp

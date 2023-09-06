@@ -46,8 +46,10 @@ function task:fetch_today()
 end
 
 --- @method fetch_upcoming
+-- @brief Fetch all tasks, pending or completed, that have a due date within the next week.
+--        Side note... holy shit it took so long to find a command that worked. taskwarrior why are u like this.
 function task:fetch_upcoming()
-  local cmd = "task +DUE " .. JSON_EXPORT
+  local cmd = "task $(task due.after:today and due.before:today+1wk uuids) " .. JSON_EXPORT
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     self:emit_signal("ready::due::upcoming", json.decode(stdout))
   end)
@@ -117,7 +119,9 @@ end
 --- @method fetch_project_stats
 -- @brief Get the number of pending and completed tasks for a project
 function task:fetch_project_stats(tag, project)
-  local cmd = SCRIPTS_PATH .. 'task-project-stats ' .. tag .. ' ' .. project
+  local cmd_1 = "task tag:'"..tag.."' project:'"..project.."' limit:none | tail -n 1 | awk 'NF--'"
+  local cmd_2 = "task tag:'"..tag.."' project:'"..project.."' completed | tail -n 1 | awk 'NF--'"
+  local cmd = cmd_1 .. " ; " .. cmd_2
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local arr = strutil.split(stdout)
     self:emit_signal("ready::project_stats", arr[1] or 0, arr[2] or 0)
@@ -235,7 +239,7 @@ function task:gen_twdeps_img()
   local task_cmd = "task tag:'"..tag.."' project:'"..project.."' export "
   local twdeps_args = " --taskid="..taskid..
                       " --title='Task Dependencies'"..
-                      " --fg="..beautiful.fg..
+                      " --fg="..beautiful.neutral[100]..
                       " --sbfg="..beautiful.neutral[300]..
                       " --bg="..beautiful.neutral[900]..
                       " --nodebg="..beautiful.neutral[800]..

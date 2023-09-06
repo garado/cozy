@@ -28,6 +28,7 @@ function _ui.textbox(userargs)
     height         = nil,
     ellipsize      = "end",
     letter_spacing = nil,
+    strikethrough  = false,
   }
   gtable.crush(args, userargs or {})
   args.text = tostring(args.text) -- just making sure
@@ -47,6 +48,10 @@ function _ui.textbox(userargs)
     args.markup = "<span letter_spacing='" .. args.letter_spacing .. "'>" .. args.markup .. "</span>"
   end
 
+  if args.strikethrough then
+    args.markup = "<span strikethrough='true'>" .. args.markup .. "</span>"
+  end
+
   local widget = wibox.widget({
     font          = args.font,
     markup        = args.markup,
@@ -56,6 +61,7 @@ function _ui.textbox(userargs)
     forced_width  = args.width,
     forced_height = args.height,
     visible       = args.visible,
+    strikethrough = args.strikethrough,
     widget        = wibox.widget.textbox,
     -------
     _text         = args.text,
@@ -63,9 +69,15 @@ function _ui.textbox(userargs)
     update_text   = function(self, text)
       self._text  = text
       self.markup = _ui.colorize(text, self._color)
+      if self.strikethrough then
+        self.markup = "<span strikethrough='true'>"..self.markup.."</span>"
+      end
     end,
     update_color  = function(self, color)
       self.markup = _ui.colorize(self._text, color)
+      if self.strikethrough then
+        self.markup = "<span strikethrough='true'>"..self.markup.."</span>"
+      end
     end
   })
 
