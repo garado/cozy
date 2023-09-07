@@ -12,18 +12,25 @@ local keynav         = require("modules.keynav")
 local conf           = require("cozyconf")
 local math           = math
 
-local eventboxes     = wibox.widget({
+local eventboxes = wibox.widget({
   layout = wibox.layout.manual,
 })
 
-eventboxes.area      = keynav.area({
+eventboxes.area = keynav.area({
   name = "nav_eventboxes",
   keys = {
     ["m"] = function(self)
       if not self.active_element then return end
-      local x = self.active_element.point.x
-      local y = self.active_element.point.y
-      dash:emit_signal("calpopup::toggle", x, y, self.active_element.event)
+      -- local x = self.active_element.point.x
+      -- local y = self.active_element.point.y
+      -- dash:emit_signal("calpopup::toggle", x, y, self.active_element.event)
+      cal.modify_mode = true
+      cal.active_element = self.active_element
+      cal:emit_signal("add::setstate::toggle")
+    end,
+    ["d"] = function(self)
+      if not self.active_element then return end
+      cal:delete(self.active_element.event)
     end
   }
 })
@@ -142,6 +149,7 @@ local function gen_eventbox(event, height, width)
 
   -- Different sized event boxes have different layouts.
   -- Below we're just trying to make a "responsive" event box.
+  -- TODO: Still needs work.
   local text_top_margin = dpi(6)
   local text_layout = wibox.layout.fixed.vertical
   local time_prefix = ""

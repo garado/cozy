@@ -19,6 +19,8 @@ local config    = require("cozyconf")
 local navigator, nav_root = keynav.navigator()
 local content
 
+require(... .. ".snackbar")
+
 -- Pick tabs based on user input
 -- TODO: Only require the tabs specified in the user config
 -- might speed things up or improve mem usage?
@@ -237,6 +239,7 @@ dashstate:connect_signal("setstate::close", function()
   dash.visible = false
   navigator:stop()
   dashstate:emit_signal("newstate::closed")
+  dashstate:emit_signal("snackbar::hide")
 end)
 
 awesome.connect_signal("theme::reload", function()

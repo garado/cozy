@@ -90,8 +90,8 @@ local DT_MATCH_REPLACE = {
   "(%%d%%d)", -- Second [00-59]
   "(%%d%%d)", -- Two-digit year
   "(%%d%%d)", -- Month [01-12]
-  "(%%d%%d)", -- "am" or "pm"
-  "(%%d%%d%%d)", -- Weekday name (3 letters)
+  "(%%l%%l)", -- "am" or "pm"
+  "(%%l%%l%%l)", -- Weekday name (3 letters)
   "(%%d%%d%%d%%d)", -- Full year
 }
 
@@ -119,6 +119,8 @@ _string.dt_format = {
 -- @param new_pattern   The new pattern, i.e. "%A %M %d"
 --                      If not specified, the function returns the raw timestamp.
 function _string.dt_convert(subject, old_pattern, new_pattern)
+  subject = tostring(subject)
+  subject = subject:lower()
   old_pattern = old_pattern or "%Y-%m-%d"
 
   -- Record the order in which matches appear.
@@ -141,7 +143,12 @@ function _string.dt_convert(subject, old_pattern, new_pattern)
   local match_values = { subject:match(old_pattern) }
 
   -- Set up inputs to get os.time timestamp
-  local timetable = {}
+  local timetable = {
+    ["day"]   = 1,
+    ["month"] = 1,
+    ["year"]  = 1970,
+  }
+
   for i = 1, #captures do
     if DT_LETTERS[captures[i]] then
       timetable[DT_LETTERS[captures[i]]] = match_values[i]

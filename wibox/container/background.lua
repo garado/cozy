@@ -507,6 +507,7 @@ local function new(widget, bg, shape)
     awesome.connect_signal("theme::reload", function(lut)
         ret:set_bg(lut[ret._private.bg_hex])
         ret:set_fg(lut[ret._private.fg_hex])
+        ret._private.shape_border_color = lut[ret._private.shape_border_color]
     end)
 
     return ret

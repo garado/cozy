@@ -10,6 +10,7 @@ local gfs     = require("gears.filesystem")
 local awful   = require("awful")
 local strutil = require("utils.string")
 local calconf = require("cozyconf").calendar
+local dash    = require("backend.cozy.dash")
 local os      = os
 
 local calendar = {}
@@ -21,8 +22,195 @@ local SECONDS_IN_DAY = 24 * 60 * 60
 
 ---------------------------------------------------------------------
 
--- █▀▄ ▄▀█ ▀█▀ ▄▀█    █▀█ █▀▀ ▀█▀ █▀█ █ █▀▀ █░█ ▄▀█ █░░ 
--- █▄▀ █▀█ ░█░ █▀█    █▀▄ ██▄ ░█░ █▀▄ █ ██▄ ▀▄▀ █▀█ █▄▄ 
+-- █▀▀ █▀▀ ▄▀█ █░░ █▀▀ █░░ █    ▄▀█ █▀█ █ 
+-- █▄█ █▄▄ █▀█ █▄▄ █▄▄ █▄▄ █    █▀█ █▀▀ █ 
+
+-- Functions that interact directly with gcalcli (plus some helpers)
+
+--- @function _abbreviate_to_duration
+-- @method Converts a string like "3h 15m" to a duration in minutes
+local function _abbreviation_to_duration(dur)
+  local tokens = strutil.split(dur, " ")
+
+  local factor = {
+    { "mins",  1 },
+    { "min",  1 },
+    { "mn",   1 },
+    { "m",    1 },
+    { "hours", 60 },
+    { "hour",  60 },
+    { "hrs",   60 },
+    { "hr",    60 },
+    { "h",     60 },
+    { "days", 24 * 60 },
+    { "day",  24 * 60 },
+    { "d",    24 * 60 },
+  }
+
+  local minutes = 0
+
+  for i = 1, #tokens do
+    for j = 1, #factor do
+      if tokens[i]:find(factor[j][1]) then
+        tokens[i] = tokens[i]:gsub(factor[j][1], "")
+        minutes = minutes + (factor[j][2] * tonumber(tokens[i]))
+        break
+      end
+    end
+  end
+
+  return minutes
+end
+
+--- @function get_ts_from_time
+-- @brief Turn any variation of a time string (10:15, 9am, 9:13pm, 1700, etc.) into
+--        an os.time timestamp.
+-- @return os.time timestamp
+local function get_ts_from_time(str)
+  str = str:gsub("%s", "") -- strip whitespace
+  str = str:lower()
+  local len = str:wlen()
+
+  if len == 4 and tonumber(str) then
+    -- military time
+    print(str, "%H%M")
+    return strutil.dt_convert(str, "%H%M")
+  elseif (len == 3 or len == 4) and (str:find("am") or str:find("pm")) and not str:find(":") then
+    -- 9am/10am or 9pm/10pm
+    -- %H requires 2-char hour
+    if not tonumber(str:sub(2,1)) then str = "0"..str end
+    return strutil.dt_convert(str, "%H%p")
+  elseif (len == 4 or len == 5) and str:find(":") and not (str:find("am") or str:find("pm")) then
+    -- %H:%M
+    if not tonumber(str:sub(2,1)) then str = "0"..str end
+    return strutil.dt_convert(str, "%H:%M")
+  elseif (len == 6 or len == 7) and str:find(":") then
+    -- %H:%M%p
+    if not tonumber(str:sub(2,1)) then str = "0"..str end
+    return strutil.dt_convert(str, "%H:%M%p")
+  else
+    print("Unknown time format: "..str)
+  end
+end
+
+--- @function _timespan_to_duration
+-- @brief gcalcli doesn't accept specifying event end time - only duration.
+--        so this is a function to calculate duration based on start and end times
+local function _timespan_to_duration(stime, etime)
+  local s_ts = get_ts_from_time(stime)
+  local e_ts = get_ts_from_time(etime)
+  local ret = (e_ts - s_ts) / 60
+
+  -- If it ends up being negative it's usually because there's some wonkiness
+  -- with timestrings that include "am" or "pm"
+  if ret <= 0 then ret = ret + (12 * 60) end
+
+  return ret
+end
+
+--- @function convert_duration
+-- @brief Convert user input to a duration in minutes, because gcalcli only accepts
+--        duration in minutes for some reason.
+local function convert_duration(stime, arg2)
+  arg2 = string.lower(arg2)
+
+  -- Two cases: the user inputs an endtime or the user inputs a duration
+  -- A numeric input is treated as an hour (e.g. '17' == '5pm')
+  if arg2:find(":") or arg2:find("am") or arg2:find("pm") or tonumber(arg2) then
+    return _timespan_to_duration(stime, arg2)
+  else
+    return _abbreviation_to_duration(arg2)
+  end
+end
+
+--- @method add_event
+-- @brief Add a new calendar event.
+function calendar:add_event(args)
+  if args.title == "" or args.start == "" or args.duration == "" then
+    return
+  end
+
+  local dur = convert_duration(args.start, args.duration)
+
+  local title = "--title '" .. args.title .. "'"
+  local place = (args.place ~= "" and " --where '"..args.place .. "'") or ""
+  local start = " --when '" .. args.date .. " " .. args.start .. "'"
+  local duration = " --duration '" .. dur .. "'"
+  local cmd = "gcalcli add "..title..place..start..duration.." --noprompt"
+
+  dash:emit_signal("snackbar::show", "Cozy calendar", "Event added. Updating cache...")
+  awful.spawn.easy_async_with_shell(cmd, function(_, stderr)
+    if stderr ~= "" then
+      dash:emit_signal("snackbar::show", "Cozy calendar", "Failed to add event - please try again.")
+    else
+      self:update_cache()
+    end
+  end)
+end
+
+--- @function gen_pipe_cmd
+-- @brief Editing/deleting events in gcalcli is done interactively with stdin,
+--        so we have to jump through a few odd hoops to execute the
+--        the edit command through the dashboard.
+--        Example: to edit the title of an event, the command would look like:
+--        ( echo "t" & echo "New title" & echo "s" & cat ) | gcalcli edit 'Title of event to edit'
+-- @param arr Array of inputs to pipe to gcalcli.
+--        In the example above, arr == { "t", "newtitle", "s" }
+local function gen_pipe_cmd(arr)
+  if #arr == 0 then return end
+
+  local function _echo(input)
+    return ' echo \"' .. input .. '\" '
+  end
+
+  local pipecmd = '( '
+  for i = 1, #arr do
+    pipecmd = pipecmd .. _echo(arr[i]) .. '&'
+  end
+
+  return pipecmd .. ' cat )'
+end
+
+--- @method modify_event
+-- @brief
+function calendar:modify_event(args)
+  local event = self.active_element.event
+  local cmd = "gcalcli edit \""..event.title.."\" '"..event.s_date.." "..event.s_time.."'"
+
+  args.duration = convert_duration(args.start, args.duration)
+
+  args.when = args.date .. " " .. args.start
+
+  local map = {
+    ["title"]    = "t",
+    ["place"]    = "l",
+    ["when"]     = "w",
+    ["duration"] = "g",
+  }
+
+  for type, value in pairs(args) do
+    if map[type] and value ~= "" then
+      cmd = gen_pipe_cmd({ map[type], value }) .. ' | ' .. cmd
+    end
+  end
+
+  cmd = gen_pipe_cmd({'s', 'q'}) .. ' | ' .. cmd
+  dash:emit_signal("snackbar::show", "Cozy calendar", "Event modified. Updating cache...")
+  awful.spawn.easy_async_with_shell(cmd, function()
+    self:update_cache()
+  end)
+end
+
+--- @method delete
+-- @brief Delete an event. This cannot be undone.
+function calendar:delete(event)
+  local cmd = "gcalcli delete '"..event.title.."' '"..event.s_date.." "..event.s_time .. "'"
+  cmd = gen_pipe_cmd({'y', 'q'}) .. " | " .. cmd
+  awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
+    dash:emit_signal("snackbar::show", "Cozy calendar", "Event deleted. Updating cache...")
+    self:update_cache()
+  end)
+end
 
 --- @method check_cache_empty
 function calendar:check_cache_empty()
@@ -98,7 +286,7 @@ end
 -- @param days_before
 -- @param days_after
 -- @brief Given a starting date, returns table of events within a specified
--- number of days before and after the anchor date.
+--        number of days before and after the anchor date.
 function calendar:fetch_anchored_range(request_id, anchor_date, days_before, days_after)
   anchor_date = anchor_date or os.date("%Y-%m-%d")
 
@@ -126,7 +314,7 @@ function calendar:fetch_upcoming(request_id, start_date)
   local signal = 'ready::upcoming::' .. request_id
   local args = CACHE_PATH .. ' ' .. start_date .. ' ' .. 22
   local cmd = SCRIPTS_PATH .. 'fetchupcoming ' .. args
-  awful.spawn.easy_async_with_shell(cmd, function(stdout)
+  awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
     self:emit_signal(signal, tsv_to_table(stdout))
   end)
 end
@@ -168,7 +356,7 @@ end
 
 function calendar:jump_middle_hour()
   self.start_hour = calconf.start_hour
-  self.end_hour = calconf.end_hour)
+  self.end_hour = calconf.end_hour
   self:emit_signal("hours::adjust")
 end
 

@@ -31,6 +31,7 @@ local base = require("wibox.widget.base")
 local surface = require("gears.surface")
 local gtable = require("gears.table")
 local gdebug = require("gears.debug")
+local gears  = require("gears")
 local setmetatable = setmetatable
 local type = type
 local math = math
@@ -692,7 +693,7 @@ local function new(image, resize_allowed, clip_shape, ...)
 
     awesome.connect_signal("theme::reload", function(lut)
         if lut[ret._private.original_image] then
-            ret:set_image(lut[ret._private.original_image])
+            ret:set_image(gears.surface.load_uncached(lut[ret._private.original_image]))
         end
     end)
 
