@@ -44,6 +44,8 @@ Your schedule at a glance. Powered by gcalcli.
 
 <img src="./dashboard-calendar.gif">
 
+<img src="./dashboard-calendar-add.gif">
+
 <details>
 <summary>Calendar keybinds</summary>
 
