@@ -5,8 +5,8 @@
 -- When restarting awesome, save client/tag state, restart, and then restore client/tag states.
 
 -- Note: I was having so much trouble getting the double quotes to echo to file correctly
--- lichrally tried everything wtf! single quoting the string, escaping the doublequotes, everything
--- So my sloppy fix was to gsub " with @, then write it
+-- literally tried everything wtf! single quoting the string, escaping the doublequotes, everything
+-- So my sloppy fix was to gsub " with @, then write it.
 -- @ because that character would never appear in either the keys or values
 -- Then when reading it from file, replace the @ with " again
 

@@ -1,14 +1,11 @@
 
--- █▄▀ █▀▀ █▄█ █▀
--- █░█ ██▄ ░█░ ▄█
+-- █░█ █▀█ ▀█▀ █▄▀ █▀▀ █▄█ █▀ 
+-- █▀█ █▄█ ░█░ █░█ ██▄ ░█░ ▄█ 
 
-local beautiful = require("beautiful")
 local awful   = require("awful")
 local apps    = require("sysconf.apps")
 local naughty = require("naughty")
 local bling   = require("modules.bling")
-local rrect   = require("utils.ui").rrect
-local dpi     = require("utils.ui").dpi
 local os = os
 
 local control = require("backend.cozy.control")
@@ -41,7 +38,6 @@ awful.key.keygroups["vimlike"] = {
   { "k", 3 },
   { "l", 4 },
 }
-
 
 -- Saner keyboard resizing
 local function resize_h(factor)
@@ -93,15 +89,15 @@ awful.keyboard.append_global_keybindings({
   -- ▄▀█ █░█░█ █▀▀ █▀ █▀█ █▀▄▀█ █▀▀
   -- █▀█ ▀▄▀▄▀ ██▄ ▄█ █▄█ █░▀░█ ██▄
 
-  -- Restart awesome
+  -- Restart
   awful.key({ shift, alt }, "r", awesome.restart,
     { description = "reload", group = "Awesome" }),
 
-  -- Quit awesome
+  -- Quit
   awful.key({ shift, alt }, "q", awesome.quit,
     { description = "quit", group = "Awesome" }),
 
-  -- Show help
+  -- Show
   awful.key({ mod }, "s", function()
     cozy:close_all()
     help:show_help()
@@ -112,52 +108,52 @@ awful.keyboard.append_global_keybindings({
   -- █▀█ █▄█ ░█░ █░█ ██▄ ░█░ ▄█
 
   -- Adjust brightness
-	awful.key({}, "XF86MonBrightnessUp", function()
-		awful.spawn("brightnessctl set 5%+ -q", false)
-		awesome.emit_signal("module::brightness")
-	end),
+  awful.key({}, "XF86MonBrightnessUp", function()
+    awful.spawn("brightnessctl set 5%+ -q", false)
+    awesome.emit_signal("module::brightness")
+  end),
 
-	awful.key({}, "XF86MonBrightnessDown", function()
-		awful.spawn("brightnessctl set 5%- -q", false)
-		awesome.emit_signal("module::brightness")
-	end),
+  awful.key({}, "XF86MonBrightnessDown", function()
+    awful.spawn("brightnessctl set 5%- -q", false)
+    awesome.emit_signal("module::brightness")
+  end),
 
-	--- Audio control
-	awful.key({}, "XF86AudioRaiseVolume", function()
-		awful.spawn("pamixer -u ; pamixer -i 5", false)
-		awesome.emit_signal("module::volume")
-	end),
+  --- Audio control
+  awful.key({}, "XF86AudioRaiseVolume", function()
+    awful.spawn("pamixer -u ; pamixer -i 5", false)
+    awesome.emit_signal("module::volume")
+  end),
 
-	awful.key({}, "XF86AudioLowerVolume", function()
-		awful.spawn("pamixer -u ; pamixer -d 5", false)
-		awesome.emit_signal("module::volume")
-	end),
+  awful.key({}, "XF86AudioLowerVolume", function()
+    awful.spawn("pamixer -u ; pamixer -d 5", false)
+    awesome.emit_signal("module::volume")
+  end),
 
-	awful.key({}, "XF86AudioMute", function()
-		awful.spawn("pamixer -t", false)
-		awesome.emit_signal("module::volume")
-	end),
+  awful.key({}, "XF86AudioMute", function()
+    awful.spawn("pamixer -t", false)
+    awesome.emit_signal("module::volume")
+  end),
 
   -- Playerctl
   awful.key({}, "XF86AudioPlay", function()
-		awful.spawn("playerctl play-pause", false)
-	end),
+    awful.spawn("playerctl play-pause", false)
+  end),
 
   awful.key({ mod }, "XF86AudioLowerVolume", function()
     awful.spawn("playerctl play-pause", false)
   end, { description = "play/pause track", group = "Hotkeys" }),
 
   awful.key({}, "XF86AudioPrev", function()
-		awful.spawn("playerctl previous", false)
-	end),
+    awful.spawn("playerctl previous", false)
+  end),
 
   awful.key({ mod }, "XF86AudioMute", function()
     awful.spawn("playerctl previous", false)
   end, { description = "previous track", group = "Hotkeys" }),
 
   awful.key({}, "XF86AudioNext", function()
-		awful.spawn("playerctl next", false)
-	end),
+    awful.spawn("playerctl next", false)
+  end),
 
   awful.key({ mod }, "XF86AudioRaiseVolume", function()
     awful.spawn("playerctl next", false)
@@ -240,8 +236,8 @@ awful.keyboard.append_global_keybindings({
 })
 
 
--- █▀▀ █░░ █ █▀▀ █▄░█ ▀█▀    █▄▀ █▀▀ █▄█ █▄▄ █ █▄░█ █▀▄ █▀ 
--- █▄▄ █▄▄ █ ██▄ █░▀█ ░█░    █░█ ██▄ ░█░ █▄█ █ █░▀█ █▄▀ ▄█ 
+-- █▀▀ █░░ █ █▀▀ █▄░█ ▀█▀
+-- █▄▄ █▄▄ █ ██▄ █░▀█ ░█░
 
 client.connect_signal("request::default_keybindings", function()
   awful.keyboard.append_client_keybindings({

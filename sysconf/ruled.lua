@@ -13,7 +13,7 @@ ruled.client.connect_signal("request::rules", function()
     rule = { },
     properties = {
       raise = true,
-      size_hints_honor = false,
+      size_hints_honor = true,
       honor_workarea = true,
       honor_padding = true,
       screen = awful.screen.focused,
