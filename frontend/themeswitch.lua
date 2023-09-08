@@ -178,7 +178,7 @@ ts:connect_signal("ready::themes", function()
   for i = 1, #ts.themes do
     local s = sbtn({
       text = ts.themes[i],
-      func = function(self)
+      on_release = function(self)
         ts.selected_theme = self.name
         ts.selected_style = nil
         styles_sbg:reset()
@@ -197,7 +197,7 @@ ts:connect_signal("ready::styles", function()
   for i = 1, #ts.styles do
     local s = sbtn({
       text = ts.styles[i],
-      func = function(self)
+      on_release = function(self)
         ts.selected_style = self.name
         nav_actions:clear()
         nav_actions:append(apply_btn)

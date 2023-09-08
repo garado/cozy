@@ -41,12 +41,7 @@ col1:set_ratio(4, 0.25)
 -- col1:set_ratio(4, 0.4)
 
 local col2 = wibox.widget({
-  {
-    schedule,
-    strategy = "max",
-    height = dpi(550),
-    widget = wibox.container.constraint,
-  },
+  schedule,
   music,
   spacing = beautiful.dash_widget_gap,
   layout = wibox.layout.fixed.vertical,

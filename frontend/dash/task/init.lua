@@ -26,12 +26,13 @@ local nav_tasks = keynav.area({
     nav_tags_projects
   },
   keys = {
-    ["Shift_R!"] = function() -- Shift_R + 1
-      taskheader:get_pages()[1]:emit_signal("button::press")
-    end,
-    ["Shift_R@"] = function() -- Shift_R + 2
-      taskheader:get_pages()[2]:emit_signal("button::press")
-    end,
+    -- Shift_R/Shift_L + 1
+    ["Shift_R!"] = function() taskheader:get_pages()[1]:emit_signal("button::press") end,
+    ["Shift_L!"] = function() taskheader:get_pages()[1]:emit_signal("button::press") end,
+
+    -- Shift_R/Shift_L + 2
+    ["Shift_R@"] = function() taskheader:get_pages()[2]:emit_signal("button::press") end,
+    ["Shift_L@"] = function() taskheader:get_pages()[2]:emit_signal("button::press") end,
   },
 })
 

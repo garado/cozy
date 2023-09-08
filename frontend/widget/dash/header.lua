@@ -96,6 +96,7 @@ local function worker(user_args)
       },
       widget = wibox.container.place,
     },
+    forced_height = dpi(100),
     layout = wibox.layout.align.horizontal,
   })
 
@@ -135,6 +136,10 @@ local function worker(user_args)
 
   function header:get_actions()
     return actions.children
+  end
+
+  function header:get_pages()
+    return pages.children
   end
 
   return header

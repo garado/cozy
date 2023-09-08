@@ -11,6 +11,7 @@ local wibox         = require("wibox")
 local cal           = require("backend.system.calendar")
 local conf          = require("cozyconf")
 local task          = require("backend.system.task")
+local awful         = require("awful")
 local strutil       = require("utils.string")
 local truncate_fixed = require("utils.layout.truncate_fixed")
 
@@ -116,7 +117,6 @@ end
 --- @function gen_task
 -- @brief Generate task widget
 -- @param data  Table containing task data
--- TODO: Make this interactive + add UI for completed tasks
 local function gen_task(data)
   local cbox = ui.textbox({
     text = data.status == "pending" and "󰄱" or "󰱒"
@@ -141,14 +141,24 @@ local function gen_task(data)
     widget = wibox.container.background,
   })
 
-  return wibox.widget({
+  local widget = wibox.widget({
     cbox,
     tag,
     desc,
     spacing = dpi(4),
     forced_height = dpi(20),
     layout = wibox.layout.fixed.horizontal,
+    ---
+    uuid = data.uuid,
+    pending = data.status == "pending"
   })
+
+  widget:connect_signal("button::press", function()
+    local cmd = "task "..widget.uuid.." mod status:" .. (widget.pending and "completed" or "pending")
+    awful.spawn.easy_async_with_shell(cmd, function() task:emit_signal("refresh") end)
+  end)
+
+  return widget
 end
 
 -- This is where all the date containers get added

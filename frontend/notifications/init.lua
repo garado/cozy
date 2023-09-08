@@ -134,9 +134,9 @@ naughty.connect_signal("request::display", function(n)
 				},
 				widget = wibox.container.place,
 			},
-			bg = beautiful.neutral[900],
 			forced_height = dpi(25),
 			forced_width = dpi(70),
+			bg = beautiful.neutral[700],
 			widget = wibox.container.background,
 		},
 		style = {
@@ -152,7 +152,7 @@ naughty.connect_signal("request::display", function(n)
 		min_value = 0,
 		value = 100,
 		thickness = dpi(3),
-		background_color = beautiful.neutral[600],
+		background_color = beautiful.neutral[500],
     color = accent_color,
     widget = wibox.widget.progressbar,
   })
@@ -203,7 +203,6 @@ naughty.connect_signal("request::display", function(n)
     shape = ui.rrect(),
     maximum_width = dpi(350),
     maximum_height = dpi(180),
-    bg = beautiful.neutral[900],
 
     widget_template = {
       {
@@ -222,7 +221,7 @@ naughty.connect_signal("request::display", function(n)
         timeout_bar,
         layout = wibox.layout.fixed.vertical,
       },
-      bg = beautiful.neutral[900],
+      bg = beautiful.neutral[800],
       forced_width = dpi(275),
       widget = wibox.container.background,
     },

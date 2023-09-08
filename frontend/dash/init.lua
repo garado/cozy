@@ -9,45 +9,37 @@
 local awful = require("awful")
 local gears = require("gears")
 local wibox = require("wibox")
-local ui    = require("utils.ui")
-local dpi   = require("utils.ui").dpi
+local ui  = require("utils.ui")
+local dpi = require("utils.ui").dpi
 local keynav = require("modules.keynav")
 local beautiful = require("beautiful")
 local dashstate = require("backend.cozy.dash")
-local config    = require("cozyconf")
+local config = require("cozyconf")
 
 local navigator, nav_root = keynav.navigator()
 local content
 
 require(... .. ".snackbar")
 
--- Pick tabs based on user input
--- TODO: Only require the tabs specified in the user config
--- might speed things up or improve mem usage?
-local main,     nav_main     = require(... .. ".main")()
-local task,     nav_task     = require(... .. ".task")()
-local ledger,   nav_ledger   = require(... .. ".ledger")()
-local calendar, nav_calendar = require(... .. ".calendar")()
-local goals,    nav_goals    = require(... .. ".goals-habits")()
-local settings, nav_settings = require(... .. ".settings")()
-
-local tabs = {
-  ["main"]     = { "", main,     nav_main     },
-  ["task"]     = { "", task,     nav_task     },
-  ["ledger"]   = { "", ledger,   nav_ledger   },
-  ["calendar"] = { "", calendar, nav_calendar },
-  ["goals"]    = { "", goals,    nav_goals    },
-  ["settings"] = { "", settings, nav_settings },
+local TAB_ICONS = {
+  ["main"]     = "",
+  ["task"]     = "",
+  ["ledger"]   = "",
+  ["calendar"] = "",
+  ["goals"]    = "",
+  ["settings"] = "",
 }
 
 local tab_list  = {}
-local tab_icons = {}
 local tab_nav   = {}
+local tab_icons = {}
 
+-- Only require the tabs specified in config
 for _, tab in ipairs(config.tabs) do
-  tab_icons[#tab_icons+1] = tabs[tab][1]
-  tab_list[#tab_list+1]   = tabs[tab][2]
-  tab_nav[#tab_nav+1]     = tabs[tab][3]
+  local _tab_content, _tab_nav = require(... .. "." .. tab)()
+  tab_icons[#tab_icons+1] = TAB_ICONS[tab]
+  tab_list[#tab_list+1] = _tab_content
+  tab_nav[#tab_nav+1] = _tab_nav
 end
 
 -- Generate keybinds for switching tabs (number keys)

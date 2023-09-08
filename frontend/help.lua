@@ -158,7 +158,7 @@ function widget.new(args)
   function widget_instance:_load_widget_settings()
     if self._widget_settings_loaded then return end
     self.width  = dpi(900)
-    self.height = dpi(800)
+    self.height = dpi(500)
     self.bg = beautiful.neutral[800]
     self.fg = beautiful.neutral[100]
     self.border_width = 0
@@ -166,7 +166,7 @@ function widget.new(args)
     self.shape = ui.rrect()
     self.modifiers_fg = beautiful.primary[600]
     self.label_bg = beautiful.neutral[100]
-    self.label_fg = args.label_fg or beautiful.hotkeys_label_fg or self.bg
+    self.label_fg = beautiful.neutral[800]
     self.opacity = 1
     self.font = beautiful.font_reg_s
     self.description_font = beautiful.font_reg_s
@@ -281,7 +281,6 @@ function widget.new(args)
     end
   end
 
-
   function widget_instance:_import_awful_keys()
     if next(self._cached_awful_keys) then
       return
@@ -380,20 +379,20 @@ function widget.new(args)
           modifiers = markup.fg(self.modifiers_fg, modifiers.."+")
         end
         local key_label = ""
-        if key.keylist and #key.keylist > 1 then
+        if key.key then
+          key_label = gstring.xml_escape(key.key)
+        elseif key.keylist and #key.keylist > 1 then
           for each_key_idx, each_key in ipairs(key.keylist) do
             key_label = key_label .. gstring.xml_escape(each_key)
             if each_key_idx ~= #key.keylist then
               key_label = key_label .. markup.fg(self.modifiers_fg, '/')
             end
           end
-        elseif key.key then
-          key_label = gstring.xml_escape(key.key)
         end
         local rendered_hotkey = markup.font(self.font,
-          modifiers .. key_label .. " "
+          modifiers ..  key_label  .. " "
         ) .. markup.font(self.description_font,
-          key.description or ""
+          markup.fg( beautiful.neutral[300], key.description or "" )
         )
         local label_width = wibox.widget.textbox.get_markup_geometry(rendered_hotkey, s).width
         if label_width > max_label_width then
@@ -483,16 +482,16 @@ function widget.new(args)
         halign = "center",
         horizontal_fit_policy = "expand",
         vertical_fit_policy = "none",
-        image = CFG_DIR .. "theme/colorschemes/mountain/nrofi",
+        image = beautiful.accent_image,
         forced_height = dpi(140),
         forced_width = dpi(200),
         widget = wibox.widget.imagebox,
       },
       {
         ui.textbox({
-          text = "Keybinds",
-          font = beautiful.font_reg_xl,
-          color = beautiful.neutral[100],
+          text  = "Keybinds",
+          font  = beautiful.font_reg_l,
+          color = beautiful.primary[100],
         }),
         widget = wibox.container.place,
       },
@@ -505,7 +504,10 @@ function widget.new(args)
         header,
         {
           pages[1],
-          margins = dpi(12),
+          top = dpi(12),
+          left = dpi(12),
+          bottom = dpi(22),
+          right = dpi(12),
           widget = wibox.container.margin,
         },
         layout = wibox.layout.fixed.vertical,

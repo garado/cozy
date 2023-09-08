@@ -26,8 +26,8 @@ return function(theme, style)
 
   -- Generate 9 neutral colors
   local ndark  = cscheme.neutral.dark
-  local nbase  = cscheme.neutral.base
   local nlight = cscheme.neutral.light
+  local nbase  = cscheme.neutral.base or clrutils.blend(ndark, nlight)
 
   cscheme.neutral[900] = ndark
   cscheme.neutral[700] = clrutils.blend(ndark, nbase)
