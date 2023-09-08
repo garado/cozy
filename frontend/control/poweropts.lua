@@ -35,7 +35,7 @@ local function create_poweropt(icon, text, _cmd)
     text  = icon,
     bg    = beautiful.neutral[700],
     bg_mo = beautiful.neutral[600],
-    func  = function()
+    on_release = function()
       -- Show confirm text
       poweropts_confirm.visible = true
       confirm_text:update_text(text)
@@ -74,7 +74,7 @@ local yes_btn = btn({
   text = "Yes",
   bg = beautiful.neutral[700],
   bg_mo = beautiful.neutral[600],
-  func = function()
+  on_release = function()
     if cmd and cmd ~= "" then
       control:close()
       awful.spawn(cmd)
@@ -86,7 +86,7 @@ local no_btn = btn({
   text = "Cancel",
   bg = beautiful.neutral[700],
   bg_mo = beautiful.neutral[600],
-  func = function()
+  on_release = function()
     poweropts_confirm.visible = false
     cmd = nil
     nav_power_container:clear()

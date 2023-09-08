@@ -14,22 +14,28 @@ local nav_goals_roadmap = keynav.area({
   keys = {
     ["BackSpace"] = function()
       goals:emit_signal("goals::show_overview")
+    end,
+    ["r"] = function()
+      goals:gen_twdeps_image()
     end
   },
 })
 
 local roadmap = wibox.widget({
+  resize = false,
+  widget = wibox.widget.imagebox,
+})
+
+local roadmap_container = wibox.widget({
   nil,
   {
-    {
-      resize = false,
-      widget = wibox.widget.imagebox,
-    },
+    roadmap,
     widget = wibox.container.place,
   },
   nil,
-  forced_height = dpi(2000),
   layout = wibox.layout.align.vertical,
+  forced_width  = dpi(2000),
+  forced_height = dpi(2000),
   -----
   area = nav_goals_roadmap
 })
@@ -43,8 +49,7 @@ goals:connect_signal("goals::show_roadmap", function(_, data)
 end)
 
 goals:connect_signal("ready::image", function()
-  local file = gears.surface.load_uncached(goals.deps_img_path)
-  roadmap.children[1].widget.image = file
+  roadmap.image = gears.surface.load_uncached(goals.deps_img_path)
 end)
 
-return roadmap
+return roadmap_container

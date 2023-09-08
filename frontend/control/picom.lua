@@ -39,7 +39,7 @@ local function create_option_btn(opt)
       left   = dpi(15),
       right  = dpi(15),
     },
-    func = function()
+    on_release = function()
       if opt == "off" then
         local cmd = "pkill picom"
         awful.spawn.easy_async_with_shell(cmd, function() end)

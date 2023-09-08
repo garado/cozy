@@ -93,12 +93,12 @@ local expenses = wibox.widget({
 })
 
 local overview = wibox.widget({
-  ui.place(total),
-  ui.place(checking),
-  ui.place(savings),
-  ui.place(cash),
-  ui.place(income),
-  ui.place(expenses),
+  wibox.container.place(total),
+  wibox.container.place(checking),
+  wibox.container.place(savings),
+  wibox.container.place(cash),
+  wibox.container.place(income),
+  wibox.container.place(expenses),
   spacing = dpi(10),
   layout  = wibox.layout.flex.horizontal,
 })

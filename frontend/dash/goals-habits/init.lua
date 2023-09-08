@@ -14,7 +14,8 @@ local keynav = require("modules.keynav")
 local gstate = require("backend.system.goals")
 
 -- Modules
-local goals = require(... .. ".goals")
+local goals     = require(... .. ".goals")
+local timeline  = require(... .. ".timeline")
 
 local nav_goals_habits = keynav.area({
   name  = "nav_goals_habits",
@@ -32,20 +33,27 @@ local nav_goals_habits = keynav.area({
 ---------------------
 
 local goals_header = header({
-  title_text = "Goals &amp; habits",
+  title_text = "Goals & habits",
+  actions = {
+    {
+      text = "Refresh",
+      func = function()
+        goals:emit_signal("goals::refresh")
+      end,
+    },
+  },
+  pages = {
+    {
+      text = "Goals",
+    },
+    {
+      text = "Habits"
+    },
+    {
+      text = "Timeline",
+    },
+  }
 })
-
-local action_refresh = btn({
-  text = "Refresh",
-  func = function()
-    goals:emit_signal("goals::refresh")
-  end,
-})
-
-goals_header:add_action(action_refresh)
-
-goals_header:add_sb("Goals")
-goals_header:add_sb("Habits")
 
 local content = goals
 
@@ -59,22 +67,16 @@ goals:connect_signal("goals::show_overview", function()
   goals_header:update_title({ text = "Goals &amp; habits" })
 end)
 
-local container = wibox.widget({
-  goals_header,
-  {
-    content,
-    margins = dpi(15),
-    widget = wibox.container.margin,
-  },
+content = wibox.widget({
+  content,
+  margins = dpi(15),
   forced_width  = dpi(2000),
-  layout = wibox.layout.ratio.vertical,
+  forced_height = dpi(2000),
+  widget  = wibox.container.margin,
 })
-container:adjust_ratio(1, 0, 0.08, 0.92)
+
+local container = ui.contentbox(goals_header, content)
 
 return function()
-  return wibox.widget({
-    container,
-    forced_height = dpi(2000),
-    layout = wibox.layout.fixed.horizontal,
-  }), nav_goals_habits
+  return container, nav_goals_habits
 end

@@ -123,7 +123,7 @@ local options = wibox.widget({
 local widget = wibox.widget({
   {
     img,
-    ui.place(search),
+    wibox.container.place(search),
     widget = wibox.layout.stack,
   },
   {

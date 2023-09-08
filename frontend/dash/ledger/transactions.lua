@@ -159,7 +159,7 @@ ledger:connect_signal("ready::transactions", function(_, tx)
 end)
 
 return ui.dashbox(
-  ui.place(transaction_entries),
+  wibox.container.place(transaction_entries),
   dpi(410), -- width
   dpi(2000)  -- height
 )

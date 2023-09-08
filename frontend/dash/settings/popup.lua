@@ -84,7 +84,7 @@ local cpopup = awful.popup({
   ontop     = true,
   visible   = false,
   placement = awful.placement.centered,
-  widget = ui.place(widget, { margins = dpi(10) }),
+  widget = wibox.container.place(widget, { margins = dpi(10) }),
 })
 
 awesome.connect_signal("colorpopup::toggle", function(color)

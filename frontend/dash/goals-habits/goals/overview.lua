@@ -82,8 +82,6 @@ local function gen_goal(data)
     gstate:emit_signal("goals::show_roadmap", self.data)
   end)
 
-  goalbox.navitem = keynav.navitem.base({ widget = goalbox })
-
   return goalbox
 end
 
@@ -112,7 +110,7 @@ function short:init()
   for i = 1, #gstate.shortterm do
     local goal = gen_goal(gstate.shortterm[i])
     short_goals:add(goal)
-    nav_goals_short:append(goal.navitem)
+    nav_goals_short:append(goal)
   end
 end
 
@@ -140,7 +138,7 @@ function long:init()
   for i = 1, #gstate.longterm do
     local goal = gen_goal(gstate.longterm[i])
     long_goals:add(goal)
-    nav_goals_long:append(goal.navitem)
+    nav_goals_long:append(goal)
   end
 end
 

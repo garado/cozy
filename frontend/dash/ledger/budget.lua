@@ -81,7 +81,7 @@ ledger:connect_signal("ready::budget", function(_, bdata)
 end)
 
 return ui.dashbox(
-  ui.place(budget_entries),
+  wibox.container.place(budget_entries),
   dpi(390), -- width
   dpi(500)  -- height
 )

@@ -58,7 +58,7 @@ local widget = wibox.widget({
     labels,
     layout = wibox.layout.fixed.horizontal,
   },
-  ui.place(habits),
+  wibox.container.place(habits),
   spacing = dpi(5),
   layout = wibox.layout.fixed.vertical,
 })

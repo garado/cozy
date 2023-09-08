@@ -50,7 +50,7 @@ local content = wibox.widget({
 })
 
 return ui.dashbox(
-  ui.place(content),
+  wibox.container.place(content),
   dpi(500), -- width
   dpi(500)  -- height
 )
