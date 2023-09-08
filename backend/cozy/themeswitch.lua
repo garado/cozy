@@ -96,7 +96,10 @@ function themeswitch:generate_lut()
   beautiful.border_color_active = beautiful.primary[300]
   beautiful.border_color_normal = beautiful.neutral[900]
 
+  -- BUG: Reloading accent image only works after the first theme switch?
   lut[beautiful.accent_image] = cscheme.accent_image
+  beautiful.accent_image = nil
+  beautiful.accent_image = cscheme.accent_image
 
   return lut
 end

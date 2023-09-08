@@ -41,9 +41,15 @@ function goals:fetch_shortterm()
 end
 
 function goals:gen_twdeps_image(taskid, project)
+  taskid  = taskid  or self.taskid
+  project = project or self.project
+
+  self.taskid = taskid
+  self.project = project
+
   local task_cmd = "task tag:Goals project:'"..project.."' export "
   local twdeps_args = " --taskid="..taskid..
-                      " --fg="..beautiful.fg..
+                      " --fg="..beautiful.neutral[100]..
                       " --sbfg="..beautiful.neutral[300]..
                       " --bg="..beautiful.neutral[900]..
                       " --nodebg="..beautiful.neutral[800]..

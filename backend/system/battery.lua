@@ -18,7 +18,8 @@ local DISCHARGING = 2
 local FULLY_CHARGED = 4
 local PENDING_CHARGE = 5
 
---- Ensures only one battery notification is active at any given time.
+--- @function notify
+-- @brief Ensures only one battery notification is active at any given time.
 local function notify(msg)
   if not batnotif then
     batnotif = naughty.notification {
