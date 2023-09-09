@@ -15,6 +15,7 @@ local themeswitch = require("backend.cozy.themeswitch")
 local nrofi = require("backend.cozy.notrofi")
 local bluetooth = require("backend.cozy.bluetooth")
 local help = require("frontend.help")
+local kitty = require("backend.cozy.kitty")
 
 local mod   = "Mod4"
 local alt   = "Mod1"
@@ -209,6 +210,10 @@ awful.keyboard.append_global_keybindings({
     nrofi:toggle()
   end, { description = "not rofi", group = "Launchers" }),
 
+  awful.key({ mod }, "o", function()
+    scratchpad:turn_off()
+    kitty:toggle()
+  end, { description = "kitty sessions", group = "Launchers "}),
 
   --  █░░ ▄▀█ █░█ █▄░█ █▀▀ █░█ █▀▀ █▀█ █▀
   --  █▄▄ █▀█ █▄█ █░▀█ █▄▄ █▀█ ██▄ █▀▄ ▄█

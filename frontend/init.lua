@@ -12,6 +12,7 @@ require(... .. ".dash")
 require(... .. ".help")
 require(... .. ".control")
 require(... .. ".notrofi")
+require(... .. ".kitty")
 require("frontend.dash.calendar.week.details")
 
 awful.screen.connect_for_each_screen(require(... .. ".bar." .. conf.bar_style))

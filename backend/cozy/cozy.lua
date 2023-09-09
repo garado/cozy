@@ -13,6 +13,7 @@ local POPUPS = {
   "dash",
   "bluetooth",
   "notrofi",
+  "kitty",
 }
 
 function cozy:close_all()
