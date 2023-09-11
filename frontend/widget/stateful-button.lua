@@ -30,19 +30,6 @@ local DESELECT_PROPS = {
   border_color = beautiful.neutral[600],
 }
 
-awesome.connect_signal("theme::reload", function(lut)
-  SELECT_PROPS.bg    = lut[SELECT_PROPS.bg]
-  SELECT_PROPS.bg_mo = lut[SELECT_PROPS.bg_mo]
-  SELECT_PROPS.fg    = lut[SELECT_PROPS.fg]
-  SELECT_PROPS.fg_mo = lut[SELECT_PROPS.fg_mo]
-  SELECT_PROPS.border_color = lut[SELECT_PROPS.border_color]
-  DESELECT_PROPS.bg    = lut[DESELECT_PROPS.bg]
-  DESELECT_PROPS.bg_mo = lut[DESELECT_PROPS.bg_mo]
-  DESELECT_PROPS.fg    = lut[DESELECT_PROPS.fg]
-  DESELECT_PROPS.fg_mo = lut[DESELECT_PROPS.fg_mo]
-  DESELECT_PROPS.border_color = lut[DESELECT_PROPS.border_color]
-end)
-
 local function worker(user_args)
   local args = {
     text     = "Default",
@@ -79,6 +66,22 @@ local function worker(user_args)
   stateful_btn.name = args.name
   stateful_btn.func = args.func
   stateful_btn.on_press = args.on_press
+  stateful_btn.select_props = gtable.crush(SELECT_PROPS, args.select or {})
+  stateful_btn.deselect_props = gtable.crush(DESELECT_PROPS, args.deselect or {})
+
+  -- desgustang
+  awesome.connect_signal("theme::reload", function(lut)
+    stateful_btn.select_props.bg    = lut[stateful_btn.select_props.bg]
+    stateful_btn.select_props.bg_mo = lut[stateful_btn.select_props.bg_mo]
+    stateful_btn.select_props.fg    = lut[stateful_btn.select_props.fg]
+    stateful_btn.select_props.fg_mo = lut[stateful_btn.select_props.fg_mo]
+    stateful_btn.select_props.border_color = lut[stateful_btn.select_props.border_color]
+    stateful_btn.deselect_props.bg    = lut[stateful_btn.deselect_props.bg]
+    stateful_btn.deselect_props.bg_mo = lut[stateful_btn.deselect_props.bg_mo]
+    stateful_btn.deselect_props.fg    = lut[stateful_btn.deselect_props.fg]
+    stateful_btn.deselect_props.fg_mo = lut[stateful_btn.deselect_props.fg_mo]
+    stateful_btn.deselect_props.border_color = lut[stateful_btn.deselect_props.border_color]
+  end)
 
   function stateful_btn:get_textbox()
     return self.children[1].widget
@@ -93,7 +96,7 @@ local function worker(user_args)
   end)
 
   function stateful_btn:update()
-    self.props = self.selected and SELECT_PROPS or DESELECT_PROPS
+    self.props = self.selected and self.select_props or self.deselect_props
     self.bg = self.props.bg
     if self.selected and self.func then self:func() end
   end
