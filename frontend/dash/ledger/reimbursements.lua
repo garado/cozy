@@ -1,4 +1,3 @@
-
 -- █▀█ █▀▀ █ █▀▄▀█ █▄▄ █░█ █▀█ █▀ █▀▀ █▀▄▀█ █▀▀ █▄░█ ▀█▀ █▀
 -- █▀▄ ██▄ █ █░▀░█ █▄█ █▄█ █▀▄ ▄█ ██▄ █░▀░█ ██▄ █░▀█ ░█░ ▄█
 
@@ -9,39 +8,47 @@ local wibox = require("wibox")
 local ledger = require("backend.system.ledger")
 local gears = require("gears")
 
---- @function gen_entry
+--- @function gen_account
 -- @brief Generate a reimbursement entry widget
-local function gen_entry(data)
-  local amt = tonumber(data[1])
-  local text
-  if amt > 0 then
-    text = data[2] .. " owes you $" .. amt
+-- @param account{}   [1] amount owed; [2] account name
+local function gen_account(data)
+  local account = data[2]
+  local amount = ""
+  if string.find(data[1], "-") then
+    amount = "you owe "..data[1]
   else
-    text = "You owe " .. data[2] .. " $" .. amt
+    amount = "they owe "..data[1]
   end
+
+  local transactions = wibox.widget({
+    spacing = dpi(8),
+    layout = wibox.layout.fixed.vertical,
+  })
 
   local widget = wibox.widget({
     {
-      {
-        ui.textbox({
-          text = data[2]:sub(1, 1),
-          font = beautiful.font_med_s,
-          align = "center",
-          color = beautiful.primary[700],
-        }),
-        margins = dpi(8),
-        widget = wibox.container.margin,
-      },
-      shape = gears.shape.circle,
-      bg = beautiful.primary[100],
-      widget = wibox.container.background,
+      ui.textbox({
+        text = account,
+        font = beautiful.font_med_s,
+      }),
+      nil,
+      ui.textbox({
+        text = amount,
+      }),
+      forced_width = dpi(1000),
+      layout = wibox.layout.align.horizontal,
     },
-    ui.textbox({
-      text = text,
-    }),
-    spacing = dpi(12),
-    layout = wibox.layout.fixed.horizontal,
+    transactions,
+    spacing = dpi(8),
+    layout = wibox.layout.fixed.vertical,
   })
+
+  function widget:add_transaction(_data)
+    self.transactions:add(ui.textbox({ text = _data }))
+  end
+
+  widget.account = account
+  widget.transactions = transactions
 
   return widget
 end
@@ -64,9 +71,38 @@ local content = wibox.widget({
   },
   nil,
   forced_height = dpi(400),
-  spacing = dpi(8),
+  spacing = dpi(20),
   layout = wibox.layout.fixed.vertical,
 })
+
+--- @function gen_transaction
+-- @brief Generate widget showing transaction, then append it to the correct
+--        account. The data fields are:
+-- #    1: 2023/09/08
+-- #    2: Utilities: PGE
+-- #    3: Assets:Reimbursements:Kassidy
+-- #    4: $
+-- #    5: 38.54
+-- #    6: !
+local function gen_transaction(data)
+  local widget = wibox.widget({
+    ui.textbox({
+      text = data[2],
+      color = beautiful.neutral[300],
+    }),
+    nil,
+    ui.textbox({ text = data[5] }),
+    layout = wibox.layout.align.horizontal,
+  })
+
+  -- Put it with the correct account
+  for _, container in ipairs(content.children) do
+    print(container.account)
+    if container.account == data[3] then
+      container.transactions:add(widget)
+    end
+  end
+end
 
 local reimbursements = wibox.widget({
   ui.textbox({
@@ -75,26 +111,31 @@ local reimbursements = wibox.widget({
     height = dpi(30),
     font   = beautiful.font_med_m,
   }),
+  ui.vpad(dpi(10)),
   content,
   forced_height = dpi(300),
   layout = wibox.layout.fixed.vertical,
 })
 
 ledger:connect_signal("refresh", function()
-  ledger:parse_reimbursements()
+  ledger:parse_reimbursement_accounts()
 end)
 
-ledger:connect_signal("ready::reimbursements", function(_, data)
+ledger:connect_signal("ready::reimbursements::accounts", function(_, data)
   if #data == 0 then return end
   content:reset()
   for i = 1, #data do
-    local w = gen_entry(data[i])
+    local w = gen_account(data[i])
     content:add(w)
   end
-  ledger:parse_reimbursement_data()
+  ledger:parse_reimbursement_transactions()
 end)
 
-ledger:connect_signal("ready::reimbursement_data", function()
+ledger:connect_signal("ready::reimbursements::transactions", function(_, data)
+  if #data == 0 then return end
+  for i = 1, #data do
+    gen_transaction(data[i])
+  end
 end)
 
 return ui.dashbox(reimbursements)

@@ -83,31 +83,45 @@ function ledger:parse_recent_transactions()
   end)
 end
 
---- @method parse_reimbursements
--- @brief Get info on who owes what. This only shows the amount owed.
---        See parse_reimbursement_data to get information on what the transaction was.
-function ledger:parse_reimbursements()
-  local cmd = LEDGER_CMD .." bal Liabilities Assets:Reimbursements | tail -n +2 | head -n -2"
+--- @method parse_reimbursement_accounts
+-- @brief Get information on who owes what. This only shows the amount owed.
+--        See parse_reimbursement_data to get information on what the specific
+--        transaction was.
+function ledger:parse_reimbursement_accounts()
+  local cmd = LEDGER_CMD .." bal Liabilities Assets:Reimbursements --no-total --format \"%12(O)=%A\n\""
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    -- Clean up data
-    local tmp = strutil.split(stdout, "\r\n")
-    local lines = {}
+    -- sample stdout:
+    --      $61.87=Assets:Reimbursements:Kassidy
+    --  $-1,871.50=Liabilities:Bills
+    --    $-709.00=Liabilities:Bills:Hospital
+    --  $-1,162.50=Liabilities:Bills:Rent
 
-    for i = 1, #tmp do
-      lines[i] = strutil.split(tmp[i], "%s+%$")
+    local lines = strutil.split(stdout, "\r\n")
+    local data = {}
+    for i = 1, #lines do
+      if strutil.count(lines[i], ":") >= 2 then
+        local tmp = lines[i]:gsub("%s", "")
+        data[#data+1] = strutil.split(tmp, "=")
+      end
     end
-
-    self:emit_signal("ready::reimbursements", lines)
+    self:emit_signal("ready::reimbursements::accounts", data)
   end)
 end
 
 --- @method parse_reimbursement_data
--- @brief Get information on transaction data.
-function ledger:parse_reimbursement_data(account)
-  local cmd = LEDGER_CMD .. " reg --pedantic --pending Liabilities Assets:Reimbursements"
-  cmd = cmd .. " | head -n -2"
+-- @brief Get information on pending liability/reimbursement transaction data.
+function ledger:parse_reimbursement_transactions()
+  local cmd = LEDGER_CMD .. " --pending csv | grep \"Liabilities\\|Reimbursements\""
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
-    -- local lines = strutil.strip(stdout, "\r\n")
+    local lines = strutil.split(stdout, "\r\n")
+    local tmp = {}
+
+    for i = 1, #lines do
+      tmp[i] = lines[i]:gsub('"', "")
+      tmp[i] = strutil.split(tmp[i], ",")
+    end
+
+    self:emit_signal("ready::reimbursements::transactions", tmp)
   end)
 end
 
