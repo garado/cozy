@@ -1,5 +1,6 @@
--- █▀█ █▀█ █▀█ █▀▄▀█ █▀█ ▀█▀
--- █▀▀ █▀▄ █▄█ █░▀░█ █▀▀ ░█░
+
+-- █▀▄▀█ █░█ █░░ ▀█▀ █ █▀█ █▀█ █▀█ █▀▄▀█ █▀█ ▀█▀
+-- █░▀░█ █▄█ █▄▄ ░█░ █ █▀▀ █▀▄ █▄█ █░▀░█ █▀▀ ░█░
 
 -- Minorly modified prompt widget that supports changing the textbox mid-prompt.
 -- It does this by adding a new set_textbox function and also changing the scope

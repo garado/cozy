@@ -1,6 +1,9 @@
 
--- █▀▀ ▄▀█ █░░    ▄▀█ █▀▄ █▀▄
--- █▄▄ █▀█ █▄▄    █▀█ █▄▀ █▄▀
+-- ▄▀█ █▀▄ █▀▄    ▄█▄    █▀▀ █▀▄ █ ▀█▀    █▀▀ █░█ █▀▀ █▄░█ ▀█▀ █▀ 
+-- █▀█ █▄▀ █▄▀    ░▀░    ██▄ █▄▀ █ ░█░    ██▄ ▀▄▀ ██▄ █░▀█ ░█░ ▄█ 
+
+-- A popup allowing you to add and modify events. Uses a modified version
+-- of awful.prompt.
 
 local beautiful  = require("beautiful")
 local ui    = require("utils.ui")
@@ -10,10 +13,9 @@ local wibox = require("wibox")
 local dash  = require("backend.cozy.dash")
 local btn   = require("frontend.widget.button")
 local calendar = require("backend.system.calendar")
-local calprompt = require("frontend.dash.calendar.popups.prompt")
+local calprompt = require("frontend.dash.calendar.popups.multiprompt")
 
 local CAL_ICON = ""
-
 
 -- █░█ █
 -- █▄█ █
@@ -221,9 +223,8 @@ hide = function()
   calprompt.set_textbox(textboxes[tbox_idx].tb)
 end
 
-dash:connect_signal("setstate::close", hide)
-calendar:connect_signal("add::setstate::open", show)
-calendar:connect_signal("add::setstate::close", hide)
-calendar:connect_signal("add::setstate::toggle", function()
+dash:connect_signal("add::setstate::open", show)
+dash:connect_signal("add::setstate::close", hide)
+dash:connect_signal("add::setstate::toggle", function()
   if cal_add.visible then hide() else show() end
 end)

@@ -1,4 +1,3 @@
-
 -- █▀▀ ▄▀█ █░░ █▀▀ █▄░█ █▀▄ ▄▀█ █▀█ 
 -- █▄▄ █▀█ █▄▄ ██▄ █░▀█ █▄▀ █▀█ █▀▄ 
 
@@ -73,7 +72,6 @@ local function get_ts_from_time(str)
 
   if len == 4 and tonumber(str) then
     -- military time
-    print(str, "%H%M")
     return strutil.dt_convert(str, "%H%M")
   elseif (len == 3 or len == 4) and (str:find("am") or str:find("pm")) and not str:find(":") then
     -- 9am/10am or 9pm/10pm
@@ -82,7 +80,7 @@ local function get_ts_from_time(str)
     return strutil.dt_convert(str, "%H%p")
   elseif (len == 4 or len == 5) and str:find(":") and not (str:find("am") or str:find("pm")) then
     -- %H:%M
-    if not tonumber(str:sub(2,1)) then str = "0"..str end
+    if not tonumber(str:sub(2,2)) then str = "0"..str end
     return strutil.dt_convert(str, "%H:%M")
   elseif (len == 6 or len == 7) and str:find(":") then
     -- %H:%M%p
@@ -132,15 +130,17 @@ function calendar:add_event(args)
 
   local dur = convert_duration(args.start, args.duration)
 
-  local title = "--title '" .. args.title .. "'"
-  local place = (args.place ~= "" and " --where '"..args.place .. "'") or ""
-  local start = " --when '" .. args.date .. " " .. args.start .. "'"
-  local duration = " --duration '" .. dur .. "'"
+  strutil.print_arr(args)
+
+  local title = "--title \"" .. args.title .. "\""
+  local place = (args.place ~= "" and " --where \""..args.place .. "\"") or ""
+  local start = " --when \"" .. args.date .. " " .. args.start .. "\""
+  local duration = " --duration \"" .. dur .. "\""
   local cmd = "gcalcli add "..title..place..start..duration.." --noprompt"
 
   dash:emit_signal("snackbar::show", "Cozy calendar", "Event added. Updating cache...")
-  awful.spawn.easy_async_with_shell(cmd, function(_, stderr)
-    if stderr ~= "" then
+  awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
+    if stderr ~= "" or string.find(stdout, "error") then
       dash:emit_signal("snackbar::show", "Cozy calendar", "Failed to add event - please try again.")
     else
       self:update_cache()
@@ -151,7 +151,7 @@ end
 --- @function gen_pipe_cmd
 -- @brief Editing/deleting events in gcalcli is done interactively with stdin,
 --        so we have to jump through a few odd hoops to execute the
---        the edit command through the dashboard.
+--        the edit/delete commands through the dashboard.
 --        Example: to edit the title of an event, the command would look like:
 --        ( echo "t" & echo "New title" & echo "s" & cat ) | gcalcli edit 'Title of event to edit'
 -- @param arr Array of inputs to pipe to gcalcli.
@@ -179,6 +179,8 @@ function calendar:modify_event(args)
 
   args.duration = convert_duration(args.start, args.duration)
 
+  strutil.print_arr(args)
+
   args.when = args.date .. " " .. args.start
 
   local map = {
@@ -195,8 +197,13 @@ function calendar:modify_event(args)
   end
 
   cmd = gen_pipe_cmd({'s', 'q'}) .. ' | ' .. cmd
+
+  print(cmd)
+
   dash:emit_signal("snackbar::show", "Cozy calendar", "Event modified. Updating cache...")
-  awful.spawn.easy_async_with_shell(cmd, function()
+  awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
+    print(stdout)
+    print(stderr)
     self:update_cache()
   end)
 end
@@ -379,6 +386,10 @@ function calendar:new()
   self.TITLE      = 5
   self.LOCATION   = 6
   self.DESCRIPTION = 7
+
+  self:connect_signal("refresh", function()
+    dash:emit_signal("snackbar::show", "Cozy calendar", "Refreshing cache...")
+  end)
 
   -- Variables shared across UI elements
   self.weekview_cur_offset = 0

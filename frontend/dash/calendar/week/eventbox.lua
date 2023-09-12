@@ -1,16 +1,20 @@
+
 -- █▀▀ █░█ █▀▀ █▄░█ ▀█▀ █▄▄ █▀█ ▀▄▀
 -- ██▄ ▀▄▀ ██▄ █░▀█ ░█░ █▄█ █▄█ █░█
 
-local beautiful      = require("beautiful")
-local ui             = require("utils.ui")
-local dpi            = ui.dpi
-local wibox          = require("wibox")
-local dash           = require("backend.cozy.dash")
-local cal            = require("backend.system.calendar")
-local strutil        = require("utils").string
-local keynav         = require("modules.keynav")
-local conf           = require("cozyconf")
-local math           = math
+local ui  = require("utils.ui")
+local dpi = ui.dpi
+local cal = require("backend.system.calendar")
+local dash  = require("backend.cozy.dash")
+local wibox = require("wibox")
+local strutil = require("utils").string
+local keynav  = require("modules.keynav")
+local conf = require("cozyconf")
+local beautiful = require("beautiful")
+
+local math = math
+
+local events
 
 local eventboxes = wibox.widget({
   layout = wibox.layout.manual,
@@ -21,12 +25,9 @@ eventboxes.area = keynav.area({
   keys = {
     ["m"] = function(self)
       if not self.active_element then return end
-      -- local x = self.active_element.point.x
-      -- local y = self.active_element.point.y
-      -- dash:emit_signal("calpopup::toggle", x, y, self.active_element.event)
       cal.modify_mode = true
       cal.active_element = self.active_element
-      cal:emit_signal("add::setstate::toggle")
+      dash:emit_signal("add::setstate::toggle")
     end,
     ["d"] = function(self)
       if not self.active_element then return end
@@ -50,8 +51,8 @@ local colors = {
 }
 
 awesome.connect_signal("theme::reload", function()
-  ELAPSED_BG     = beautiful.neutral[600]
-  ELAPSED_FG     = beautiful.neutral[300]
+  ELAPSED_BG = beautiful.neutral[600]
+  ELAPSED_FG = beautiful.neutral[300]
 
   colors = {
     beautiful.primary[900],
@@ -149,7 +150,6 @@ local function gen_eventbox(event, height, width)
 
   -- Different sized event boxes have different layouts.
   -- Below we're just trying to make a "responsive" event box.
-  -- TODO: Still needs work.
   local text_top_margin = dpi(6)
   local text_layout = wibox.layout.fixed.vertical
   local time_prefix = ""
@@ -211,11 +211,6 @@ local function gen_eventbox(event, height, width)
 
   ebox:connect_signal("mouse::leave", function(self)
     self.widget.color = self.widget.bg
-    dash:emit_signal("calpopup::hide")
-  end)
-
-  ebox:connect_signal("button::press", function()
-    dash:emit_signal("calpopup::toggle", x, y, event)
   end)
 
   return ebox
@@ -229,11 +224,27 @@ function eventboxes:add_event(e)
   end
 end
 
+function eventboxes:redraw(e)
+  eventboxes.area:clear()
+  eventboxes.children = {}
+  for _, e in ipairs(events) do
+    eventboxes:add_event({
+      title  = e[cal.TITLE],
+      s_time = e[cal.START_TIME],
+      e_time = e[cal.END_TIME],
+      s_date = e[cal.START_DATE],
+      e_date = e[cal.END_DATE],
+      loc    = e[cal.LOCATION],
+    })
+  end
+end
+
+
 -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█
 
 local function weekview_update()
-  local ts        = cal:get_weekview_start_ts() + cal.weekview_cur_offset
+  local ts = cal:get_weekview_start_ts() + cal.weekview_cur_offset
   local start_day = os.date("%Y-%m-%d", ts)
   local end_day   = os.date("%Y-%m-%d", ts + (7 * SECONDS_IN_DAY))
   cal:fetch_range("weekview", start_day, end_day)
@@ -245,26 +256,17 @@ dash:connect_signal("weekview::size_calculated", function(_, height, width)
   weekview_update()
 end)
 
--- TODO: Could probably consolidate these signals somehow
-cal:connect_signal("hours::adjust", weekview_update)
 cal:connect_signal("cache::ready", weekview_update)
 cal:connect_signal("weekview::change_week", weekview_update)
 dash:connect_signal("date::changed", weekview_update)
 
-cal:connect_signal("ready::range::weekview", function(_, events)
-  eventboxes.area:clear()
-  eventboxes.children = {}
-  for i = 1, #events do
-    local e = events[i]
-    eventboxes:add_event({
-      title  = e[cal.TITLE],
-      s_time = e[cal.START_TIME],
-      e_time = e[cal.END_TIME],
-      s_date = e[cal.START_DATE],
-      e_date = e[cal.END_DATE],
-      loc    = e[cal.LOCATION],
-    })
-  end
+cal:connect_signal("hours::adjust", function()
+  eventboxes:redraw()
+end)
+
+cal:connect_signal("ready::range::weekview", function(_, _events)
+  events = _events
+  eventboxes:redraw()
 end)
 
 return eventboxes
