@@ -27,7 +27,6 @@ local TAB_ICONS = {
   ["ledger"]   = "",
   ["calendar"] = "",
   ["goals"]    = "",
-  ["settings"] = "",
 }
 
 local tab_list  = {}
@@ -188,7 +187,6 @@ local sidebar = wibox.widget({
 
 -- Container for dash contents
 content = wibox.widget({
-  main,
   margins = dpi(15),
   widget  = wibox.container.margin,
   update_contents = function(self, new_content)

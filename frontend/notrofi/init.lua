@@ -246,7 +246,7 @@ end
 
 
 notrofi:connect_signal("setstate::open", function()
-  notrofi.mode = "nav"
+  notrofi.mode = ""
   nrofi.visible = true
   prompt()
 end)

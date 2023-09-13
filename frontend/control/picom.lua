@@ -58,7 +58,7 @@ local function create_option_btn(opt)
       local config_name = PICOM_OPTS_DIR .. opt .. ".conf"
       local cmd = "cp " .. config_name .. ' ' .. PICOM_CFG_PATH
       awful.spawn.easy_async_with_shell(cmd, function()
-        awful.spawn.easy_async_with_shell("picom")
+        awful.spawn.easy_async_with_shell("picom", function() end)
       end)
     end
   })

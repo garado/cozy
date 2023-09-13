@@ -70,12 +70,15 @@ return function(t, index)
     forced_height = dpi(15),
     layout = wibox.layout.align.horizontal,
     -----
+    data = t,
+    indicator = indicator,
     desc = desc, -- need an easy-access reference for later
     index = index,
     select_color = beautiful.primary[400],
   })
 
   taskitem:connect_signal("mouse::enter", function(self)
+    self.selected = true
     self:emit_signal("button::press")
     task.active_task = self.data
     task.active_task_ui = desc
@@ -83,6 +86,7 @@ return function(t, index)
   end)
 
   taskitem:connect_signal("mouse::leave", function(self)
+    self.selected = false
     self:update()
   end)
 

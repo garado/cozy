@@ -3,12 +3,13 @@
 
 local ui        = require("utils.ui")
 local dpi       = ui.dpi
-local math      = require("math")
 local gears     = require("gears")
 local wibox     = require("wibox")
 local beautiful = require("beautiful")
 local dash      = require("backend.cozy.dash")
 local conf      = require("cozyconf")
+
+local math = math
 
 local pfp       = wibox.widget({
   {

@@ -7,7 +7,7 @@ local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local awful = require("awful")
 local wibox = require("wibox")
-local header = require("frontend.widget.dash.header")
+local header = require("frontend.widget.dashheader")
 local keynav = require("modules.keynav")
 
 local tags_projects, nav_tags_projects = require(... .. ".tags-and-projects")()

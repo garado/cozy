@@ -135,7 +135,7 @@ local content = wibox.widget({
       right   = dpi(10),
       widget  = wibox.container.margin,
     },
-    bg = beautiful.neutral[900],
+    bg = beautiful.neutral[800],
     widget = wibox.container.background,
   },
   {
@@ -151,7 +151,6 @@ themeswitcher = awful.popup({
   minimum_width  = dpi(330),
   maximum_width  = dpi(330),
   shape = ui.rrect(),
-  bg = beautiful.neutral[900],
   ontop     = true,
   visible   = false,
   placement = awful.placement.centered,
@@ -178,6 +177,8 @@ ts:connect_signal("ready::themes", function()
   for i = 1, #ts.themes do
     local s = sbtn({
       text = ts.themes[i],
+      bg    = beautiful.neutral[700],
+      bg_mo = beautiful.neutral[600],
       on_release = function(self)
         ts.selected_theme = self.name
         ts.selected_style = nil
@@ -197,6 +198,8 @@ ts:connect_signal("ready::styles", function()
   for i = 1, #ts.styles do
     local s = sbtn({
       text = ts.styles[i],
+      bg    = beautiful.neutral[700],
+      bg_mo = beautiful.neutral[600],
       on_release = function(self)
         ts.selected_style = self.name
         nav_actions:clear()

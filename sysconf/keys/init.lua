@@ -108,6 +108,12 @@ awful.keyboard.append_global_keybindings({
   -- █░█ █▀█ ▀█▀ █▄▀ █▀▀ █▄█ █▀
   -- █▀█ █▄█ ░█░ █░█ ██▄ ░█░ ▄█
 
+  -- Picom killswitch
+  awful.key({ ctrl, alt }, "p", function()
+    local cmd = "pkill picom"
+    awful.spawn.easy_async_with_shell(cmd, function() end)
+  end, { description = "picom killswitch", group = "Hotkeys" }),
+
   -- Adjust brightness
   awful.key({}, "XF86MonBrightnessUp", function()
     awful.spawn("brightnessctl set 5%+ -q", false)

@@ -97,7 +97,6 @@ local function gen_transaction(data)
 
   -- Put it with the correct account
   for _, container in ipairs(content.children) do
-    print(container.account)
     if container.account == data[3] then
       container.transactions:add(widget)
     end

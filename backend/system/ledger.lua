@@ -5,7 +5,6 @@
 local gobject = require("gears.object")
 local gtable  = require("gears.table")
 local config  = require("cozyconf")
-local gfs     = require("gears.filesystem")
 local awful   = require("awful")
 local strutil = require("utils.string")
 local os      = os

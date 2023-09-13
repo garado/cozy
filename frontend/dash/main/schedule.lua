@@ -67,6 +67,13 @@ local function gen_event(data)
     widget = wibox.container.background,
   })
 
+  local date_text
+  if data[cal.START_TIME] == data[cal.END_TIME] then
+    date_text = "All day"
+  else
+    date_text = data[cal.START_TIME]
+  end
+
   -- Event title
   local toptext = wibox.widget({
     ui.textbox({
@@ -75,7 +82,7 @@ local function gen_event(data)
     }),
     nil,
     ui.textbox({
-      text = data[cal.START_TIME]
+      text = date_text
     }),
     forced_height = conf.font.sizes.s + dpi(4),
     forced_width = dpi(2000),

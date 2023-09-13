@@ -8,7 +8,7 @@ local ui  = require("utils.ui")
 local dpi = ui.dpi
 local btn    = require("frontend.widget.button")
 local wibox  = require("wibox")
-local header = require("frontend.widget.dash.header")
+local header = require("frontend.widget.dashheader")
 local ledger = require("backend.system.ledger")
 local keynav = require("modules.keynav")
 
