@@ -23,7 +23,6 @@ local nav_main   = keynav.area({
   name      = "nav_main",
   autofocus = false,
   items     = {
-    time.keynav,
     habits.keynav,
   }
 })
@@ -38,7 +37,6 @@ local col1 = wibox.widget({
 })
 col1:set_ratio(1, 0.32)
 col1:set_ratio(4, 0.25)
--- col1:set_ratio(4, 0.4)
 
 local col2 = wibox.widget({
   schedule,
@@ -55,7 +53,7 @@ local col3 = wibox.widget({
   layout = spaceratio.vertical,
 })
 col3:set_ratio(1, 0.25)
-col3:set_ratio(3, 0.34)
+col3:set_ratio(3, 0.36)
 
 local content = wibox.widget({
   col1,
