@@ -1,4 +1,3 @@
-
 -- █▀ ▀█▀ █▀█ █ █▄░█ █▀▀    █░█ ▀█▀ █ █░░ █▀
 -- ▄█ ░█░ █▀▄ █ █░▀█ █▄█    █▄█ ░█░ █ █▄▄ ▄█
 
@@ -100,28 +99,32 @@ local DT_LETTERS = {
   ["d"] = "day",
   ["H"] = "hour",
   ["h"] = "hour",
-  ["M"] = "minute",
+  ["M"] = "min",
   ["m"] = "month",
 }
 
 _string.dt_format = {
   standard = "%Y-%m-%d",
-  iso = "%Y%m%dT%H%M%SZ",
+  iso = "%Y%m%dt%H%M%Sz",
 }
 
 -- @brief Convert a datetime string to another format.
 --        This function is meant to be a catch-all replacement for all of the datetime
 --        conversion functions I've had to write because writing really specific conversion
 --        functions got annoying.
+-- @note  All subjects get converted to lowercase.
 -- @param subject       The string to convert, i.e. "2023-03-02"
 -- @param old_pattern   The pattern for the subject string, i.e. "%Y-%m-%d"
 --                      If not specified, %Y-%m-%d is assumed.
 -- @param new_pattern   The new pattern, i.e. "%A %M %d"
 --                      If not specified, the function returns the raw timestamp.
 function _string.dt_convert(subject, old_pattern, new_pattern)
-  subject = tostring(subject)
   subject = subject:lower()
   old_pattern = old_pattern or "%Y-%m-%d"
+
+  local debug = false
+
+  if debug then print('=== DTC: CONVERTING '..subject..' WITH PATTERN '..old_pattern.." ===") end
 
   -- Record the order in which matches appear.
   -- This generates a table that for the example case %Y-%m-%d looks like { "Y", "m", "d" }
@@ -129,6 +132,8 @@ function _string.dt_convert(subject, old_pattern, new_pattern)
   for i = 1, #captures do
     captures[i] = captures[i]:sub(1, 1)
   end
+
+  if debug then _string.print_arr(captures) end
 
   -- This takes the subject string: 2023-04-02
   -- And the old_pattern information: %Y-%m-%d
@@ -139,8 +144,12 @@ function _string.dt_convert(subject, old_pattern, new_pattern)
     end
   end
 
+  if debug then print('Old pattern converted to '..old_pattern) end
+
   -- Get table of matches using old_pattern (%d%d%d%d)-(%d%d)-(%d%d)
   local match_values = { subject:match(old_pattern) }
+
+  if debug then _string.print_arr(match_values) end
 
   -- Set up inputs to get os.time timestamp
   local timetable = {
@@ -155,9 +164,13 @@ function _string.dt_convert(subject, old_pattern, new_pattern)
     end
   end
 
+  if debug then _string.print_arr(timetable) end
+
   local ts = os.time(timetable)
   local tz_offset = require("cozyconf").timezone or 0
   ts = ts + (tz_offset * 60 * 60)
+
+  if debug then print('Timestamp: '..ts) end
 
   return (new_pattern and os.date(new_pattern, ts)) or ts
 end
@@ -166,7 +179,6 @@ end
 -- @brief Convert an os.time timestamp to relative time
 --        i.e. '1 day ago', '2 months ago'
 -- @param ts  os.time timestamp for the date to convert
--- TODO: Make all the old to_relative functions use this
 function _string.ts_to_relative(ts)
   local now = os.time()
   local diff = now - ts

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-aawmtt --size 1400x850
+awmtt start --size 1400x850

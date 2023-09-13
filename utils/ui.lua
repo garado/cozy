@@ -29,6 +29,7 @@ function _ui.textbox(userargs)
     ellipsize      = "end",
     letter_spacing = nil,
     strikethrough  = false,
+    bg             = nil,
   }
   gtable.crush(args, userargs or {})
   args.text = tostring(args.text) -- just making sure
@@ -42,7 +43,7 @@ function _ui.textbox(userargs)
     args.text = args.text:gsub("<", "&gt;")
   end
 
-  args.markup = args.markup or _ui.colorize(args.text or "Default text", args.color)
+  args.markup = args.markup or _ui.colorize(args.text or "Default text", args.color, args.bg)
 
   if args.letter_spacing then
     args.markup = "<span letter_spacing='" .. args.letter_spacing .. "'>" .. args.markup .. "</span>"
@@ -66,15 +67,14 @@ function _ui.textbox(userargs)
     -------
     _text         = args.text,
     _color        = args.color,
+    _bg           = args.bg,
     update_text   = function(self, text)
       self._text  = text
-      self.markup = _ui.colorize(text, self._color)
-      if self.strikethrough then
-        self.markup = "<span strikethrough='true'>"..self.markup.."</span>"
-      end
+      self.markup = _ui.colorize(text, self._color, self._bg)
+      if self.strikethrough then self.markup = "<span strikethrough='true'>"..self.markup.."</span>" end
     end,
     update_color  = function(self, color)
-      self.markup = _ui.colorize(self._text, color)
+      self.markup = _ui.colorize(self._text, color, self._bg)
       if self.strikethrough then
         self.markup = "<span strikethrough='true'>"..self.markup.."</span>"
       end
@@ -83,7 +83,8 @@ function _ui.textbox(userargs)
 
   awesome.connect_signal("theme::reload", function(lut)
     widget._color = lut[widget._color]
-    widget:update_color(widget._color)
+    widget._bg    = lut[widget._bg]
+    widget:update_color(widget._color, widget._bg)
   end)
 
   return widget
@@ -194,20 +195,6 @@ function _ui.vpad(height)
   })
 end
 
---- @method place
--- @brief Place + margin
-function _ui.place(content, args)
-  args = args or {}
-  return wibox.widget({
-    {
-      content,
-      widget = wibox.container.place,
-    },
-    widget = wibox.container.margin,
-    margins = args.margins,
-  })
-end
-
 --- @method rrect
 -- @brief Create rounded rectangle
 function _ui.rrect(radius)
@@ -303,9 +290,13 @@ end
 
 --- @method colorize
 -- @brief Apply color markup
-function _ui.colorize(text, color)
+function _ui.colorize(text, color, bg)
   color = color or beautiful.neutral[100]
-  return "<span foreground='" .. color .. "'>" .. text .. "</span>"
+  if bg then
+    return "<span foreground='".. color.."' ".."background='"..bg.."'>" .. text .. "</span>"
+  else
+    return "<span foreground='" .. color .. "'>" .. text .. "</span>"
+  end
 end
 
 return _ui
