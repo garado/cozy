@@ -5,17 +5,14 @@
 local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local wibox = require("wibox")
-local header = require("frontend.widget.dash.header")
 local task  = require("backend.system.task")
 local keynav = require("modules.keynav")
 
 local sidebar, nav_tags, nav_projects = require(... .. ".sidebar")()
 local tasklist_header = require(... .. ".tasklist.header")
-local tasklist_body   = require(... .. ".tasklist.list")
+local tasklist_body, scrollbar   = require(... .. ".tasklist.list")()
 local tasklist_details = require(... .. ".tasklist.details")
 local tasklist_prompt = require(... .. ".tasklist.prompt")
-
-local taskheader
 
 local nav_tags_projects = keynav.area({
   name = "nav_tags_projects",
@@ -24,14 +21,7 @@ local nav_tags_projects = keynav.area({
     nav_projects,
     tasklist_body.area,
   },
-  keys = {
-    ["Shift_R!"] = function() -- Shift_R + 1
-      task:emit_signal("page::switch::tags_and_projects")
-    end,
-    ["Shift_R@"] = function() -- Shift_R + 2
-      task:emit_signal("page::switch::view_all")
-    end
-  }
+  keys = {}
 })
 
 local _tasklist = wibox.widget({
@@ -42,7 +32,7 @@ local _tasklist = wibox.widget({
   },
   {
     {
-      tasklist_body.scrollbar,
+      scrollbar,
       tasklist_body,
       layout = wibox.layout.fixed.horizontal,
     },

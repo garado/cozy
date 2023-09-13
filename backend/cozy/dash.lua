@@ -25,6 +25,10 @@ end
 function dash:close()
   self:emit_signal("setstate::close")
   self.visible = false
+
+  for i = 1, #self.child_popups do
+    self:emit_signal(self.child_popups[i] .. "::setstate::close")
+  end
 end
 
 function dash:open()
@@ -43,6 +47,7 @@ function dash:set_tab(tab_enum)
 end
 
 function dash:new()
+  self.child_popups = {}
   self.visible = false
   self.date = os.date("%d")
 end

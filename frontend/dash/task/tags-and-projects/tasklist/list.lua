@@ -68,7 +68,11 @@ function tasklist:set_position(idx)
     scroll_down()
   end
 
-  tasklist.area.active_element:emit_signal("mouse::enter")
+  -- TODO: This is messy af
+  local c = tasklist.area.active_element.desc._color
+  tasklist.area.active_element.desc:update_color(c)
+  tasklist.area.active_element.indicator.bg = c
+
   previous_index = idx
 end
 
@@ -166,6 +170,7 @@ end
 tasklist.area:connect_signal("area::left", function()
   local c = tasklist.area.active_element.desc._color
   tasklist.area.active_element.desc:update_color(c)
+  tasklist.area.active_element.indicator.bg = c
 end)
 
 task:connect_signal("ready::tasks", function(_, tag, project, tasks)

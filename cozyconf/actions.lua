@@ -73,8 +73,8 @@ local function create_stateless_qa(name, icon, on_press)
     height = dpi(40),
     width  = dpi(40),
     func   = on_press,
-    bg     = beautiful.neutral[600],
-    bg_mo  = beautiful.neutral[500],
+    bg     = beautiful.neutral[700],
+    bg_mo  = beautiful.neutral[600],
   })
   qa.name = name
   actions[#actions + 1] = qa
@@ -220,7 +220,7 @@ create_stateful_qa("Dash: Screen record", "",
 
   -- Activate
   function()
-    local cmd = 'ffmpeg -y -video_size 1370x830 -framerate 25 -f x11grab -i :0.0+275,125 $HOME/Videos/cozy/output.mp4'
+    local cmd = 'ffmpeg -y -video_size 1370x830 -framerate 40 -f x11grab -i :0.0+275,125 $HOME/Videos/cozy/output.mp4'
     awful.spawn.easy_async_with_shell(cmd, function() end)
   end,
 
@@ -242,7 +242,26 @@ create_stateless_qa("Dash: Screenshot", "󰹑", function()
   end)
 end)
 
-create_stateless_qa("Filler", "󱐟", function()
-end)
+create_stateful_qa("Airplane mode", "󱐟",
+  -- Init
+  function(qa)
+    local cmd = "rfkill list all"
+    awful.spawn.easy_async_with_shell(cmd, function(stdout)
+      qa:emit_signal("setstate", stdout:find("yes"))
+    end)
+  end,
+
+  -- Activate
+  function()
+    local cmd = "rfkill block all"
+    awful.spawn.easy_async_with_shell(cmd, function() end)
+  end,
+
+  -- Deactivate
+  function()
+    local cmd = "rfkill unblock all"
+    awful.spawn.easy_async_with_shell(cmd, function() end)
+  end
+)
 
 return actions
