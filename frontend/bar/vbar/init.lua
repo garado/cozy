@@ -8,12 +8,12 @@ local dpi   = require("utils.ui").dpi
 local beautiful  = require("beautiful")
 local conf = require("cozyconf")
 
-local logo = require(... .. ".logo")
-local clock = require(... .. ".clock")
+local logo    = require("frontend.bar.common.logo")
+local clock   = require("frontend.bar.common.clock")("%H\n%M")
+local battery = require("frontend.bar.common.battery")
 local taglist = require(... .. ".taglist")
-local battery = require(... .. ".battery")
 
-local align = (conf.bar_align == "left") and "left" or "right"
+local align = (conf.bar_align == "right") and "right" or "left"
 
 local top_vbar = wibox.widget({
   logo,

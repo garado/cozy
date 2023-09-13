@@ -2,31 +2,28 @@
 -- █▄▄ ▄▀█ ▀█▀ ▀█▀ █▀▀ █▀█ █▄█
 -- █▄█ █▀█ ░█░ ░█░ ██▄ █▀▄ ░█░
 
--- Credit: - https://github.com/Aire-One/awesome-battery_widget
---         - @rxyhn
+-- Credits: - https://github.com/Aire-One/awesome-battery_widget
+--          - @rxyhn
 
 require("backend.system.battery")
-
 local conf = require("cozyconf")
-local wibox = require("wibox")
+local theme = require("theme.colorschemes."..conf.theme_name.."."..conf.theme_style)
+
+local ui = require("utils.ui")
 local beautiful = require("beautiful")
-local floor = math.floor
+local math = math
 
 local CHARGING = 1
 
-local low_color      = beautiful.red[500]
-local normal_color   = conf.pulsebar_fg_r =="dark" and beautiful.neutral[900] or beautiful.neutral[100]
-local charging_color = beautiful.green[500]
+local charging_color  = beautiful.green[500]
+local low_color       = beautiful.red[500]
+local normal_color    = theme.pulsebar_fg_r == "dark" and beautiful.neutral[800] or beautiful.neutral[100]
 
-local percentage = wibox.widget({
-  {
-    font = beautiful.font_reg_xs,
-    markup = "50",
-    align  = "center",
-    widget = wibox.widget.textbox,
-  },
-  fg = normal_color,
-  widget = wibox.container.background,
+local percentage = ui.textbox({
+  text = "50",
+  font = beautiful.font_reg_xs,
+  align = "center",
+  color = normal_color
 })
 
 awesome.connect_signal("signal::battery", function(value, state)
@@ -41,8 +38,8 @@ awesome.connect_signal("signal::battery", function(value, state)
     percent_color = normal_color
   end
 
-  percentage.widget.text = floor(value)
-  percentage:set_fg(percent_color)
+  percentage:update_text(math.floor(value))
+  percentage:update_color(percent_color)
 end)
 
 return percentage

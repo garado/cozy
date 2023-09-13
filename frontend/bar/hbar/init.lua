@@ -9,14 +9,11 @@ local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local beautiful  = require("beautiful")
 
-local logo    = require(... .. ".logo")
-local timew   = require(... .. ".timewarrior")
-local clock   = require(... .. ".clock")
+local logo    = require("frontend.bar.common.logo")
+local timew   = require("frontend.bar.common.timewarrior")
+local clock   = require("frontend.bar.common.clock")("%H:%M")
+local battery = require("frontend.bar.common.battery")
 local taglist = require(... .. ".taglist")
-local battery = require(... .. ".battery")
--- local bluetooth = require(... .. ".bluetooth")
--- local audio = require(... .. ".audio")
--- local wifi = require(... .. ".wifi")
 
 local align = (conf.bar_align == "top") and "top" or "bottom"
 

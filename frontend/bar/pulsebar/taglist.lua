@@ -8,10 +8,11 @@ local wibox = require("wibox")
 local ui = require("utils.ui")
 local dpi = ui.dpi
 local beautiful = require("beautiful")
+local animation = require("modules.animation")
 
 local taglist
 
-local FG_EMPTY    = beautiful.neutral[700]
+local FG_EMPTY    = beautiful.neutral[900]
 local FG_FOCUSED  = beautiful.primary[300]
 local FG_OCCUPIED = beautiful.neutral[200]
 

@@ -34,6 +34,15 @@ return {
     "#a5b4cb",
   },
 
+  -- Pulsebar is a style where the bar background is transparent.
+  -- Depending on which wallpaper you use, you may want to change the
+  -- font color of the bar icons so that they're actually visible against
+  -- the wallpaper.
+  -- Options: dark light
+  pulsebar_fg_l = "light",
+  pulsebar_fg_m = "light",
+  pulsebar_fg_r = "light",
+
   integrations = {
     kitty = "Mountain Fuji",
     nvim  = "mountain",

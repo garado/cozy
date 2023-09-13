@@ -11,14 +11,11 @@ local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local beautiful  = require("beautiful")
 
-local timew   = require(... .. ".timewarrior")
-local clock   = require(... .. ".clock")
-local taglist = require(... .. ".taglist")
 local battery = require(... .. ".battery")
+local clock   = require(... .. ".clock")
+local timew   = require(... .. ".timewarrior")
+local taglist = require(... .. ".taglist")
 local logo    = require(... .. ".logo")
--- local bluetooth = require(... .. ".bluetooth")
--- local audio = require(... .. ".audio")
--- local wifi = require(... .. ".wifi")
 
 local align = (conf.bar_align == "top") and "top" or "bottom"
 
