@@ -2,13 +2,13 @@
 -- █▀▄▀█ █▀█ █░█ █▄░█ ▀█▀ ▄▀█ █ █▄░█ ▀    █▀▀ █░█ ░░█ █ 
 -- █░▀░█ █▄█ █▄█ █░▀█ ░█░ █▀█ █ █░▀█ ▄    █▀░ █▄█ █▄█ █ 
 
-local gfs = require("gears.filesystem")
-local awesome_cfg = gfs.get_configuration_dir()
+local cfg = require("gears.filesystem").get_configuration_dir()
+local path = cfg .. ((...):match("(.-)[^%.]+$")):gsub("%.", "/") -- path to this file's dir
 
 return {
   type = "dark",
-  wall = awesome_cfg .. "theme/colorschemes/mountain/wallpaper",
-  accent_image = awesome_cfg .. "theme/colorschemes/mountain/accent_image",
+  wall = path .. "wallpaper",
+  accent_image = path .. "accent_image",
 
   primary = {
     base = "#7d6a4f",

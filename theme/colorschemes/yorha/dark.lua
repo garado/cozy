@@ -1,27 +1,27 @@
 
--- █▄░█ █▀█ █▀█ █▀▄    █▀▄ ▄▀█ █▀█ █▄▀ 
--- █░▀█ █▄█ █▀▄ █▄▀    █▄▀ █▀█ █▀▄ █░█ 
+-- █▄█ █▀█ █▀█ █░█ ▄▀█    █▀▄ ▄▀█ █▀█ █▄▀ 
+-- ░█░ █▄█ █▀▄ █▀█ █▀█    █▄▀ █▀█ █▀▄ █░█ 
 
 local cfg = require("gears.filesystem").get_configuration_dir()
 local path = cfg .. ((...):match("(.-)[^%.]+$")):gsub("%.", "/") -- path to this file's dir
 
 local theme = {
   type = "dark",
-  wall = path .. "wallpaper",
-  accent_image = path .. "accent_image",
+  wall = path .. "wall_dark",
+  accent_image = path .. "wall_dark",
 
   primary = {
-    base = "#5e81ac",
+    base = "#bdb3a0",
   },
   neutral = {
-    dark  = "#1f242f",
-    base  = "#465064",
-    light = "#e5e9f0",
+    dark  = "#494949",
+    base  = "#696862",
+    light = "#c9c5ad",
   },
   colors = {
-    red    = "#bf616a",
-    green  = "#a3be8c",
-    yellow = "#ebcb8b",
+    red    = "#825b69",
+    green  = "#69825b",
+    yellow = "#82755b",
   },
   accents = {
     "#8fbcbb",
@@ -45,8 +45,8 @@ local theme = {
   pulsebar_fg_r = "light",
 
   integrations = {
-    kitty = "Nord",
-    nvim  = { "nord", "dark" },
+    kitty = "Nostalgia Light",
+    nvim  = "nostalgia",
   }
 }
 
