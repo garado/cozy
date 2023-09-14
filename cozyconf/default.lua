@@ -51,6 +51,10 @@ return {
   -- This only affects AwesomeWM widgets.
   scale = 1,
 
+  -- Set bar style.
+  -- Options: hbar vbar pulsebar
+  bar_style = "hbar",
+
   -- Set bar alignment.
   -- Options:
   --    > [hbar] top bottom
@@ -58,15 +62,11 @@ return {
   --    > [pulsebar] top
   bar_align = "top",
 
-  -- Set bar style. Default style is vertical.
-  -- Options: hbar vbar pulsebar
-  bar_style = "hbar",
-
   -- Show notifications for playerctl.
   playerctl_notifications = true,
 
-  -- █▀▄▀█ █ █▀ █▀▀ 
-  -- █░▀░█ █ ▄█ █▄▄ 
+  -- █▀▄▀█ █ █▀ █▀▀
+  -- █░▀░█ █ ▄█ █▄▄
 
   -- GMT offset.
   timezone = -7,
