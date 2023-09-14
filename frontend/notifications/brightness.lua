@@ -19,7 +19,7 @@ awesome.connect_signal("module::brightness", function()
       if not brightnotif then
         brightnotif = naughty.notification {
           title = "Brightness",
-          app_name = "System",
+          app_name = "System message",
           message = "Brightness at " .. val .. "%",
           auto_reset_timeout = true,
           timeout = 1.25,

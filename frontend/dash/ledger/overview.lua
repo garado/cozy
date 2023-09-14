@@ -109,4 +109,7 @@ ledger:connect_signal("refresh", function(self)
   self:parse_month_expenses()
 end)
 
-return ui.dashbox(overview, dpi(2000), dpi(100), beautiful.neutral[800])
+return require("frontend.widget.yorha.line_container")({
+  widget = overview,
+})
+-- return ui.dashbox(overview, dpi(2000), dpi(100), beautiful.neutral[800])

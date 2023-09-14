@@ -80,8 +80,12 @@ ledger:connect_signal("ready::budget", function(_, bdata)
   end
 end)
 
-return ui.dashbox(
-  wibox.container.place(budget_entries),
-  dpi(390), -- width
-  dpi(500)  -- height
-)
+return require("frontend.widget.yorha.basic_container")({
+  text = "Budget",
+  widget = wibox.container.place(budget_entries)
+})
+-- return ui.dashbox(
+--   wibox.container.place(budget_entries),
+--   dpi(390), -- width
+--   dpi(500)  -- height
+-- )

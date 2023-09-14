@@ -25,17 +25,23 @@ local navigator, nav_root = keynav.navigator()
 -- █▀░ █▀▄ █▄█ █░▀█ ░█░ ██▄ █░▀█ █▄▀
 
 local function gen_entry(name)
-  return btn({
+  return require("frontend.widget.yorha.list.item")({
     text = name,
-    bg = beautiful.neutral[700],
-    bg_mo = beautiful.neutral[600],
-    on_release = function()
-      local cmd = "kitty --session sessions/"..name
-      awful.spawn.easy_async_with_shell(cmd, function() end)
-      kitty:close()
-    end
   })
 end
+
+-- local function gen_entry(name)
+--   return btn({
+--     text = name,
+--     bg = beautiful.neutral[700],
+--     bg_mo = beautiful.neutral[600],
+--     on_release = function()
+--       local cmd = "kitty --session sessions/"..name
+--       awful.spawn.easy_async_with_shell(cmd, function() end)
+--       kitty:close()
+--     end
+--   })
+-- end
 
 local session_list = wibox.widget({
   spacing = dpi(10),

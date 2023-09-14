@@ -6,8 +6,10 @@ local path = cfg .. ((...):match("(.-)[^%.]+$")):gsub("%.", "/") -- path to this
 
 local theme = {
   type = "light",
-  wall = path .. "wall_light",
+  wall = path .. "wall_dark",
   accent_image = path .. "accent_light",
+
+  yorha = "#cd664d",
 
   primary = {
     base = "#8b7f65",

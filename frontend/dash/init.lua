@@ -7,7 +7,6 @@
 -- open/close signals.
 
 local awful = require("awful")
-local gears = require("gears")
 local wibox = require("wibox")
 local ui  = require("utils.ui")
 local dpi = require("utils.ui").dpi
@@ -15,6 +14,8 @@ local keynav = require("modules.keynav")
 local beautiful = require("beautiful")
 local dashstate = require("backend.cozy.dash")
 local config = require("cozyconf")
+local triangles = require("frontend.widget.yorha.triangles")
+local vdecor = require("frontend.widget.yorha.vbar")
 
 local navigator, nav_root = keynav.navigator()
 local content
@@ -50,70 +51,95 @@ for i = 1, #tab_list do
 end
 nav_root.keys = root_keys
 
+local function gen_tab_button(i)
+  local icon_text = ui.textbox({
+    text = tab_icons[i],
+    color = beautiful.neutral[900],
+  })
+
+  local icon = wibox.widget({
+    {
+      icon_text,
+      margins = dpi(3),
+      widget = wibox.container.margin,
+    },
+    forced_width = dpi(20),
+    forced_height = dpi(20),
+    bg = beautiful.neutral[100],
+    widget = wibox.container.background,
+  })
+
+  local tabtext = ui.textbox({
+    text = config.tabs[i]:upper(),
+    align = "center",
+  })
+
+  local c = wibox.widget({
+    {
+      {
+        {
+          icon,
+          widget = wibox.container.place,
+        },
+        tabtext,
+        spacing = dpi(6),
+        layout = wibox.layout.fixed.horizontal,
+      },
+      top    = dpi(5),
+      bottom = dpi(5),
+      left   = dpi(5),
+      right  = dpi(30),
+      widget = wibox.container.margin,
+    },
+    bg = beautiful.neutral[600],
+    widget = wibox.container.background,
+  })
+
+  local widget = wibox.widget({
+    ui.vpad(dpi(5)),
+    c,
+    {
+      forced_height = dpi(25),
+      bg = beautiful.neutral[100],
+      widget = wibox.container.background,
+    },
+    forced_height = dpi(43),
+    layout = wibox.layout.fixed.vertical,
+  })
+
+  widget.tab_enum = i
+
+  function widget:deselect()
+    icon.bg = beautiful.neutral[100]
+    icon_text:update_color(beautiful.neutral[900])
+    tabtext:update_color(beautiful.neutral[100])
+    c.bg = beautiful.neutral[500]
+    widget.children[3].bg = beautiful.neutral[900]
+  end
+
+  function widget:select()
+    icon.bg = beautiful.neutral[900]
+    icon_text:update_color(beautiful.neutral[100])
+    tabtext:update_color(beautiful.neutral[900])
+    c.bg = beautiful.neutral[100]
+    widget.children[3].bg = beautiful.neutral[100]
+  end
+
+  widget:connect_signal("button::press", function()
+    dashstate:set_tab(widget.tab_enum)
+  end)
+
+  return widget
+end
+
 -- Generate tab sidebar
 local tab_buttons = wibox.widget({
-  layout  = wibox.layout.fixed.vertical,
-
-  -- @param i A tab enum
-  add_tab = function(self, i)
-    local btn = wibox.widget({
-      {
-        ui.textbox({
-          text  = tab_icons[i],
-          align = "center",
-        }),
-        left   = dpi(2),
-        widget = wibox.container.margin,
-      },
-      bg = beautiful.primary[800],
-      forced_height = dpi(50),
-      widget = wibox.container.background,
-      ------
-      tab_enum = i,
-      bg_color = beautiful.neutral[800],
-      mo_color = beautiful.neutral[700],
-      select = function(_self)
-        -- Margin
-        _self.children[1].color = beautiful.neutral[100]
-
-        -- Icon color
-        _self.children[1].widget:update_color(beautiful.neutral[100])
-
-        _self.bg_color = beautiful.neutral[600]
-        _self.mo_color = beautiful.neutral[500]
-        _self.bg = _self.bg_color
-      end,
-      deselect = function(_self)
-        -- Margin
-        _self.children[1].color = nil
-
-        -- Icon color
-        _self.children[1].widget:update_color(beautiful.neutral[500])
-
-        _self.bg_color = beautiful.neutral[800]
-        _self.mo_color = beautiful.neutral[700]
-        _self.bg = _self.bg_color
-      end,
-    })
-
-    btn:connect_signal("mouse::enter", function()
-      btn.bg = btn.mo_color
-    end)
-
-    btn:connect_signal("mouse::leave", function()
-      btn.bg = btn.bg_color
-    end)
-
-    btn:connect_signal("button::press", function()
-      dashstate:set_tab(btn.tab_enum)
-    end)
-
-    self:add(btn)
-  end
+  spacing = dpi(30),
+  layout  = wibox.layout.fixed.horizontal,
 })
 
 for i = 1, #tab_list do
-  tab_buttons:add_tab(i)
+  tab_buttons:add(gen_tab_button(i))
 end
 
 -- Logic for switching tabs
@@ -140,46 +166,41 @@ end)
 -- Building the rest of the sidebar
 local sidebar = wibox.widget({
   {
-    { -- Profile picture
-      {
-        {
-          {
-            image  = beautiful.pfp,
-            resize = true,
-            forced_height = dpi(28),
-            forced_width  = dpi(28),
-            widget = wibox.widget.imagebox,
-          },
-          bg     = beautiful.primary[300],
-          shape  = gears.shape.circle,
-          widget = wibox.container.background,
-        },
-        top = dpi(10),
-        widget = wibox.container.margin,
-      },
-      widget = wibox.container.place,
-    },
-    tab_buttons,
-    { -- Distro icon
-      {
-        ui.textbox({
-          text  = config.distro_icon,
-          align = "center",
-          color = beautiful.primary[300],
-        }),
-        widget = wibox.container.place,
-      },
-      bottom = dpi(15),
+    {
+      ui.textbox({
+        text = require("cozyconf").distro_icon,
+        align = "center",
+      }),
+      left = dpi(10),
       widget = wibox.container.margin,
     },
-    expand = "none",
-    layout = wibox.layout.align.vertical,
+    {
+      {
+        tab_buttons,
+        widget = wibox.container.place,
+      },
+      top = dpi(4),
+      widget = wibox.container.margin,
+    },
+    nil,
+    layout = wibox.layout.align.horizontal,
   },
-  forced_width  = dpi(50),
-  forced_height = dpi(1400),
-  shape  = gears.shape.rect,
-  bg     = beautiful.neutral[800],
-  widget = wibox.container.background,
+  {
+    {
+      color = beautiful.neutral[100],
+      border_width = 0,
+      thickness = dpi(4),
+      forced_height = dpi(2),
+      widget = wibox.widget.separator,
+    },
+    {
+      triangles,
+      forced_height = dpi(40),
+      widget = wibox.container.place,
+    },
+    layout = wibox.layout.fixed.vertical,
+  },
+  layout = wibox.layout.fixed.vertical,
 })
 
 -- ▄▀█ █▀ █▀ █▀▀ █▀▄▀█ █▄▄ █░░ █▄█ 
@@ -201,15 +222,18 @@ local dash = awful.popup({
   minimum_width  = dpi(1350),
   maximum_width  = dpi(1350),
   bg = beautiful.neutral[900],
-  shape = ui.rrect(),
   ontop     = true,
   visible   = false,
   placement = awful.placement.centered,
   widget = ({
     {
-      sidebar,
+      {
+        sidebar,
+        forced_height = dpi(70),
+        widget = wibox.container.place,
+      },
       content,
-      layout = wibox.layout.align.horizontal,
+      layout = wibox.layout.fixed.vertical,
     },
     bg = beautiful.neutral[900],
     widget = wibox.container.background,

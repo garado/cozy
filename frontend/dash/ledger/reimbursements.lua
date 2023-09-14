@@ -137,4 +137,10 @@ ledger:connect_signal("ready::reimbursements::transactions", function(_, data)
   end
 end)
 
-return ui.dashbox(reimbursements)
+return require("frontend.widget.yorha.basic_container")({
+  text = "Reimbursements + liabilities",
+  widget = wibox.container.place(content),
+  height = dpi(300),
+})
+
+-- return ui.dashbox(reimbursements)

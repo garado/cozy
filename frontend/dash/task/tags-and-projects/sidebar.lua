@@ -26,8 +26,9 @@ local TAG, PROJECT, SORT = 1, 2, 3
 -- ░█░ █▀█ █▄█ ▄█    ░▀░    █▀▀ █▀▄ █▄█ █▄█ ██▄ █▄▄ ░█░ ▄█ 
 
 local select_props = {
-  fg = beautiful.primary[400],
-  fg_mo = beautiful.primary[500],
+  fg = beautiful.yorha,
+  fg_mo = beautiful.yorha,
+  highlight = beautiful.yorha,
   indicator_color = beautiful.neutral[100],
 }
 
@@ -138,10 +139,10 @@ local function gen_item(type, name, parent_tag)
   -- Highlight
   item:connect_signal("mouse::enter", function(self)
     -- Unhighlight last item
-    self.parent.active_element.textbox:update_color(beautiful.neutral[100])
+    self.parent.active_element.textbox:update_color(deselect_props.fg)
 
     -- Highlight this item
-    self.textbox:update_color(beautiful.primary[400])
+    self.textbox:update_color(select_props.highlight)
   end)
 
   -- Un-highlight
@@ -261,35 +262,68 @@ sortoptions.area:connect_signal("area::left", function()
 end)
 
 -- Final widget assembly -----------
-local sidebar = wibox.widget({
-  { -- Tags
-    ui.textbox({
-      text = "Tags",
-      font = beautiful.font_med_m,
-    }),
-    taglist,
-    spacing = dpi(15),
+
+local tags = wibox.widget({
+  {
+    { -- Header
+      {
+        ui.textbox({
+          text = "Tags",
+          font = beautiful.font_reg_s,
+          color = beautiful.neutral[900],
+          height = dpi(22),
+        }),
+        margins = dpi(5),
+        widget = wibox.container.margin,
+      },
+      bg = beautiful.neutral[100],
+      widget = wibox.container.background,
+    },
+    {
+      taglist,
+      margins = dpi(8),
+      widget = wibox.container.margin,
+    },
     layout  = wibox.layout.fixed.vertical,
   },
-  { -- Projects
-    ui.textbox({
-      text = "Projects",
-      font = beautiful.font_med_m,
-    }),
-    projectlist,
-    spacing = dpi(15),
-    layout = wibox.layout.fixed.vertical,
+  bg = beautiful.neutral[800],
+  widget = wibox.container.background,
+})
+
+local projects = wibox.widget({
+  {
+    { -- Header
+      {
+        ui.textbox({
+          text = "Projects",
+          font = beautiful.font_reg_s,
+          color = beautiful.neutral[900],
+          height = dpi(22),
+        }),
+        margins = dpi(5),
+        widget = wibox.container.margin,
+      },
+      bg = beautiful.neutral[100],
+      widget = wibox.container.background,
+    },
+    {
+      projectlist,
+      margins = dpi(8),
+      widget = wibox.container.margin,
+    },
+    layout  = wibox.layout.fixed.vertical,
   },
-  { -- Sort options
-    ui.textbox({
-      text = "Sort options",
-      font = beautiful.font_med_m,
-    }),
-    sortoptions,
-    spacing = dpi(15),
-    layout = wibox.layout.fixed.vertical,
-  },
-  spacing = dpi(25),
+  bg = beautiful.neutral[800],
+  widget = wibox.container.background,
+})
+
+local cont = require("frontend.widget.yorha.basic_container")
+
+local sidebar = wibox.widget({
+  cont({ text = "Tags", widget = taglist }),
+  cont({ text = "Projects", widget = projectlist }),
+  spacing = beautiful.dash_widget_gap,
+  forced_width = dpi(300),
   layout  = wibox.layout.fixed.vertical,
 })
 
@@ -372,5 +406,5 @@ task:connect_signal("ready::tags_and_projects", function()
 end)
 
 return function()
-  return ui.dashbox(sidebar), taglist.area, projectlist.area
+  return sidebar, taglist.area, projectlist.area
 end

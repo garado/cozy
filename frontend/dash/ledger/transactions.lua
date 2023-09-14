@@ -158,8 +158,8 @@ ledger:connect_signal("ready::transactions", function(_, tx)
   end
 end)
 
-return ui.dashbox(
-  wibox.container.place(transaction_entries),
-  dpi(410), -- width
-  dpi(2000)  -- height
-)
+return require("frontend.widget.yorha.basic_container")({
+  text = "Transactions",
+  widget = wibox.container.place(transaction_entries),
+})
+

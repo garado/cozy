@@ -207,14 +207,6 @@ end
 -- █▀▄▀█ █ █▀ █▀▀
 -- █░▀░█ █ ▄█ █▄▄
 
-function _ui.dashbox_padding(content)
-  return wibox.widget({
-    content,
-    margins = beautiful.dash_widget_gap / 2,
-    widget = wibox.container.margin,
-  })
-end
-
 --- @method (dashboard) dashbox_v2
 -- @brief Standardized container for dashboard widgets.
 function _ui.dashbox_v2(content, args)
@@ -232,7 +224,7 @@ function _ui.dashbox_v2(content, args)
       forced_height = args.height or nil,
       forced_width  = args.width or nil,
       bg            = beautiful.neutral[800],
-      shape         = _ui.rrect(),
+      -- shape         = _ui.rrect(),
       widget        = wibox.container.background,
     },
     content_fill_vertical = true,
@@ -240,6 +232,29 @@ function _ui.dashbox_v2(content, args)
     widget = wibox.container.place,
   })
 end
+
+
+--- (Dashboard) Put a box around a widget.
+function _ui.dashbox(content, width, height, bg)
+  return wibox.widget({
+    {
+      {
+        content,
+        margins = dpi(15),
+        widget  = wibox.container.margin,
+      },
+      forced_height = height or nil,
+      forced_width  = width or nil,
+      bg            = bg or beautiful.neutral[800],
+     --  shape         = _ui.rrect(),
+      widget        = wibox.container.background,
+    },
+    margins = dpi(10),
+    color   = "#FF000000",
+    widget  = wibox.container.margin,
+  })
+end
+
 
 --- @method (dashboard) contentbox
 -- @brief Defines layout for tabs on dashboard.
@@ -258,27 +273,6 @@ function _ui.contentbox(header, content)
   return container
 end
 
---- (Dashboard) Put a box around a widget.
-function _ui.dashbox(content, width, height, bg)
-  return wibox.widget({
-    {
-      {
-        content,
-        margins = dpi(15),
-        widget  = wibox.container.margin,
-      },
-      forced_height = height or nil,
-      forced_width  = width or nil,
-      bg            = bg or beautiful.neutral[800],
-      shape         = _ui.rrect(),
-      widget        = wibox.container.background,
-    },
-    margins = dpi(10),
-    color   = "#FF000000",
-    widget  = wibox.container.margin,
-  })
-end
-
 --- @method dpi
 -- @brief For people with different screen resolutions, I hope this might be a solution.
 -- (Sorry it took so long linuxmobile :P)
@@ -286,6 +280,11 @@ function _ui.dpi(px)
   local scale = require("cozyconf").scale
   return dpi(px * scale)
   -- return dpi(px)
+end
+
+function _ui.theme_is_dark()
+  local conf = require("cozyconf")
+  return require("theme.colorschemes." .. conf.theme_name .. "." .. conf.theme_style).type == "dark"
 end
 
 --- @method colorize

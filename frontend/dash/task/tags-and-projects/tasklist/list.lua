@@ -13,7 +13,7 @@ local keynav = require("modules.keynav")
 local beautiful = require("beautiful")
 local gen_taskitem = require("frontend.dash.task.gen_taskitem")
 
-local MAX_VISIBLE_ELEMENTS = 19
+local MAX_VISIBLE_ELEMENTS = 18
 local first_visible_index  = 1
 local last_visible_index   = MAX_VISIBLE_ELEMENTS
 local previous_index  = 0
@@ -29,6 +29,7 @@ local scrollbar
 -- The main layout where the tasks will be inserted.
 local tasklist = wibox.widget({
   spacing = dpi(15),
+  forced_height = dpi(2000),
   layout = wibox.layout.fixed.vertical,
   ---
   area = keynav.area({

@@ -74,7 +74,7 @@ return function(t, index)
     indicator = indicator,
     desc = desc, -- need an easy-access reference for later
     index = index,
-    select_color = beautiful.primary[400],
+    select_color = beautiful.yorha,
   })
 
   taskitem:connect_signal("mouse::enter", function(self)

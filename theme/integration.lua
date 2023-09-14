@@ -15,6 +15,8 @@ local HOME = os.getenv("HOME")
 local CONFIG = HOME .. "/.config/"
 
 return function(name, style)
+  if not require("cozyconf").theme_switch_integration then return end
+
   local theme = require("theme.colorschemes." .. name .. '.' .. style)
 
   -- Start modifications below here ----------------------

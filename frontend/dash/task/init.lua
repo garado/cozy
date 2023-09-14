@@ -37,7 +37,7 @@ local nav_tasks = keynav.area({
 })
 
 taskheader = header({
-  title_text = "Taskwarrior",
+  title_text = "T a s k s",
   pages = {
     { text = "Tags & projects" },
     { text = "View all" },
@@ -60,13 +60,32 @@ taskheader = header({
 -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█
 
+-- local container = wibox.widget({
+--   taskheader,
+--   content,
+--   layout = wibox.layout.ratio.vertical,
+-- })
+-- container:adjust_ratio(1, 0, 0.08, 0.92)
+
+-- return function()
+--   return ui.contentbox(taskheader, require("frontend.widget.yorha.vbar_container")(content)), nav_tasks
+-- end
+--
+
 local container = wibox.widget({
   taskheader,
-  content,
+  require("frontend.widget.yorha.vbar_container")(content),
+  forced_width = dpi(2000),
   layout = wibox.layout.ratio.vertical,
 })
 container:adjust_ratio(1, 0, 0.08, 0.92)
 
 return function()
-  return ui.contentbox(taskheader, content), nav_tasks
+  return wibox.widget({
+    container,
+    forced_height = dpi(2000),
+    forced_width  = dpi(2000),
+    layout = wibox.layout.fixed.horizontal,
+  }),
+  nav_tasks
 end

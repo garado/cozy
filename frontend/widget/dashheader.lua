@@ -13,6 +13,7 @@ local ss    = require("frontend.widget.single-select")
 local sbtn  = require("frontend.widget.stateful-button")
 local btn    = require("frontend.widget.button")
 local gtable = require("gears.table")
+local yorha_header = require("frontend.widget.yorha.header")
 
 local header = {}
 
@@ -26,11 +27,7 @@ local function worker(user_args)
   gtable.crush(args, user_args or {})
 
   -- Assemble components
-  local title = ui.textbox({
-    markup = args.title_mkup,
-    text   = args.title_text,
-    font   = beautiful.font_reg_xl,
-  })
+  local title = yorha_header({ text = args.title_text })
 
   local subtitle = ui.textbox({
     markup = args.subtitle_mkup,
@@ -122,7 +119,7 @@ local function worker(user_args)
     if _args.text then
       title:update_text(_args.text)
     elseif _args.markup then
-      title.markup = _args.markup
+      title:update_text(_args.markup)
     end
   end
 

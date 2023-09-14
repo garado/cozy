@@ -20,7 +20,7 @@ awesome.connect_signal("module::volume", function()
       if not volnotif then
         volnotif = naughty.notification {
           title = "Volume",
-          app_name = "System notification",
+          app_name = "System message",
           message = "Volume at " .. val,
           timeout = 1.25,
           auto_reset_timeout = true,

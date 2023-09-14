@@ -42,13 +42,24 @@ local OVERLAP_OFFSET = dpi(7)
 local ELAPSED_BG     = beautiful.neutral[600]
 local ELAPSED_FG     = beautiful.neutral[300]
 
-local colors = {
-  beautiful.primary[900],
-  beautiful.primary[700],
-  beautiful.primary[500],
-  beautiful.primary[300],
-  beautiful.primary[100],
-}
+local colors
+if ui.theme_is_dark() then
+  colors = {
+    beautiful.primary[900],
+    beautiful.primary[700],
+    beautiful.primary[500],
+    beautiful.primary[300],
+    beautiful.primary[100],
+  }
+else
+  colors = {
+    beautiful.primary[100],
+    beautiful.primary[500],
+    beautiful.primary[300],
+    beautiful.primary[700],
+    beautiful.primary[900],
+  }
+end
 
 awesome.connect_signal("theme::reload", function()
   ELAPSED_BG = beautiful.neutral[600]
@@ -146,7 +157,7 @@ local function gen_eventbox(event, height, width)
   w = w - (num_overlaps * OVERLAP_OFFSET)
   bg = bg or colors[num_overlaps + 1]
 
-  fg = fg or beautiful.neutral[100]
+  fg = fg or (beautiful.neutral[ui.theme_is_dark() and 100 or 900])
 
   -- Different sized event boxes have different layouts.
   -- Below we're just trying to make a "responsive" event box.
@@ -192,7 +203,7 @@ local function gen_eventbox(event, height, width)
         widget = wibox.container.margin,
       },
       margins = dpi(2),
-      color   = beautiful.bg,
+      color   = bg,
       widget  = wibox.container.margin,
     },
     bg            = bg,

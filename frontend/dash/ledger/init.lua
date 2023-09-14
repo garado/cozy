@@ -11,6 +11,7 @@ local wibox  = require("wibox")
 local header = require("frontend.widget.dashheader")
 local ledger = require("backend.system.ledger")
 local keynav = require("modules.keynav")
+local beautiful = require("beautiful")
 
 -- Modules
 local overview = require(... .. ".overview")
@@ -44,10 +45,13 @@ local content = wibox.widget({
     {
       reimbursements,
       graph,
+      spacing = beautiful.dash_widget_gap,
       layout = wibox.layout.fixed.vertical,
     },
+    spacing = beautiful.dash_widget_gap,
     layout = wibox.layout.fixed.horizontal,
   },
+  spacing = beautiful.dash_widget_gap,
   layout = wibox.layout.fixed.vertical,
 })
 
@@ -67,7 +71,7 @@ ledger:emit_signal("refresh")
 
 -- Set up the rest of this tab's UI
 local ledger_header = header({
-  title_text = "Ledger",
+  title_text = "L e d g e r",
   actions = {
     {
       text = "Open ledger",
@@ -85,7 +89,7 @@ local ledger_header = header({
 
 local container = wibox.widget({
   ledger_header,
-  content,
+  require("frontend.widget.yorha.vbar_container")(content),
   forced_width = dpi(2000),
   layout = wibox.layout.ratio.vertical,
 })

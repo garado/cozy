@@ -15,7 +15,7 @@ local utils = require("utils")
 naughty.persistence_enabled = true
 naughty.config.defaults.ontop = true
 naughty.config.defaults.timeout = 5
-naughty.config.defaults.title = "Notification"
+naughty.config.defaults.title = "System Message"
 naughty.config.defaults.position = "top_right"
 naughty.config.defaults.auto_reset_timeout = true
 
@@ -200,26 +200,33 @@ naughty.connect_signal("request::display", function(n)
     notification = n,
     cursor = "hand2",
     type = "notification",
-    shape = ui.rrect(),
     maximum_width = dpi(350),
     maximum_height = dpi(180),
 
     widget_template = {
       {
         {
-          {
-            notif_body,
-            notif_actions,
-            layout = wibox.layout.fixed.vertical,
-          },
-          left   = dpi(15),
-          right  = dpi(15),
-          top    = dpi(10),
-          bottom = dpi(10),
+          require("frontend.widget.yorha.vbar")({ color = beautiful.neutral[100] }),
+          right = -dpi(8),
           widget = wibox.container.margin,
         },
-        timeout_bar,
-        layout = wibox.layout.fixed.vertical,
+        {
+          {
+            {
+              notif_body,
+              notif_actions,
+              layout = wibox.layout.fixed.vertical,
+            },
+            -- left   = dpi(15),
+            -- right  = dpi(15),
+            top    = dpi(10),
+            bottom = dpi(10),
+            widget = wibox.container.margin,
+          },
+          -- timeout_bar,
+          layout = wibox.layout.fixed.vertical,
+        },
+        layout = wibox.layout.fixed.horizontal,
       },
       bg = beautiful.neutral[800],
       forced_width = dpi(275),
