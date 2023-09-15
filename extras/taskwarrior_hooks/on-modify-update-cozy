@@ -1,0 +1,7 @@
+#!/bin/bash
+read original_task
+read modified_task
+echo 'awesome.emit_signal("task::external_update")' | awesome-client
+echo "${modified_task}"
+echo 'on-modify'
+exit 0

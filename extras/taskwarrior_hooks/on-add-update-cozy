@@ -1,0 +1,6 @@
+#!/bin/bash
+read original_task
+echo "awesome.emit_signal('task::external_update')" | awesome-client
+echo "${original_task}"
+echo 'on-add'
+exit 0
