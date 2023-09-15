@@ -2,11 +2,9 @@
 -- █▀▄ █▀▀ ▀█▀ ▄▀█ █ █░░ █▀ 
 -- █▄▀ ██▄ ░█░ █▀█ █ █▄▄ ▄█ 
 
-local beautiful  = require("beautiful")
 local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local wibox = require("wibox")
-local bold  = require("utils.string").pango_bold
 local strutil = require("utils.string")
 local task  = require("backend.system.task")
 

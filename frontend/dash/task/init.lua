@@ -25,23 +25,24 @@ local nav_tasks = keynav.area({
   items = {
     nav_tags_projects
   },
-  keys = {
-    -- Shift_R/Shift_L + 1
-    ["Shift_R!"] = function() taskheader:get_pages()[1]:emit_signal("button::press") end,
-    ["Shift_L!"] = function() taskheader:get_pages()[1]:emit_signal("button::press") end,
+  -- Disabled until I actually implement view all page
+  -- keys = {
+  --   -- Shift_R/Shift_L + 1
+  --   ["Shift_R!"] = function() taskheader:get_pages()[1]:emit_signal("button::press") end,
+  --   ["Shift_L!"] = function() taskheader:get_pages()[1]:emit_signal("button::press") end,
 
-    -- Shift_R/Shift_L + 2
-    ["Shift_R@"] = function() taskheader:get_pages()[2]:emit_signal("button::press") end,
-    ["Shift_L@"] = function() taskheader:get_pages()[2]:emit_signal("button::press") end,
-  },
+  --   -- Shift_R/Shift_L + 2
+  --   ["Shift_R@"] = function() taskheader:get_pages()[2]:emit_signal("button::press") end,
+  --   ["Shift_L@"] = function() taskheader:get_pages()[2]:emit_signal("button::press") end,
+  -- },
 })
 
 taskheader = header({
   title_text = "Taskwarrior",
-  pages = {
-    { text = "Tags & projects" },
-    { text = "View all" },
-  },
+  -- pages = {
+  --   { text = "Tags & projects" },
+  --   { text = "View all" },
+  -- },
   actions = {
     {
       text = "Refresh",

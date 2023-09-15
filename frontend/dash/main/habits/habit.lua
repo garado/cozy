@@ -113,7 +113,7 @@ local function worker(id)
     ts = os.time()
     for i = #boxes.children, 1, -1 do
       local date = os.date(pixela.date_format, ts)
-      boxes.children[i].ticked = strutil.contains(stdout, date)
+      boxes.children[i].ticked = string.find(stdout, date)
       boxes.children[i]:update()
       ts = ts - SECONDS_PER_DAY
     end

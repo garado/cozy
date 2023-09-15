@@ -12,7 +12,10 @@ local gtable  = require("gears.table")
 local awful   = require("awful")
 local gfs     = require("gears.filesystem")
 
-local credentials = require("cozyconf.pixela")
+local exists, credentials = pcall(require, "cozyconf.pixela")
+
+if not exists then return false end
+
 local USER_NAME  = credentials.name
 local USER_TOKEN = credentials.token
 local HEADER = " -H 'X-USER-TOKEN:"..USER_TOKEN.."' "

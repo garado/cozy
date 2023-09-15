@@ -90,44 +90,6 @@ function _ui.textbox(userargs)
   return widget
 end
 
-function _ui.checkbox(userargs)
-  local args = {
-    width      = dpi(15),
-    height     = dpi(15),
-    checked    = true,
-    shape      = _ui.rrect(dpi(2)),
-    on_release = nil
-  }
-  gtable.crush(args, userargs or {})
-
-  local cbox = wibox.widget({
-    checked            = true,
-    color              = beautiful.neutral[100],
-    paddings           = dpi(1),
-    forced_width       = dpi(20),
-    forced_height      = dpi(20),
-    shape              = _ui.rrect(dpi(1)),
-    check_shape        = function(cr, width, height)
-      -- TODO: Improve this. Super crusty but it works.
-      local rs = math.min(width, height)
-      cr:move_to((rs * 0.08) + rs/3,   (rs * 0.13) + rs/2)
-      cr:line_to((rs * 0.08) + rs/9,   (rs * 0.13) + rs/4)
-      cr:move_to((rs * 0.08) + rs/3,   (rs * 0.13) + rs/2)
-      cr:line_to((rs * 0.08) + rs*7/9, (rs * 0.13) + rs/9)
-    end,
-    check_border_color = beautiful.neutral[100],
-    check_color        = beautiful.neutral[100],
-    check_border_width = dpi(1),
-    widget             = wibox.widget.checkbox
-  })
-
-  if args.on_release then
-    cbox:connect_signal("button::press", args.on_release)
-  end
-
-  return cbox
-end
-
 --- @method cborder
 -- @brief Create circular border around a widget
 function _ui.cborder(widget)
@@ -207,11 +169,25 @@ end
 -- █▀▄▀█ █ █▀ █▀▀
 -- █░▀░█ █ ▄█ █▄▄
 
-function _ui.dashbox_padding(content)
+--- (Dashboard) Put a box around a widget.
+-- TODO: Replace
+function _ui.dashbox(content, width, height, bg)
   return wibox.widget({
-    content,
-    margins = beautiful.dash_widget_gap / 2,
-    widget = wibox.container.margin,
+    {
+      {
+        content,
+        margins = dpi(15),
+        widget  = wibox.container.margin,
+      },
+      forced_height = height or nil,
+      forced_width  = width or nil,
+      bg            = bg or beautiful.neutral[800],
+      shape         = _ui.rrect(),
+      widget        = wibox.container.background,
+    },
+    margins = dpi(10),
+    color   = "#FF000000",
+    widget  = wibox.container.margin,
   })
 end
 
@@ -256,27 +232,6 @@ function _ui.contentbox(header, content)
   container:adjust_ratio(1, 0, 0.08, 0.92)
 
   return container
-end
-
---- (Dashboard) Put a box around a widget.
-function _ui.dashbox(content, width, height, bg)
-  return wibox.widget({
-    {
-      {
-        content,
-        margins = dpi(15),
-        widget  = wibox.container.margin,
-      },
-      forced_height = height or nil,
-      forced_width  = width or nil,
-      bg            = bg or beautiful.neutral[800],
-      shape         = _ui.rrect(),
-      widget        = wibox.container.background,
-    },
-    margins = dpi(10),
-    color   = "#FF000000",
-    widget  = wibox.container.margin,
-  })
 end
 
 --- @method dpi

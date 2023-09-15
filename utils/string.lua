@@ -1,3 +1,4 @@
+
 -- █▀ ▀█▀ █▀█ █ █▄░█ █▀▀    █░█ ▀█▀ █ █░░ █▀
 -- ▄█ ░█░ █▀▄ █ █░▀█ █▄█    █▄█ ░█░ █ █▄▄ ▄█
 
@@ -46,12 +47,6 @@ end
 -- @param prefix  Text to look for
 function _string.hasprefix(text, prefix)
   return string.sub(text, 1, string.len(prefix)) == prefix
-end
-
---- @function contains
--- @brief Check if string contains a substring
-function _string.contains(str, target)
-  return string.find(str, target)
 end
 
 --- @method count
@@ -223,14 +218,6 @@ function _string.time_to_float(time)
   local h = tonumber(fields[1])
   local m = tonumber(fields[2]) / 60
   return h + m
-end
-
--- █▀█ ▄▀█ █▄░█ █▀▀ █▀█
--- █▀▀ █▀█ █░▀█ █▄█ █▄█
-
-function _string.pango_bold(str)
-  if not str then return end
-  return "<b>" .. str .. "</b>"
 end
 
 -- █▀▄▀█ █ █▀ █▀▀

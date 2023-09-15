@@ -7,7 +7,6 @@
 local beautiful  = require("beautiful")
 local wibox = require("wibox")
 local awful = require("awful")
-local bold  = require("utils.string").pango_bold
 local task  = require("backend.system.task")
 local fzf = require("modules.fzf")
 
@@ -143,7 +142,7 @@ task:connect_signal("input::request", function(_, type)
     mod_name  = task.active_task.description
   }
 
-  local prompt = bold(prompt_options[type])
+  local prompt = "<b>"..prompt_options[type].."</b>"
   local text   = text_options[type]
 
   -- Modify takes no input; just changes the prompt

@@ -8,11 +8,22 @@ local beautiful  = require("beautiful")
 local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local wibox = require("wibox")
-local habit = require(... .. ".habit")
 local conf  = require("cozyconf")
 local dash  = require("backend.cozy.dash")
-local pixela = require("backend.system.pixela")
 local keynav = require("modules.keynav")
+local pixela = require("backend.system.pixela")
+
+if not pixela then
+  local default = ui.textbox({
+    text = "Habit tracking not configured - please see the wiki.",
+    align = "center",
+    color = beautiful.neutral[500],
+  })
+
+  return ui.dashbox_v2(wibox.container.place(default))
+end
+
+local habit = require(... .. ".habit")
 
 local SECONDS_PER_DAY = 24 * 60 * 60
 

@@ -16,7 +16,7 @@ require(... .. ".popups.add_modify")
 local nav_jump_calendar = require(... .. ".popups.jump")
 
 local week_actions, week_content, nav_week = require(... .. ".week")()
-local schedule_actions, schedule_content, nav_schedule = require(... .. ".schedule")()
+-- local schedule_actions, schedule_content, nav_schedule = require(... .. ".schedule")()
 
 local calheader, container
 
@@ -44,22 +44,23 @@ nav_calendar = keynav.area({
 
 calheader = header({
   title_text = "",
-  pages = {
-    {
-      text = "Week",
-      func = function(self)
-        self:emit_signal("page::switch::week")
-        if container then container:set(2, week_content) end
-      end
-    },
-    {
-      text = "Schedule",
-      func = function(self)
-        self:emit_signal("page::switch::schedule")
-        if container then container:set(2, schedule_content) end
-      end
-    },
-  },
+  -- Disabling schedule page until I actually implement it
+  -- pages = {
+  --   {
+  --     text = "Week",
+  --     func = function(self)
+  --       self:emit_signal("page::switch::week")
+  --       if container then container:set(2, week_content) end
+  --     end
+  --   },
+  --   {
+  --     text = "Schedule",
+  --     func = function(self)
+  --       self:emit_signal("page::switch::schedule")
+  --       if container then container:set(2, schedule_content) end
+  --     end
+  --   },
+  -- },
   actions = week_actions
 })
 

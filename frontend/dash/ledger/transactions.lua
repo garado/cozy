@@ -52,13 +52,13 @@ local function pick_transaction_icon(title, account)
   }
 
   for i = #title_icons, 1, -1 do
-    if strutil.contains(title, title_icons[i][2]) then
+    if string.find(title, title_icons[i][2]) then
       return title_icons[i][1]
     end
   end
 
   for i = #account_icons, 1, -1 do
-    if strutil.contains(account, account_icons[i][2]) then
+    if string.find(account, account_icons[i][2]) then
       return account_icons[i][1]
     end
   end
