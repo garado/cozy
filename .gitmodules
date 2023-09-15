@@ -4,3 +4,6 @@
 [submodule "modules/color"]
 	path = modules/color
 	url = https://github.com/andOrlando/color.git
+[submodule "modules/keynav"]
+	path = modules/keynav
+	url = git@github.com:garado/awesome-keynav.git
