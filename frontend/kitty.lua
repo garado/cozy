@@ -83,8 +83,9 @@ local launcher = awful.popup({
 -- Populate session list
 local cmd = "ls " .. SESSION_DIR
 awful.spawn.easy_async_with_shell(cmd, function(stdout)
-  session_list:reset()
   local lines = strutil.split(stdout, "\r\n")
+  if #lines == 0 then return end
+  session_list:reset()
   for i = 1, #lines do
     local entry = gen_entry(lines[i])
     session_list:add(entry)

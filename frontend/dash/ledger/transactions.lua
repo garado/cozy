@@ -153,6 +153,7 @@ ledger:connect_signal("refresh", function(self)
 end)
 
 ledger:connect_signal("ready::transactions", function(_, tx)
+  if #tx == 0 then return end
   transaction_entries:reset()
   for i = 1, #tx do
     transaction_entries:add(gen_transaction(tx[i]))

@@ -33,7 +33,7 @@ function ledger:parse_assets()
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     local lines = strutil.split(stdout, "\r\n")
     local signal_names = { "total", "cash", "checking", "savings" }
-    for i = 1, #signal_names do
+    for i = 1, #lines do
       -- Remove all chars except numbers and decimal points
       local amount = lines[i]:gsub("[^0-9.]", "")
       local signal = "ready::" .. signal_names[i]

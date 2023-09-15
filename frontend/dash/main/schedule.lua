@@ -168,14 +168,8 @@ local function gen_task(data)
 end
 
 -- This is where all the date containers get added
-local default = ui.textbox({
-  text = "Empty schedule. Did you configure gcalcli and Taskwarrior correctly?",
-  align = "center",
-  color = beautiful.neutral[300],
-})
-
 local schedule = wibox.widget({
-  default,
+  ui.placeholder("No tasks or events to show."),
   spacing = dpi(12),
   forced_width = dpi(1000),
   forced_height = WIDGET_HEIGHT,

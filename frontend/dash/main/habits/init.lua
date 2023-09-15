@@ -14,13 +14,7 @@ local keynav = require("modules.keynav")
 local pixela = require("backend.system.pixela")
 
 if not pixela then
-  local default = ui.textbox({
-    text = "Habit tracking not configured - please see the wiki.",
-    align = "center",
-    color = beautiful.neutral[500],
-  })
-
-  return ui.dashbox_v2(wibox.container.place(default))
+  return ui.dashbox_v2(ui.placeholder("Habit tracking not configured."))
 end
 
 local habit = require(... .. ".habit")
