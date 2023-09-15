@@ -1,22 +1,21 @@
+-- █░░ █▀▀ █▀▄ █▀▀ █▀▀ █▀█
+-- █▄▄ ██▄ █▄▀ █▄█ ██▄ █▀▄
 
--- █░░ █▀▀ █▀▄ █▀▀ █▀▀ █▀█ 
--- █▄▄ ██▄ █▄▀ █▄█ ██▄ █▀▄ 
+local gobject    = require("gears.object")
+local gtable     = require("gears.table")
+local config     = require("cozyconf")
+local awful      = require("awful")
+local strutil    = require("utils.string")
+local os         = os
 
-local gobject = require("gears.object")
-local gtable  = require("gears.table")
-local config  = require("cozyconf")
-local awful   = require("awful")
-local strutil = require("utils.string")
-local os      = os
+local lfile      = config.ledger.ledger_file
+local bfile      = config.ledger.budget_file
+local afile      = config.ledger.account_file
 
-local lfile = config.ledger.ledger_file
-local bfile = config.ledger.budget_file
-local afile = config.ledger.account_file
+local LEDGER_CMD = "ledger -f " .. lfile .. " -f " .. afile .. " -f " .. bfile .. " "
 
-local LEDGER_CMD = "ledger -f "..lfile.." -f "..afile.." -f "..bfile.." "
-
-local ledger = {}
-local instance = nil
+local ledger     = {}
+local instance   = nil
 
 ---------------------------------------------------------------------
 
@@ -87,7 +86,7 @@ end
 --        See parse_reimbursement_data to get information on what the specific
 --        transaction was.
 function ledger:parse_reimbursement_accounts()
-  local cmd = LEDGER_CMD .." bal Liabilities Assets:Reimbursements --no-total --format \"%12(O)=%A\n\""
+  local cmd = LEDGER_CMD .. " bal Liabilities Assets:Reimbursements --no-total --format \"%12(O)=%A\n\""
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     -- sample stdout:
     --      $61.87=Assets:Reimbursements:Kassidy
@@ -100,7 +99,7 @@ function ledger:parse_reimbursement_accounts()
     for i = 1, #lines do
       if strutil.count(lines[i], ":") >= 2 then
         local tmp = lines[i]:gsub("%s", "")
-        data[#data+1] = strutil.split(tmp, "=")
+        data[#data + 1] = strutil.split(tmp, "=")
       end
     end
     self:emit_signal("ready::reimbursements::accounts", data)
@@ -137,7 +136,7 @@ end
 --      Expenses:Transportation,($36.83, $-40.00)
 -- 2nd line is total budget. Following lines are budget entries.
 function ledger:get_budget(month)
-  month = month or os.date("%Y/%m/01")
+  month        = month or os.date("%Y/%m/01")
 
   local files  = " -f " .. lfile .. " -f " .. bfile
   local format = " budget --budget-format '%A,%T\n'"
@@ -163,15 +162,15 @@ function ledger:get_budget(month)
         local tmp, _ = _fields[j]:gsub("[)%(-%$]", "")
 
         if j == 1 then
-          tmp = tmp:gsub("Expenses:", "")
+          tmp         = tmp:gsub("Expenses:", "")
           category    = tmp:gsub(":.*", "")
           subcategory = tmp:gsub(".*:", "")
-          tmp = subcategory
+          tmp         = subcategory
         else
           tmp = self:format(tonumber(tmp))
         end
 
-        fields[#fields+1] = tmp
+        fields[#fields + 1] = tmp
       end
 
       if last_subcat_added == category then
@@ -179,13 +178,14 @@ function ledger:get_budget(month)
       end
       last_subcat_added = subcategory
 
-      budget[#budget+1] = fields
+      budget[#budget + 1] = fields
     end
 
-    budget[1][1] = "Total"
-    self:emit_signal("ready::budget", budget)
+    if #budget > 0 then
+      budget[1][1] = "Total"
+      self:emit_signal("ready::budget", budget)
+    end
   end)
-
 end
 
 function ledger:format(num)
@@ -213,7 +213,7 @@ function ledger:balances_this_year()
     local data = {}
     local tmp = strutil.split(stdout, "\r\n")
     for i = 1, #tmp do
-      data[#data+1] = tmp[i]:gsub("[^0-9.]", "")
+      data[#data + 1] = tmp[i]:gsub("[^0-9.]", "")
     end
     self:emit_signal("ready::year_data", data)
   end)
@@ -226,7 +226,7 @@ function ledger:new()
 end
 
 local function new()
-  local ret = gobject{}
+  local ret = gobject {}
   gtable.crush(ret, ledger, true)
   ret:new()
   return ret

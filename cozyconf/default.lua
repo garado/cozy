@@ -73,7 +73,7 @@ return {
 
   -- OpenWeather.
   weather = {
-    key = "API_KEY_HERE",
+    key = nil,
     lat = "36.9741",
     lon = "-122.0308",
 

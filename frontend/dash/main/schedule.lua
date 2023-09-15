@@ -1,24 +1,23 @@
-
 -- █▀ █▀▀ █░█ █▀▀ █▀▄ █░█ █░░ █▀▀
 -- ▄█ █▄▄ █▀█ ██▄ █▄▀ █▄█ █▄▄ ██▄
 
 -- Widget showing upcoming tasks and events.
 
-local beautiful     = require("beautiful")
-local ui            = require("utils.ui")
-local dpi           = ui.dpi
-local wibox         = require("wibox")
-local cal           = require("backend.system.calendar")
-local conf          = require("cozyconf")
-local task          = require("backend.system.task")
-local awful         = require("awful")
-local strutil       = require("utils.string")
+local beautiful      = require("beautiful")
+local ui             = require("utils.ui")
+local dpi            = ui.dpi
+local wibox          = require("wibox")
+local cal            = require("backend.system.calendar")
+local conf           = require("cozyconf")
+local task           = require("backend.system.task")
+local awful          = require("awful")
+local strutil        = require("utils.string")
 local truncate_fixed = require("utils.layout.truncate_fixed")
 
 -- █▀▀ █▀█ █▀█ █▄░█ ▀█▀ █▀▀ █▄░█ █▀▄
 -- █▀░ █▀▄ █▄█ █░▀█ ░█░ ██▄ █░▀█ █▄▀
 
-local WIDGET_HEIGHT = dpi(520)
+local WIDGET_HEIGHT  = dpi(520)
 
 --- @function gen_date
 -- @brief Generate container widget that holds tasks + events for a single date.
@@ -161,7 +160,7 @@ local function gen_task(data)
   })
 
   widget:connect_signal("button::press", function()
-    local cmd = "task "..widget.uuid.." mod status:" .. (widget.pending and "completed" or "pending")
+    local cmd = "task " .. widget.uuid .. " mod status:" .. (widget.pending and "completed" or "pending")
     awful.spawn.easy_async_with_shell(cmd, function() task:emit_signal("refresh") end)
   end)
 
@@ -169,11 +168,24 @@ local function gen_task(data)
 end
 
 -- This is where all the date containers get added
+local default = ui.textbox({
+  text = "Empty schedule. Did you configure gcalcli and Taskwarrior correctly?",
+  align = "center",
+  color = beautiful.neutral[300],
+})
+
 local schedule = wibox.widget({
+  default,
   spacing = dpi(12),
   forced_width = dpi(1000),
   forced_height = WIDGET_HEIGHT,
   layout = truncate_fixed.vertical,
+  ---
+  has_default = true,
+  clear_default = function(self)
+    self:remove(1)
+    self.has_default = false
+  end
 })
 
 --- @method create_date
@@ -209,12 +221,14 @@ function schedule:create_date(date)
 end
 
 function schedule:clear_events()
+  if self.has_default then self:clear_default() end
   for i = 1, #self.children do
     self.children[i].events:reset()
   end
 end
 
 function schedule:clear_tasks()
+  if self.has_default then self:clear_default() end
   for i = 1, #self.children do
     self.children[i].tasks:reset()
   end

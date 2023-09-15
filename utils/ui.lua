@@ -169,6 +169,16 @@ end
 -- █▀▄▀█ █ █▀ █▀▀
 -- █░▀░█ █ ▄█ █▄▄
 
+function _ui.placeholder(text)
+  return wibox.container.place(
+    _ui.textbox({
+      text = text,
+      align = "center",
+      color = beautiful.neutral[300]
+    })
+  )
+end
+
 --- (Dashboard) Put a box around a widget.
 -- TODO: Replace
 function _ui.dashbox(content, width, height, bg)

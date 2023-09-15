@@ -99,6 +99,7 @@ scrollbar = wibox.widget({
   },
   right = ui.dpi(15),
   widget = wibox.container.margin,
+  visible = false
 })
 
 local function scroll_total_overflow()

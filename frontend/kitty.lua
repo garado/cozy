@@ -38,6 +38,7 @@ local function gen_entry(name)
 end
 
 local session_list = wibox.widget({
+  ui.placeholder("No Kitty sessions configured..."),
   spacing = dpi(10),
   layout = wibox.layout.fixed.vertical,
 })
@@ -82,6 +83,7 @@ local launcher = awful.popup({
 -- Populate session list
 local cmd = "ls " .. SESSION_DIR
 awful.spawn.easy_async_with_shell(cmd, function(stdout)
+  session_list:reset()
   local lines = strutil.split(stdout, "\r\n")
   for i = 1, #lines do
     local entry = gen_entry(lines[i])

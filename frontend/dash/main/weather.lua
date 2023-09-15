@@ -12,6 +12,10 @@ local gcolor     = require("gears.color")
 local wibox      = require("wibox")
 local weather    = require("backend.system.openweather")
 
+if not weather then
+  return ui.dashbox_v2(ui.placeholder("OpenWeather API key not provided."))
+end
+
 local ICONS_PATH = gfs.get_configuration_dir() .. "theme/assets/weather/"
 local DEGREE     = "°"
 

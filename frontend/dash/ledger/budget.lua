@@ -59,6 +59,7 @@ end
 
 -- Assembly
 local budget_entries = wibox.widget({
+  ui.placeholder("No budget entries yet."),
   spacing = dpi(25),
   forced_height = dpi(420),
   layout  = wibox.layout.flex.vertical,

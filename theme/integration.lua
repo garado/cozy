@@ -9,6 +9,7 @@
 -- forget to set `theme_integration = true` in the config file.
 
 local awful = require("awful")
+local conf  = require("cozyconf")
 local gfs   = require("gears.filesystem")
 
 local HOME = os.getenv("HOME")

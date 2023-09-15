@@ -140,6 +140,7 @@ local function gen_transaction(tdata)
 end
 
 local transaction_entries = wibox.widget({
+  ui.placeholder("No transaction entries yet."),
   spacing = dpi(15),
   layout  = wibox.layout.flex.vertical,
 })

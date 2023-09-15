@@ -14,12 +14,12 @@ local title = ui.textbox({
 })
 
 local tag = ui.textbox({
-  text  = "Cozy",
+  text  = "Tag",
   color = beautiful.neutral[400],
 })
 
 local remaining = ui.textbox({
-  text  = "19/54 remaining",
+  text  = "0/0 remaining",
   color = beautiful.neutral[400],
 })
 
@@ -29,14 +29,14 @@ local remaining = ui.textbox({
 -- })
 
 local percent = ui.textbox({
-  text  = "88%",
+  text  = "0%",
   align = "right",
   color = beautiful.neutral[200],
   font  = beautiful.font_reg_l,
 })
 
 local progress = wibox.widget({
-  value = 88,
+  value = 0,
   max_value = 100,
   background_color = beautiful.neutral[700],
   forced_height = dpi(8),

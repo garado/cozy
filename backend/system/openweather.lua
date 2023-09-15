@@ -22,6 +22,8 @@ local instance        = nil
 local SCRIPT_CURRENT  = gfs.get_configuration_dir() .. "utils/scripts/fetch-weather-current"
 local SCRIPT_FORECAST = gfs.get_configuration_dir() .. "utils/scripts/fetch-weather-forecast"
 
+if not key then return false end
+
 ---------------------------------------------------------------------
 
 --- @method fetch_current

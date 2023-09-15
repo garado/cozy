@@ -95,7 +95,7 @@ local update_widget = function(_, stdout, _, _, _)
 end
 
 local contrib_count = ui.textbox({
-  text = "2351",
+  text = "0",
   align = "center",
   font = beautiful.font_reg_l,
 })

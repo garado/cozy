@@ -19,7 +19,7 @@ local beautiful = require("beautiful")
 local singlesel = require("frontend.widget.single-select")
 
 -- Item types
-local TAG, PROJECT, SORT = 1, 2, 3
+local TAG, PROJECT = 1, 2
 
 
 -- ▀█▀ ▄▀█ █▀▀ █▀    ▄█▄    █▀█ █▀█ █▀█ ░░█ █▀▀ █▀▀ ▀█▀ █▀ 
@@ -192,74 +192,6 @@ projectlist.area:connect_signal("area::left", function()
   projectlist.area:set_active_element(projectlist.active_element)
 end)
 
-
--- █▀ █▀█ █▀█ ▀█▀    █▀█ █▀█ ▀█▀ █ █▀█ █▄░█ █▀ 
--- ▄█ █▄█ █▀▄ ░█░    █▄█ █▀▀ ░█░ █ █▄█ █░▀█ ▄█ 
-
---- @function gen_sort_option
--- @param type
-local function gen_sort_option(name)
-  local tbox = ui.textbox({ text = name })
-  local indicator = wibox.widget({
-    forced_height = dpi(3),
-    forced_width  = dpi(3),
-    bg = beautiful.neutral[800],
-    shape = gears.shape.circle,
-    widget = wibox.container.background,
-  })
-
-  local item = wibox.widget({
-    indicator,
-    tbox,
-    spacing = dpi(10),
-    forced_height = dpi(18),
-    layout = wibox.layout.fixed.horizontal,
-    ---
-    props = deselect_props,
-    indicator = indicator,
-    textbox = tbox,
-  })
-
-  -- Highlight
-  item:connect_signal("mouse::enter", function(self)
-    -- Unhighlight last item
-    self.parent.active_element.textbox:update_color(beautiful.neutral[100])
-
-    -- Highlight this item
-    self.textbox:update_color(beautiful.primary[400])
-  end)
-
-  -- Un-highlight
-  item:connect_signal("mouse::leave", function(self)
-    self.textbox:update_color(self.props.fg)
-  end)
-
-  return item
-end
-
-local sortoptions = singlesel({
-  spacing = dpi(10),
-  layout = wibox.layout.fixed.vertical,
-  ---
-  keynav = true,
-  name = "nav_sort",
-})
-
-local options = { "Alphabetical", "Due", "Urgency", "Effort", }
-
-for i = 1, #options do
-  sortoptions:add_element( gen_sort_option(options[i]) )
-end
-
-sortoptions.area:connect_signal("area::enter", function()
-  sortoptions.active_element:update()
-end)
-
-sortoptions.area:connect_signal("area::left", function()
-  sortoptions.active_element.textbox:update_color(beautiful.neutral[100])
-  sortoptions.area:set_active_element(sortoptions.active_element)
-end)
-
 -- Final widget assembly -----------
 local sidebar = wibox.widget({
   { -- Tags
@@ -277,15 +209,6 @@ local sidebar = wibox.widget({
       font = beautiful.font_med_m,
     }),
     projectlist,
-    spacing = dpi(15),
-    layout = wibox.layout.fixed.vertical,
-  },
-  { -- Sort options
-    ui.textbox({
-      text = "Sort options",
-      font = beautiful.font_med_m,
-    }),
-    sortoptions,
     spacing = dpi(15),
     layout = wibox.layout.fixed.vertical,
   },

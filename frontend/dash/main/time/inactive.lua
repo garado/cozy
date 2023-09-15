@@ -9,7 +9,7 @@ local wibox = require("wibox")
 local timew = require("backend.system.time")
 
 local focus_time_today = ui.textbox({
-  text  = "3h 45m",
+  text  = "0h 0m",
   align = "center",
   font  = beautiful.font_reg_xxl,
 })

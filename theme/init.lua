@@ -10,7 +10,7 @@ local gtable   = require("gears.table")
 -- Load default AwesomeWM theme
 local theme = dofile(gfs.get_themes_dir() .. "default/theme.lua")
 
-if conf.theme_switch_integration then
+if conf.theme_switch_integration == true then
   require("theme.integration")(conf.theme_name, conf.theme_style)
 end
 

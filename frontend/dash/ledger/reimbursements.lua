@@ -55,20 +55,7 @@ end
 
 local content = wibox.widget({
   nil,
-  {
-    ui.textbox({
-      text = "$",
-      align = "center",
-      color = beautiful.neutral[300],
-      font = beautiful.font_bold_xxl,
-    }),
-    ui.textbox({
-      text = "No reimbursements.",
-      align = "center",
-      color = beautiful.neutral[300],
-    }),
-    layout = wibox.layout.fixed.vertical,
-  },
+  ui.placeholder("Nothing to see here."),
   nil,
   forced_height = dpi(400),
   spacing = dpi(20),
