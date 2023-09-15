@@ -136,6 +136,7 @@ task:connect_signal("input::request", function(_, type)
     mod_clear   = "",
     mod_project = "Modify project: ",
     search      = "/",
+    start       = "",
   }
 
   local text_options = {

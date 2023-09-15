@@ -38,7 +38,7 @@ local function gen_annotations(annotations)
 
   for i = 1, #annotations do
     local a = ui.textbox({
-      text = strutil.iso_to_readable(annotations[i].entry) .. ": " ..
+      text = strutil.dt_convert(annotations[i].entry, strutil.dt_format.iso, "%b %d %Y") .. ": " ..
              annotations[i].description
     })
     ret:add(a)

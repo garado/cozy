@@ -74,6 +74,8 @@ function linegraph:draw(_, cr, width, height)
   -- Scale things so that we have less coordinate values to shuffle
   local xscale = width / (#data - 1)
   local yscale = height / (self._private.max_value - self._private.min_value)
+  local xs = xscale
+  local ys = yscale
 
   -- Calculate the average
   -- NOTE: This only works for the first dataset!
@@ -88,15 +90,16 @@ function linegraph:draw(_, cr, width, height)
     cr:set_source(gears.color(clr))
     cr:move_to(0, avg * yscale)
     cr:line_to(width, avg * yscale)
-    cr: stroke()
+    cr:stroke()
   end
 
-  -- Now, actually draw things
+  -- bezier curve
   for line = 1, self._private.len do
     local color = colors[(line - 1) % #colors + 1]
     cr:set_source(gears.color(color))
-    for i = 1, #data do
-      cr:line_to((i - 1) * xscale, data[i][line] * yscale)
+    cr:move_to(0*xs, data[1][line]*ys)
+    for x = 1, #data - 2, 2 do
+      cr:curve_to(x*xs, data[x][line]*ys, (x+1)*xs, data[x+1][line]*ys, (x+2)*xs, data[x+2][line]*ys)
     end
     cr:stroke()
   end
