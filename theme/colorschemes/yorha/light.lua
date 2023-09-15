@@ -32,9 +32,9 @@ local theme = {
   -- font color of the bar icons so that they're actually visible against
   -- the wallpaper.
   -- Options: dark light
-  pulsebar_fg_l = "light",
-  pulsebar_fg_m = "light",
-  pulsebar_fg_r = "light",
+  pulsebar_fg_l = "dark",
+  pulsebar_fg_m = "dark",
+  pulsebar_fg_r = "dark",
   integrations = {
     kitty = "Nostalgia Light",
     nvim  = "nostalgia",

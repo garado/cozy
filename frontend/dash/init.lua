@@ -15,7 +15,6 @@ local beautiful = require("beautiful")
 local dashstate = require("backend.cozy.dash")
 local config = require("cozyconf")
 local triangles = require("frontend.widget.yorha.triangles")
-local vdecor = require("frontend.widget.yorha.vbar")
 
 local navigator, nav_root = keynav.navigator()
 local content
@@ -55,6 +54,7 @@ local function gen_tab_button(i)
   local icon_text = ui.textbox({
     text = tab_icons[i],
     color = beautiful.neutral[900],
+    align = "center",
   })
 
   local icon = wibox.widget({
@@ -63,8 +63,8 @@ local function gen_tab_button(i)
       margins = dpi(3),
       widget = wibox.container.margin,
     },
-    forced_width = dpi(20),
-    forced_height = dpi(20),
+    forced_width  = dpi(25),
+    forced_height = dpi(25),
     bg = beautiful.neutral[100],
     widget = wibox.container.background,
   })
