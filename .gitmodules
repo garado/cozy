@@ -7,3 +7,6 @@
 [submodule "modules/keynav"]
 	path = modules/keynav
 	url = git@github.com:garado/awesome-keynav.git
+[submodule "modules/rubato"]
+	path = modules/rubato
+	url = git@github.com:andOrlando/rubato.git
