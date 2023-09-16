@@ -47,8 +47,15 @@ return {
     },
   },
 
+  -- Enable animations within widgets.
+  animate = true,
+
+  -- Enable systray.
+  show_systray = true,
+
   -- For scaling UI size up and down.
-  -- This only affects AwesomeWM widgets.
+  -- Might be useful for people with smaller screen resolutions.
+  -- This only affects Cozy widgets.
   scale = 1,
 
   -- Set bar style.

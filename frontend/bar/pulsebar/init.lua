@@ -11,6 +11,7 @@ local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local beautiful  = require("beautiful")
 
+local systray = require("frontend.bar.common.systray")
 local battery = require(... .. ".battery")
 local clock   = require(... .. ".clock")
 local timew   = require(... .. ".timewarrior")
@@ -38,6 +39,7 @@ return function(s)
       { -- Right
         battery,
         clock,
+        conf.show_systray and systray,
         spacing = dpi(15),
         align = "end",
         layout = wibox.layout.fixed.horizontal,

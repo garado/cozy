@@ -191,6 +191,10 @@ awful.keyboard.append_global_keybindings({
   -- █▀▀ █▀█ ▀█ █▄█
   -- █▄▄ █▄█ █▄ ░█░
 
+  awful.key({ alt }, "s", function()
+    cozy:emit_signal("systray::toggle")
+  end, { description = "systray", group = "Launchers" }),
+
   awful.key({ mod }, "j", function()
     scratchpad:turn_off()
     dash:toggle()
@@ -206,10 +210,10 @@ awful.keyboard.append_global_keybindings({
     themeswitch:toggle()
   end, { description = "theme switcher", group = "Launchers "}),
 
-  awful.key({ alt }, "b", function()
-    scratchpad:turn_off()
-    bluetooth:toggle()
-  end, { description = "bluetooth menu", group = "Launchers "}),
+  -- awful.key({ alt }, "b", function()
+  --   scratchpad:turn_off()
+  --   bluetooth:toggle()
+  -- end, { description = "bluetooth menu", group = "Launchers "}),
 
   awful.key({ alt }, "r", function()
     scratchpad:turn_off()

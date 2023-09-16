@@ -13,6 +13,7 @@ local logo    = require("frontend.bar.common.logo")
 local timew   = require("frontend.bar.common.timewarrior")
 local clock   = require("frontend.bar.common.clock")("%H:%M")
 local battery = require("frontend.bar.common.battery")
+local systray = require("frontend.bar.common.systray")
 local taglist = require(... .. ".taglist")
 
 local align = (conf.bar_align == "top") and "top" or "bottom"
@@ -36,6 +37,7 @@ return function(s)
       { -- Right
         battery,
         clock,
+        conf.show_systray and systray,
         spacing = dpi(15),
         align = "end",
         layout = wibox.layout.fixed.horizontal,

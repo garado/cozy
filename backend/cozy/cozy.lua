@@ -5,7 +5,7 @@
 -- Can control state of all of Cozy's popups. Used primarily for closing all popups at once.
 -- To avoid circular dependencies, we have to require() inside of functions.
 
-local cozy = {}
+local cozy = require("gears.object"){}
 
 local POPUPS = {
   "themeswitch",

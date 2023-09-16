@@ -11,6 +11,7 @@ local conf = require("cozyconf")
 local logo    = require("frontend.bar.common.logo")
 local clock   = require("frontend.bar.common.clock")("%H\n%M")
 local battery = require("frontend.bar.common.battery")
+local systray = require("frontend.bar.common.systray")
 local taglist = require(... .. ".taglist")
 
 local align = (conf.bar_align == "right") and "right" or "left"
@@ -23,6 +24,7 @@ local top_vbar = wibox.widget({
 local bottom_vbar = wibox.widget({
   battery,
   clock,
+  conf.show_systray and systray,
   spacing = dpi(10),
   layout = wibox.layout.fixed.vertical,
 })

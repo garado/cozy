@@ -36,6 +36,8 @@ theme.wallpaper = gears.surface.load_uncached(cscheme.wall)
 theme.useless_gap = dpi(7)
 theme.dash_widget_gap = dpi(15)
 theme.notification_spacing = dpi(10)
+theme.systray_icon_spacing = dpi(10)
+theme.bg_systray = cscheme.neutral[900]
 
 theme.border_width = dpi(3)
 theme.border_color_active = cscheme.primary[300]
