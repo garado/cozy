@@ -29,7 +29,7 @@ return {
   -- Make sure the weights for your font actually exist.
   -- Name/weight strings must have a trailing space!
   font = {
-    name = "Circular Std ",
+    name = "Inter Nerd Font ",
     weights = {
       light = "Light ",
       reg   = "Regular ",
@@ -39,7 +39,7 @@ return {
     sizes = {
       xxs = 5,
       xs  = 8,
-      s   = 11,
+      s   = 10,
       m   = 15,
       l   = 20,
       xl  = 28,
