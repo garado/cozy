@@ -18,7 +18,7 @@ local normal_color    = beautiful.neutral[100]
 local low_color       = beautiful.red[300]
 
 local percentage = wibox.widget({
-  markup  = "50",
+  markup  = "-",
   font = beautiful.font_reg_xs,
   align = "center",
   valign = "center",

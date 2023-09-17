@@ -37,11 +37,20 @@ local function notify(msg)
   end
 end
 
--- TODO: Make this a config option
 local battery_listener = upower({
-  device_path    = "/org/freedesktop/UPower/devices/battery_BAT0",
+  device_path = require("cozyconf").upower_battery_path,
 	instant_update = true,
 })
+
+if not battery_listener then
+  require("naughty").notification {
+    app_name = "System message",
+    title = "upower",
+    message = "Error determining the battery to use. Specify the battery path in cozyconf.",
+    timeout = 7,
+  }
+  return
+end
 
 battery_listener:connect_signal("upower::update", function(_, device)
   -- Don't give notification when AwesomeWM restarts
@@ -52,7 +61,7 @@ battery_listener:connect_signal("upower::update", function(_, device)
   end
 
   curstate = device.state
-	awesome.emit_signal("signal::battery", device.percentage, device.state)
+  awesome.emit_signal("signal::battery", device.percentage, device.state)
 
   if curstate == DISCHARGING and prevstate ~= DISCHARGING then
     notify("Discharging")

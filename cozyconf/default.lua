@@ -75,6 +75,9 @@ return {
   -- █▀▄▀█ █ █▀ █▀▀
   -- █░▀░█ █ ▄█ █▄▄
 
+  -- Upower
+  upower_battery_path = nil,
+
   -- GMT offset.
   timezone = -7,
 

@@ -110,31 +110,31 @@ function battery_widget.new (args)
     args = gtable.crush({
         widget_template = default_template(),
         device_path = '',
-        use_display_device = false
+        use_display_device = false -- unused
     }, args or {})
 
     local widget = wbase.make_widget_from_value(args.widget_template)
 
-    widget.device = args.use_display_device
-        and upower.Client():get_display_device()
-        or battery_widget.get_device(args.device_path)
+  widget.device = battery_widget.get_device(args.device_path) or upower.Client():get_display_device()
 
-    -- Attach signals:
-    widget.device.on_notify = function (d)
-        widget:emit_signal('upower::update', d)
-    end
+  if not widget.device then return end
 
-    -- Call an update cycle if the user asked to instan update the widget.
-    if args.instant_update then
-        gtimer.delayed_call(widget.emit_signal, widget, 'upower::update', widget.device)
-    end
+  -- Attach signals:
+  widget.device.on_notify = function (d)
+    widget:emit_signal('upower::update', d)
+  end
 
-    return widget
+  -- Call an update cycle if the user asked to instan update the widget.
+  if args.instant_update then
+    gtimer.delayed_call(widget.emit_signal, widget, 'upower::update', widget.device)
+  end
+
+  return widget
 end
 
 
 function mt.__call(self, ...)
-    return battery_widget.new(...)
+  return battery_widget.new(...)
 end
 
 return setmetatable(battery_widget, mt)
