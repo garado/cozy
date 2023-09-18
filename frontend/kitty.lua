@@ -94,6 +94,7 @@ awful.spawn.easy_async_with_shell(cmd, function(stdout)
 end)
 
 kitty:connect_signal("setstate::open", function()
+  launcher.screen = awful.screen.focused()
   launcher.visible = true
   navigator:start()
 end)

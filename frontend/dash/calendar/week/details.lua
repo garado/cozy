@@ -1,4 +1,4 @@
-  
+
 -- █▀▄ █▀▀ ▀█▀ ▄▀█ █ █░░ █▀ 
 -- █▄▀ ██▄ ░█░ █▀█ █ █▄▄ ▄█ 
 
@@ -142,7 +142,11 @@ dash:connect_signal("setstate::close", function()
   calpopup.visible = false
 end)
 
-dash:connect_signal("calpopup::show", function() calpopup.visible = true  end)
+dash:connect_signal("calpopup::show", function()
+  calpopup.screen = awful.screen.focused()
+  calpopup.visible = true
+end)
+
 dash:connect_signal("calpopup::hide", function() calpopup.visible = false end)
 
 return function() return calpopup end

@@ -161,6 +161,7 @@ local show, hide
 --- @function show
 -- @brief Show the add/modify popup and start the prompt.
 show = function()
+  cal_add.screen = awful.screen.focused()
   tbox_idx = 1
   textboxes[tbox_idx]:set_active()
 

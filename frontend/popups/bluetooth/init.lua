@@ -97,6 +97,7 @@ bt:connect_signal("ready::devices", function(_, data)
 end)
 
 bt:connect_signal("setstate::open", function()
+  bt.screen = awful.screen.focused()
   popup.visible = true
 end)
 

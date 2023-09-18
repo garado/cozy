@@ -214,6 +214,7 @@ ts:connect_signal("ready::styles", function()
 end)
 
 ts:connect_signal("setstate::open", function()
+  themeswitcher.screen = awful.screen.focused()
   navigator:start()
   themeswitcher.visible = true
   ts:emit_signal("newstate::opened")

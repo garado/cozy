@@ -23,7 +23,7 @@ local do_open_anim = true
 
 local tray = wibox.widget({
   {
-    horizontal = not conf.bar_style == "vbar",
+    horizontal = not (conf.bar_style == "vbar"),
     base_size = SIZE,
     widget = wibox.widget.systray,
   },

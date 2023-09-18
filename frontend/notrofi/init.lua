@@ -246,6 +246,7 @@ end
 
 
 notrofi:connect_signal("setstate::open", function()
+  notrofi.screen = awful.screen.focused()
   notrofi.mode = ""
   nrofi.visible = true
   prompt()

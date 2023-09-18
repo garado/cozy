@@ -220,6 +220,7 @@ local dash = awful.popup({
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
 
 dashstate:connect_signal("setstate::open", function()
+  dash.screen = awful.screen.focused()
   dash.visible = true
   navigator:start()
   dashstate:emit_signal("newstate::opened")

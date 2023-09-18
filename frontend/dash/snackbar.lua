@@ -67,6 +67,7 @@ local snackbar = awful.popup({
 })
 
 dash:connect_signal("snackbar::show", function(_, t, m)
+  snackbar.screen = awful.screen.focused()
   widget:set_title(t)
   widget:set_message(m)
   snackbar.visible = true

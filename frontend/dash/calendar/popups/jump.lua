@@ -65,6 +65,7 @@ local show, hide
 local nav_calendar
 
 function show()
+  popup.screen = awful.screen.focused()
   popup.visible = true
   if nav_calendar then
     nav_calendar:append(calendar.area)

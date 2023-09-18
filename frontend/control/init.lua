@@ -108,6 +108,7 @@ ctrl_ui = awful.popup ({
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
 
 control:connect_signal("setstate::open", function()
+  ctrl_ui.screen = awful.screen.focused()
   ctrl_ui.visible = true
   navigator:start()
 end)
