@@ -63,4 +63,12 @@ function be.create_popup_manager(args)
   return ret
 end
 
+function be.create_gobject(t)
+  local ret = gobject{}
+  gtable.crush(ret, t, true)
+  ret._private = {}
+  ret:new()
+  return ret
+end
+
 return be

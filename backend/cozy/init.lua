@@ -13,4 +13,5 @@ return {
   notrofi = be.create_popup_manager({ name = "notrofi" }),
   themeswitch = require(... .. ".themeswitch"),
   bluetooth = require(... .. ".bluetooth"),
+  systray_control = require(... .. ".systray_control")
 }

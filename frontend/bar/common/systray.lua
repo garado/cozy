@@ -2,8 +2,6 @@
 -- █▀ █▄█ █▀ ▀█▀ █▀█ ▄▀█ █▄█
 -- ▄█ ░█░ ▄█ ░█░ █▀▄ █▀█ ░█░
 
--- obligatory fuck x11
-
 local beautiful  = require("beautiful")
 local ui    = require("utils.ui")
 local dpi   = ui.dpi
@@ -11,7 +9,7 @@ local conf  = require("cozyconf")
 local wibox = require("wibox")
 local rubato = require("modules.rubato")
 local cozy  = require("backend.cozy.cozy")
-local sysctrl = require("backend.cozy.systray_control")
+local sysctrl = require("backend.cozy").systray_control
 
 local GAP = beautiful.systray_icon_spacing
 local SIZE = dpi(20)
