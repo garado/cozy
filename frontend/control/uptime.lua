@@ -26,4 +26,4 @@ control:connect_signal("setstate::open", function()
   end)
 end)
 
-return wibox.container.place(widget)
+return widget

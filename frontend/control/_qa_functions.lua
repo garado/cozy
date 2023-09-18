@@ -32,6 +32,10 @@ return function(actions)
       text     = args.icon,
       height   = dpi(40),
       width    = dpi(40),
+      deselect = {
+        bg    = beautiful.neutral[700],
+        bg_mo = beautiful.neutral[600],
+      },
       on_press = function(self)
         self.selected = not self.selected
         self:update()

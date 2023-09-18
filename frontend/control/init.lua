@@ -55,12 +55,13 @@ local body = wibox.widget({
 local bottom_tab = wibox.widget({
   {
     {
+      ui.hpad(dpi(15)),
       {
-        ui.hpad(dpi(15)),
         require(... .. ".uptime"),
-        layout = wibox.layout.fixed.horizontal,
+        valign = "bottom",
+        widget = wibox.container.place,
       },
-      widget = wibox.container.place,
+      layout = wibox.layout.fixed.horizontal,
     },
     nil,
     {
