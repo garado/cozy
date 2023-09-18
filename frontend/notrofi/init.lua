@@ -13,7 +13,7 @@ local ui = require("utils.ui")
 local dpi = ui.dpi
 local awful = require("awful")
 local wibox = require("wibox")
-local notrofi = require("backend.cozy.notrofi")
+local manager = require("backend.cozy").notrofi
 
 local launcher = require(... .. ".launcher")
 local switcher = require(... .. ".switcher")
@@ -157,6 +157,8 @@ local nrofi = awful.popup({
   widget        = widget
 })
 
+manager.popup = nrofi
+
 ------------------------
 
 local function show_launcher()
@@ -186,10 +188,10 @@ local function prompt()
     textbox              = promptbox,
     keypressed_callback  = function(_, key, input)
       if key == "Escape" or last_key..key == "Alt_Lr" then
-        notrofi:close()
+        manager:close()
       elseif key == "Alt_L" then
-        notrofi.mode = "nav"
-      elseif key == "Tab" or (notrofi.mode == "nav" and (key == "h" or key == "l")) then
+        manager.mode = "nav"
+      elseif key == "Tab" or (manager.mode == "nav" and (key == "h" or key == "l")) then
         if active_opt == LAUNCHER then
           show_switcher()
         else
@@ -203,22 +205,22 @@ local function prompt()
       last_key = key
     end,
     keyreleased_callback = function(_, key, input)
-      if notrofi.mode == "nav" then
+      if manager.mode == "nav" then
         if key == "j" then
-          notrofi:iter_element(1)
+          manager:iter_element(1)
         elseif key == "k" then
-          notrofi:iter_element(-1)
+          manager:iter_element(-1)
         elseif key == "Alt_L" then
-          notrofi.mode = ""
+          manager.mode = ""
         end
         return
       end
 
       if key == "Down" then
-        notrofi:iter_element(1)
+        manager:iter_element(1)
         return
       elseif key == "Up" then
-        notrofi:iter_element(-1)
+        manager:iter_element(-1)
         return
       end
 
@@ -226,14 +228,14 @@ local function prompt()
     end,
     exe_callback = function()
       content.exe_callback()
-      notrofi:close()
+      manager:close()
     end
   }
 end
 
 ------------------------
 
-function notrofi:iter_element(iter_amt)
+function manager:iter_element(iter_amt)
   if not self.active_element then return end
   self.active_element:emit_signal("mouse::leave")
 
@@ -245,14 +247,14 @@ function notrofi:iter_element(iter_amt)
 end
 
 
-notrofi:connect_signal("setstate::open", function()
-  notrofi.screen = awful.screen.focused()
-  notrofi.mode = ""
+manager:connect_signal("setstate::open", function()
+  manager.screen = awful.screen.focused()
+  manager.mode = ""
   nrofi.visible = true
   prompt()
 end)
 
-notrofi:connect_signal("setstate::close", function()
+manager:connect_signal("setstate::close", function()
   awful.keygrabber.stop()
   nrofi.visible = false
 end)

@@ -8,14 +8,15 @@ local naughty = require("naughty")
 local bling   = require("modules.bling")
 local os = os
 
-local control = require("backend.cozy.control")
-local dash  = require("backend.cozy.dash")
+local dash  = require("backend.cozy").dash
 local cozy  = require("backend.cozy.cozy")
-local themeswitch = require("backend.cozy.themeswitch")
-local nrofi = require("backend.cozy.notrofi")
-local bluetooth = require("backend.cozy.bluetooth")
+local themeswitch = require("backend.cozy").themeswitch
+local bluetooth = require("backend.cozy").bluetooth
 local help = require("frontend.help")
-local kitty = require("backend.cozy.kitty")
+
+local nrofi = require("backend.cozy").notrofi
+local kitty = require("backend.cozy").kitty
+local control = require("backend.cozy").control
 
 local mod   = "Mod4"
 local alt   = "Mod1"

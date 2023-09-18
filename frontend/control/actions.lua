@@ -6,7 +6,6 @@ local ui  = require("utils.ui")
 local dpi = ui.dpi
 local wibox     = require("wibox")
 local keynav    = require("modules.keynav")
-local control   = require("backend.cozy.control")
 local actions   = require("cozyconf.actions")
 
 local nav_qactions = keynav.area({

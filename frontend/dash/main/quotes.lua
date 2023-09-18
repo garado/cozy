@@ -7,7 +7,7 @@ local ui = require("utils.ui")
 local dpi = ui.dpi
 local wibox = require("wibox")
 local conf = require("cozyconf")
-local dash = require("backend.cozy.dash")
+local dash = require("backend.cozy").dash
 
 local text = ui.textbox({
   text = "Everything you want is on the other side of fear.",

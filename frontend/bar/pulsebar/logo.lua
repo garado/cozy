@@ -7,7 +7,7 @@
 local wibox = require("wibox")
 local ui   = require("utils.ui")
 local beautiful = require("beautiful")
-local dash = require("backend.cozy.dash")
+local dash = require("backend.cozy").dash
 local conf = require("cozyconf")
 local theme = require("theme.colorschemes."..conf.theme_name.."."..conf.theme_style)
 

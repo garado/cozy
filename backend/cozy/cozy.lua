@@ -6,28 +6,29 @@
 -- To avoid circular dependencies, we have to require() inside of functions.
 
 local cozy = require("gears.object"){}
+cozy.popups = {}
 
-local POPUPS = {
-  "themeswitch",
-  "control",
-  "dash",
-  "bluetooth",
-  "notrofi",
-  "kitty",
-}
+function cozy:add_popup(name)
+  self.popups[#self.popups+1] = name
+end
 
 function cozy:close_all()
-  for i = 1, #POPUPS do
-    local path = "backend.cozy." .. POPUPS[i]
-    require(path):close()
+  for i = 1, #self.popups do
+    require("backend.cozy")[self.popups[i]]:close()
   end
 end
 
 function cozy:close_all_except(exception)
-  for i = 1, #POPUPS do
-    if POPUPS[i] ~= exception then
-      local path = "backend.cozy." .. POPUPS[i]
-      require(path):close()
+  for i = 1, #self.popups do
+    if self.popups[i] ~= exception then
+      local path = "backend.cozy." .. self.popups[i]
+
+      -- compatibility with new backend
+      if require("backend.cozy")[self.popups[i]] then
+        require("backend.cozy")[self.popups[i]]:close()
+      else
+        require(path):close()
+      end
     end
   end
 end

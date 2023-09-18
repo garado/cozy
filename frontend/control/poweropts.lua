@@ -8,7 +8,7 @@ local btn                 = require("frontend.widget.button")
 local awful               = require("awful")
 local wibox               = require("wibox")
 local keynav              = require("modules.keynav")
-local control             = require("backend.cozy.control")
+local control             = require("backend.cozy").control
 
 local poweropts, poweropts_confirm, confirm_text, cmd
 

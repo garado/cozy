@@ -10,7 +10,7 @@ local gears = require("gears")
 local wibox = require("wibox")
 local keynav = require("modules.keynav")
 
-local control = require("backend.cozy.control")
+local manager = require("backend.cozy").control
 local ctrl_ui
 
 local profile = require(... .. ".profile")
@@ -104,16 +104,18 @@ ctrl_ui = awful.popup ({
   visible = false,
 })
 
+manager.popup = ctrl_ui
+
 -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
 
-control:connect_signal("setstate::open", function()
+manager:connect_signal("setstate::open", function()
   ctrl_ui.screen = awful.screen.focused()
   ctrl_ui.visible = true
   navigator:start()
 end)
 
-control:connect_signal("setstate::close", function()
+manager:connect_signal("setstate::close", function()
   navigator:stop()
   ctrl_ui.visible = false
   collectgarbage("collect")

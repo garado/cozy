@@ -9,7 +9,7 @@ local gfs     = require("gears.filesystem")
 local awful   = require("awful")
 local strutil = require("utils.string")
 local calconf = require("cozyconf").calendar
-local dash    = require("backend.cozy.dash")
+local dash    = require("backend.cozy").dash
 local os      = os
 
 local calendar = {}

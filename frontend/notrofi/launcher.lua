@@ -9,7 +9,7 @@ local Gio = require("lgi").Gio
 local awful = require("awful")
 local fzf = require("modules.fzf")
 local wibox = require("wibox")
-local notrofi = require("backend.cozy.notrofi")
+local notrofi = require("backend.cozy").notrofi
 
 local MAX_ENTRIES = 8
 local APP_ENTRY_HEIGHT = dpi(30)

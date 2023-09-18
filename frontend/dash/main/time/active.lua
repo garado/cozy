@@ -8,7 +8,7 @@ local dpi   = ui.dpi
 local wibox = require("wibox")
 local btn   = require("frontend.widget.button")
 local timew = require("backend.system.time")
-local dash  = require("backend.cozy.dash")
+local dash  = require("backend.cozy").dash
 local strutil = require("utils.string")
 local math = math
 

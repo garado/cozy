@@ -10,7 +10,7 @@ local wibox  = require("wibox")
 local header = require("frontend.widget.dashheader")
 local keynav = require("modules.keynav")
 local cal    = require("backend.system.calendar")
-local dash = require("backend.cozy.dash")
+local dash = require("backend.cozy").dash
 
 require(... .. ".popups.add_modify")
 local nav_jump_calendar = require(... .. ".popups.jump")

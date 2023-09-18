@@ -9,7 +9,7 @@ local gears = require("gears")
 local awful = require("awful")
 local wibox = require("wibox")
 local strutil = require("utils.string")
-local bt = require("backend.cozy.bluetooth")
+local manager = require("backend.cozy").bluetooth
 
 -- █▀▀ █▀█ █▀█ █▄░█ ▀█▀ █▀▀ █▄░█ █▀▄ 
 -- █▀░ █▀▄ █▄█ █░▀█ ░█░ ██▄ █░▀█ █▄▀ 
@@ -86,9 +86,11 @@ local popup = awful.popup({
   })
 })
 
-bt:get_devices()
+manager.popup = popup
 
-bt:connect_signal("ready::devices", function(_, data)
+manager:get_devices()
+
+manager:connect_signal("ready::devices", function(_, data)
   devices.children[2]:reset()
   for i = 1, #data do
     local d = gen_device(data[i])
@@ -96,11 +98,11 @@ bt:connect_signal("ready::devices", function(_, data)
   end
 end)
 
-bt:connect_signal("setstate::open", function()
-  bt.screen = awful.screen.focused()
+manager:connect_signal("setstate::open", function()
+  popup.screen = awful.screen.focused()
   popup.visible = true
 end)
 
-bt:connect_signal("setstate::close", function()
+manager:connect_signal("setstate::close", function()
   popup.visible = false
 end)

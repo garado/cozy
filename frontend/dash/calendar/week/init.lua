@@ -8,7 +8,7 @@ local cal   = require("backend.system.calendar")
 local keynav = require("modules.keynav")
 local awful  = require("awful")
 local gears  = require("gears")
-local dash   = require("backend.cozy.dash")
+local dash   = require("backend.cozy").dash
 local beautiful = require("beautiful")
 local mathutils = require("utils.math")
 

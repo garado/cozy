@@ -5,12 +5,14 @@
 -- Cool little calendar popup. Used for modifying events and
 -- showing event details.
 
+-- NOTE: UNUSED
+
 local beautiful  = require("beautiful")
 local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local awful = require("awful")
 local wibox = require("wibox")
-local dash  = require("backend.cozy.dash")
+local dash  = require("backend.cozy").dash
 local strutils = require("utils.string")
 local calwidget = require("frontend.widget.calendar")
 

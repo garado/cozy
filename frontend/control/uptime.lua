@@ -3,10 +3,9 @@
 -- █▄█ █▀▀ ░█░ █ █░▀░█ ██▄ 
 
 local ui = require("utils.ui")
-local wibox = require("wibox")
 local awful = require("awful")
 local beautiful = require("beautiful")
-local control = require("backend.cozy.control")
+local control = require("backend.cozy").control
 
 local widget = ui.textbox({
   text = "",

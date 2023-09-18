@@ -9,7 +9,7 @@ local ui = require("utils.ui")
 local dpi = ui.dpi
 local awful = require("awful")
 local wibox = require("wibox")
-local dash = require("backend.cozy.dash")
+local manager = require("backend.cozy").dash
 local calbackend = require("backend.system.calendar")
 local math = math
 
@@ -81,19 +81,19 @@ function hide()
   end
 end
 
-dash.child_popups[#dash.child_popups+1] = "jump"
+manager:add_child("jump")
 
-dash:connect_signal("jump::setstate::toggle", function(_, nav)
+manager:connect_signal("jump::setstate::toggle", function(_, nav)
   if not nav_calendar and nav then nav_calendar = nav end
   if popup.visible then hide() else show() end
 end)
 
-dash:connect_signal("jump::setstate::open", function(_, nav)
+manager:connect_signal("jump::setstate::open", function(_, nav)
   if not nav_calendar and nav then nav_calendar = nav end
   show()
 end)
 
-dash:connect_signal("jump::setstate::close", function(_, nav)
+manager:connect_signal("jump::setstate::close", function(_, nav)
   if not nav_calendar and nav then nav_calendar = nav end
   hide()
 end)

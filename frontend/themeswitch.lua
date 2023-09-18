@@ -6,7 +6,7 @@ local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local awful = require("awful")
 local wibox = require("wibox")
-local ts    = require("backend.cozy.themeswitch")
+local manager    = require("backend.cozy").themeswitch
 local ss    = require("frontend.widget.single-select")
 local btn  = require("frontend.widget.button")
 local sbtn  = require("frontend.widget.button")
@@ -86,7 +86,7 @@ local styles = wibox.widget({
 local apply_btn = btn({
   text  = "Apply",
   func  = function()
-    ts:apply()
+    manager:apply()
     themeswitcher:reset()
   end,
   bg    = beautiful.neutral[700],
@@ -156,6 +156,7 @@ themeswitcher = awful.popup({
   placement = awful.placement.centered,
   widget = content,
 })
+manager.popup = themeswitcher
 
 -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀    ▄▀█ █▄░█ █▀▄    █▀ ▀█▀ █░█ █▀▀ █▀▀ 
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█    █▀█ █░▀█ █▄▀    ▄█ ░█░ █▄█ █▀░ █▀░ 
@@ -173,57 +174,57 @@ function themeswitcher:reset()
   navigator.focused_area = nav_root
 end
 
-ts:connect_signal("ready::themes", function()
-  for i = 1, #ts.themes do
+manager:connect_signal("ready::themes", function()
+  for i = 1, #manager.themes do
     local s = sbtn({
-      text = ts.themes[i],
+      text = manager.themes[i],
       bg    = beautiful.neutral[700],
       bg_mo = beautiful.neutral[600],
       on_release = function(self)
-        ts.selected_theme = self.name
-        ts.selected_style = nil
+        manager.selected_theme = self.name
+        manager.selected_style = nil
         styles_sbg:reset()
         actions.visible = false
-        ts:fetch_styles(ts.selected_theme)
+        manager:fetch_styles(manager.selected_theme)
       end
     })
-    s.name = ts.themes[i]
+    s.name = manager.themes[i]
     themes_sbg:add_element(s)
   end
 end)
 
-ts:connect_signal("ready::styles", function()
+manager:connect_signal("ready::styles", function()
   styles_sbg:reset()
   styles.visible = true
-  for i = 1, #ts.styles do
+  for i = 1, #manager.styles do
     local s = sbtn({
-      text = ts.styles[i],
+      text = manager.styles[i],
       bg    = beautiful.neutral[700],
       bg_mo = beautiful.neutral[600],
       on_release = function(self)
-        ts.selected_style = self.name
+        manager.selected_style = self.name
         nav_actions:clear()
         nav_actions:append(apply_btn)
         nav_actions:append(cancel_btn)
         actions.visible = true
       end
     })
-    s.name = ts.styles[i]
+    s.name = manager.styles[i]
     styles_sbg:add_element(s)
   end
 end)
 
-ts:connect_signal("setstate::open", function()
+manager:connect_signal("setstate::open", function()
   themeswitcher.screen = awful.screen.focused()
   navigator:start()
   themeswitcher.visible = true
-  ts:emit_signal("newstate::opened")
+  manager:emit_signal("newstate::opened")
 end)
 
-ts:connect_signal("setstate::close", function()
+manager:connect_signal("setstate::close", function()
   navigator:stop()
   themeswitcher.visible = false
-  ts:emit_signal("newstate::closed")
+  manager:emit_signal("newstate::closed")
 end)
 
 return function(_) return themeswitcher end

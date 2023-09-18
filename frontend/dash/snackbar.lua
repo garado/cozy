@@ -10,7 +10,7 @@ local dpi       = ui.dpi
 local awful     = require("awful")
 local wibox     = require("wibox")
 local gears     = require("gears")
-local dash      = require("backend.cozy.dash")
+local manager      = require("backend.cozy").dash
 
 local title = ui.textbox({
   text = "This is Primary 700.",
@@ -66,7 +66,9 @@ local snackbar = awful.popup({
   widget  = widget,
 })
 
-dash:connect_signal("snackbar::show", function(_, t, m)
+manager:add_child("snackbar")
+
+manager:connect_signal("snackbar::show", function(_, t, m)
   snackbar.screen = awful.screen.focused()
   widget:set_title(t)
   widget:set_message(m)
@@ -77,6 +79,6 @@ dash:connect_signal("snackbar::show", function(_, t, m)
   end)
 end)
 
-dash:connect_signal("snackbar::hide", function()
+manager:connect_signal("snackbar::hide", function()
   snackbar.visible = false
 end)

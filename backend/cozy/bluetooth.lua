@@ -4,16 +4,11 @@
 
 -- Manages state (open/closed) for Bluetooth popup.
 
-local cozy    = require("backend.cozy.cozy")
-local gobject = require("gears.object")
-local gtable  = require("gears.table")
-local awful   = require("awful")
+local be = require("utils.backend")
+local awful = require("awful")
 local strutil = require("utils.string")
 
 local bluetooth = {}
-local instance = nil
-
----------------------------------------------------------------------
 
 function bluetooth:get_devices()
   local cmd = "bluetoothctl devices"
@@ -33,39 +28,7 @@ function bluetooth:get_devices()
   end)
 end
 
----------------------------------------------------------------------
-
-function bluetooth:toggle()
-  if self.visible then
-    self:close()
-  else
-    self:open()
-  end
-end
-
-function bluetooth:close()
-  self:emit_signal("setstate::close")
-  self.visible = false
-end
-
-function bluetooth:open()
-  cozy:close_all_except("bluetooth")
-  self:emit_signal("setstate::open")
-  self.visible = true
-end
-
-function bluetooth:new()
-  self.visible = false
-end
-
-local function new()
-  local ret = gobject{}
-  gtable.crush(ret, bluetooth, true)
-  ret._private = {}
-  ret:new()
-  return ret
-end
-
-if not instance then instance = new() end
-
-return instance
+return be.create_popup_manager({
+  tbl = bluetooth,
+  name = "bluetooth",
+})

@@ -10,7 +10,7 @@ local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local awful = require("awful")
 local wibox = require("wibox")
-local dash  = require("backend.cozy.dash")
+local manager  = require("backend.cozy").dash
 local btn   = require("frontend.widget.button")
 local calendar = require("backend.system.calendar")
 local calprompt = require("frontend.dash.calendar.popups.multiprompt")
@@ -224,8 +224,8 @@ hide = function()
   calprompt.set_textbox(textboxes[tbox_idx].tb)
 end
 
-dash:connect_signal("add::setstate::open", show)
-dash:connect_signal("add::setstate::close", hide)
-dash:connect_signal("add::setstate::toggle", function()
+manager:connect_signal("add::setstate::open", show)
+manager:connect_signal("add::setstate::close", hide)
+manager:connect_signal("add::setstate::toggle", function()
   if cal_add.visible then hide() else show() end
 end)

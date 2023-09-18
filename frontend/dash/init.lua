@@ -13,7 +13,7 @@ local ui  = require("utils.ui")
 local dpi = require("utils.ui").dpi
 local keynav = require("modules.keynav")
 local beautiful = require("beautiful")
-local dashstate = require("backend.cozy.dash")
+local manager = require("backend.cozy").dash
 local config = require("cozyconf")
 
 local navigator, nav_root = keynav.navigator()
@@ -45,7 +45,7 @@ end
 local root_keys = {}
 for i = 1, #tab_list do
   root_keys[tostring(i)] = function()
-    dashstate:set_tab(i)
+    manager:set_tab(i)
   end
 end
 nav_root.keys = root_keys
@@ -105,7 +105,7 @@ local tab_buttons = wibox.widget({
     end)
 
     btn:connect_signal("button::press", function()
-      dashstate:set_tab(btn.tab_enum)
+      manager:set_tab(btn.tab_enum)
     end)
 
     self:add(btn)
@@ -117,7 +117,7 @@ for i = 1, #tab_list do
 end
 
 -- Logic for switching tabs
-dashstate:connect_signal("tab::set", function(_, tab_enum)
+manager:connect_signal("tab::set", function(_, tab_enum)
   -- Update sidebar
   for i = 1, #tab_buttons.children do
     if tab_buttons.children[i].tab_enum == tab_enum then
@@ -219,23 +219,23 @@ local dash = awful.popup({
 -- █▀ █ █▀▀ █▄░█ ▄▀█ █░░ █▀ 
 -- ▄█ █ █▄█ █░▀█ █▀█ █▄▄ ▄█ 
 
-dashstate:connect_signal("setstate::open", function()
+manager:connect_signal("setstate::open", function()
   dash.screen = awful.screen.focused()
   dash.visible = true
   navigator:start()
-  dashstate:emit_signal("newstate::opened")
+  manager:emit_signal("newstate::opened")
 end)
 
-dashstate:connect_signal("setstate::close", function()
+manager:connect_signal("setstate::close", function()
   dash.visible = false
   navigator:stop()
-  dashstate:emit_signal("newstate::closed")
-  dashstate:emit_signal("snackbar::hide")
+  manager:emit_signal("newstate::closed")
+  manager:emit_signal("snackbar::hide")
 end)
 
 awesome.connect_signal("theme::reload", function()
-  dashstate:set_tab(dashstate.curtab)
+  manager:set_tab(manager.curtab)
 end)
 
-dashstate:set_tab(1)
+manager:set_tab(1)
 return function(_) return dash end

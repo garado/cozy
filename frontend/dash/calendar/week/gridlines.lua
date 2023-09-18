@@ -6,7 +6,7 @@ local wibox = require("wibox")
 local gcolor = require("gears.color")
 local gtable = require("gears.table")
 local calconf = require("cozyconf").calendar
-local dash  = require("backend.cozy.dash")
+local dash  = require("backend.cozy").dash
 local beautiful = require("beautiful")
 
 local gridlines = { mt = {} }

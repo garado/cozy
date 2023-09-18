@@ -10,7 +10,7 @@ local ui      = require("utils.ui")
 local dpi     = ui.dpi
 local wibox   = require("wibox")
 local watch   = require("awful.widget.watch")
-local control = require("backend.cozy.control")
+local control = require("backend.cozy").control
 
 --- Helper function to create stats UI
 -- @param name The stat label

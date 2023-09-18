@@ -8,7 +8,7 @@ local beautiful  = require("beautiful")
 local ui    = require("utils.ui")
 local wibox = require("wibox")
 local calconf = require("cozyconf").calendar
-local dash  = require("backend.cozy.dash")
+local dash  = require("backend.cozy").dash
 local cal   = require("backend.system.calendar")
 local os = os
 

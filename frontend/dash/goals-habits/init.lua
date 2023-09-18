@@ -9,7 +9,7 @@ local awful = require("awful")
 local wibox = require("wibox")
 local btn   = require("frontend.widget.button")
 local header = require("frontend.widget.dashheader")
-local dash  = require("backend.cozy.dash")
+local dash  = require("backend.cozy").dash
 local keynav = require("modules.keynav")
 local gstate = require("backend.system.goals")
 

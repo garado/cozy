@@ -2,66 +2,28 @@
 -- █▀▄ ▄▀█ █▀ █░█ 
 -- █▄▀ █▀█ ▄█ █▀█ 
 
--- Manages state (open/closed) for dashboard, along with
--- other miscellaneous variables.
+-- Manages state for dashboard, along with other miscellaneous variables.
 
-local cozy    = require("backend.cozy.cozy")
-local gobject = require("gears.object")
-local gtable  = require("gears.table")
+local be = require("utils.backend")
 
 local dash = {}
-local instance = nil
 
----------------------------------------------------------------------
-
-function dash:toggle()
-  if self.visible then
-    self:close()
-  else
-    self:open()
-  end
+function dash:set_tab(tabnum)
+  self:emit_signal("tab::set", tabnum)
+  self.curtab = tabnum
 end
 
-function dash:close()
-  self:emit_signal("setstate::close")
-  self.visible = false
-
-  for i = 1, #self.child_popups do
-    self:emit_signal(self.child_popups[i] .. "::setstate::close")
-  end
-end
-
-function dash:open()
-  if os.date("%d") ~= self.date then
-    self:emit_signal("date::changed")
-  end
-
-  cozy:close_all_except("dash")
-  self:emit_signal("setstate::open", self.curtab)
-  self.visible = true
-end
-
-function dash:set_tab(tab_enum)
-  self:emit_signal("tab::set", tab_enum)
-  self.curtab = tab_enum
-end
-
-function dash:new()
-  self.child_popups = {}
-  self.visible = false
+function dash:on_init()
   self.date = os.date("%d")
 end
 
-local function new()
-  local ret = gobject{}
-  gtable.crush(ret, dash, true)
-  ret._private = {}
-  ret:new()
-  return ret
+function dash:on_open()
+  if os.date("%d") ~= self.date then
+    self:emit_signal("date::changed")
+  end
 end
 
-if not instance then
-  instance = new()
-end
-
-return instance
+return be.create_popup_manager({
+  tbl = dash,
+  name = "dash",
+})

@@ -8,7 +8,7 @@ local apps  = require("sysconf.apps")
 local awful = require("awful")
 local gears = require("gears")
 local naughty = require("naughty")
-local control = require("backend.cozy.control")
+local control = require("backend.cozy").control
 
 local HOME = os.getenv("HOME")
 local CFG = gears.filesystem.get_configuration_dir()

@@ -9,7 +9,7 @@ local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local wibox = require("wibox")
 local conf  = require("cozyconf")
-local dash  = require("backend.cozy.dash")
+local dash  = require("backend.cozy").dash
 local keynav = require("modules.keynav")
 local pixela = require("backend.system.pixela")
 

@@ -11,7 +11,7 @@ local dpi   = ui.dpi
 local btn   = require("frontend.widget.button")
 local awful = require("awful")
 local wibox = require("wibox")
-local kitty = require("backend.cozy.kitty")
+local manager = require("backend.cozy").kitty
 local keynav = require("modules.keynav")
 local strutil = require("utils.string")
 local os = os
@@ -32,7 +32,7 @@ local function gen_entry(name)
     on_release = function()
       local cmd = "kitty --session sessions/"..name
       awful.spawn.easy_async_with_shell(cmd, function() end)
-      kitty:close()
+      manager:close()
     end
   })
 end
@@ -76,6 +76,7 @@ local launcher = awful.popup({
   }),
 })
 
+manager.popup = launcher
 
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄
 -- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀
@@ -93,13 +94,13 @@ awful.spawn.easy_async_with_shell(cmd, function(stdout)
   end
 end)
 
-kitty:connect_signal("setstate::open", function()
+manager:connect_signal("setstate::open", function()
   launcher.screen = awful.screen.focused()
   launcher.visible = true
   navigator:start()
 end)
 
-kitty:connect_signal("setstate::close", function()
+manager:connect_signal("setstate::close", function()
   launcher.visible = false
   navigator:stop()
 end)

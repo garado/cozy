@@ -5,10 +5,8 @@
 -- Manages state (open/closed) for theme switcher.
 -- Also provides list of themes.
 
-local cozy      = require("backend.cozy.cozy")
+local be = require("utils.backend")
 local gears     = require("gears")
-local gobject   = require("gears.object")
-local gtable    = require("gears.table")
 local naughty   = require("naughty")
 local gfs       = require("gears.filesystem")
 local awful     = require("awful")
@@ -16,11 +14,8 @@ local strutil   = require("utils.string")
 local beautiful = require("beautiful")
 
 local themeswitch = {}
-local instance = nil
 
 local THEMES_DIR = gfs.get_configuration_dir() .. "/theme/colorschemes/"
-
----------------------------------------------------------------------
 
 function themeswitch:fetch_themes()
   local cmd = 'ls ' .. THEMES_DIR
@@ -130,42 +125,11 @@ function themeswitch:apply()
   end)
 end
 
----------------------------------------------------------------------
-
-function themeswitch:toggle()
-  if self.visible then
-    self:close()
-  else
-    self:open()
-  end
-end
-
-function themeswitch:close()
-  self:emit_signal("setstate::close")
-  self.visible = false
-end
-
-function themeswitch:open()
-  cozy:close_all_except("themeswitch")
-  self:emit_signal("setstate::open")
-  self.visible = true
-end
-
-function themeswitch:new()
+function themeswitch:on_init()
   self:fetch_themes()
-  self.visible = false
 end
 
-local function new()
-  local ret = gobject{}
-  gtable.crush(ret, themeswitch, true)
-  ret._private = {}
-  ret:new()
-  return ret
-end
-
-if not instance then
-  instance = new()
-end
-
-return instance
+return be.create_popup_manager({
+  tbl = themeswitch,
+  name = "themeswitch"
+})

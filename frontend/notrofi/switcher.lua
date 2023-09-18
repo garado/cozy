@@ -6,7 +6,7 @@ local beautiful  = require("beautiful")
 local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local wibox = require("wibox")
-local notrofi = require("backend.cozy.notrofi")
+local notrofi = require("backend.cozy").notrofi
 local fzf = require("modules.fzf")
 
 local MAX_ENTRIES = 8
