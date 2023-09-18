@@ -4,7 +4,6 @@
 
 local awful = require("awful")
 local ruled = require("ruled")
-local utils = require("utils")
 
 ruled.client.connect_signal("request::rules", function()
   -- Rules applied to every window
@@ -71,14 +70,13 @@ ruled.client.connect_signal("request::rules", function()
     },
   })
 
-  -- Rules for onscreen keyboard
   ruled.client.append_rule({
     rule_any = {
-      instance = { "onboard" },
+      instance = { "Xephyr" },
+      class = { "Xephyr" },
     },
     properties = {
-      floating = true,
-      placement = awful.placement.centered,
+      placement = awful.placement.top_right,
     },
   })
 end)
