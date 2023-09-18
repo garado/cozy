@@ -15,6 +15,7 @@ require(... .. ".notrofi")
 require(... .. ".kitty")
 require("frontend.dash.calendar.week.details")
 
-awful.screen.connect_for_each_screen(
-  require(... .. ".bar." .. conf.bar_style)
-)
+local path = ...
+awful.screen.connect_for_each_screen(function(s)
+  require(path .. ".bar." .. conf.bar_style)(s)
+end)

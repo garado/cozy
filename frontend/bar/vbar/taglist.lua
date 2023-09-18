@@ -9,6 +9,22 @@ local dpi   = require("utils.ui").dpi
 local colorize    = require("utils.ui").colorize
 local beautiful   = require("beautiful")
 
+local taglist
+
+local FG_EMPTY    = beautiful.neutral[600]
+local FG_FOCUSED  = beautiful.primary[400]
+local FG_OCCUPIED = beautiful.neutral[100]
+
+awesome.connect_signal("theme::reload", function(lut)
+  FG_EMPTY    = lut[FG_EMPTY]
+  FG_FOCUSED  = lut[FG_FOCUSED]
+  FG_OCCUPIED = lut[FG_OCCUPIED]
+
+  -- Undocumented taglist function 
+  -- https://www.reddit.com/r/awesomewm/comments/c6r2co/how_to_force_a_widget_to_update/
+  taglist._do_taglist_update()
+end)
+
 return function(s)
   -- Mouse + client actions
   local modkey = "Mod4"
@@ -38,11 +54,11 @@ return function(s)
   local function update_callback(self, c3, _)
     local tb = self.widget.children[1]
     if c3.selected then
-      tb:set_markup_silently(colorize(c3.name, beautiful.wibar_focused))
+      tb:set_markup_silently(colorize(c3.name, FG_FOCUSED))
     elseif #c3:clients() == 0 then
-      tb:set_markup_silently(colorize(c3.name, beautiful.wibar_empty))
+      tb:set_markup_silently(colorize(c3.name, FG_EMPTY))
     else
-      tb:set_markup_silently(colorize(c3.name, beautiful.wibar_occupied))
+      tb:set_markup_silently(colorize(c3.name, FG_OCCUPIED))
     end
   end
 

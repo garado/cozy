@@ -11,25 +11,26 @@ local conf = require("cozyconf")
 local logo    = require("frontend.bar.common.logo")
 local clock   = require("frontend.bar.common.clock")("%H\n%M")
 local battery = require("frontend.bar.common.battery")
-local systray = require("frontend.bar.common.systray")
 local taglist = require(... .. ".taglist")
 
 local align = (conf.bar_align == "right") and "right" or "left"
 
-local top_vbar = wibox.widget({
-  logo,
-  layout = wibox.layout.fixed.vertical,
-})
-
-local bottom_vbar = wibox.widget({
-  battery,
-  clock,
-  conf.show_systray and systray,
-  spacing = dpi(10),
-  layout = wibox.layout.fixed.vertical,
-})
-
 return function(s)
+  local systray = require("frontend.bar.common.systray")(s)
+
+  local top_vbar = wibox.widget({
+    logo,
+    layout = wibox.layout.fixed.vertical,
+  })
+
+  local bottom_vbar = wibox.widget({
+    battery,
+    clock,
+    conf.show_systray and systray,
+    spacing = dpi(10),
+    layout = wibox.layout.fixed.vertical,
+  })
+
   s.bar = awful.popup({
     screen = s,
     type = "dock",
@@ -67,4 +68,7 @@ return function(s)
   s.bar:struts({
     [align] = s.bar.maximum_width,
   })
+
+  systray.screen_name = s.name
+  systray.bar = s.bar
 end

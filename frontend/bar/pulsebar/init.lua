@@ -11,7 +11,6 @@ local ui    = require("utils.ui")
 local dpi   = ui.dpi
 local beautiful  = require("beautiful")
 
-local systray = require("frontend.bar.common.systray")
 local battery = require(... .. ".battery")
 local clock   = require(... .. ".clock")
 local timew   = require(... .. ".timewarrior")
@@ -21,6 +20,7 @@ local logo    = require(... .. ".logo")
 local align = (conf.bar_align == "top") and "top" or "bottom"
 
 return function(s)
+  local systray = require("frontend.bar.common.systray")(s)
 
   -- The way this is written is weird but the taglist won't be easily centered otherwise.
   -- Leftside and rightside widgets are inside their own separate align layout.
