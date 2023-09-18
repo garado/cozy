@@ -25,6 +25,12 @@ local theme = {
   accents = {
     "#8b7f66",
   },
+
+  overrides = {
+    task_select_highlight = "#cd664d",
+    focused_border_color  = "#cd664d",
+  },
+
   -- Pulsebar is a style where the bar background is transparent.
   -- Depending on which wallpaper you use, you may want to change the
   -- font color of the bar icons so that they're actually visible against
