@@ -20,7 +20,7 @@ local low_color       = beautiful.red[500]
 local normal_color    = theme.pulsebar_fg_r == "dark" and beautiful.neutral[800] or beautiful.neutral[100]
 
 local percentage = ui.textbox({
-  text = "50",
+  text = "-",
   font = beautiful.font_reg_xs,
   align = "center",
   color = normal_color

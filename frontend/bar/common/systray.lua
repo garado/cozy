@@ -23,7 +23,7 @@ local no_anim_prop = conf.bar_style == "vbar" and "forced_width"  or "forced_hei
 return function(s)
   local widget = wibox.widget({
     wibox.widget({
-      [anim_prop] = conf.animate and dpi(0) or SIZE,
+      [anim_prop] = conf.animate and dpi(0),
       [no_anim_prop] = SIZE,
       widget = wibox.container.place,
       do_open_anim = true

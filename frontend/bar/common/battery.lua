@@ -17,12 +17,11 @@ local charging_color  = beautiful.green[300]
 local normal_color    = beautiful.neutral[100]
 local low_color       = beautiful.red[300]
 
-local percentage = wibox.widget({
-  markup  = "-",
-  font = beautiful.font_reg_xs,
-  align = "center",
-  valign = "center",
-  widget = wibox.widget.textbox,
+local percentage = require("utils.ui").textbox({
+  text   = "-",
+  font   = beautiful.font_reg_xs,
+  align  = "center",
+  color = normal_color
 })
 
 awesome.connect_signal("signal::battery", function(value, state)
@@ -37,7 +36,8 @@ awesome.connect_signal("signal::battery", function(value, state)
     percent_color = normal_color
   end
 
-  percentage:set_markup(colorize(math.floor(value), percent_color))
+  percentage:update_color(percent_color)
+  percentage:update_text(math.floor(value))
 end)
 
 return percentage
