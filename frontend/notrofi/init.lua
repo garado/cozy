@@ -179,6 +179,10 @@ local function show_switcher()
   active_opt = SWITCHER
 end
 
+-- mouse support
+opt_launcher:connect_signal("button::press", show_launcher)
+opt_switcher:connect_signal("button::press", show_switcher)
+
 local function prompt()
   awful.prompt.run {
     font                 = beautiful.font_reg_s,
