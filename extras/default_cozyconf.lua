@@ -51,7 +51,7 @@ return {
   animate = true,
 
   -- Enable systray.
-  show_systray = true,
+  show_systray = false,
 
   -- For scaling UI size up and down.
   -- Might be useful for people with smaller screen resolutions.
@@ -96,7 +96,7 @@ return {
   -- █▄▀ █▀█ ▄█ █▀█ 
 
   -- Configure the visibility and order of tabs.
-  -- Options: setup main task ledger calendar goals settings
+  -- Options: main task ledger calendar
   tabs = { "main", "task", "ledger", "calendar" },
 
   ---------------------------
