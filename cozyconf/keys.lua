@@ -96,6 +96,7 @@ gkbind("Alt+s", function()
   require("backend.cozy.cozy"):emit_signal("systray::toggle")
 end, "systray", "Launchers")
 
+
 -- █░█░█ █▀█ █▀█ █▄▀ █▀ █▀█ ▄▀█ █▀▀ █▀▀ 
 -- ▀▄▀▄▀ █▄█ █▀▄ █░█ ▄█ █▀▀ █▀█ █▄▄ ██▄ 
 
@@ -125,11 +126,11 @@ gkbind("Super+j", function() bec.dash:toggle() end, "dashboard", "Launchers")
 gkbind("Super+o", function() bec.kitty:toggle() end, "kitty sessions", "Launchers")
 gkbind("Super+k", function() bec.control:toggle() end, "control", "Launchers")
 gkbind("Super+l", function() bec.themeswitch:toggle() end, "themes", "Launchers")
+gkbind("Super+p", function() bec.scratchpad:toggle() end, "scratchpad", "Launchers")
 
 gkbind("Alt+Return", function()
   awful.spawn(apps.default.terminal)
 end, "terminal", "Launchers")
-
 
 -- █▀▀ █░░ █ █▀▀ █▄░█ ▀█▀ 
 -- █▄▄ █▄▄ █ ██▄ █░▀█ ░█░ 
