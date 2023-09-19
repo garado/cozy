@@ -10,3 +10,6 @@
 [submodule "modules/rubato"]
 	path = modules/rubato
 	url = git@github.com:andOrlando/rubato.git
+[submodule "modules/awesome-treetile"]
+	path = modules/awesome-treetile
+	url = git@github.com:Kasper24/awesome-treetile.git
