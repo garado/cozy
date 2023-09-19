@@ -575,6 +575,7 @@ function widget.new(args)
   --  released.
   -- @method show_help
   function widget_instance:show_help(c, s, show_args)
+    require("backend.cozy.cozy"):close_all()
     show_args = show_args or {}
     local show_awesome_keys = show_args.show_awesome_keys ~= false
 

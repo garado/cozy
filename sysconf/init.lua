@@ -5,11 +5,11 @@
 -- Configuration options for window management stuff.
 
 require(... .. ".autostart")
-require(... .. ".keys")
 require(... .. ".layout")
 require(... .. ".ruled")
 require(... .. ".tags")
 require(... .. ".restore")
+require("cozyconf.keys")
 
 local awful = require("awful")
 local gears = require("gears")
