@@ -8,11 +8,9 @@
 -- Modified to play nicer with Cozy and also to be an imagebox. It only actually draws the
 -- widget once on AwesomeWM startup. I noticed that opening the dash is significantly faster that way.
 
--- For best results, set up a cronjob to run the script to cache the data once daily.
--- Script path: utils/scripts/fetch-github-contribs [username] [number of days]
-
 local ui = require("utils.ui")
 local gfs = require("gears.filesystem")
+local dash = require("backend.cozy.dash")
 local conf = require("cozyconf")
 local awful = require("awful")
 local wibox = require("wibox")
@@ -20,6 +18,7 @@ local gears = require("gears")
 local beautiful = require("beautiful")
 local strutil = require("utils.string")
 
+local SCRIPT_PATH = gfs.get_configuration_dir() .. "utils/scripts/fetch-github-contribs"
 local HEATMAP_DATA = gfs.get_cache_dir() .. "github-data-heatmap"
 local CONTRIB_COUNT_DATA = gfs.get_cache_dir() .. "github-data-year-totals"
 local SVG_CACHE_PATH = gfs.get_cache_dir() .. "github-data-heatmap.svg"
@@ -30,6 +29,8 @@ local SIDELENGTH = ui.dpi(24)
 local GAP_SIZE   = ui.dpi(5)
 local WIDTH  = SIDELENGTH * (DAYS_SHOWN / BOXES_PER_COL)
 local HEIGHT = SIDELENGTH * BOXES_PER_COL
+
+local fetch_data, load_data, process_data
 
 local img = wibox.widget({
   resize = true,
@@ -103,7 +104,50 @@ local contrib_count = ui.textbox({
 -- █▄▄ ▄▀█ █▀▀ █▄▀ █▀▀ █▄░█ █▀▄ 
 -- █▄█ █▀█ █▄▄ █░█ ██▄ █░▀█ █▄▀ 
 
-local function process_data(stdout)
+--- @function fetch_data
+-- @brief Run script to fetch Github contrib data.
+function fetch_data()
+  local cmd = SCRIPT_PATH .. " " .. conf.github_username .. ' ' .. DAYS_SHOWN
+  awful.spawn.easy_async_with_shell(cmd, load_data)
+end
+
+--- @function load_data
+-- @brief Read Github contrib data from cache.
+function load_data()
+  -- Reset vars in case theme was reloaded
+  color_of_empty_cells = beautiful.neutral[900]
+  colors = {
+    [4] = beautiful.primary[400],
+    [3] = beautiful.primary[500],
+    [2] = beautiful.primary[600],
+    [1] = beautiful.primary[700],
+    [0] = beautiful.neutral[900],
+  }
+
+  -- If cache files don't exist, run script to populate them.
+  -- Otherwise read cache files like normal.
+  -- (The script writes to both cache files and stdout.)
+  if not gfs.file_readable(HEATMAP_DATA) or not gfs.file_readable(CONTRIB_COUNT_DATA) then
+    fetch_data()
+  else
+    local cmd = "cat " .. HEATMAP_DATA .. " ; echo '=' ; cat " .. CONTRIB_COUNT_DATA
+    awful.spawn.easy_async_with_shell(cmd, function(stdout)
+      -- The first line of the file contains the date.
+      -- Update if outdated.
+      local cachedate = stdout:sub(1, 10) -- yyyy-mm-dd
+      if cachedate ~= os.date("%Y-%m-%d") then
+        fetch_data()
+      else
+        process_data(stdout:sub(12))
+      end
+    end)
+  end
+end
+
+--- @function process_data
+-- @brief Using data read from cache, redraw the Github widget.
+-- @param stdout The data read from the cache
+function process_data(stdout)
   -- Script outputs heatmap data and total contrib data to stdout, and these
   -- two are separated by a '=' on a newline
   local data = strutil.split(stdout, "=")
@@ -122,31 +166,10 @@ local function process_data(stdout)
   contrib_count:update_text(total)
 end
 
-local function load_data()
-  -- Reset vars in case theme was reloaded
-  color_of_empty_cells = beautiful.neutral[900]
-  colors = {
-    [4] = beautiful.primary[400],
-    [3] = beautiful.primary[500],
-    [2] = beautiful.primary[600],
-    [1] = beautiful.primary[700],
-    [0] = beautiful.neutral[900],
-  }
+load_data() -- initial update of data
 
-  -- If cache files don't exist, run script to populate them.
-  -- Otherwise read cache files like normal.
-  -- (The script writes to both cache files and stdout.)
-  if not gfs.file_readable(HEATMAP_DATA) or not gfs.file_readable(CONTRIB_COUNT_DATA) then
-    local cmd = "utils/scripts/fetch-github-contribs " .. conf.github_username .. ' ' .. DAYS_SHOWN
-    awful.spawn.easy_async_with_shell(cmd, process_data)
-  else
-    local cmd = "cat " .. HEATMAP_DATA .. " ; echo '=' ; cat " .. CONTRIB_COUNT_DATA
-    awful.spawn.easy_async_with_shell(cmd, process_data)
-  end
-end
-
-load_data()
 awesome.connect_signal("theme::reload", load_data)
+dash:connect_signal("date::changed", fetch_data) -- update daily
 
 return ui.dashbox_v2(
   wibox.widget({
