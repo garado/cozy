@@ -59,7 +59,8 @@ function systray_control:request_tray(tray_container, screen)
     -- to expose it.
     -- BUG: num_entries is sometimes only set *after* the first draw
     --      (so the first time the systray is opened, it doesn't show)
-    tray_container:toggle_systray(self.widget.num_entries or 0)
+    -- tray_container:toggle_systray(self.widget.num_entries or 0)
+    tray_container:toggle_systray(awesome.systray() or 0)
 
     self.active_container = tray_container
   end

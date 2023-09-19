@@ -66,8 +66,9 @@ return function(s)
     end
   end
 
-  function tray_container:toggle_systray(num_entries)
+  function tray_container:toggle_systray()
     if conf.animate then
+      local num_entries = awesome.systray()
       local traysize = (num_entries > 0 and (num_entries*SIZE) + ((num_entries-1)*GAP)) or 0
       systray_anim.target = tray_container.do_open_anim and traysize or 0
       toggle:update_text(TRAY_ICONS[tray_container.do_open_anim and 1 or 2])
