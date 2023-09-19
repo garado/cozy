@@ -42,7 +42,7 @@ local widget = wibox.widget({
   pfp,
   {
     ui.textbox({
-      text = "Alexis G.",
+      text = conf.name,
       font = beautiful.font_med_m,
       align = "center",
     }),
