@@ -56,9 +56,9 @@ end
 
 poweropts = wibox.widget({
   {
-    create_poweropt("", "Sleep?", "systemctl suspend"),
+    create_poweropt("", "Sleep?", "systemctl suspend"),
     create_poweropt("", "Lock?", "dm-tool lock"),
-    create_poweropt("", "Log out?", "pkill awesome"),
+    create_poweropt("󰍃", "Log out?", "pkill awesome"),
     create_poweropt("", "Restart?", "systemctl reboot"),
     create_poweropt("", "Shut down?", "systemctl poweroff"),
     spacing = dpi(8),

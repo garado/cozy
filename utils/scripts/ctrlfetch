@@ -1,20 +1,16 @@
 #!/bin/bash
 
+# trying to reduce the number of async calls by putting these
+# in one script vs. making a bunch of separate easy_async_with_shells
+
 # os 
 os=$(hostnamectl | grep 'Operating System: ')
 os=$(echo $os | sed -e s/^"Operating System: "//)
 os=$(echo $os | sed -e s/" Linux"//)
 echo "os:$os"
 
-# kernel
-kernel=$(hostnamectl | grep 'Kernel: ')
-kernel=$(echo $kernel | sed -e s/^"Kernel: Linux "//)
-echo "kernel:$kernel"
-
 # wm
-wm=$(wmctrl -m | grep 'Name:')
-wm=$(echo $wm | sed -e s/^"Name: "//)
-echo "wm:$wm"
+echo "wm:awesome"
 
 # packages
 pkg=$(pacman -Q | wc -l)
@@ -32,15 +28,6 @@ up=$(echo $up | sed -e s/","//g)
 up=$(echo $up | sed -e s/"s"//g)
 echo "up:$up"
 
-# cpu
-cpu=$(cat /proc/cpuinfo | grep 'model name' -m 1)
-cpu=$(echo $cpu | sed -e s/^"model name : "//)
-echo "cpu:$cpu"
-
-# shell
-shell=$(echo $SHELL | sed -e s:/usr/bin/:: | sed -e s:/bin/::)
-echo "shell:$shell"
-
 #host
-host=$(hostname)
+host=$(cat /etc/hostname)
 echo "host:$host"

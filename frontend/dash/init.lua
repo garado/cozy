@@ -23,7 +23,7 @@ require(... .. ".snackbar")
 
 local TAB_ICONS = {
   ["main"]     = "",
-  ["task"]     = "",
+  ["task"]     = "󰄴",
   ["ledger"]   = "",
   ["calendar"] = "",
   ["goals"]    = "",
