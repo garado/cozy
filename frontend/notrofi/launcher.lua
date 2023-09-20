@@ -10,6 +10,7 @@ local awful = require("awful")
 local fzf = require("modules.fzf")
 local wibox = require("wibox")
 local notrofi = require("backend.cozy").notrofi
+local math = math
 
 local MAX_ENTRIES = 8
 local APP_ENTRY_HEIGHT = dpi(30)
@@ -39,6 +40,8 @@ end
 --- @function gen_app_entry
 -- @brief Generate widget for an app entry
 local function gen_app_entry(app, index)
+  if not app then return end
+
   local entry = wibox.widget({
     {
       {
@@ -87,7 +90,7 @@ end
 local function update_applist(_, key, input)
   -- Generate list of all clients
   if not input then
-    for i = 1, MAX_ENTRIES do
+    for i = 1, math.min(#all_entries, MAX_ENTRIES) do
       local entry = gen_app_entry(all_entries[i], i)
       app_list:add(entry)
     end
@@ -113,7 +116,7 @@ app_list = wibox.widget({
   layout = wibox.layout.fixed.vertical,
 })
 
-for i = 1, MAX_ENTRIES do
+for i = 1, math.min(#all_entries, MAX_ENTRIES) do
   local entry = gen_app_entry(all_entries[i])
   app_list:add(entry)
 end
