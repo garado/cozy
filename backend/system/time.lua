@@ -23,7 +23,11 @@ function timewarrior:fetch_stats_today()
   local cmd = "timew sum today | tail -n 2"
   awful.spawn.easy_async_with_shell(cmd, function(stdout)
     if string.find(stdout, "No filtered data") then
-      self:emit_signal("stats::inactive::ready", "0h 0m")
+      -- No time tracking today, so default text "0h 0m" is fine
+      return
+    elseif string.find(stdout, "Create new config") then
+      -- User hasn't configured Timewarrior yet.
+      self:emit_signal("not_configured")
     else
       -- Convert from HH:MM:SS or MM:SS to 3h 2m
       local num_colons = strutil.count(":", stdout)

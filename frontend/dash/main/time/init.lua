@@ -7,13 +7,16 @@
 local ui    = require("utils.ui")
 local wibox = require("wibox")
 local timew = require("backend.system.time")
-
-local path = ...
+local path  = ...
 
 local contents = wibox.widget({
   require(path .. ".inactive"),
   widget = wibox.container.place,
 })
+
+timew:connect_signal("not_configured", function()
+  contents.widget = ui.placeholder("Timewarrior hasn't been configured. Run `timew` in terminal to configure.")
+end)
 
 timew:connect_signal("tracking::active", function()
   contents.widget = require(path .. ".active")
