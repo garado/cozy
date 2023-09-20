@@ -1,12 +1,12 @@
 [submodule "modules/bling"]
 	path = modules/bling
-	url = git@github.com:garado/bling.git
+	url = ../garado/bling.git
 [submodule "modules/color"]
 	path = modules/color
-	url = https://github.com/andOrlando/color.git
+	url = ../andOrlando/color.git
 [submodule "modules/keynav"]
 	path = modules/keynav
-	url = git@github.com:garado/awesome-keynav.git
+	url = ../garado/awesome-keynav.git
 [submodule "modules/rubato"]
 	path = modules/rubato
-	url = git@github.com:andOrlando/rubato.git
+	url = ../andOrlando/rubato.git
