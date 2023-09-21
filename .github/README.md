@@ -1,112 +1,73 @@
 <h1 align="center">Cozy</h1>
 
-<p>
+![cozy](https://github.com/garado/cozy/assets/50887322/59fd4511-04de-43ed-83d7-1c8e101fa627)
+
+<p align="center">
 A desktop with an emphasis on functionality and cohesive design. Made with ❤️ and AwesomeWM.
 </p>
 
-<p>
-⚠️ I'm rewriting this from scratch and this is under really heavy development. This code probably won't work on your machine yet. Clone at your own risk. ⚠️
+<p align="center">
+Installation instructions can be found <a href="https://github.com/garado/cozy/wiki">here</a>.
 </p>
 
-<!-- █▀▄ ▄▀█ █▀ █░█ █▄▄ █▀█ ▄▀█ █▀█ █▀▄ -->
-<!-- █▄▀ █▀█ ▄█ █▀█ █▄█ █▄█ █▀█ █▀▄ █▄▀ --> 
-
-<h1> Dashboard </h1>
-
-The dashboard combines all my essential organizational tools into one convenient place.
-
-<h2> Main tab </h2>
-
-<img src="./main.png">
-
+<h1>Features</h1>
 <ul>
-  <li>View upcoming tasks and events using Taskwarrior + gcalcli</li>
-  <li>Track habits with <a href="https://pixe.la">Pixela</a></li>
-  <li><a href="https://github.com/GothenburgBitFactory/timewarrior">Timewarrior</a> time-tracking</li>
-  <li>And more fun widgets!</li>
+  <li>Feature-packed dashboard with Task/Timewarrior, Google calendar, and ledger-cli integrations</li>
+  <li>Hot reload theme with optional integration with other applications</li>
+  <li>Kitty session launcher</li>
+  <li>Custom (and significantly simpler) way of defining keybinds</li>
+  <li>Restore window position on restart</li>
 </ul>
 
-<h2> Task management </h2>
+<b>Planned</b>
+<ul>
+  <li>Timewarrior dashboard tab</li>
+  <li>Alternate calendar tab view</li>
+  <li>Sort options for Task tab</li>
+  <li>Screenshot and screen recorder tool</li>
+  <li>Bluetooth and audio control widgets</li>
+</ul>
 
-Simple, aesthetic, and effective GUI for Taskwarrior.
+<h1>Showcase</h1>
 
-<img src="./dashboard-task.gif">
+<h2>Dashboard</h2>
+<h3>Main tab</h3>
+<img width=800 src="https://github.com/garado/cozy/assets/50887322/4bfb8193-c9e7-4b8a-bbd1-c4a2bd614d75">
 
-<h2> Ledger </h2>
+<h3>Taskwarrior GUI</h3>
+<img width=800 src="https://github.com/garado/cozy/assets/50887322/30cc31a7-b504-4fd5-b1c1-7b8b0f8da350">
 
-Use data from <a href="https://github.com/ledger/ledger">ledger-cli</a> to view your budget progress, recent transactions, and yearly balance trends.
+<h3>Ledger</h3>
 
-<img src="./ledger.png">
+<img width=800 src="https://github.com/garado/cozy/assets/50887322/25bb538f-3c21-43d5-9fa7-8d0e307435ea">
 
-<h2> Calendar </h2>
+<h3>Calendar</h3>
+<img width=800 src="https://github.com/garado/cozy/assets/50887322/7ac17221-7703-4afb-88ae-519f8002de42">
 
-Your schedule at a glance. Powered by gcalcli.
+<img width=800 src="https://github.com/garado/cozy/assets/50887322/47a4abce-da36-43f4-832a-9f7977436589">j
 
-<img src="./dashboard-calendar.gif">
+<h2>Hot reload theme</h2>
+<img width=800 src="https://github.com/garado/cozy/assets/50887322/85248a1d-81d9-4d11-a169-169bd4d1fd52">
 
-<img src="./dashboard-calendar-add.gif">
+<h2>App launcher + window switcher</h2>
 
-<details>
-<summary>Calendar keybinds</summary>
+<img width=300 alt="window switcher" src="https://github.com/garado/cozy/assets/50887322/a25d6ec4-6a73-4d4d-bae3-38d7b9caba97">
+<img width=300 alt="app launcher" src="https://github.com/garado/cozy/assets/50887322/a2fd79a0-52bd-40fd-9537-f034eefdc25c">
 
-| Keybind          | Action           |
-| -------          | ------           |
-| <kbd>H</kbd>     | Previous week    |
-| <kbd>L</kbd>     | Next week        |
-| <kbd>J</kbd>     | Scroll down      |
-| <kbd>K</kbd>     | Scroll up        |
-| <kbd>gg</kbd>    | Scroll to top    |
-| <kbd>GG</kbd>    | Scroll to bottom |
-| <kbd>zz</kbd>    | Center           |
-| <kbd>h/k</kbd>   | Previous event   |
-| <kbd>j/l</kbd>   | Next event       |
-| <kbd>t</kbd>     | Jump to today    |
-| <kbd>r</kbd>     | Refresh          |
+<h2>Slightly nicer hotkeys popup</h2>
 
-</details>
+<img width=600 src="https://github.com/garado/cozy/assets/50887322/7f897735-e721-4471-80be-525702d2feb7">
 
-<h2> Goal tracking </h2>
-
-Goal visualization and tracking with Taskwarrior, GraphViz, and twdeps.
-
-<img src = "./goals-overview.png">
-
-<img src = "./goals-details.png">
-
-<!-- █▀█ ▀█▀ █░█ █▀▀ █▀█ -->
-<!-- █▄█ ░█░ █▀█ ██▄ █▀▄ -->
-
-<h1> Other stuff </h1>
-
-<h2> Theme switcher </h2>
-
-<img src="./hotreload.gif">
-
-Theme switching with hot reloading and integration with other applications.
-
-<h2> Control center </h2>
-
-<img src="./control.png" height=400>
-
-<h2> App launcher and window switcher </h2>
-
-<img src="./notrofi-applauncher.png" height=400> <img src="./notrofi-windowswitcher.png" height=400>
-
-<h2> Slightly nicer hotkeys popup </h2>
-
-<img src="./hotkeys.png" height=500>
-
-<!-- █▀▀ █▀█ █▀█ ▀█▀ █▄░█ █▀█ ▀█▀ █▀▀ █▀ --> 
-<!-- █▀░ █▄█ █▄█ ░█░ █░▀█ █▄█ ░█░ ██▄ ▄█ --> 
-
-<h3>Misc</h3>
+<h3>Other stuff</h3>
 <b>Why is it called 'cozy'?</b>
 
-I've spent a lot of time tweaking this setup to be just the way I like it, so now this setup feels very personal, comfortable, and cozy.
+<p>I've spent a lot of time tweaking this setup to be just the way I like it, so now this setup feels very personal, comfortable, and cozy.</p>
 
 <b>Why write this with Awesome and not a "proper" UI framework?</b>
 
+<p>
 I started out making simple things like a fancy bar and then over the course of a year it slowly but steadily turned into whatever this is. I'm in too deep. Also, AWM is unbelievably easy to use and development with it is really, really fast, and since this is just a hobby and this stuff has nothing to do with my career skillset, starting over with a different framework would be a waste of time.
+</p>
 
 <h3>Acknowledgements</h3>
 <ul>
