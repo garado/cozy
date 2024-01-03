@@ -128,6 +128,21 @@ function calendar:add_event(args)
     return
   end
 
+  -- Convert '2' or '2nd' etc. to a date 2024-01-02
+  if tonumber(args.date) or string.find(args.date, "st") or string.find(args.date, "nd") or
+    string.find(args.date, "rd") or string.find(args.date, "th") then
+
+      args.date = args.date:gsub("[^0-9]", "") -- Keep only numbers
+
+      if tonumber(os.date("%d")) >= 15 and args.date < 15 then
+        -- Next month
+        args.date = os.date("%Y-") .. ((os.date("%m-")+1)%12) .. args.date
+      else
+        -- This month 
+        args.date = os.date("%Y-%m-") .. string.format("%02d", args.date)
+      end
+  end
+
   local dur = convert_duration(args.start, args.duration)
 
   strutil.print_arr(args)
@@ -138,11 +153,11 @@ function calendar:add_event(args)
   local duration = " --duration \"" .. dur .. "\""
   local cmd = "gcalcli add "..title..place..start..duration.." --noprompt"
 
-  dash:emit_signal("snackbar::show", "Cozy calendar", "Event added. Updating cache...")
   awful.spawn.easy_async_with_shell(cmd, function(stdout, stderr)
     if stderr ~= "" or string.find(stdout, "error") then
       dash:emit_signal("snackbar::show", "Cozy calendar", "Failed to add event - please try again.")
     else
+      dash:emit_signal("snackbar::show", "Cozy calendar", "Event added. Updating cache...")
       self:update_cache()
     end
   end)
