@@ -170,6 +170,9 @@ function _string.dt_convert(subject, old_pattern, new_pattern)
   return (new_pattern and os.date(new_pattern, ts)) or ts
 end
 
+-- Abbreviated function call for convenience.
+_string.dtc = _string.dt_convert
+
 --- @method ts_to_relative
 -- @brief Convert an os.time timestamp to relative time
 --        i.e. '1 day ago', '2 months ago'
@@ -222,6 +225,20 @@ end
 
 -- █▀▄▀█ █ █▀ █▀▀
 -- █░▀░█ █ ▄█ █▄▄
+
+--- @method fix_html
+-- @brief Fixes stuff like:
+-- &amp;  -> &
+-- &apos; -> '
+-- TODO is there a way to replace multiple MULTI-character patterns using a lookup tables?
+function _string.fix_html(str)
+  str = str:gsub("&amp;",  "&")
+  str = str:gsub("&apos;", "'")
+  str = str:gsub("&quot;", '"')
+  str = str:gsub("&lt;",   "<")
+  str = str:gsub("&gt;",   ">")
+  return str
+end
 
 --- @method print_arr
 -- @brief Pretty print array. Stolen from somewhere on StackOverflow

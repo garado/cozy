@@ -4,6 +4,7 @@
 
 local naughty = require("naughty")
 local bling = require("modules.bling")
+local strutil = require("utils.string")
 
 local music_notif
 
@@ -19,8 +20,8 @@ playerctl:connect_signal("metadata", function(_, title, artist, album_path, _, n
   if new then
     music_notif = naughty.notification {
       app_name = "Music",
-      title = title,
-      text  = artist,
+      title = strutil.fix_html(title),
+      text  = strutil.fix_html(artist),
       image = album_path,
     }
   end
